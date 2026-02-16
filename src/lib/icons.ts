@@ -1,0 +1,45 @@
+import {
+    Activity,
+    AlertTriangle,
+    ArrowRight,
+    Bot,
+    CheckCircle,
+    CheckCircle2,
+    ChevronRight,
+    FileText,
+    Heart,
+    Info,
+    Loader2,
+    Paperclip,
+    Plus,
+    Send,
+    Shield,
+    TrendingDown,
+    TrendingUp,
+    User,
+    X
+} from 'lucide-react';
+
+export const icons = {
+    activity: Activity,
+    alert: AlertTriangle,
+    arrowRight: ArrowRight,
+    bot: Bot,
+    check: CheckCircle,
+    check2: CheckCircle2,
+    chevronRight: ChevronRight,
+    file: FileText,
+    heart: Heart,
+    info: Info,
+    loader: Loader2,
+    paperclip: Paperclip,
+    plus: Plus,
+    send: Send,
+    shield: Shield,
+    trendDown: TrendingDown,
+    trendUp: TrendingUp,
+    user: User,
+    x: X,
+};
+
+export type IconName = keyof typeof icons;
