@@ -1,159 +1,209 @@
 "use client";
 
-import React, { useState } from "react";
-import { User, Bell, Shield, Lock, Smartphone, Moon, Globe, ChevronRight, Save } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Mock Settings Data
+const initialAlertSettings = [
+    { id: 1, label: "Detailed Biomarker Changes", description: "Notify when any marker shifts >5%", enabled: true },
+    { id: 2, label: "Weekly Summary", description: "Email digest every Monday morning", enabled: false },
+];
+
+const initialAISettings = [
+    { id: 1, label: "Proactive Suggestions", description: "AI can suggest questions based on new results", enabled: true },
+    { id: 2, label: "Context Sharing", description: "Allow AI to reference past conversations", enabled: true },
+];
+
+const initialPrivacySettings = [
+    { id: 1, label: "De-identified Research Contribution", description: "Contribute anonymous data to medical research", enabled: false },
+    { id: 2, label: "Local-Only Result Processing", description: "Keep sensitive raw data on device where possible", enabled: true },
+];
 
 export default function SettingsPage() {
-    const [emailNotifs, setEmailNotifs] = useState(true);
-    const [pushNotifs, setPushNotifs] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
-    const [biometric, setBiometric] = useState(true);
+    const router = useRouter();
+    const [alertSettings, setAlertSettings] = useState(initialAlertSettings);
+    const [aiSettings, setAiSettings] = useState(initialAISettings);
+    const [privacySettings, setPrivacySettings] = useState(initialPrivacySettings);
+    const [analysisDepth, setAnalysisDepth] = useState("Standard");
+
+    const toggleSetting = (id: number) => {
+        setAlertSettings(prev => prev.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
+    };
+    const toggleAISetting = (id: number) => {
+        setAiSettings(prev => prev.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
+    };
+    const togglePrivacy = (id: number) => {
+        setPrivacySettings(prev => prev.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
+    };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-20">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">Settings</h1>
+        <div className="max-w-[800px] mx-auto px-6 py-8 space-y-6">
 
-            <div className="space-y-6">
-
-                {/* ACCOUNT SETTINGS */}
-                <section className="bg-white rounded-2xl border border-border overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <h2 className="font-bold text-foreground flex items-center gap-2">
-                            <User className="w-5 h-5 text-blue-600" />
-                            Account & Profile
-                        </h2>
-                    </div>
-                    <div className="p-2">
-                        <SettingItem
-                            label="Personal Information"
-                            desc="Update your name, email, and phone number."
-                            action={<ChevronRight className="w-4 h-4 text-slate-300" />}
-                        />
-                        <SettingItem
-                            label="Change Password"
-                            desc="Last changed 3 months ago."
-                            action={<ChevronRight className="w-4 h-4 text-slate-300" />}
-                        />
-                        <SettingItem
-                            label="Linked Providers"
-                            desc="Manage connections to MyChart, Quest, and LabCorp."
-                            action={<span className="text-xs font-bold text-emerald-600 bg-success-light px-2 py-1 rounded">2 Connected</span>}
-                        />
-                    </div>
-                </section>
-
-                {/* NOTIFICATIONS */}
-                <section className="bg-white rounded-2xl border border-border overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <h2 className="font-bold text-foreground flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-amber-500" />
-                            Notifications
-                        </h2>
-                    </div>
-                    <div className="p-2">
-                        <SettingSwitch
-                            label="Email Notifications"
-                            desc="Receive weekly health summaries and appointment reminders."
-                            checked={emailNotifs}
-                            onChange={setEmailNotifs}
-                        />
-                        <SettingSwitch
-                            label="Push Notifications"
-                            desc="Get real-time alerts for new test results."
-                            checked={pushNotifs}
-                            onChange={setPushNotifs}
-                        />
-                    </div>
-                </section>
-
-                {/* PRIVACY & SECURITY */}
-                <section className="bg-white rounded-2xl border border-border overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <h2 className="font-bold text-foreground flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-emerald-600" />
-                            Privacy & Security
-                        </h2>
-                    </div>
-                    <div className="p-2">
-                        <SettingSwitch
-                            label="Biometric Login"
-                            desc="Use FaceID / TouchID to access the app."
-                            checked={biometric}
-                            onChange={setBiometric}
-                        />
-                        <SettingItem
-                            label="Data Export"
-                            desc="Download a copy of all your medical data."
-                            action={<button className="text-sm font-bold text-blue-600 hover:underline">Request Archive</button>}
-                        />
-                        <SettingItem
-                            label="Delete Account"
-                            desc="Permanently remove your account and all data."
-                            action={<button className="text-sm font-bold text-red-600 hover:underline">Delete</button>}
-                        />
-                    </div>
-                </section>
-
-                {/* APP PREFERENCES */}
-                <section className="bg-white rounded-2xl border border-border overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <h2 className="font-bold text-foreground flex items-center gap-2">
-                            <Smartphone className="w-5 h-5 text-slate-600" />
-                            App Preferences
-                        </h2>
-                    </div>
-                    <div className="p-2">
-                        <SettingSwitch
-                            label="Dark Mode"
-                            desc="Switch to a dark theme interface."
-                            checked={darkMode}
-                            onChange={setDarkMode}
-                            icon={<Moon className="w-4 h-4" />}
-                        />
-                        <SettingItem
-                            label="Language"
-                            desc="English (US)"
-                            action={<Globe className="w-4 h-4 text-slate-400" />}
-                        />
-                    </div>
-                </section>
-
+            <div>
+                <h1 className="font-display text-3xl text-[#1C1917]">Settings</h1>
+                <p className="text-sm text-[#A8A29E] mt-1">
+                    Control how MedAssist works for you
+                </p>
             </div>
 
-            <div className="flex justify-end pt-8">
-                <button className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2">
-                    <Save className="w-4 h-4" />
-                    Save Changes
+            {/* Unreviewed alerts banner */}
+            <div className="bg-[#FFFBEB] rounded-[14px] border border-[#FDE68A] p-4 
+                      flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-amber-500" />
+                    <p className="text-sm font-medium text-amber-800">
+                        You have 2 unreviewed alerts
+                    </p>
+                </div>
+                <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-xs font-semibold text-amber-700 hover:text-amber-900 
+                     transition-colors flex items-center gap-1"
+                >
+                    Go to Dashboard <ChevronRight className="w-3 h-3" />
                 </button>
             </div>
-        </div>
-    );
-}
 
-function SettingItem({ label, desc, action }: any) {
-    return (
-        <div className="flex items-center justify-between p-4 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-            <div>
-                <div className="font-bold text-foreground text-sm group-hover:text-blue-700 transition-colors">{label}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
-            </div>
-            <div>{action}</div>
-        </div>
-    )
-}
-
-function SettingSwitch({ label, desc, checked, onChange, icon }: any) {
-    return (
-        <div className="flex items-center justify-between p-4 hover:bg-slate-50 rounded-xl transition-colors">
-            <div className="flex items-center gap-3">
-                {icon}
-                <div>
-                    <div className="font-bold text-foreground text-sm">{label}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+            {/* Alert Thresholds */}
+            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5">
+                <p className="text-base font-semibold text-[#1C1917] mb-1">
+                    Alert Thresholds
+                </p>
+                <p className="text-xs text-[#A8A29E] mb-5">
+                    Control when MedAssist notifies you
+                </p>
+                <div className="space-y-4">
+                    {alertSettings.map(setting => (
+                        <div key={setting.id}
+                            className="flex items-center justify-between py-3 
+                            border-b border-[#E8E6DF] last:border-0">
+                            <div>
+                                <p className="text-sm font-medium text-[#1C1917]">
+                                    {setting.label}
+                                </p>
+                                <p className="text-xs text-[#A8A29E] mt-0.5">
+                                    {setting.description}
+                                </p>
+                            </div>
+                            {/* Toggle switch */}
+                            <button
+                                onClick={() => toggleSetting(setting.id)}
+                                className={cn(
+                                    "relative w-10 h-6 rounded-full transition-colors",
+                                    setting.enabled ? "bg-sky-500" : "bg-[#E8E6DF]"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute left-0 top-1 w-4 h-4 bg-white rounded-full shadow-sm",
+                                    "transition-transform",
+                                    setting.enabled ? "translate-x-5" : "translate-x-1"
+                                )} />
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
-            <Switch checked={checked} onCheckedChange={onChange} />
+
+            {/* AI Analysis */}
+            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5">
+                <p className="text-base font-semibold text-[#1C1917] mb-1">
+                    AI Analysis
+                </p>
+                <p className="text-xs text-[#A8A29E] mb-5">
+                    Configure how Groq AI analyzes your data
+                </p>
+                <div className="space-y-4">
+                    {aiSettings.map(setting => (
+                        <div key={setting.id}
+                            className="flex items-center justify-between py-3 
+                            border-b border-[#E8E6DF] last:border-0">
+                            <div>
+                                <p className="text-sm font-medium text-[#1C1917]">
+                                    {setting.label}
+                                </p>
+                                <p className="text-xs text-[#A8A29E] mt-0.5">
+                                    {setting.description}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => toggleAISetting(setting.id)}
+                                className={cn(
+                                    "relative w-10 h-6 rounded-full transition-colors",
+                                    setting.enabled ? "bg-sky-500" : "bg-[#E8E6DF]"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute left-0 top-1 w-4 h-4 bg-white rounded-full shadow-sm",
+                                    "transition-transform",
+                                    setting.enabled ? "translate-x-5" : "translate-x-1"
+                                )} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                {/* Analysis depth */}
+                <div className="mt-4 pt-4 border-t border-[#E8E6DF]">
+                    <p className="text-sm font-medium text-[#1C1917] mb-3">
+                        Analysis Depth
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                        {["Standard", "Deep — thorough but slower"].map(option => (
+                            <button
+                                key={option}
+                                onClick={() => setAnalysisDepth(option)}
+                                className={cn(
+                                    "px-4 py-3 rounded-[10px] border text-sm font-medium",
+                                    "transition-all text-left",
+                                    analysisDepth === option
+                                        ? "bg-sky-500 text-white border-sky-500"
+                                        : "bg-[#FAFAF7] text-[#57534E] border-[#E8E6DF] hover:border-[#D9D6CD]"
+                                )}
+                            >
+                                {option}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Privacy */}
+            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5">
+                <p className="text-base font-semibold text-[#1C1917] mb-1">Privacy</p>
+                <p className="text-xs text-[#A8A29E] mb-5">
+                    Your health data stays private by default
+                </p>
+                <div className="space-y-4">
+                    {privacySettings.map(setting => (
+                        <div key={setting.id}
+                            className="flex items-center justify-between py-3 
+                            border-b border-[#E8E6DF] last:border-0">
+                            <div>
+                                <p className="text-sm font-medium text-[#1C1917]">
+                                    {setting.label}
+                                </p>
+                                <p className="text-xs text-[#A8A29E] mt-0.5">
+                                    {setting.description}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => togglePrivacy(setting.id)}
+                                className={cn(
+                                    "relative w-10 h-6 rounded-full transition-colors",
+                                    setting.enabled ? "bg-sky-500" : "bg-[#E8E6DF]"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute left-0 top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform",
+                                    setting.enabled ? "translate-x-5" : "translate-x-1"
+                                )} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </div>
-    )
+    );
 }

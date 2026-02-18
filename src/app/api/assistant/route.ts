@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/services/rateLimitService";
-import { generateClinicalInsight } from "@/app/actions/gemini"; // We'll re-use the logic, but might need to adjust signature if it expects form data? No, it expects string.
+import { generateClinicalInsight } from "@/app/actions/gemini"; // Groq-powered clinical insight generator
 import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
                     status: 429,
                     headers: {
                         'Retry-After': String(limit.retryAfter || 60),
-                        'X-RateLimit-Limit': '10', // Hardcoded from service constants for now
+                        'X-RateLimit-Limit': '10',
                         'X-RateLimit-Remaining': '0'
                     }
                 }
@@ -41,15 +41,12 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // 4. Call Gemini Logic
-        // We reuse the existing function. 
-        // Note: generateClinicalInsight currently checks rate limit internally too. 
-        // We might want to remove that check or let it pass redundant.
-        // For now, we'll let it run, but since we already passed, it should pass there too (within same second).
+        // 4. Call Groq AI Logic
+        // We reuse the existing function which now uses Groq internally.
         const result = await generateClinicalInsight(prompt, contextType || 'symptom');
 
         if (!result.success) {
-            // Handle internal errors from Gemini helper
+            // Handle internal errors from Groq helper
             return NextResponse.json(result, { status: result.status || 500 });
         }
 

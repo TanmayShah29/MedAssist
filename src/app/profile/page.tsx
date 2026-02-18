@@ -1,162 +1,208 @@
 "use client";
 
-import React from "react";
-import { User, Shield, Activity, FileText, Settings, Bell, ChevronRight, AlertTriangle, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Mock Data
+const uploadedReports = [
+    { id: 1, name: "Complete Blood Count", date: "Feb 14, 2024", biomarkers: 14 },
+    { id: 2, name: "Metabolic Panel", date: "Jan 10, 2024", biomarkers: 8 },
+];
+
+const savedConversations = [
+    { id: 1, title: "Discussing low hemoglobin causes", date: "Feb 14 · 4 messages" },
+    { id: 2, title: "Vitamin D supplement options", date: "Feb 10 · 2 messages" },
+];
+
 export default function ProfilePage() {
+    const router = useRouter();
+
     return (
-        <div className="space-y-8 max-w-5xl mx-auto">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">Clinical Profile</h1>
+        <div className="max-w-[1400px] mx-auto px-6 py-8 space-y-6">
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h1 className="font-display text-3xl text-[#1C1917]">Clinical Profile</h1>
+                <p className="text-sm text-[#A8A29E] mt-1">John Doe · Patient #8492</p>
+            </div>
 
-                {/* 1. MAIN PROFILE CARD */}
-                <div className="md:col-span-1 space-y-6">
-                    <div className="bg-white rounded-2xl border border-border shadow-sm p-6 text-center">
-                        <div className="w-24 h-24 rounded-full bg-muted mx-auto mb-4 overflow-hidden border-4 border-white shadow-lg">
-                            <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
-                                <User className="w-10 h-10 text-slate-400" />
-                            </div>
-                        </div>
-                        <h2 className="text-xl font-bold text-foreground">John Doe</h2>
-                        <p className="text-sm text-muted-foreground">DOB: Jan 12, 1985 • Blood Type: O+</p>
-
-                        <div className="mt-6 flex justify-center gap-2">
-                            <span className="px-3 py-1 bg-emerald-100 text-success-dark text-xs font-bold rounded-full border border-emerald-200">
-                                Active Coverage
-                            </span>
-                        </div>
+            {/* Completion card — sky accent */}
+            <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-6">
+                <div className="flex items-center justify-between mb-3">
+                    <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
+                          text-sky-400">
+                            Profile Completeness
+                        </p>
+                        <p className="text-sm text-sky-700 mt-0.5">
+                            Adding missing info improves AI analysis accuracy by ~23%
+                        </p>
                     </div>
-
-                    {/* Navigation Links */}
-                    <div className="bg-white rounded-2xl border border-border p-2">
-                        {[
-                            { icon: Settings, label: "Account Settings" },
-                            { icon: Bell, label: "Notifications" },
-                            { icon: Shield, label: "Privacy & Data" },
-                        ].map((item, i) => (
-                            <button key={i} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <item.icon className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
-                                    <span className="text-sm font-medium text-slate-600 group-hover:text-foreground">{item.label}</span>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-slate-300" />
-                            </button>
-                        ))}
-                    </div>
+                    <span className="font-display text-3xl text-sky-700">68%</span>
                 </div>
-
-                {/* 2. CLINICAL INTELLIGENCE SHIELD (The new requested feature) */}
-                <div className="md:col-span-2 space-y-6">
-
-                    {/* Risk Factors Section */}
-                    <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <div className="h-2 bg-sky-200 rounded-full mb-4">
+                    <div className="h-full w-[68%] bg-sky-500 rounded-full" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                        { label: "Family history", cta: "Complete now" },
+                        { label: "Current medications", cta: "Add now" },
+                        { label: "Allergies", cta: "Add now" },
+                    ].map(item => (
+                        <div key={item.label}
+                            className="flex items-center justify-between bg-sky-100/50 
+                            rounded-[10px] px-3 py-2.5">
                             <div className="flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-blue-600" />
-                                <h3 className="font-bold text-foreground">Health Shield Analysis</h3>
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                                <span className="text-xs text-sky-800">{item.label}</span>
                             </div>
-                            <span className="text-xs font-bold text-emerald-600 bg-success-light px-2 py-1 rounded border border-emerald-100">
-                                LOW RISK PROFILE
-                            </span>
+                            <button className="text-xs font-semibold text-sky-600 
+                                 hover:text-sky-800 transition-colors">
+                                {item.cta} →
+                            </button>
                         </div>
-                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Factor 1 */}
-                            <RiskCard
-                                title="Hypertension"
-                                status="Controlled"
-                                level="low"
-                                desc="Last BP reading 118/72 indicates effective management."
-                            />
-                            {/* Factor 2 */}
-                            <RiskCard
-                                title="BMI / Metabolic"
-                                status="Elevated"
-                                level="medium"
-                                desc="BMI 26.2. Weight trend stable. Monitor lipids."
-                            />
-                            {/* Factor 3 */}
-                            <RiskCard
-                                title="Cardiovascular"
-                                status="Optimal"
-                                level="low"
-                                desc="Resting HR 62. No history of arrhythmia."
-                            />
-                            {/* Factor 4 */}
-                            <RiskCard
-                                title="Family History"
-                                status="Noted"
-                                level="neutral"
-                                desc="Father: T2 Diabetes. Mother: Hypertension."
-                            />
-                        </div>
-                    </div>
-
-                    {/* Medications & Allergies */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-2xl border border-border p-6">
-                            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2 text-sm">
-                                <Activity className="w-4 h-4 text-emerald-500" />
-                                Active Medications
-                            </h3>
-                            <div className="space-y-3">
-                                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                    <div className="flex justify-between font-bold text-foreground text-sm">
-                                        <span>Ferrous Sulfate</span>
-                                        <span className="text-muted-foreground font-normal">325mg</span>
-                                    </div>
-                                    <div className="text-xs text-slate-400 mt-0.5">Daily • For Anemia</div>
-                                </div>
-                                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                    <div className="flex justify-between font-bold text-foreground text-sm">
-                                        <span>Vitamin D3</span>
-                                        <span className="text-muted-foreground font-normal">2000 IU</span>
-                                    </div>
-                                    <div className="text-xs text-slate-400 mt-0.5">Daily • Supplement</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-2xl border border-border p-6">
-                            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2 text-sm">
-                                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                                Allergies & Alerts
-                            </h3>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                    <span className="text-sm font-medium text-slate-700">Penicillin (Severe)</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                    <span className="text-sm font-medium text-slate-700">Shellfish (Mild)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    ))}
                 </div>
+            </div>
+
+            {/* Two column — equal height */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch equal-height-grid">
+
+                <div className="flex flex-col gap-5">
+                    {/* Personal Information */}
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] 
+                          p-5 flex flex-col flex-1">
+                        <p className="text-base font-semibold text-[#1C1917] mb-4">
+                            Personal Information
+                        </p>
+                        <div className="flex-1 grid grid-cols-2 gap-4 card-content-fill">
+                            {[
+                                { label: "Full Name", value: "John Doe" },
+                                { label: "Date of Birth", value: "March 15, 1990" },
+                                { label: "Blood Type", value: "O+" },
+                                { label: "Height", value: "5'11\" / 180cm" },
+                                { label: "Weight", value: "175 lbs / 79kg" },
+                                { label: "Member Since", value: "January 2024" },
+                            ].map(field => (
+                                <div key={field.label}>
+                                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
+                                text-[#A8A29E]">
+                                        {field.label}
+                                    </p>
+                                    <p className="text-sm font-medium text-[#1C1917] mt-0.5">
+                                        {field.value}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                        <button className="mt-4 text-xs font-semibold text-sky-500 
+                               hover:text-sky-600 transition-colors self-start">
+                            Edit information →
+                        </button>
+                    </div>
+
+                    {/* Uploaded Reports */}
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] 
+                          p-5 flex flex-col flex-1">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-base font-semibold text-[#1C1917]">
+                                Uploaded Reports
+                            </p>
+                            <button className="text-xs text-sky-500 font-medium 
+                                 hover:text-sky-600 transition-colors">
+                                + Upload new
+                            </button>
+                        </div>
+                        <div className="flex-1 space-y-2.5 card-content-fill">
+                            {uploadedReports.map(report => (
+                                <div key={report.id}
+                                    className="flex items-center gap-3 p-3 bg-[#FAFAF7] 
+                                rounded-[10px] border border-[#E8E6DF]">
+                                    <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center 
+                                  justify-center flex-shrink-0">
+                                        <FileText className="w-4 h-4 text-sky-500" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-[#1C1917] truncate">
+                                            {report.name}
+                                        </p>
+                                        <p className="text-xs text-[#A8A29E]">
+                                            {report.date} · {report.biomarkers} biomarkers
+                                        </p>
+                                    </div>
+                                    <button className="text-xs text-sky-500 hover:text-sky-600 
+                                     font-medium flex-shrink-0">
+                                        View →
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-5">
+                    {/* Health Summary */}
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] 
+                          p-5 flex flex-col flex-1">
+                        <p className="text-base font-semibold text-[#1C1917] mb-4">
+                            Health Summary
+                        </p>
+                        <div className="flex-1 space-y-4 card-content-fill">
+                            {[
+                                { label: "Known Conditions", items: ["None reported"], cta: "Add conditions" },
+                                { label: "Current Medications", items: ["Ferrous Sulfate 325mg"], cta: "Add medication" },
+                                { label: "Allergies", items: ["None reported"], cta: "Add allergy" },
+                            ].map(section => (
+                                <div key={section.label}>
+                                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
+                                text-[#A8A29E] mb-1.5">
+                                        {section.label}
+                                    </p>
+                                    {section.items.map(item => (
+                                        <p key={item} className="text-sm text-[#57534E]">{item}</p>
+                                    ))}
+                                    <button className="text-xs text-sky-500 hover:text-sky-600 
+                                     transition-colors mt-1">
+                                        + {section.cta}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Saved AI Conversations */}
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] 
+                          p-5 flex flex-col flex-1">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-base font-semibold text-[#1C1917]">
+                                Saved Conversations
+                            </p>
+                            <button
+                                onClick={() => router.push('/assistant')}
+                                className="text-xs text-sky-500 font-medium 
+                           hover:text-sky-600 transition-colors"
+                            >
+                                Open AI →
+                            </button>
+                        </div>
+                        <div className="flex-1 space-y-2.5 card-content-fill">
+                            {savedConversations.map(conv => (
+                                <div key={conv.id}
+                                    onClick={() => router.push(`/assistant?session=${conv.id}`)}
+                                    className="p-3 bg-[#FAFAF7] rounded-[10px] border 
+                                border-[#E8E6DF] cursor-pointer 
+                                hover:border-[#D9D6CD] transition-colors">
+                                    <p className="text-sm font-medium text-[#1C1917] truncate">
+                                        {conv.title}
+                                    </p>
+                                    <p className="text-xs text-[#A8A29E] mt-0.5">{conv.date}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );
-}
-
-function RiskCard({ title, status, level, desc }: { title: string, status: string, level: string, desc: string }) {
-    return (
-        <div className="p-4 rounded-xl border border-slate-100 bg-white hover:border-blue-200 transition-colors shadow-sm group">
-            <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-slate-400 tracking-wider group-hover:text-blue-500 transition-colors">{title}</span>
-                <span className={cn(
-                    "text-[10px] font-bold px-1.5 py-0.5 rounded uppercase",
-                    level === 'low' ? "bg-emerald-100 text-success-dark" :
-                        level === 'medium' ? "bg-amber-100 text-amber-700" :
-                            level === 'high' ? "bg-red-100 text-red-700" : "bg-muted text-slate-600"
-                )}>
-                    {status}
-                </span>
-            </div>
-            <p className="text-sm text-slate-600 leading-snug">{desc}</p>
-        </div>
-    )
 }

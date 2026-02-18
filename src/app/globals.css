@@ -1,153 +1,80 @@
 @import "tailwindcss";
 
 @layer base {
+
+  /* Ensure all grid rows stretch to equal height */
+  .equal-height-grid {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .equal-height-grid>* {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .equal-height-grid>*>.card-content-fill {
+    flex: 1;
+  }
+
+  /* Remove ALL white backgrounds */
+  * {
+    --tw-bg-opacity: 1;
+  }
+
+  /* Cream base */
+  body {
+    background-color: #FAFAF7;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: #1C1917;
+  }
+
+  /* No pure white surfaces */
+  .bg-white {
+    background-color: #F5F4EF !important;
+  }
+
   :root {
-    /* ── LOCKED BRAND SYSTEM (TEAL/SLATE) ── */
+    /* New Clinical Light Theme (Slate/Sky) */
+    --bg-base: #F8FAFC;
+    /* Slate-50 */
+    --bg-elevated: #FFFFFF;
+    /* White */
+    --bg-overlay: #F1F5F9;
+    /* Slate-100 */
+    --bg-active: #E2E8F0;
+    /* Slate-200 */
 
-    /* User-Defined Strict Tokens */
-    --bg-base: #0F172A;
-    --bg-surface: #1E293B;
+    --border-base: #E2E8F0;
+    /* Slate-200 */
+    --border-hover: #CBD5E1;
+    /* Slate-300 */
 
-    --color-primary: #14B8A6;
-    --color-secondary: #38BDF8;
-
-    --text-primary: #E2E8F0;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-
-    --success: #22C55E;
-    --warning: #F59E0B;
-    --error: #EF4444;
-
-    /* Shadcn Mappings (to ensure compatibility) */
-    --background: 222.2 47.4% 11.2%;
-    /* Matches #0F172A */
-    --foreground: 210 40% 98%;
-    /* Matches #E2E8F0 roughly */
-
-    /* Lifted Slate Surface #1E293B */
-    --card: 217.2 32.6% 17.5%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 217.2 32.6% 17.5%;
-    --popover-foreground: 210 40% 98%;
-
-    /* Primary Accent: #14B8A6 (Teal-500) */
-    --primary: 173 80% 40%;
-    --primary-foreground: 210 40% 98%;
-
-    /* Secondary Accent: #38BDF8 (Sky-400) */
-    --secondary: 199 89% 60%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 217.2 32.6% 24%;
-    /* Slate-700/50 */
-    --muted-foreground: 215 20.2% 65.1%;
+    --text-primary: #0F172A;
+    /* Slate-900 */
+    --text-secondary: #334155;
+    /* Slate-700 */
+    --text-muted: #94A3B8;
     /* Slate-400 */
 
-    --accent: 217.2 32.6% 24%;
-    --accent-foreground: 210 40% 98%;
+    --status-optimal: #10B981;
+    --status-warning: #F59E0B;
+    --status-critical: #EF4444;
+    --status-info: #0EA5E9;
+    /* Sky-500 */
+  }
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    /* Match Card Surface for subtle blend, or lighter for outline? */
-    /* Actually, border should be slightly lighter than surface: #334155 (Slate-700) is common */
-    /* Let's use a subtle white alpha for dark mode feel: rgba(255,255,255,0.1) which is approx Slate-700 */
-    --border: 217.2 32.6% 24%;
-    --input: 217.2 32.6% 24%;
-    --ring: 173 80% 40%;
-    /* Teal Ring */
-
-    --radius: 0.75rem;
-
-    /* Status Colors */
-    --success: 142.1 76.2% 36.3%;
-    /* #22C55E */
-    --warning: 38 92% 50%;
-    /* #F59E0B */
-    --error: 0 84.2% 60.2%;
-    /* #EF4444 */
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-@theme inline {
-  /* Strict User Token Mappings */
-  --color-base: var(--bg-base);
-  --color-surface: var(--bg-surface);
-
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
-
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-
-  /* Map standard Tailwind utilities to our tokens */
-  --color-background: var(--bg-base);
-  --color-foreground: var(--text-primary);
-
-  --color-card: var(--bg-surface);
-  --color-card-foreground: var(--text-primary);
-
-  --color-popover: var(--bg-surface);
-  --color-popover-foreground: var(--text-primary);
-
-  --color-muted: var(--bg-surface);
-  /* Use surface for muted bg */
-  --color-muted-foreground: var(--text-muted);
-
-  --color-accent: var(--bg-surface);
-  --color-accent-foreground: var(--text-primary);
-
-  --color-destructive: var(--error);
-  --color-destructive-foreground: var(--text-primary);
-
-  --color-border: #334155;
-  /* Slate-700 hardcoded for now or use var */
-  --color-input: #334155;
-  --color-ring: var(--color-primary);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-
-  /* Chart Tokens */
-  --chart-1: var(--color-primary);
-  --chart-2: var(--color-secondary);
-  --chart-3: var(--text-muted);
-}
-
-/* ── Base Reset ── */
-html,
-body {
-  background-color: #0F172A !important;
-  /* Force Deep Slate */
-  color: #E2E8F0 !important;
-  /* Force Primary Text */
-  font-family: var(--font-inter);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
-/* ── Medical Card Utility (Dark Mode) ── */
-.medical-card {
-  background-color: #1E293B !important;
-  /* Force Surface */
-  border-radius: var(--radius);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.medical-card:hover {
-  border-color: rgba(20, 184, 166, 0.2);
-  /* Teal hint */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

@@ -1,48 +1,57 @@
-"use client";
+"use client"
 
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
-import { MotionButton } from "@/components/ui/motion";
+import * as React from "react"
+import { Button } from "@/components/ui/button"
+import { AlertTriangle } from "lucide-react"
 
-interface Props {
-    children: ReactNode;
-    fallback?: ReactNode;
+interface ErrorBoundaryProps {
+    children: React.ReactNode
 }
 
-interface State {
-    hasError: boolean;
+interface ErrorBoundaryState {
+    hasError: boolean
+    error?: Error
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-    public state: State = {
-        hasError: false
-    };
-
-    public static getDerivedStateFromError(_: Error): State {
-        return { hasError: true };
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    constructor(props: ErrorBoundaryProps) {
+        super(props)
+        this.state = { hasError: false }
     }
 
-    public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error("Uncaught error:", error, errorInfo);
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true, error }
     }
 
-    public render() {
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.error("ErrorBoundary caught an error:", error, errorInfo)
+    }
+
+    render() {
         if (this.state.hasError) {
-            return this.props.fallback || (
-                <div className="p-6 rounded-2xl bg-critical-light border border-critical-light text-center">
-                    <AlertTriangle className="w-8 h-8 text-critical mx-auto mb-2" />
-                    <h3 className="text-critical-dark font-bold mb-1">Something went wrong</h3>
-                    <p className="text-critical text-sm mb-4">We couldn&apos;t load this section.</p>
-                    <MotionButton
-                        onClick={() => this.setState({ hasError: false })}
-                        className="text-xs bg-white border border-critical/20 text-critical px-3 py-1.5 rounded-lg font-bold hover:bg-critical-light transition-colors"
-                    >
-                        Try Again
-                    </MotionButton>
+            return (
+                <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-4 text-center">
+                    <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
+                        <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-bold tracking-tight">Something went wrong</h2>
+                        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                            We encountered an unexpected error. Our team has been notified.
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => window.location.reload()}>
+                            Reload Page
+                        </Button>
+                        <Button onClick={() => this.setState({ hasError: false })}>
+                            Try Again
+                        </Button>
+                    </div>
                 </div>
-            );
+            )
         }
 
-        return this.props.children;
+        return this.props.children
     }
 }

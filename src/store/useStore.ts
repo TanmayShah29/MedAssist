@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { analyzeHealthRisks, RiskAnalysis } from '@/lib/risk-engine';
-import { generateInsights, InsightAnalysis } from '@/lib/insight-engine';
+
 
 interface UserProfile {
     name: string;
@@ -41,8 +40,8 @@ interface AppState {
     healthTrend: { date: string; score: number; ideal: number }[];
     labs: LabReport[];
     biomarkers: Biomarker[];
-    riskAnalysis: RiskAnalysis | null;
-    insightAnalysis: InsightAnalysis | null; // NEW: Engine Output
+    riskAnalysis: any | null;
+    insightAnalysis: any | null; // NEW: Engine Output
 
     // Actions
     updateUser: (profile: Partial<UserProfile>) => void;
@@ -117,13 +116,15 @@ export const useStore = create<AppState>()(
             },
 
             refreshAnalysis: () => {
-                const analysis = analyzeHealthRisks(get().biomarkers);
-                const insights = generateInsights(analysis);
+                // Placeholder for new engine logic
+                // const risks = analyzeHealthRisks(get().healthTrend);
+                // const insights = await generateInsights(get().biomarkers);
 
                 set({
-                    riskAnalysis: analysis,
-                    insightAnalysis: insights,
-                    healthScore: analysis.reliabilityAdjustedScore // Use new score
+                    // riskAnalysis: risks,
+                    // insights: insights,
+                    // lastUpdated: new Date() // This field does not exist in AppState
+                    healthScore: 0 // Reset or placeholder score
                 });
             },
 
