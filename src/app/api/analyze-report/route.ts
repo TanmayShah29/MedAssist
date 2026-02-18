@@ -35,7 +35,15 @@ export async function POST(request: NextRequest) {
         }, { status: 401 })
     }
 
-    const { base64, mimeType, symptoms, fileName } = await request.json()
+    // Robust Body Parsing with Error Handling
+    let body;
+    try {
+        body = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON body', hint: 'Payload might be too large' }, { status: 400 });
+    }
+
+    const { base64, mimeType, symptoms, fileName } = body;
 
     if (!base64) {
         return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -44,7 +52,13 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now()
 
     try {
-        const response = await groq.chat.completions.create({
+        // TIMEOUT RACE
+        // Vercel Hobby Limit is 10s. We race 9.5s to fail gracefully.
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Analysis timed out. Try a smaller part of the image.")), 9500)
+        );
+
+        const aiPromise = groq.chat.completions.create({
             model: 'llama-3.2-11b-vision-preview',
             messages: [
                 {
@@ -69,7 +83,7 @@ Return this exact structure:
   "biomarkers": [
     {
       "name": "string",
-      "value": number,
+      "value": "string or number", 
       "unit": "string",
       "referenceMin": number or null,
       "referenceMax": number or null,
@@ -85,6 +99,7 @@ Return this exact structure:
 }
 
 Rules:
+- Value should be extracted exactly as seen. If it is "Positive" or "Detected", return that string.
 - status is optimal if value is within reference range
 - status is warning if slightly outside range
 - status is critical if significantly outside range
@@ -96,17 +111,27 @@ Rules:
                 }
             ],
             max_tokens: 4000
-        })
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response: any = await Promise.race([aiPromise, timeoutPromise]);
 
         const rawText = response.choices[0]?.message?.content || ''
 
-        // Strip any accidental markdown code fences
-        const cleaned = rawText.replace(/```json|```/g, '').trim()
+        // ROBUST JSON EXTRACTION (Regex Fallback)
+        let cleaned = rawText.replace(/```json|```/g, '').trim()
+
+        // If the model yaps before/after json, find the object
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            cleaned = jsonMatch[0];
+        }
 
         let result
         try {
             result = JSON.parse(cleaned)
         } catch {
+            console.error("AI JSON Parse Failed. Raw:", rawText);
             return NextResponse.json({ error: 'AI returned invalid format. Please try again.' }, { status: 500 })
         }
 
@@ -133,7 +158,7 @@ Rules:
                 user_id: user.id,
                 lab_result_id: labResult.id,
                 name: b.name,
-                value: b.value,
+                value: String(b.value), // Force to string for new text column
                 unit: b.unit,
                 status: b.status,
                 reference_min: b.referenceMin,
@@ -147,7 +172,10 @@ Rules:
                 .from('biomarkers')
                 .insert(biomarkersToInsert)
 
-            if (bioError) throw new Error('Failed to save biomarkers')
+            if (bioError) {
+                console.error("Biomarker Insert Error:", bioError);
+                throw new Error('Failed to save biomarkers')
+            }
         }
 
         // Save symptoms
@@ -170,6 +198,7 @@ Rules:
         })
 
     } catch (error: any) {
+        console.error("Analysis Error:", error);
         if (error?.status === 429) {
             return NextResponse.json({ error: 'Rate limit hit. Please wait a minute and try again.' }, { status: 429 })
         }

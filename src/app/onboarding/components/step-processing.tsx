@@ -6,23 +6,18 @@ import { useEffect, useState, useRef } from "react";
 import { Check, Shield, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Simulation steps (cosmetic animation — runs independently of real API)
-const PROCESS_STEPS = [
-    { id: "ocr", label: "Scanning document structure...", icon: Search },
-    { id: "ner", label: "Groq AI: Extracting biomarkers...", icon: Brain },
-    { id: "validation", label: "Validating reference ranges...", icon: Shield },
-    { id: "synthesis", label: "Synthesizing health insights...", icon: Activity },
-];
+// Real processing stages related to API lifecycle
+type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
 
 export function StepProcessing() {
-    const { setStep, completeStep, setExtractedData, setAnalysisResult } = useOnboardingStore();
-    const [currentProcess, setCurrentProcess] = useState(0);
+    const { setStep, completeStep, setAnalysisResult } = useOnboardingStore();
+    const [state, setState] = useState<ProcessingState>("uploading");
     const [error, setError] = useState<string | null>(null);
     const hasStarted = useRef(false);
 
     const goBackToUpload = () => {
         setError(null);
-        setCurrentProcess(0);
+        setState("uploading");
         hasStarted.current = false;
         setStep(3);
     };
@@ -30,13 +25,13 @@ export function StepProcessing() {
     const runProcessing = async () => {
         try {
             setError(null);
+            setState("uploading");
 
             // Get file from onboarding store
             const file = useOnboardingStore.getState().uploadedFile;
             const symptoms = useOnboardingStore.getState().selectedSymptoms;
 
             if (!file || !(file instanceof File)) {
-                // File is missing or was lost during serialization — go back to upload
                 goBackToUpload();
                 return;
             }
@@ -46,14 +41,14 @@ export function StepProcessing() {
                 const reader = new FileReader();
                 reader.onload = () => {
                     const result = reader.result as string;
-                    // Strip the data URL prefix, keep only base64 data
                     resolve(result.split(',')[1]);
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
 
-            // Call analyze API with base64
+            setState("analyzing"); // File read complete, sending to API
+
             const response = await fetch("/api/analyze-report", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -68,9 +63,21 @@ export function StepProcessing() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || "Analysis failed");
+                // Handle specific status codes if needed
+                if (response.status === 413) {
+                    setError("File is too large for the server. Please try a smaller file (max 4MB) or compress it.");
+                } else if (response.status === 429) {
+                    setError("Too many requests (Rate Limit). Please wait a minute and try again.");
+                } else if (response.status === 504) {
+                    setError("Analysis timed out. The AI took too long. Try cropping the image to just the results table.");
+                } else {
+                    setError(data.error || "Analysis failed. Please try again.");
+                }
+                setState("error");
                 return;
             }
+
+            setState("finalizing");
 
             // Save to onboarding store
             useOnboardingStore.getState().setAnalysisResult({
@@ -80,11 +87,15 @@ export function StepProcessing() {
                 summary: data.summary,
             });
 
-            // Advance to next step
-            onComplete();
+            // Short delay to show "Finalizing" state for UX
+            setTimeout(() => {
+                setState("complete");
+                onComplete();
+            }, 800);
 
         } catch (err: any) {
-            setError(err.message || "Something went wrong. Please try again.");
+            setError(err.message || "Network error. Please check your connection.");
+            setState("error");
         }
     };
 
@@ -96,26 +107,11 @@ export function StepProcessing() {
     useEffect(() => {
         if (hasStarted.current) return;
         hasStarted.current = true;
-
-        // Cosmetic animation — runs independently of real API
-        const interval = setInterval(() => {
-            setCurrentProcess((curr) => {
-                if (curr >= PROCESS_STEPS.length - 1) {
-                    clearInterval(interval);
-                    return curr;
-                }
-                return curr + 1;
-            });
-        }, 1500);
-
-        // Kick off real processing in parallel
         runProcessing();
-
-        return () => clearInterval(interval);
     }, []);
 
     // Error state
-    if (error) {
+    if (state === "error" || error) {
         return (
             <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center">
                 <motion.div
@@ -129,7 +125,7 @@ export function StepProcessing() {
                         </div>
                         <div className="flex-1">
                             <h3 className="font-display text-lg text-[#1C1917] mb-1">
-                                Analysis Error
+                                Analysis Failed
                             </h3>
                             <p className="text-sm text-[#57534E] leading-relaxed">
                                 {error}
@@ -139,7 +135,6 @@ export function StepProcessing() {
                     <button
                         onClick={() => {
                             setError(null);
-                            setCurrentProcess(0);
                             hasStarted.current = false;
                             runProcessing();
                         }}
@@ -160,11 +155,6 @@ export function StepProcessing() {
                         <ArrowLeft className="w-4 h-4" />
                         Upload a different file
                     </button>
-
-                    <p className="mt-3 text-xs text-[#A8A29E] text-center leading-relaxed">
-                        <strong>Tip:</strong> Scanned or image-only PDFs can&apos;t be read.
-                        Use a digitally generated PDF from your lab portal.
-                    </p>
                 </motion.div>
             </div>
         );
@@ -173,87 +163,95 @@ export function StepProcessing() {
     return (
         <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center">
 
-            {/* Animated Orbiting Ring */}
+            {/* Status Icon */}
             <div className="relative w-32 h-32 mb-12 flex items-center justify-center">
-                {/* Outer ring */}
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, ease: "linear", duration: 8 }}
                     className="absolute inset-0 rounded-full border border-sky-100"
                 />
-                {/* Spinning gradient segment */}
                 <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, ease: "linear", duration: 3 }}
+                    transition={{ repeat: Infinity, ease: "linear", duration: 2 }}
                     className="absolute inset-0 rounded-full border-t-2 border-sky-500"
                 />
-
-                {/* Inner Icon */}
                 <div className="w-16 h-16 rounded-2xl bg-sky-50 
                         flex items-center justify-center shadow-sm">
-                    <Brain className="w-8 h-8 text-sky-500 animate-pulse" />
+                    {state === "analyzing" ? (
+                        <Brain className="w-8 h-8 text-sky-500 animate-pulse" />
+                    ) : state === "uploading" ? (
+                        <Search className="w-8 h-8 text-sky-500 animate-pulse" />
+                    ) : (
+                        <Activity className="w-8 h-8 text-sky-500 animate-pulse" />
+                    )}
                 </div>
             </div>
 
             <h2 className="font-display text-2xl text-[#1C1917] mb-8 text-center">
-                Analysing your data...
+                {state === "uploading" && "Reading document..."}
+                {state === "analyzing" && "Groq AI is analyzing..."}
+                {state === "finalizing" && "Preparing your results..."}
             </h2>
 
-            {/* Process list */}
+            {/* Stages */}
             <div className="w-full max-w-sm space-y-4">
-                {PROCESS_STEPS.map((step, idx) => {
-                    const isComplete = currentProcess > idx;
-                    const isCurrent = currentProcess === idx;
-                    const isPending = currentProcess < idx;
-
-                    const Icon = step.icon;
-
-                    return (
-                        <motion.div
-                            key={step.id}
-                            initial={{ opacity: 0.5, y: 10 }}
-                            animate={{
-                                opacity: isPending ? 0.4 : 1,
-                                y: 0,
-                                scale: isCurrent ? 1.02 : 1
-                            }}
-                            className={cn(
-                                "flex items-center gap-4 p-4 rounded-[12px] border transition-all",
-                                isCurrent
-                                    ? "bg-white border-sky-200 shadow-md shadow-sky-100"
-                                    : isComplete
-                                        ? "bg-emerald-50/50 border-emerald-100"
-                                        : "bg-[#F5F4EF] border-transparent"
-                            )}
-                        >
-                            <div className={cn(
-                                "w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                                isComplete ? "bg-emerald-500" : isCurrent ? "bg-sky-500" : "bg-[#E8E6DF]"
-                            )}>
-                                {isComplete ? (
-                                    <Check className="w-4 h-4 text-white" />
-                                ) : (
-                                    <Icon className="w-4 h-4 text-white" />
-                                )}
-                            </div>
-                            <span className={cn(
-                                "text-sm font-medium",
-                                isComplete ? "text-emerald-700" : isCurrent ? "text-sky-700" : "text-[#A8A29E]"
-                            )}>
-                                {step.label}
-                            </span>
-                            {isCurrent && (
-                                <div className="ml-auto flex gap-1">
-                                    <span className="w-1 h-1 bg-sky-500 rounded-full animate-bounce" />
-                                    <span className="w-1 h-1 bg-sky-500 rounded-full animate-bounce [animation-delay:0.1s]" />
-                                    <span className="w-1 h-1 bg-sky-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-                                </div>
-                            )}
-                        </motion.div>
-                    );
-                })}
+                {/* Uploading Stage */}
+                <ProcessingItem
+                    label="Scanning document structure..."
+                    isActive={state === "uploading"}
+                    isComplete={state !== "uploading"}
+                />
+                {/* Analyzing Stage */}
+                <ProcessingItem
+                    label="Identifying biomarkers & values..."
+                    isActive={state === "analyzing"}
+                    isComplete={state === "finalizing" || state === "complete"}
+                />
+                {/* Finalizing Stage */}
+                <ProcessingItem
+                    label="Generating health insights..."
+                    isActive={state === "finalizing"}
+                    isComplete={state === "complete"}
+                />
             </div>
-
         </div>
     );
+}
+
+function ProcessingItem({ label, isActive, isComplete }: { label: string, isActive: boolean, isComplete: boolean }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0.5, y: 10 }}
+            animate={{
+                opacity: isActive || isComplete ? 1 : 0.4,
+                y: 0,
+                scale: isActive ? 1.02 : 1
+            }}
+            className={cn(
+                "flex items-center gap-4 p-4 rounded-[12px] border transition-all",
+                isActive
+                    ? "bg-white border-sky-200 shadow-md shadow-sky-100"
+                    : isComplete
+                        ? "bg-emerald-50/50 border-emerald-100"
+                        : "bg-[#F5F4EF] border-transparent"
+            )}
+        >
+            <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                isComplete ? "bg-emerald-500" : isActive ? "bg-sky-500" : "bg-[#E8E6DF]"
+            )}>
+                {isComplete ? (
+                    <Check className="w-4 h-4 text-white" />
+                ) : (
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" />
+                )}
+            </div>
+            <span className={cn(
+                "text-sm font-medium",
+                isComplete ? "text-emerald-700" : isActive ? "text-sky-700" : "text-[#A8A29E]"
+            )}>
+                {label}
+            </span>
+        </motion.div>
+    )
 }

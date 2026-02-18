@@ -28,17 +28,33 @@ export function StepUpload() {
         setIsDragging(false);
     };
 
+    const validateAndSetFile = (file: File) => {
+        // Vercel/Next.js Body Limit is ~4.5MB
+        // We set 4.3MB to be safe with base64 overhead 
+        // Base64 adds ~33%, so 4.5MB payload means max ~3.3MB binary file.
+        // Wait, standard limit for `serverActions` body size limit is payload size. 
+        // If we increased it to 4.5MB, a 3.3MB file becomes ~4.4MB base64.
+        // Let's hold it to 4MB max to be safe.
+        const MAX_SIZE = 4 * 1024 * 1024;
+
+        if (file.size > MAX_SIZE) {
+            alert(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 4MB.`);
+            return;
+        }
+        setUploadedFile(file);
+    };
+
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setUploadedFile(e.dataTransfer.files[0]);
+            validateAndSetFile(e.dataTransfer.files[0]);
         }
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setUploadedFile(e.target.files[0]);
+            validateAndSetFile(e.target.files[0]);
         }
     };
 
