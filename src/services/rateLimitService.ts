@@ -46,6 +46,11 @@ async function getClientIp(): Promise<string> {
  * Calls Supabase RPC `check_rate_limit`.
  */
 export async function checkRateLimit(): Promise<RateLimitResult> {
+    if (!supabaseAdmin) {
+        logger.error('Supabase admin client not initialized. Check SUPABASE_SERVICE_ROLE_KEY env variable.');
+        return { success: true, message: 'rate_limit_unavailable' };
+    }
+
     try {
         const ip = await getClientIp();
         const ipHash = hashIp(ip);
