@@ -28,7 +28,11 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        return NextResponse.json({
+            error: 'Unauthorized',
+            detail: authError?.message || 'No user session found',
+            hint: 'Check Supabase Site URL and Redirect URLs configuration'
+        }, { status: 401 })
     }
 
     const { base64, mimeType, symptoms, fileName } = await request.json()
