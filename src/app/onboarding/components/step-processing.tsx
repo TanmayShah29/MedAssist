@@ -41,21 +41,25 @@ export function StepProcessing() {
                 return;
             }
 
-            // Step 1-2: Extract PDF text (client-side)
-            const { extractTextFromPDF, isPDFReadable } = await import("@/lib/pdf-extractor");
-            const pdfText = await extractTextFromPDF(file);
+            // Convert file to base64 client-side
+            const base64 = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = reader.result as string;
+                    // Strip the data URL prefix, keep only base64 data
+                    resolve(result.split(',')[1]);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
 
-            if (!isPDFReadable(pdfText)) {
-                setError("This PDF appears to be scanned or image-only. Text extraction failed. Please try a digital PDF.");
-                return;
-            }
-
-            // Step 3-8: Call analyze API
+            // Call analyze API with base64
             const response = await fetch("/api/analyze-report", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    text: pdfText,
+                    base64,
+                    mimeType: file.type || 'application/pdf',
                     symptoms,
                     fileName: file.name,
                 }),
@@ -78,6 +82,7 @@ export function StepProcessing() {
 
             // Advance to next step
             onComplete();
+
         } catch (err: any) {
             setError(err.message || "Something went wrong. Please try again.");
         }

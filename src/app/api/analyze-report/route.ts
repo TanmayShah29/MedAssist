@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase'
 import { NextRequest, NextResponse } from 'next/server'
-import { extractAndInterpretBiomarkers } from '@/lib/groq-medical'
+import Groq from 'groq-sdk'
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 export async function POST(request: NextRequest) {
-    // 1. Get authenticated user
     const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -11,22 +12,84 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 2. Parse request body
-    const { text, symptoms, fileName } = await request.json()
+    const { base64, mimeType, symptoms, fileName } = await request.json()
 
-    if (!text || text.length < 50) {
-        return NextResponse.json({ error: 'PDF text too short or empty. The PDF may be scanned/image-only.' }, { status: 400 })
+    if (!base64) {
+        return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
     const startTime = Date.now()
 
     try {
-        // 3. Call Groq extraction
-        const result = await extractAndInterpretBiomarkers(text, symptoms || [])
+        const response = await groq.chat.completions.create({
+            model: 'llama-3.2-11b-vision-preview',
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        {
+                            type: 'image_url',
+                            image_url: {
+                                url: `data:${mimeType};base64,${base64}`
+                            }
+                        },
+                        {
+                            type: 'text',
+                            text: `You are a medical data extraction assistant. Extract ALL biomarker values from this lab report image.
+
+Return ONLY a valid JSON object with NO markdown, NO backticks, NO explanation. Just raw JSON.
+
+User symptoms: ${symptoms?.join(', ') || 'none reported'}
+
+Return this exact structure:
+{
+  "biomarkers": [
+    {
+      "name": "string",
+      "value": number,
+      "unit": "string",
+      "referenceMin": number or null,
+      "referenceMax": number or null,
+      "status": "optimal" or "warning" or "critical",
+      "category": "hematology" or "inflammation" or "metabolic" or "vitamins" or "other",
+      "confidence": number between 0 and 1,
+      "aiInterpretation": "1-2 plain English sentences a non-medical person can understand. Never use diagnostic language."
+    }
+  ],
+  "healthScore": number between 0 and 100,
+  "riskLevel": "low" or "moderate" or "high",
+  "summary": "2-3 sentence plain English overview"
+}
+
+Rules:
+- status is optimal if value is within reference range
+- status is warning if slightly outside range
+- status is critical if significantly outside range
+- healthScore = percentage of optimal values weighted by severity
+- Never use words like diagnose, prescribe, or treatment plan in interpretations
+- Always recommend consulting a physician at the end of the summary`
+                        }
+                    ]
+                }
+            ],
+            max_tokens: 4000
+        })
+
+        const rawText = response.choices[0]?.message?.content || ''
+
+        // Strip any accidental markdown code fences
+        const cleaned = rawText.replace(/```json|```/g, '').trim()
+
+        let result
+        try {
+            result = JSON.parse(cleaned)
+        } catch {
+            return NextResponse.json({ error: 'AI returned invalid format. Please try again.' }, { status: 500 })
+        }
 
         const processingTime = Date.now() - startTime
 
-        // 4. Save lab result record
+        // Save lab result
         const { data: labResult, error: labError } = await supabase
             .from('lab_results')
             .insert({
@@ -38,11 +101,12 @@ export async function POST(request: NextRequest) {
             .select()
             .single()
 
-        if (labError) throw new Error('Failed to save lab result: ' + labError.message)
+        if (labError) throw new Error('Failed to save lab result')
 
-        // 5. Save biomarkers
-        if (result.biomarkers.length > 0) {
-            const biomarkersToInsert = result.biomarkers.map(b => ({
+        // Save biomarkers
+        if (result.biomarkers?.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const biomarkersToInsert = result.biomarkers.map((b: any) => ({
                 user_id: user.id,
                 lab_result_id: labResult.id,
                 name: b.name,
@@ -60,11 +124,11 @@ export async function POST(request: NextRequest) {
                 .from('biomarkers')
                 .insert(biomarkersToInsert)
 
-            if (bioError) throw new Error('Failed to save biomarkers: ' + bioError.message)
+            if (bioError) throw new Error('Failed to save biomarkers')
         }
 
-        // 6. Save symptoms if provided
-        if (symptoms && symptoms.length > 0) {
+        // Save symptoms
+        if (symptoms?.length > 0) {
             const symptomsToInsert = symptoms.map((s: string) => ({
                 user_id: user.id,
                 symptom: s
@@ -72,7 +136,6 @@ export async function POST(request: NextRequest) {
             await supabase.from('symptoms').upsert(symptomsToInsert, { onConflict: 'user_id,symptom' })
         }
 
-        // 7. Return results
         return NextResponse.json({
             success: true,
             biomarkers: result.biomarkers,
@@ -84,15 +147,9 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error: any) {
-        console.error('Analyze report error:', error)
-
-        if (error.message?.startsWith('RATE_LIMIT')) {
-            return NextResponse.json({ error: error.message }, { status: 429 })
+        if (error?.status === 429) {
+            return NextResponse.json({ error: 'Rate limit hit. Please wait a minute and try again.' }, { status: 429 })
         }
-
-        return NextResponse.json(
-            { error: error.message || 'Analysis failed. Please try again.' },
-            { status: 500 }
-        )
+        return NextResponse.json({ error: error.message || 'Analysis failed. Please try again.' }, { status: 500 })
     }
 }
