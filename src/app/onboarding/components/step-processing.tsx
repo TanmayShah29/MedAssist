@@ -3,7 +3,7 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { motion } from "motion/react";
 import { useEffect, useState, useRef } from "react";
-import { Check, Shield, Search, Brain, Activity, AlertCircle, RotateCcw } from "lucide-react";
+import { Check, Shield, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Simulation steps (cosmetic animation — runs independently of real API)
@@ -19,6 +19,13 @@ export function StepProcessing() {
     const [currentProcess, setCurrentProcess] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const hasStarted = useRef(false);
+
+    const goBackToUpload = () => {
+        setError(null);
+        setCurrentProcess(0);
+        hasStarted.current = false;
+        setStep(3);
+    };
 
     const runProcessing = async () => {
         try {
@@ -138,6 +145,21 @@ export function StepProcessing() {
                         <RotateCcw className="w-4 h-4" />
                         Try again
                     </button>
+
+                    <button
+                        onClick={goBackToUpload}
+                        className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 
+                                   rounded-[10px] border border-[#E8E6DF] bg-white hover:bg-[#F5F4EF]
+                                   text-[#57534E] text-sm font-semibold transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Upload a different file
+                    </button>
+
+                    <p className="mt-3 text-xs text-[#A8A29E] text-center leading-relaxed">
+                        <strong>Tip:</strong> Scanned or image-only PDFs can&apos;t be read.
+                        Use a digitally generated PDF from your lab portal.
+                    </p>
                 </motion.div>
             </div>
         );
