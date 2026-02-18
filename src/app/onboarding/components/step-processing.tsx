@@ -35,9 +35,9 @@ export function StepProcessing() {
             const file = useOnboardingStore.getState().uploadedFile;
             const symptoms = useOnboardingStore.getState().selectedSymptoms;
 
-            if (!file) {
-                // No file uploaded — skip to complete with empty state
-                setTimeout(() => onComplete(), 2000);
+            if (!file || !(file instanceof File)) {
+                // File is missing or was lost during serialization — go back to upload
+                goBackToUpload();
                 return;
             }
 

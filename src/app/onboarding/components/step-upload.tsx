@@ -114,7 +114,7 @@ export function StepUpload() {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            setUploadedFile(null as any); // Type assertion for null
+                            setUploadedFile(null);
                         }}
                         className="p-2 hover:bg-slate-50 rounded-full transition-colors"
                     >

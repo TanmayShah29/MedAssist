@@ -62,7 +62,7 @@ export interface OnboardingState {
     completeStep: (step: number) => void;
     setBasicInfo: (info: Partial<BasicInfo>) => void;
     toggleSymptom: (symptom: string) => void;
-    setUploadedFile: (file: File) => void;
+    setUploadedFile: (file: File | null) => void;
     setExtractedData: (data: {
         labValues: ExtractedLabValue[];
         entities: ExtractedEntity[];
@@ -111,7 +111,7 @@ export const useOnboardingStore = create<OnboardingState>()(
                         : [...s.selectedSymptoms, symptom],
                 })),
             setUploadedFile: (file) =>
-                set({ uploadedFile: file, uploadedFileName: file.name }),
+                set({ uploadedFile: file, uploadedFileName: file?.name ?? "" }),
             setExtractedData: (data) =>
                 set({
                     extractedLabValues: data.labValues,
@@ -134,6 +134,14 @@ export const useOnboardingStore = create<OnboardingState>()(
                     analysisResult: null,
                 }),
         }),
-        { name: "medassist-onboarding" }
+        {
+            name: "medassist-onboarding",
+            partialize: (state) => {
+                // Exclude uploadedFile — File objects can't survive JSON serialization
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { uploadedFile, ...rest } = state;
+                return rest;
+            },
+        }
     )
 );
