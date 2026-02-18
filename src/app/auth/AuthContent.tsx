@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, Eye, EyeOff, ArrowLeft, Check } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AuthContent() {
     const router = useRouter();
@@ -20,6 +21,7 @@ export default function AuthContent() {
     });
     const [error, setError] = useState("");
 
+
     const handleSubmit = async () => {
         setError("");
         setLoading(true);
@@ -31,28 +33,44 @@ export default function AuthContent() {
             return;
         }
 
-        // MOCK AUTH FOR PREVIEW
-        setTimeout(() => {
+        try {
+            const supabase = createClient();
+
             if (mode === "signup") {
+                if (form.password !== form.confirmPassword) {
+                    throw new Error("Passwords do not match");
+                }
+                const { error } = await supabase.auth.signUp({
+                    email: form.email,
+                    password: form.password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                        data: {
+                            full_name: "New User", // You might want to capture this from a form field if available
+                        }
+                    }
+                });
+                if (error) throw error;
+                // For email confirmation flows, you might show a message instead of redirecting
+                // But if auto-confirm is on, this works.
                 router.push("/onboarding");
             } else {
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: form.email,
+                    password: form.password,
+                });
+                if (error) throw error;
+                router.refresh();
                 router.push("/dashboard");
             }
-            setLoading(false);
-        }, 1000);
-
-        /*
-        try {
-            if (mode === "signup") {
-                // ... real auth logic ...
-            }
         } catch (err: any) {
+            console.error("Auth error:", err);
             setError(err.message || "Something went wrong.");
         } finally {
             setLoading(false);
         }
-        */
     };
+
 
     return (
         <div className="min-h-screen min-h-[100dvh] bg-[#FAFAF7] flex overflow-hidden">
