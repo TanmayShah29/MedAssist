@@ -127,6 +127,7 @@ export default function RootLayout({
                 overflow-y-auto
                 pb-[calc(5rem+env(safe-area-inset-bottom))]
                 lg:pb-0
+                page-enter
               ">
                 {children}
               </main>

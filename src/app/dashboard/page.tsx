@@ -69,7 +69,8 @@ export default function DashboardPage() {
     const priorities = [...biomarkers]
         .sort((a, b) => {
             const order = { critical: 0, warning: 1, optimal: 2 }
-            return order[a.status] - order[b.status]
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return (order[a.status as keyof typeof order] ?? 1) - (order[b.status as keyof typeof order] ?? 1)
         })
         .slice(0, 3)
 
@@ -99,10 +100,20 @@ export default function DashboardPage() {
                     <p className="text-[15px] text-[#57534E]">Welcome back, {profile?.first_name || 'there'}</p>
                 </div>
                 <button
-                    onClick={() => router.push('/upload')}
-                    className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2 text-[15px] font-medium transition-colors"
+                    onClick={() => {
+                        setLoading(true);
+                        router.push('/upload');
+                    }}
+                    disabled={loading}
+                    style={{
+                        background: loading ? '#7DD3FC' : '#0EA5E9',
+                        cursor: loading ? 'not-allowed' : 'pointer',
+                        opacity: loading ? 0.8 : 1,
+                        transition: 'all 0.15s ease'
+                    }}
+                    className="text-white rounded-[10px] px-4 py-2 text-[15px] font-medium"
                 >
-                    Upload Report
+                    {loading ? 'Processing...' : 'Upload Report'}
                 </button>
             </div>
 
@@ -145,17 +156,29 @@ export default function DashboardPage() {
                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">TODAY&apos;S PRIORITIES</h3>
 
                 {biomarkers.length === 0 ? (
-                    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center flex flex-col items-center justify-center">
-                        <ClipboardList className="w-12 h-12 text-[#A8A29E] mb-4" />
-                        <h3 className="text-[20px] font-semibold text-[#1C1917] mb-2 font-display">No lab results yet</h3>
-                        <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-4">
+                    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6">
+                            <ClipboardList className="w-8 h-8 text-[#A8A29E]" />
+                        </div>
+                        <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
+                        <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
                             Upload your first lab report to see your health overview and priorities.
                         </p>
                         <button
-                            onClick={() => router.push('/upload')}
-                            className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2 font-medium transition-colors"
+                            onClick={() => {
+                                setLoading(true);
+                                router.push('/upload');
+                            }}
+                            disabled={loading}
+                            style={{
+                                background: loading ? '#7DD3FC' : '#0EA5E9',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                opacity: loading ? 0.8 : 1,
+                                transition: 'all 0.15s ease'
+                            }}
+                            className="text-white rounded-[10px] px-6 py-3 font-medium flex items-center gap-2"
                         >
-                            Upload your first report
+                            {loading ? 'Processing...' : 'Upload your first report'}
                         </button>
                     </div>
                 ) : (

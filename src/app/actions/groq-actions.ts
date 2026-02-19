@@ -134,9 +134,15 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
        "summary": "Key findings summary...",
        "riskLevel": "low|moderate|high|critical",
        "confidence": 0-100,
-       "details": [{ "label": "Test Name", "value": "Result", "status": "normal|high|low|critical", "trend": "up|down|flat" }],
+       "details": [{ "label": "Test Name", "value": "Result", "status": "optimal|warning|critical", "trend": "up|down|flat" }],
+       "biomarkers": [{ "name": "Name", "value": 0, "unit": "unit", "status": "optimal|warning|critical", "category": "category", "referenceMin": 0, "referenceMax": 0, "aiInterpretation": "string" }],
        "recommendations": ["Follow-up 1", "Follow-up 2"]
-   }`;
+   }
+   
+   IMPORTANT: "status" must be exactly one of: "optimal", "warning", or "critical"
+   - optimal = value is within reference range
+   - warning = slightly outside reference range
+   - critical = significantly outside reference range`;
         }
 
         const completion = await groq.chat.completions.create({

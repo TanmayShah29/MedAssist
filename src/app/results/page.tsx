@@ -72,10 +72,20 @@ export default function ResultsPage() {
                     <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
                 </div>
                 <button
-                    onClick={() => router.push('/upload')}
-                    className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2 font-medium transition-colors"
+                    onClick={() => {
+                        setLoading(true);
+                        router.push('/upload');
+                    }}
+                    disabled={loading}
+                    style={{
+                        background: loading ? '#7DD3FC' : '#0EA5E9',
+                        cursor: loading ? 'not-allowed' : 'pointer',
+                        opacity: loading ? 0.8 : 1,
+                        transition: 'all 0.15s ease'
+                    }}
+                    className="text-white rounded-[10px] px-4 py-2 font-medium"
                 >
-                    Upload New Report
+                    {loading ? 'Processing...' : 'Upload New Report'}
                 </button>
             </div>
 
@@ -126,8 +136,12 @@ export default function ResultsPage() {
                             ))}
                         </div>
                     ) : biomarkers.length === 0 ? (
-                        <div className="p-12 text-center">
-                            <p className="text-[15px] text-[#57534E]">No results in this category.</p>
+                        <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
+                            <div className="w-12 h-12 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-4">
+                                <span className="text-xl">🔍</span>
+                            </div>
+                            <p className="text-[15px] text-[#57534E] font-medium">No results in this category.</p>
+                            <p className="text-[13px] text-[#A8A29E] mt-1">Try selecting a different filter.</p>
                         </div>
                     ) : (
                         <div>

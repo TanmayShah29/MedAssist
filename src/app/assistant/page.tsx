@@ -56,6 +56,7 @@ export default function AssistantPage() {
         }
     ]);
     const [inputValue, setInputValue] = useState("");
+    const [isProcessing, setIsProcessing] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -86,7 +87,7 @@ export default function AssistantPage() {
     }, [messages]);
 
     const handleSendMessage = () => {
-        if (!inputValue.trim()) return;
+        if (!inputValue.trim() || isProcessing) return;
 
         const newUserMsg: Message = {
             id: Date.now().toString(),
@@ -97,6 +98,7 @@ export default function AssistantPage() {
 
         setMessages(prev => [...prev, newUserMsg]);
         setInputValue("");
+        setIsProcessing(true);
 
         // Mock AI Response
         setTimeout(() => {
@@ -107,7 +109,8 @@ export default function AssistantPage() {
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, newAiMsg]);
-        }, 1000);
+            setIsProcessing(false);
+        }, 1500);
     };
 
     const handleSuggestedQuestion = (question: string) => {
@@ -211,15 +214,28 @@ export default function AssistantPage() {
                                 <input
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                                    className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                                    placeholder="Ask about your results..."
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    onKeyDown={(e: any) => e.key === "Enter" && !isProcessing && handleSendMessage()}
+                                    disabled={isProcessing}
+                                    className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
                                 />
                                 <button
                                     onClick={handleSendMessage}
-                                    className="px-4 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-[12px] transition-colors shadow-md shadow-sky-500/20"
+                                    disabled={!inputValue.trim() || isProcessing}
+                                    style={{
+                                        background: isProcessing || !inputValue.trim() ? '#94A3B8' : '#0EA5E9',
+                                        cursor: isProcessing || !inputValue.trim() ? 'not-allowed' : 'pointer',
+                                        opacity: isProcessing || !inputValue.trim() ? 0.7 : 1,
+                                        transition: 'all 0.15s ease'
+                                    }}
+                                    className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px]"
                                 >
-                                    <Send className="w-4 h-4" />
+                                    {isProcessing ? (
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <Send className="w-4 h-4" />
+                                    )}
                                 </button>
                             </div>
                         </div>

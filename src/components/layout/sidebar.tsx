@@ -104,10 +104,10 @@ export function Sidebar({ className }: { className?: string }) {
                             href={item.path}
                             className={cn(
                                 "flex items-center justify-between px-3 py-2.5 rounded-[10px]",
-                                "text-sm transition-all duration-100 group",
+                                "text-sm transition-all duration-150 group border-l-3",
                                 isActive
-                                    ? "bg-sky-500 text-white shadow-sm shadow-sky-500/20"
-                                    : "text-[#57534E] hover:bg-[#E8E6DF] hover:text-[#1C1917]"
+                                    ? "bg-sky-100 text-sky-700 border-sky-500"
+                                    : "text-[#57534E] hover:bg-[#EFEDE6] hover:text-[#1C1917] border-transparent"
                             )}
                         >
                             <div className="flex items-center gap-3">

@@ -70,11 +70,11 @@ export function BottomMenu({
                          min-w-[56px] rounded-xl transition-colors"
                             aria-label={item.label}
                         >
-                            {/* Active background pill */}
+                            {/* Active Dot Indicator - NEW DESIGN */}
                             {isActive && (
                                 <motion.div
                                     layoutId="bottom-menu-indicator"
-                                    className="absolute inset-0 bg-sky-50 rounded-xl"
+                                    className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-sky-500"
                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                             )}
@@ -92,7 +92,7 @@ export function BottomMenu({
                             <motion.span
                                 animate={{
                                     color: isActive ? "#0EA5E9" : "#94A3B8",
-                                    scale: isActive ? 1.1 : 1,
+                                    scale: isActive ? 1.0 : 1,
                                 }}
                                 transition={{ duration: 0.15 }}
                                 className="relative z-10"

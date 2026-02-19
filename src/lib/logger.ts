@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 export const logger = {
     info: (message: string, data?: unknown) => {
-        if (isProduction && !process.env.ENABLE_VERBOSE_LOGMING) return; // Silence info in prod unless enabled
+        if (isProduction && !process.env.ENABLE_VERBOSE_LOGGING) return; // Silence info in prod unless enabled
         console.log(`[INFO] ${message}`, data || '');
     },
     warn: (message: string, data?: unknown) => {
