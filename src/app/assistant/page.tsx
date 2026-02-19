@@ -124,7 +124,7 @@ export default function AssistantPage() {
             // Add engagement nudge if strictly needed
             const showNudge = biomarkers.length > 0 && biomarkers.length < 20;
             const finalContent = showNudge
-                ? `${aiContent}\n\n💡 The more reports you upload, the more personalized my analysis becomes.`
+                ? `${aiContent}\n\nThe more reports you upload, the more personalized my analysis becomes.`
                 : aiContent;
 
             const newAiMsg: Message = {
@@ -218,7 +218,7 @@ export default function AssistantPage() {
                                 padding: 24,
                             }}>
                                 <p style={{ fontSize: 15, color: '#1C1917', fontWeight: 600, margin: '0 0 8px 0' }}>
-                                    👋 Welcome to your AI health assistant
+                                    Welcome to your AI health assistant
                                 </p>
                                 <p style={{ fontSize: 14, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
                                     I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.

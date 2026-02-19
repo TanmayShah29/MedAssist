@@ -3,7 +3,7 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, FileText, BarChart, Sparkles } from "lucide-react";
+import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, FileText, BarChart, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Real processing stages related to API lifecycle
@@ -229,7 +229,9 @@ export function StepProcessing() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center"
                 >
-                    <div className="text-6xl mb-6">✅</div>
+                    <div className="mb-6">
+                        <CheckCircle2 className="w-16 h-16 text-emerald-500" />
+                    </div>
                     <h3 className="text-[#1C1917] text-[24px] font-bold font-display mb-2">
                         Analysis complete!
                     </h3>
@@ -248,7 +250,7 @@ export function StepProcessing() {
             {/* Warning Banner */}
             <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 32 }}>
                 <p style={{ color: '#92400E', fontSize: 14, margin: 0, fontWeight: 500 }} className="flex items-center gap-2">
-                    <span>⏳</span> Please don't close or refresh this page while we analyze your report
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-600" /> Please don't close or refresh this page while we analyze your report
                 </p>
             </div>
 

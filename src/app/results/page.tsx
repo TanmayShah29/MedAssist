@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, ClipboardList, Search } from 'lucide-react'
 
 // Define types
 interface Biomarker {
@@ -229,7 +229,18 @@ export default function ResultsPage() {
                         </div>
                     ) : biomarkers.length === 0 && selectedCategory === 'all' ? (
                         <div style={{ textAlign: 'center', padding: '64px 32px' }}>
-                            <div style={{ fontSize: 40, marginBottom: 16 }}>📋</div>
+                            <div style={{
+                                width: 56,
+                                height: 56,
+                                borderRadius: '50%',
+                                background: '#E0F2FE',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 16px auto'
+                            }}>
+                                <ClipboardList size={24} color="#0EA5E9" />
+                            </div>
                             <h3 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', margin: '0 0 8px 0' }}>
                                 No results yet
                             </h3>
@@ -247,7 +258,7 @@ export default function ResultsPage() {
                     ) : biomarkers.length === 0 ? (
                         <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
                             <div className="w-12 h-12 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-4">
-                                <span className="text-xl">🔍</span>
+                                <Search className="w-6 h-6 text-[#A8A29E]" />
                             </div>
                             <p className="text-[15px] text-[#57534E] font-medium">No results in this category.</p>
                             <p className="text-[13px] text-[#A8A29E] mt-1">Try selecting a different filter.</p>

@@ -2,7 +2,7 @@
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield } from "lucide-react";
+import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
@@ -89,7 +89,9 @@ export function StepUpload() {
                         onClick={() => setShowOptions(false)}
                         className="bg-[#F5F4EF] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-500 group"
                     >
-                        <div className="text-[32px] mb-3">📄</div>
+                        <div className="flex justify-center mb-3">
+                            <FileText className="w-8 h-8 text-[#A8A29E] group-hover:text-sky-500 transition-colors" />
+                        </div>
                         <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-sky-600 transition-colors">
                             Upload my report now
                         </h3>
@@ -106,7 +108,9 @@ export function StepUpload() {
                         onClick={onSkip}
                         className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group"
                     >
-                        <div className="text-[32px] mb-3">🗓️</div>
+                        <div className="flex justify-center mb-3">
+                            <Calendar className="w-8 h-8 text-[#A8A29E] group-hover:text-[#57534E] transition-colors" />
+                        </div>
                         <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-[#57534E] transition-colors">
                             I don&apos;t have one yet
                         </h3>

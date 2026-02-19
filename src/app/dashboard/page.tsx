@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ClipboardList, AlertCircle, CheckCircle, Activity } from 'lucide-react'
+import { ClipboardList, AlertCircle, CheckCircle, Activity, FileText } from 'lucide-react'
 import {
     RadialBarChart, RadialBar, PolarAngleAxis,
     RadarChart, Radar, PolarGrid,
@@ -332,7 +332,18 @@ export default function DashboardPage() {
                     textAlign: 'center',
                     marginBottom: 24
                 }}>
-                    <div style={{ fontSize: 48, marginBottom: 16 }}>🔬</div>
+                    <div style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '50%',
+                        background: '#E0F2FE',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 16px auto'
+                    }}>
+                        <FileText size={24} color="#0EA5E9" />
+                    </div>
                     <h2 style={{
                         fontFamily: 'Instrument Serif',
                         fontSize: 28,
@@ -425,14 +436,11 @@ export default function DashboardPage() {
                 <div style={{
                     background: '#E0F2FE',
                     border: '1px solid #BAE6FD',
+                    borderLeft: '4px solid #0EA5E9',
                     borderRadius: 14,
                     padding: '16px 20px',
                     marginBottom: 24,
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 12
                 }}>
-                    <span style={{ fontSize: 20 }}>📈</span>
                     <div>
                         <p style={{ color: '#0369A1', fontWeight: 600, fontSize: 15, margin: 0 }}>
                             Your AI gets smarter with every report
