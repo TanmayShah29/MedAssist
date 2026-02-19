@@ -1,8 +1,8 @@
-export async function extractPdfText(base64: string, mimeType: string = 'application/pdf'): Promise<string> {
-    const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64
+export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
+    const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
 
     const formData = new FormData()
-    formData.append('base64Image', `data:${mimeType};base64,${cleanBase64}`)
+    formData.append('file', blob, 'report.pdf') // OCR.space expects 'file' for binary or 'base64Image' for base64
     formData.append('language', 'eng')
     formData.append('isOverlayRequired', 'false')
     formData.append('detectOrientation', 'true')

@@ -41,9 +41,8 @@ export async function POST(req: NextRequest) {
 
         // 3. Extract Text
         logger.info("Starting text extraction...");
-        const base64String = buffer.toString('base64');
-        const cleanBase64 = base64String.includes(',') ? base64String.split(',')[1] : base64String;
-        const extractedText = await extractPdfText(cleanBase64);
+
+        const extractedText = await extractPdfText(buffer, file.type);
         logger.info("Text extracted successfully.");
 
         // 4. Analyze with Groq (Extraction + Interpretation)

@@ -67,7 +67,23 @@ export default function DashboardPage() {
     const criticalCount = biomarkers.filter(b => b.status === 'critical').length
     const totalCount = biomarkers.length
 
-    const healthScore = totalCount === 0 ? 0 : Math.round(((optimalCount * 1) + (warningCount * 0.5)) / totalCount * 100)
+    // Optimistic scoring calculation
+    let healthScore = 0
+    if (totalCount > 0) {
+        const rawScore = ((optimalCount * 100) + (warningCount * 75) + (criticalCount * 40)) / totalCount
+        // Apply a floor — no one with any optimal values scores below 50
+        const floor = optimalCount > 0 ? 50 : 30
+        healthScore = Math.round(Math.max(floor, rawScore))
+    }
+
+    const getScoreLabel = (score: number) => {
+        if (score >= 85) return { label: 'Excellent', color: '#10B981' }
+        if (score >= 70) return { label: 'Good', color: '#10B981' }
+        if (score >= 55) return { label: 'Fair', color: '#F59E0B' }
+        return { label: 'Needs Attention', color: '#EF4444' }
+    }
+
+    const scoreLabel = getScoreLabel(healthScore)
 
     const priorities = [...biomarkers]
         .sort((a, b) => {
@@ -82,7 +98,8 @@ export default function DashboardPage() {
             <div className="min-h-screen animate-pulse p-6 bg-[#FAFAF7]">
                 <div className="h-8 w-48 rounded-lg mb-2 bg-[#E8E6DF]" />
                 <div className="h-4 w-64 rounded-lg mb-8 bg-[#E8E6DF]" />
-                <div className="h-36 rounded-[18px] mb-6 bg-[#E8E6DF]" />
+                {/* Skeleton matching the hero card height */}
+                <div className="h-[216px] rounded-[18px] mb-6 bg-[#E8E6DF]" />
                 <div className="h-6 w-40 rounded mb-4 bg-[#E8E6DF]" />
                 <div className="space-y-3">
                     <div className="h-20 rounded-[14px] bg-[#E8E6DF]" />
@@ -125,9 +142,17 @@ export default function DashboardPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
                     <div>
                         <span className="text-[10px] font-semibold uppercase text-white/70 tracking-wider">HEALTH SCORE</span>
-                        <div className="flex items-baseline gap-2 mt-1">
+                        <div className="flex items-baseline gap-3 mt-1">
                             <span className="text-[48px] font-bold font-display leading-none">{healthScore}</span>
-                            <span className="text-[15px] text-white/70">out of 100</span>
+                            <div className="flex flex-col">
+                                <span
+                                    className="text-[15px] font-bold px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-sm self-start mb-1"
+                                    style={{ color: scoreLabel.color === '#EF4444' ? '#FECACA' : '#D1FAE5' }} // Lighten colors for dark bg
+                                >
+                                    {scoreLabel.label}
+                                </span>
+                                <span className="text-[13px] text-white/70">out of 100</span>
+                            </div>
                         </div>
                     </div>
 

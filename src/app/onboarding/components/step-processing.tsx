@@ -9,15 +9,6 @@ import { cn } from "@/lib/utils";
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
 
-const STAGES = [
-    { message: 'Reading your lab report...', icon: '📄' },
-    { message: 'Identifying biomarkers...', icon: '🔬' },
-    { message: 'Comparing reference ranges...', icon: '📊' },
-    { message: 'Generating interpretations...', icon: '🧠' },
-    { message: 'Calculating health score...', icon: '💯' },
-    { message: 'Almost done...', icon: '✨' },
-];
-
 const getErrorMessage = (error: string) => {
     if (error.includes('Rate limit') || error.includes('429'))
         return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true }
@@ -31,20 +22,51 @@ const getErrorMessage = (error: string) => {
 export function StepProcessing() {
     const { setStep, completeStep, setAnalysisResult } = useOnboardingStore();
     const [state, setState] = useState<ProcessingState>("uploading");
-    const [processingStage, setProcessingStage] = useState(0);
+    const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string } | null>(null);
     const hasStarted = useRef(false);
 
-    // Cycle through stages
+    // New stages configuration with durations
+    const stages = [
+        { step: 1, label: 'Scanning your lab report...', detail: 'OCR reading every value on the page', duration: 8000 },
+        { step: 2, label: 'Identifying biomarkers...', detail: 'Finding hemoglobin, glucose, vitamins and more', duration: 6000 },
+        { step: 3, label: 'Comparing reference ranges...', detail: 'Checking what\'s optimal, what needs attention', duration: 5000 },
+        { step: 4, label: 'Generating plain English explanations...', detail: 'Making medical jargon actually understandable', duration: 5000 },
+        { step: 5, label: 'Calculating your health score...', detail: 'Building your personal health overview', duration: 4000 },
+    ]
+
+    // Cycle through stages based on duration
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        if (state === 'error' || state === 'complete') return;
+
+        let timer: NodeJS.Timeout;
+
+        const processStage = (index: number) => {
+            if (index >= stages.length) return;
+
+            setCurrentStageIndex(index);
+
+            timer = setTimeout(() => {
+                if (index < stages.length - 1) {
+                    processStage(index + 1);
+                }
+            }, stages[index].duration);
+        };
+
+        // Only start the internal timer loop if we are in a processing state
         if (state === 'uploading' || state === 'analyzing' || state === 'finalizing') {
-            interval = setInterval(() => {
-                setProcessingStage(prev => (prev + 1) % STAGES.length);
-            }, 1500);
+            // If we just started (index 0), kick off the chain. 
+            // If we are already mid-way (e.g. re-render), this effect might reset unless carefully managed.
+            // Simplest approach for this specific request: just run the chain from current index if not already complete.
+            if (currentStageIndex < stages.length) {
+                timer = setTimeout(() => {
+                    setCurrentStageIndex(prev => Math.min(prev + 1, stages.length - 1));
+                }, stages[currentStageIndex].duration);
+            }
         }
-        return () => clearInterval(interval);
-    }, [state]);
+
+        return () => clearTimeout(timer);
+    }, [currentStageIndex, state]); // Dependency on currentStageIndex allows the chain to continue
 
     const goBackToUpload = () => {
         setErrorData(null);
@@ -57,7 +79,7 @@ export function StepProcessing() {
         try {
             setErrorData(null);
             setState("uploading");
-            setProcessingStage(0);
+            setCurrentStageIndex(0);
 
             // Get file from onboarding store
             const file = useOnboardingStore.getState().uploadedFile;
@@ -107,14 +129,14 @@ export function StepProcessing() {
 
             setAnalysisResult(analysisData);
 
+            // Wait for animation to finish at least to step 4 or 5 ideally, but we'll show complete when ready
+            // For better UX, we could force the stages to complete, but for now we'll jump to complete
+            setState("complete");
+
             // Success animation delay
             setTimeout(() => {
-                setState("complete");
-                // Show success state for 1s then proceed
-                setTimeout(() => {
-                    onComplete();
-                }, 1000);
-            }, 800);
+                onComplete();
+            }, 1000);
 
         } catch (err: unknown) {
             setErrorData(getErrorMessage((err as Error).message || "Network error"));
@@ -200,7 +222,6 @@ export function StepProcessing() {
 
     // Success State
     if (state === "complete") {
-        const { extractedLabValues } = useOnboardingStore.getState();
         return (
             <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center justify-center min-h-[400px]">
                 <motion.div
@@ -213,72 +234,72 @@ export function StepProcessing() {
                         Analysis complete!
                     </h3>
                     <p className="text-[#57534E] text-[16px]">
-                        Found {extractedLabValues.length || 0} biomarkers
+                        Redirecting to your results...
                     </p>
                 </motion.div>
             </div>
         );
     }
 
-    // Processing State
+    // Processing State (Default)
     return (
-        <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center">
+        <div className="max-w-lg mx-auto w-full px-6 py-12">
 
-            {/* Animated Pipeline */}
-            <div className="relative w-32 h-32 mb-12 flex items-center justify-center">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, ease: "linear", duration: 8 }}
-                    className="absolute inset-0 rounded-full border border-sky-100"
-                />
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, ease: "linear", duration: 2 }}
-                    className="absolute inset-0 rounded-full border-t-2 border-sky-500"
-                />
-                <div className="w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center shadow-sm text-4xl">
-                    <AnimatePresence mode="wait">
-                        <motion.span
-                            key={processingStage}
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            {STAGES[processingStage].icon}
-                        </motion.span>
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Stage Message */}
-            <div className="text-center mb-8 h-16">
-                <AnimatePresence mode="wait">
-                    <motion.h2
-                        key={processingStage}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="font-display text-xl text-[#1C1917] font-medium"
-                    >
-                        {STAGES[processingStage].message}
-                    </motion.h2>
-                </AnimatePresence>
-            </div>
-
-            {/* Progress Indicators */}
-            <div className="w-full max-w-sm space-y-3">
-                <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full overflow-hidden">
-                    <motion.div
-                        className="h-full bg-sky-500"
-                        initial={{ width: "0%" }}
-                        animate={{ width: `${((processingStage + 1) / STAGES.length) * 100}%` }}
-                        transition={{ duration: 0.5 }}
-                    />
-                </div>
-                <p className="text-center text-xs text-[#A8A29E] uppercase tracking-wider font-semibold">
-                    Processing
+            {/* Warning Banner */}
+            <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 32 }}>
+                <p style={{ color: '#92400E', fontSize: 14, margin: 0, fontWeight: 500 }} className="flex items-center gap-2">
+                    <span>⏳</span> Please don't close or refresh this page while we analyze your report
                 </p>
+            </div>
+
+            {/* Vertical Stepper */}
+            <div className="space-y-6 relative">
+                {/* Vertical Line */}
+                <div className="absolute left-[15px] top-[15px] bottom-[15px] w-[2px] bg-[#E8E6DF] z-0" />
+
+                {stages.map((stage, index) => {
+                    const isActive = index === currentStageIndex;
+                    const isCompleted = index < currentStageIndex;
+                    const isPending = index > currentStageIndex;
+
+                    return (
+                        <div key={stage.step} className="relative z-10 flex items-start gap-4">
+                            {/* Circle Indicator */}
+                            <motion.div
+                                animate={isActive ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+                                transition={isActive ? { repeat: Infinity, duration: 2 } : {}}
+                                className={cn(
+                                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 transition-colors duration-300",
+                                    isActive && "bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200",
+                                    isCompleted && "bg-emerald-500 border-emerald-500 text-white",
+                                    isPending && "bg-white border-[#E8E6DF] text-[#A8A29E]"
+                                )}
+                            >
+                                {isCompleted ? <Check className="w-4 h-4" /> : stage.step}
+                            </motion.div>
+
+                            {/* Text Content */}
+                            <div className={cn(
+                                "pt-1 transition-opacity duration-300",
+                                isPending ? "opacity-40" : "opacity-100"
+                            )}>
+                                <h3 className={cn(
+                                    "text-[15px] font-medium leading-none mb-1.5",
+                                    isActive ? "text-sky-700 font-bold" : "text-[#1C1917]"
+                                )}>
+                                    {stage.label}
+                                </h3>
+                                <p className="text-[13px] text-[#57534E] leading-snug">
+                                    {stage.detail}
+                                </p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="mt-12 text-center">
+                <p className="text-xs text-[#A8A29E] font-medium">This usually takes 20–40 seconds</p>
             </div>
         </div>
     );
