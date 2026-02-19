@@ -1,374 +1,242 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import {
-    Search,
-    Filter,
-    ArrowUpRight,
-    BrainCircuit,
-    Sparkles,
-    X
-} from "lucide-react";
-import { AnimatedTabs } from "@/components/ui/animated-tabs";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { ResultRow } from "@/components/results/result-row";
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { X } from 'lucide-react'
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// Define types
 interface Biomarker {
-    id: string;
-    name: string;
-    value: number;
-    unit: string;
-    status: "optimal" | "warning" | "critical";
-    reference_min: number | null;
-    reference_max: number | null;
-    category: string;
-    confidence: number;
-    ai_interpretation: string;
-    created_at: string;
+    id: number
+    name: string
+    value: number
+    unit: string
+    status: 'optimal' | 'warning' | 'critical'
+    category: string
+    reference_min?: number
+    reference_max?: number
+    ai_interpretation?: string
+    confidence?: number
+    created_at: string
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-const CATEGORIES = ["All", "Metabolic", "Hormonal", "Cardiovascular", "Liver", "Kidney"];
-
-// ── Components ─────────────────────────────────────────────────────────────
-
-function ResultSkeleton() {
-    return (
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8 space-y-6 animate-pulse">
-            <div className="h-8 w-48 bg-[#E8E6DF] rounded-lg" />
-            <div className="h-12 w-full bg-[#E8E6DF] rounded-[18px]" />
-            <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1.2fr] gap-6">
-                <div className="space-y-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="h-16 bg-[#E8E6DF] rounded-[12px]" />
-                    ))}
-                </div>
-                <div className="h-[500px] bg-[#E8E6DF] rounded-[18px] hidden lg:block" />
-            </div>
-        </div>
-    );
-}
+const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
 
 export default function ResultsPage() {
-    const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);
-    const [activeCategory, setActiveCategory] = useState("All");
-    const [selectedResult, setSelectedResult] = useState<Biomarker | null>(null);
-    const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
+    const router = useRouter()
+    const [loading, setLoading] = useState(true)
+    const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
+    const [selectedCategory, setSelectedCategory] = useState<string>('all')
+    const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
 
     useEffect(() => {
-        const fetchData = async () => {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+        const fetchBiomarkers = async () => {
+            setLoading(true)
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
-                router.push("/auth");
-                return;
+                router.push('/auth')
+                return
             }
 
-            const { data } = await supabase
-                .from("biomarkers")
-                .select("*")
-                .eq("user_id", user.id)
-                .order("created_at", { ascending: false });
+            let query = supabase
+                .from('biomarkers')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
 
-            if (data) {
-                setBiomarkers(data);
-                // Pre-select first warning/critical item, or first item
-                const priority = data.find(b => b.status !== "optimal");
-                setSelectedResult(priority || data[0] || null);
+            if (selectedCategory !== 'all') {
+                query = query.eq('category', selectedCategory)
             }
-            setLoading(false);
-        };
 
-        fetchData();
-    }, [router]);
-
-    // Handle selection (Desktop vs Mobile)
-    const handleSelect = (biomarker: Biomarker) => {
-        setSelectedResult(biomarker);
-        if (window.innerWidth < 1024) {
-            setIsMobilePanelOpen(true);
+            const { data } = await query
+            setBiomarkers((data as Biomarker[]) || [])
+            setLoading(false)
         }
-    };
+        fetchBiomarkers()
+    }, [selectedCategory, router])
 
-    // Derived Data
-    const tabs = CATEGORIES.map(c => ({ id: c, label: c }));
-
-    const filteredBiomarkers = activeCategory === "All"
-        ? biomarkers
-        : biomarkers.filter(b => b.category === activeCategory);
-
-    const optimalCount = biomarkers.filter(b => b.status === "optimal").length;
-    const warningCount = biomarkers.filter(b => b.status === "warning").length;
-    const criticalCount = biomarkers.filter(b => b.status === "critical").length;
-
-    if (loading) return <ResultSkeleton />;
+    // Derived counts for status summary
+    const optimalCount = biomarkers.filter(b => b.status === 'optimal').length
+    const warningCount = biomarkers.filter(b => b.status === 'warning').length
+    const criticalCount = biomarkers.filter(b => b.status === 'critical').length
 
     return (
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-32">
+        <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            {/* ── Header ── */}
+            <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="font-display text-3xl text-[#1C1917]">
-                        Lab Results
-                    </h1>
-                    <p className="text-sm text-[#A8A29E] mt-1">
-                        Analysis of {biomarkers.length} biomarkers
-                    </p>
+                    <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
+                    <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
                 </div>
-                <div className="flex gap-2">
-                    <button className="p-2.5 rounded-[10px] border border-[#E8E6DF] text-[#57534E] hover:bg-[#F5F4EF] transition-colors">
-                        <Search className="w-4 h-4" />
-                    </button>
-                    <button className="p-2.5 rounded-[10px] border border-[#E8E6DF] text-[#57534E] hover:bg-[#F5F4EF] transition-colors">
-                        <Filter className="w-4 h-4" />
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-[#1C1917] hover:bg-black text-white rounded-[10px] text-sm font-semibold transition-colors">
-                        <ArrowUpRight className="w-4 h-4" />
-                        Export PDF
-                    </button>
+                <button
+                    onClick={() => router.push('/upload')}
+                    className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2 font-medium transition-colors"
+                >
+                    Upload New Report
+                </button>
+            </div>
+
+            {/* ── Status summary row ── */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 text-center">
+                    <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1">{optimalCount}</span>
+                    <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">Optimal</span>
+                </div>
+                <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 text-center">
+                    <span className="text-[32px] font-bold font-display text-[#92400E] block leading-none mb-1">{warningCount}</span>
+                    <span className="text-[12px] font-semibold text-[#92400E] uppercase tracking-wide">Monitor</span>
+                </div>
+                <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 text-center">
+                    <span className="text-[32px] font-bold font-display text-[#991B1B] block leading-none mb-1">{criticalCount}</span>
+                    <span className="text-[12px] font-semibold text-[#991B1B] uppercase tracking-wide">Action Needed</span>
                 </div>
             </div>
 
-            {/* Status Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-8">
-                <div className="bg-[#ECFDF5] rounded-[12px] border border-emerald-200 p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-lg">
-                        {optimalCount}
-                    </div>
-                    <div>
-                        <p className="text-sm font-semibold text-emerald-800">Optimal</p>
-                        <p className="text-xs text-emerald-600">Within range</p>
-                    </div>
-                </div>
-                <div className="bg-[#FFFBEB] rounded-[12px] border border-amber-200 p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-lg">
-                        {warningCount}
-                    </div>
-                    <div>
-                        <p className="text-sm font-semibold text-amber-800">Monitor</p>
-                        <p className="text-xs text-amber-600">Slight variation</p>
-                    </div>
-                </div>
-                <div className="bg-[#FEF2F2] rounded-[12px] border border-red-200 p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-lg">
-                        {criticalCount}
-                    </div>
-                    <div>
-                        <p className="text-sm font-semibold text-red-800">Action</p>
-                        <p className="text-xs text-red-600">Requires attention</p>
-                    </div>
-                </div>
+            {/* ── Category tabs ── */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+                {CATEGORIES.map(category => (
+                    <button
+                        key={category}
+                        onClick={() => {
+                            setSelectedCategory(category)
+                            setSelectedBiomarker(null)
+                        }}
+                        className={`px-4 py-2 rounded-[10px] text-[15px] font-semibold capitalize whitespace-nowrap transition-colors ${selectedCategory === category
+                            ? 'bg-sky-500 text-white'
+                            : 'bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] hover:bg-[#EFEDE6]'
+                            }`}
+                    >
+                        {category}
+                    </button>
+                ))}
             </div>
 
-            {/* Category Tabs */}
-            <div className="mb-6 sticky top-20 z-20 bg-[#FAFAF9]/95 backdrop-blur-sm py-2 -mx-4 px-4 md:mx-0 md:px-0">
-                <AnimatedTabs
-                    tabs={tabs}
-                    defaultTab={activeCategory}
-                    onChange={setActiveCategory}
-                    className="w-full md:w-auto"
-                />
-            </div>
+            {/* ── Two column layout ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-            {/* Results Grid - 2 Columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1.2fr] gap-6 items-start relative">
-
-                {/* LIST COLUMN */}
-                <div className="bg-white rounded-[18px] border border-[#E8E6DF] shadow-sm overflow-hidden min-h-[500px]">
-                    <div className="px-5 py-3 border-b border-[#E8E6DF] bg-[#F5F4EF]/50 flex justify-between text-xs font-semibold text-[#A8A29E] uppercase tracking-wider">
-                        <span>Biomarker</span>
-                        <div className="flex gap-16 mr-8">
-                            <span>Result</span>
-                            <span className="hidden sm:block">Reference</span>
+                {/* Left column: List */}
+                <div className="lg:col-span-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] overflow-hidden">
+                    {loading ? (
+                        <div className="p-4 space-y-4">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="h-16 bg-[#E8E6DF] rounded-lg animate-pulse" />
+                            ))}
                         </div>
-                    </div>
-                    <div className="divide-y divide-[#E8E6DF]">
-                        {filteredBiomarkers.length === 0 ? (
-                            <div className="p-12 text-center text-[#A8A29E]">
-                                No biomarkers found in this category.
+                    ) : biomarkers.length === 0 ? (
+                        <div className="p-12 text-center">
+                            <p className="text-[15px] text-[#57534E]">No results in this category.</p>
+                        </div>
+                    ) : (
+                        <div>
+                            {biomarkers.map((b, i) => (
+                                <div
+                                    key={b.id}
+                                    onClick={() => setSelectedBiomarker(b)}
+                                    className={`flex items-center p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
+                                        } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''}`}
+                                >
+                                    <div className={`w-2.5 h-2.5 rounded-full shrink-0 mr-3 ${b.status === 'optimal' ? 'bg-emerald-500' :
+                                        b.status === 'warning' ? 'amber-500' : 'bg-red-500' // Corrected amber-500 to bg-amber-500 implicitly via 'warning' check in next update if needed, but user spec said #F59E0B which is amber-500. 
+                                        // Wait, user spec said: "Status dot (10px circle: #10B981 / #F59E0B / #EF4444)"
+                                        // I will use explicit classes:
+                                        } ${b.status === 'warning' ? 'bg-amber-500' : ''
+                                        }`} />
+
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[15px] font-semibold text-[#1C1917] truncate">{b.name}</span>
+                                            <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] truncate">
+                                                {b.category}
+                                            </span>
+                                        </div>
+                                        <div className="text-[15px] text-[#57534E]">
+                                            {b.value} {b.unit}
+                                            {(b.reference_min !== undefined || b.reference_max !== undefined) && (
+                                                <span className="text-[12px] text-[#A8A29E] ml-2">
+                                                    (ref: {b.reference_min}–{b.reference_max})
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-4 ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                        b.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
+                                        }`}>
+                                        {b.status === 'optimal' ? 'Optimal' :
+                                            b.status === 'warning' ? 'Monitor' : 'Action'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Right column: Detail */}
+                <div className="lg:col-span-2">
+                    <div className="sticky top-6">
+                        {!selectedBiomarker ? (
+                            <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center">
+                                <p className="text-[15px] text-[#A8A29E]">Select a result to see AI interpretation</p>
                             </div>
                         ) : (
-                            filteredBiomarkers.map((biomarker) => (
-                                <ResultRow
-                                    key={biomarker.id}
-                                    name={biomarker.name}
-                                    value={biomarker.value}
-                                    unit={biomarker.unit}
-                                    status={biomarker.status}
-                                    range={{
-                                        min: biomarker.reference_min ?? 0,
-                                        max: biomarker.reference_max ?? 100
-                                    }}
-                                    isSelected={selectedResult?.id === biomarker.id}
-                                    onClick={() => handleSelect(biomarker)}
-                                />
-                            ))
+                            <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h2 className="text-[20px] font-semibold text-[#1C1917] leading-tight pr-4">{selectedBiomarker.name}</h2>
+                                    <button
+                                        onClick={() => setSelectedBiomarker(null)}
+                                        className="text-[#A8A29E] hover:text-[#1C1917] transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                <div className={`bg-white border border-[#E8E6DF] rounded-[10px] p-4 mb-4 text-center ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
+                                    selectedBiomarker.status === 'warning' ? 'text-amber-500' : 'text-red-500'
+                                    }`}>
+                                    <div className="text-[32px] font-bold font-display leading-none mb-1">
+                                        {selectedBiomarker.value} {selectedBiomarker.unit}
+                                    </div>
+                                    {(selectedBiomarker.reference_min !== undefined || selectedBiomarker.reference_max !== undefined) && (
+                                        <p className="text-[12px] text-[#A8A29E]">
+                                            Reference: {selectedBiomarker.reference_min} – {selectedBiomarker.reference_max}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className={`w-full text-center py-2 rounded-[6px] text-[15px] font-semibold mb-4 ${selectedBiomarker.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                    selectedBiomarker.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
+                                    }`}>
+                                    {selectedBiomarker.status === 'optimal' ? 'Optimal' :
+                                        selectedBiomarker.status === 'warning' ? 'Monitor' : 'Action Needed'}
+                                </div>
+
+                                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-2 tracking-wider">AI INTERPRETATION</h3>
+                                <p className="text-[15px] text-[#57534E] leading-relaxed mb-4">
+                                    {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
+                                </p>
+
+                                <div className="flex justify-between items-center pt-4 border-t border-[#E8E6DF] mt-4">
+                                    <span className="text-[12px] text-[#A8A29E]">Confidence</span>
+                                    <span className="text-[12px] font-semibold text-[#1C1917]">
+                                        {selectedBiomarker.confidence ? Math.round(selectedBiomarker.confidence * 100) : 0}%
+                                    </span>
+                                </div>
+
+                                <button
+                                    onClick={() => router.push('/assistant')}
+                                    className="w-full mt-4 bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] py-2.5 text-[15px] font-medium transition-colors"
+                                >
+                                    Ask AI about this
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* CONTEXT PANEL (Desktop Sticky) */}
-                <div className="hidden lg:block sticky top-24">
-                    {selectedResult ? (
-                        <div className="bg-[#F5F4EF] rounded-[24px] border border-[#E8E6DF] p-2 shadow-sm">
-                            <div className="bg-white rounded-[20px] border border-[#E8E6DF] p-6 mb-3">
-                                <div className="flex items-start justify-between mb-2">
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className={cn(
-                                                "w-2 h-2 rounded-full",
-                                                selectedResult.status === "critical" ? "bg-red-500" :
-                                                    selectedResult.status === "warning" ? "bg-amber-500" : "bg-emerald-500"
-                                            )} />
-                                            <p className="text-xs font-medium text-[#A8A29E] uppercase tracking-wider">
-                                                {selectedResult.category}
-                                            </p>
-                                        </div>
-                                        <h3 className="font-display text-2xl text-[#1C1917]">
-                                            {selectedResult.name}
-                                        </h3>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-display text-2xl text-[#1C1917]">
-                                            {selectedResult.value}
-                                        </p>
-                                        <p className="text-xs text-[#A8A29E]">
-                                            {selectedResult.unit}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Dark AI Card - NESTED */}
-                            <div className="bg-[#0F172A] rounded-[20px] p-6 text-white relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <Sparkles className="w-24 h-24" />
-                                </div>
-
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="w-6 h-6 rounded-md bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                                        <BrainCircuit className="w-3.5 h-3.5 text-indigo-400" />
-                                    </div>
-                                    <span className="text-xs font-medium text-indigo-300 uppercase tracking-widest">
-                                        Groq Analysis
-                                    </span>
-                                </div>
-
-                                <div className="space-y-4 relative z-10">
-                                    <p className="text-sm text-slate-300 leading-relaxed">
-                                        {selectedResult.ai_interpretation}
-                                    </p>
-
-                                    {selectedResult.status !== 'optimal' && (
-                                        <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                                            <p className="text-xs font-semibold text-white mb-1">
-                                                Recommended Action
-                                            </p>
-                                            <p className="text-xs text-slate-400">
-                                                Consider scheduling a follow-up if levels persist for 2 weeks.
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-2 pt-2">
-                                        <button className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-xs font-semibold transition-colors">
-                                            Ask AI Assistant
-                                        </button>
-                                        <button className="flex-1 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-semibold transition-colors border border-white/10">
-                                            View History
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="h-[400px] flex items-center justify-center text-[#A8A29E] bg-[#F5F4EF] rounded-[24px] border border-[#E8E6DF]">
-                            Select a biomarker to view details
-                        </div>
-                    )}
-                </div>
             </div>
-
-            {/* Mobile Bottom Sheet (AnimatePresence) */}
-            <AnimatePresence>
-                {isMobilePanelOpen && selectedResult && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsMobilePanelOpen(false)}
-                            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                        />
-                        <motion.div
-                            initial={{ y: "100%" }}
-                            animate={{ y: 0 }}
-                            exit={{ y: "100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="fixed bottom-0 left-0 right-0 bg-[#FAFAF9] rounded-t-[24px] p-6 z-50 lg:hidden shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-y-auto"
-                        >
-                            <div className="w-12 h-1.5 bg-[#E8E6DF] rounded-full mx-auto mb-6" />
-
-                            <div className="flex items-start justify-between mb-6">
-                                <div>
-                                    <h3 className="font-display text-2xl text-[#1C1917]">
-                                        {selectedResult.name}
-                                    </h3>
-                                    <p className="text-[#A8A29E] text-sm">
-                                        {selectedResult.category} Response
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => setIsMobilePanelOpen(false)}
-                                    className="p-2 bg-[#E8E6DF] rounded-full"
-                                >
-                                    <X className="w-4 h-4 text-[#57534E]" />
-                                </button>
-                            </div>
-
-                            {/* Content duplicated from Desktop Panel for Mobile */}
-                            <div className="bg-[#0F172A] rounded-[20px] p-6 text-white mb-6">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <BrainCircuit className="w-4 h-4 text-indigo-400" />
-                                    <span className="text-xs font-medium text-indigo-300 uppercase">
-                                        Groq Analysis
-                                    </span>
-                                </div>
-                                <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                                    {selectedResult.ai_interpretation}
-                                </p>
-                                <button className="w-full py-3 bg-indigo-600 rounded-xl text-sm font-semibold">
-                                    Ask AI Assistant
-                                </button>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
-
-            {/* AI Analysis Footer (Fixed Bottom) */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-2xl z-30 hidden md:block">
-                <div className="bg-[#1C1917]/90 backdrop-blur-md rounded-full shadow-2xl border border-white/10 p-1.5 pl-5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-sm text-white font-medium">
-                            Analysis complete. 3 items require attention.
-                        </span>
-                    </div>
-                    <button className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-xs font-semibold text-white transition-colors">
-                        View Report
-                    </button>
-                </div>
-            </div>
-
         </div>
-    );
+    )
 }
