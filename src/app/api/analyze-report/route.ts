@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
                     user_id: user.id,
                     file_name: fileName || 'Lab Report',
                     processed: true,
-                    processing_time_ms: Date.now() - startTime
+                    processing_time_ms: Date.now() - startTime,
+                    health_score: analysisResult.healthScore
                 })
                 .select()
                 .single()

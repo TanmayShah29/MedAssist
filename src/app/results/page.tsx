@@ -22,6 +22,97 @@ interface Biomarker {
 
 const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
 
+// ── Helper Component ──
+function RangeBar({ value, min, max, status }: {
+    value: number
+    min: number | null
+    max: number | null
+    status: string
+}) {
+    if (!min || !max) return null
+
+    // Calculate position as percentage
+    const range = max - min
+    const buffer = range * 0.2 // 20% buffer on each side
+    const displayMin = min - buffer
+    const displayMax = max + buffer
+    const displayRange = displayMax - displayMin
+
+    // Avoid division by zero
+    if (displayRange === 0) return null
+
+    const valuePosition = Math.min(100, Math.max(0, ((value - displayMin) / displayRange) * 100))
+    const refMinPosition = Math.max(0, Math.min(100, ((min - displayMin) / displayRange) * 100))
+    const refMaxPosition = Math.max(0, Math.min(100, ((max - displayMin) / displayRange) * 100))
+
+    const dotColor = status === 'optimal' ? '#10B981' : status === 'warning' ? '#F59E0B' : '#EF4444'
+
+    return (
+        <div style={{ position: 'relative', height: 24, marginTop: 8, width: '100%', maxWidth: '200px' }}>
+            {/* Background track */}
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: 0,
+                right: 0,
+                height: 4,
+                background: '#E8E6DF',
+                borderRadius: 2,
+                transform: 'translateY(-50%)'
+            }} />
+
+            {/* Reference range highlight */}
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: `${refMinPosition}%`,
+                width: `${Math.max(0, refMaxPosition - refMinPosition)}%`,
+                height: 4,
+                background: '#D1FAE5',
+                borderRadius: 2,
+                transform: 'translateY(-50%)'
+            }} />
+
+            {/* Value dot */}
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: `${valuePosition}%`,
+                width: 12,
+                height: 12,
+                background: dotColor,
+                borderRadius: '50%',
+                transform: 'translate(-50%, -50%)',
+                border: '2px solid white',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                zIndex: 1
+            }} />
+
+            {/* Min/Max labels */}
+            <div style={{
+                position: 'absolute',
+                bottom: -16,
+                left: `${refMinPosition}%`,
+                fontSize: 10,
+                color: '#A8A29E',
+                transform: 'translateX(-50%)'
+            }}>
+                {min}
+            </div>
+            <div style={{
+                position: 'absolute',
+                bottom: -16,
+                left: `${refMaxPosition}%`,
+                fontSize: 10,
+                color: '#A8A29E',
+                transform: 'translateX(-50%)'
+            }}>
+                {max}
+            </div>
+        </div>
+    )
+}
+
 export default function ResultsPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
@@ -192,6 +283,12 @@ export default function ResultsPage() {
                                                 </span>
                                             )}
                                         </div>
+                                        <RangeBar
+                                            value={b.value}
+                                            min={b.reference_min || null}
+                                            max={b.reference_max || null}
+                                            status={b.status}
+                                        />
                                     </div>
 
                                     <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-4 ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
