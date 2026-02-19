@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // List of paths that don't require authentication
-    const publicPaths = ['/', '/login', '/auth/callback']
+    const publicPaths = ['/', '/login', '/auth', '/auth/callback']
     const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith('/auth/callback'))
 
     // If logged in and trying to access login page, redirect to dashboard

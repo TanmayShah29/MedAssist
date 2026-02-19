@@ -6,25 +6,28 @@ if (!GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY environment variable");
 }
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
 
-export async function extractPdfText(fileBuffer: Buffer | string): Promise<string> {
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-
-    // Convert Buffer to base64 if necessary
-    const base64Data = Buffer.isBuffer(fileBuffer)
-        ? fileBuffer.toString("base64")
-        : fileBuffer;
+export async function extractPdfText(base64: string, mimeType: string = 'application/pdf'): Promise<string> {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const result = await model.generateContent([
-        "Extract all text from this medical report PDF exactly as it appears. Preserve structure, headings, test names, values, units, and reference ranges. Return only the extracted text, no commentary.",
         {
             inlineData: {
-                data: base64Data,
-                mimeType: "application/pdf",
-            },
+                mimeType: mimeType,
+                data: base64
+            }
         },
+        {
+            text: 'Extract all text content from this lab report PDF. Return the raw text exactly as it appears, including all numbers, units, and reference ranges. Do not summarize or interpret — just extract the text.'
+        }
     ]);
 
-    return result.response.text();
+    const text = result.response.text();
+
+    if (!text || text.length < 50) {
+        throw new Error('Could not extract text from PDF. The file may be empty or corrupted.');
+    }
+
+    return text;
 }
