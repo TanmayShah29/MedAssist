@@ -1,46 +1,39 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-    throw new Error("Missing GEMINI_API_KEY environment variable");
-}
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
-
 export async function extractPdfText(base64: string, mimeType: string = 'application/pdf'): Promise<string> {
-    // Only gemini-2.0-flash is available for this key
-    const modelName = 'gemini-2.0-flash';
+    const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64
 
-    try {
-        const model = genAI.getGenerativeModel({ model: modelName });
+    const formData = new FormData()
+    formData.append('base64Image', `data:${mimeType};base64,${cleanBase64}`)
+    formData.append('language', 'eng')
+    formData.append('isOverlayRequired', 'false')
+    formData.append('detectOrientation', 'true')
+    formData.append('isTable', 'true')
+    formData.append('OCREngine', '2')
 
-        const result = await model.generateContent([
-            {
-                inlineData: {
-                    mimeType: mimeType,
-                    data: base64
-                }
-            },
-            {
-                text: 'Extract all text content from this lab report PDF. Return the raw text exactly as it appears, including all numbers, units, and reference ranges. Do not summarize or interpret — just extract the text.'
-            }
-        ]);
+    const response = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        headers: {
+            'apikey': process.env.OCR_SPACE_API_KEY!
+        },
+        body: formData
+    })
 
-        const text = result.response.text();
+    const data = await response.json()
 
-        if (text && text.length >= 50) {
-            return text;
-        } else {
-            throw new Error(`Text extraction too short (${text?.length} chars).`);
-        }
-    } catch (error: any) {
-        console.error(`Gemini extraction failed with model ${modelName}:`);
-        console.error(JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-        if (error.response) {
-            console.error(`Response status: ${error.response.status}`);
-            console.error(`Response body:`, await error.response.text().catch(() => 'No body'));
-        }
-        throw new Error(`Gemini PDF extraction failed: ${error.message}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!response.ok || (data as any).IsErroredOnProcessing) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        throw new Error(`OCR failed: ${(data as any).ErrorMessage?.[0] || 'Unknown error'}`)
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const text = (data as any).ParsedResults
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ?.map((r: any) => r.ParsedText)
+        .join('\n') || ''
+
+    if (!text || text.trim().length < 50) {
+        throw new Error('Could not extract text from PDF. File may be empty or corrupted.')
+    }
+
+    return text
 }

@@ -20,7 +20,7 @@ const STAGES = [
 
 const getErrorMessage = (error: string) => {
     if (error.includes('Rate limit') || error.includes('429'))
-        return { title: 'Too many requests', detail: 'Groq AI is rate limited. Please wait 60 seconds and try again.', canRetry: true }
+        return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true }
     if (error.includes('Unauthorized') || error.includes('401'))
         return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth' }
     if (error.includes('invalid format'))

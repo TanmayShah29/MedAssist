@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
 
         // 4. Analyze with Groq (Extraction + Interpretation)
         logger.info("Starting analysis with Groq (groq-medical)...");
+
         // Passing empty symptoms array as we don't have them in this request context yet
         const analysisResult = await extractAndInterpretBiomarkers(extractedText, []);
 
