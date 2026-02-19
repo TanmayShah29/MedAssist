@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "framer-motion";
 import {
     LayoutDashboard,
     MessageSquare,
@@ -127,14 +127,9 @@ export function FloatingActionButton({
     label = "Ask AI",
     className,
 }: FABProps) {
-    const [pressed, setPressed] = React.useState(false);
-
     return (
         <motion.button
             onClick={onClick}
-            onTapStart={() => setPressed(true)}
-            onTap={() => setPressed(false)}
-            onTapCancel={() => setPressed(false)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(

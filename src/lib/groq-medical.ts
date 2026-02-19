@@ -100,7 +100,7 @@ Rules:
             .replace(/\s*```$/i, "")
             .trim();
 
-        let parsed: any;
+        let parsed: ExtractionResult;
         try {
             parsed = JSON.parse(cleaned);
         } catch {
@@ -113,16 +113,17 @@ Rules:
             riskLevel: parsed.riskLevel ?? "low",
             summary: parsed.summary ?? "",
         };
-    } catch (error: any) {
-        if (error.status === 429 || error.message?.includes("rate_limit")) {
+    } catch (error: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
         }
-        if (error.message?.startsWith("AI returned")) {
+        if ((error as Error).message?.startsWith("AI returned")) {
             throw error;
         }
-        throw new Error(`AI analysis failed: ${error.message || "Unknown error"}`);
+        throw new Error(`AI analysis failed: ${(error as Error).message || "Unknown error"}`);
     }
 }
 
@@ -169,14 +170,15 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
         });
 
         return completion.choices[0].message.content || "";
-    } catch (error: any) {
-        if (error.status === 429 || error.message?.includes("rate_limit")) {
+    } catch (error: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
         }
         throw new Error(
-            `AI question failed: ${error.message || "Unknown error"}`
+            `AI question failed: ${(error as Error).message || "Unknown error"}`
         );
     }
 }
@@ -227,14 +229,15 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
         });
 
         return completion.choices[0].message.content || "";
-    } catch (error: any) {
-        if (error.status === 429 || error.message?.includes("rate_limit")) {
+    } catch (error: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
         }
         throw new Error(
-            `AI greeting failed: ${error.message || "Unknown error"}`
+            `AI greeting failed: ${(error as Error).message || "Unknown error"}`
         );
     }
 }

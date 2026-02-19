@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 // Phase 7: Add Framer Motion and state for filters
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { useState } from "react"
 
 const timeFilters = ['3M', '6M', '1Y', 'ALL'] as const;
@@ -23,8 +23,14 @@ interface WellnessTrendChartProps {
     className?: string
 }
 
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ value: number; payload: { ideal?: number } }>;
+    label?: string;
+}
+
 // Custom animated tooltip
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     if (!active || !payload?.[0]) return null;
 
     return (
@@ -62,7 +68,7 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function WellnessTrendChart({ data, className }: WellnessTrendChartProps) {
-    const { theme } = useTheme()
+    useTheme() // Call useTheme to ensure hook rules are followed, but don't destructure theme
     const [filter, setFilter] = useState<typeof timeFilters[number]>('6M');
 
     return (

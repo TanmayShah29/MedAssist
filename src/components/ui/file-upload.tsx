@@ -1,21 +1,13 @@
 "use client"
 // IMPORTANT CHANGE: Replace @tabler/icons-react with lucide-react
-import { cn } from "@/lib/utils"
+
 import React, { useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { Upload } from "lucide-react"
 // Changed: IconUpload from @tabler → Upload from lucide-react
 import { useDropzone } from "react-dropzone"
 
-const mainVariant = {
-    initial: { x: 0, y: 0 },
-    animate: { x: 20, y: -20, opacity: 0.9 },
-}
 
-const secondaryVariant = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-}
 
 export const FileUpload = ({
     onChange,
@@ -27,7 +19,9 @@ export const FileUpload = ({
 
     const handleFileChange = (newFiles: File[]) => {
         setFiles((prevFiles) => [...prevFiles, ...newFiles])
-        onChange && onChange(newFiles)
+        if (onChange) {
+            onChange(newFiles)
+        }
     }
 
     const handleClick = () => {

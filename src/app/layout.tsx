@@ -73,6 +73,7 @@ export default function RootLayout({
                    maximum-scale=1, viewport-fit=cover"
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@300;400;500;600&display=swap"
           rel="stylesheet"

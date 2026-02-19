@@ -1,4 +1,3 @@
-import { motion } from "framer-motion"
 import { MessageSquare, FileText, HelpCircle, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 

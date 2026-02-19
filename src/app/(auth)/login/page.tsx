@@ -9,14 +9,21 @@ import {
   FaUserMd,
   FaArrowRight,
   FaCheckCircle,
-  FaNotesMedical,
   FaMicroscope
 } from "react-icons/fa";
-import { createClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 // Floating Cards Components
-const StatusCard = ({ icon, title, value, color, delay }: any) => (
+interface StatusCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  color: string; // Add color prop
+  delay: number;
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StatusCard = ({ icon, title, value, color, delay }: StatusCardProps) => (
   <motion.div
     initial={{ opacity: 0, y: 20, x: -20 }}
     animate={{ opacity: 1, y: 0, x: 0 }}
@@ -34,7 +41,14 @@ const StatusCard = ({ icon, title, value, color, delay }: any) => (
   </motion.div>
 );
 
-const FeatureSlide = ({ active, title, subtitle, color }: any) => (
+interface FeatureSlideProps {
+  active: boolean;
+  title: string;
+  subtitle: string;
+  color: string;
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const FeatureSlide = ({ active, title, subtitle, color }: FeatureSlideProps) => (
   <AnimatePresence mode="wait">
     {active && (
       <motion.div
@@ -127,6 +141,7 @@ export default function LoginPage() {
         // Ideally we fetch the profile here.
         // Let's assume dashboard for now, or check profile
         const { data: { user } } = await supabase.auth.getUser();
+
         if (user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -162,8 +177,8 @@ export default function LoginPage() {
           return;
         }
       }
-    } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Something went wrong. Please try again.");
       setLoading(false);
     }
   };

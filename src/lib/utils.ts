@@ -9,9 +9,9 @@ export function formatNumber(value: number, decimals = 1): string {
     return value.toFixed(decimals);
 }
 
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string, locale: string = 'en-US'): string {
     const d = new Date(date);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
         month: 'short',
         day: 'numeric',
         year: 'numeric',

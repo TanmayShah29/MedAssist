@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
     try {
         const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [])
         return NextResponse.json({ answer })
-    } catch (error: any) {
-        if (error.message?.startsWith('RATE_LIMIT')) {
-            return NextResponse.json({ error: error.message }, { status: 429 })
+    } catch (error: unknown) {
+        if ((error as Error).message?.startsWith('RATE_LIMIT')) {
+            return NextResponse.json({ error: (error as Error).message }, { status: 429 })
         }
         return NextResponse.json({ error: 'Failed to get answer. Please try again.' }, { status: 500 })
     }

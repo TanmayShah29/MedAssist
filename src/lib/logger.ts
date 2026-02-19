@@ -6,14 +6,14 @@
 const isProduction = process.env.NODE_ENV === 'production';
 
 export const logger = {
-    info: (message: string, data?: any) => {
+    info: (message: string, data?: unknown) => {
         if (isProduction && !process.env.ENABLE_VERBOSE_LOGMING) return; // Silence info in prod unless enabled
         console.log(`[INFO] ${message}`, data || '');
     },
-    warn: (message: string, data?: any) => {
+    warn: (message: string, data?: unknown) => {
         console.warn(`[WARN] ${message}`, data || '');
     },
-    error: (message: string, error?: any) => {
+    error: (message: string, error?: unknown) => {
         // In production, we might want to send this to a monitoring service (Sentry, etc.)
         // For now, we strip complex objects to avoid leaking full stack traces to stdout if sensitive
         if (isProduction) {

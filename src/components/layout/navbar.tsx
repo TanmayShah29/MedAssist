@@ -10,7 +10,6 @@ import {
     MessageSquare,
     User,
     Settings,
-    LogOut,
     Menu,
     X
 } from "lucide-react"

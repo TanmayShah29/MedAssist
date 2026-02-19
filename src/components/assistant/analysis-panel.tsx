@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { CheckCircle2, AlertTriangle, ArrowRight, Brain, Link as LinkIcon, ChevronRight } from "lucide-react"
+import { Brain, Link as LinkIcon } from "lucide-react"
 
 interface ClinicalEntity {
     name: string
@@ -9,11 +9,11 @@ interface ClinicalEntity {
     confidence: number
 }
 
-interface Diagnosis {
-    condition: string
-    probability: number
-    evidence: string[]
-}
+// interface Diagnosis {
+//     condition: string
+//     probability: number
+//     evidence: string[]
+// }
 
 export function AnalysisPanel() {
     // Mock data for the Abridge-style panel
@@ -25,11 +25,11 @@ export function AnalysisPanel() {
         { name: 'Shortness of breath', type: 'Symptom', confidence: 0.88 },
     ]
 
-    const differential: Diagnosis[] = [
-        { condition: 'Iron Deficiency Anemia', probability: 78, evidence: ['Low Hgb', 'Fatigue response'] },
-        { condition: 'Vitamin B12 Deficiency', probability: 34, evidence: [] },
-        { condition: 'Hypothyroidism', probability: 21, evidence: [] },
-    ]
+    // const differential: Diagnosis[] = [
+    //     { condition: 'Iron Deficiency Anemia', probability: 78, evidence: ['Low Hgb', 'Fatigue response'] },
+    //     { condition: 'Vitamin B12 Deficiency', probability: 34, evidence: [] },
+    //     { condition: 'Hypothyroidism', probability: 21, evidence: [] },
+    // ]
 
     return (
         <div className="h-full overflow-y-auto p-6 space-y-8">

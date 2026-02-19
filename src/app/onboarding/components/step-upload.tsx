@@ -1,9 +1,10 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { useRef, useState } from "react";
 
 export function StepUpload() {
@@ -28,17 +29,13 @@ export function StepUpload() {
         setIsDragging(false);
     };
 
+
+
     const validateAndSetFile = (file: File) => {
-        // Vercel/Next.js Body Limit is ~4.5MB
-        // We set 4.3MB to be safe with base64 overhead 
-        // Base64 adds ~33%, so 4.5MB payload means max ~3.3MB binary file.
-        // Wait, standard limit for `serverActions` body size limit is payload size. 
-        // If we increased it to 4.5MB, a 3.3MB file becomes ~4.4MB base64.
-        // Let's hold it to 4MB max to be safe.
-        const MAX_SIZE = 4 * 1024 * 1024;
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
         if (file.size > MAX_SIZE) {
-            alert(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 4MB.`);
+            toast.error(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 10MB.`);
             return;
         }
         setUploadedFile(file);

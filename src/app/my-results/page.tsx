@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Calendar, ChevronRight, Info, AlertTriangle, CheckCircle, ArrowRight, Activity } from "lucide-react";
+import { Calendar, ChevronRight, Info, AlertTriangle, CheckCircle, ArrowRight, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MotionButton } from "@/components/ui/motion";
 
 // Mock Data for Lab Results
 const LAB_RESULTS = [

@@ -1,535 +1,291 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase";
-import {
-    Send,
-    Paperclip,
-    Brain,
-    ChevronRight,
-    Search,
-    FileText,
-    Activity,
-    Zap,
-    Upload
-} from "lucide-react";
-import { BadgeGroup } from "@/components/ui/badge-group";
-import { MessageBubble, type Message } from "@/components/ui/message-bubble";
-import { BouncingDots } from "@/components/ui/bouncing-dots";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ArrowLeft, Send, Sparkles, ChevronRight, Activity, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface BiomarkerData {
-    name: string;
-    value: number;
-    unit: string;
-    status: string;
-    category: string;
-}
+// Types
+type Message = {
+    id: string;
+    role: "user" | "assistant" | "system_reasoning";
+    content: string;
+    timestamp: Date;
+};
 
-// ── Static sidebar data ────────────────────────────────────────────────────
-const evidenceSteps = [
-    { id: "1", label: "Symptom extraction", source: "Groq AI", ms: "120ms", Icon: Search },
-    { id: "2", label: "Lab correlation", source: "Knowledge Graph", ms: "45ms", Icon: FileText },
-    { id: "3", label: "Risk scoring", source: "MedCalc API", ms: "89ms", Icon: Activity },
-    { id: "4", label: "Response generation", source: "Groq Llama 3.3", ms: "1.2s", Icon: Zap },
-];
+type ContextData = {
+    title: string;
+    value?: string;
+    trend?: string;
+    status: "optimal" | "warning" | "critical";
+    relatedMarkers?: { name: string; status: string }[];
+};
 
-// ── Main Page ──────────────────────────────────────────────────────────────
+// Mock Context Data Loader
+const getContextData = (context: string | null): ContextData => {
+    if (context === "hemoglobin") {
+        return {
+            title: "Hemoglobin",
+            value: "12.8 g/dL",
+            trend: "↓ 8% from last month",
+            status: "critical",
+            relatedMarkers: [
+                { name: "Ferritin", status: "Low" },
+                { name: "MCV", status: "Trending ↓" }
+            ]
+        };
+    }
+    return {
+        title: "Health Overview",
+        status: "optimal",
+        relatedMarkers: []
+    };
+};
+
 export default function AssistantPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const prefillQuery = searchParams.get("q");
-
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [sending, setSending] = useState(false);
-    const [biomarkers, setBiomarkers] = useState<BiomarkerData[]>([]);
-    const [symptoms, setSymptoms] = useState<string[]>([]);
-
-    const inputRef = useRef<HTMLTextAreaElement>(null);
+    const contextParam = searchParams.get("context");
+    const [contextData, setContextData] = useState<ContextData | null>(null);
+    const [messages, setMessages] = useState<Message[]>([
+        {
+            id: "1",
+            role: "assistant",
+            content: "Hello. I've analyzed your latest results. How can I help you understand them?",
+            timestamp: new Date()
+        }
+    ]);
+    const [inputValue, setInputValue] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom when messages change
     useEffect(() => {
+        if (contextParam) {
+            const data = getContextData(contextParam);
+            setContextData(data);
+            // Simulate initial AI analysis based on context
+            if (data.title === "Hemoglobin") {
+                setMessages(prev => [
+                    ...prev,
+                    {
+                        id: "2",
+                        role: "system_reasoning",
+                        content: "Hemoglobin ↓ 8%\nFerritin ↓ 12%\nMCV trending lower\n\nPattern consistent with early iron deficiency.",
+                        timestamp: new Date()
+                    }
+                ])
+            }
+        }
+    }, [contextParam]);
+
+    const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, sending]);
-
-    // ── Init: fetch user data + generate greeting ──────────────────────────
-    const initAssistant = useCallback(async () => {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            router.push("/auth");
-            return;
-        }
-
-        const [{ data: profile }, { data: bms }, { data: syms }] = await Promise.all([
-            supabase.from("profiles").select("first_name").eq("id", user.id).single(),
-            supabase.from("biomarkers").select("*").eq("user_id", user.id).limit(20),
-            supabase.from("symptoms").select("symptom").eq("user_id", user.id),
-        ]);
-
-        const biomarkerData: BiomarkerData[] = (bms || []).map(b => ({
-            name: b.name,
-            value: b.value,
-            unit: b.unit,
-            status: b.status,
-            category: b.category,
-        }));
-        const symptomData = (syms || []).map((s: { symptom: string }) => s.symptom);
-
-        setBiomarkers(biomarkerData);
-        setSymptoms(symptomData);
-
-        // If no biomarkers, show static greeting
-        if (biomarkerData.length === 0) {
-            setMessages([{
-                id: "1",
-                role: "assistant",
-                content: "Welcome! Upload your lab results first so I can give you personalized insights. Once I have your biomarker data, I can help you understand your results and answer any health-related questions.",
-            }]);
-            setLoading(false);
-            return;
-        }
-
-        // Generate personalized greeting via API
-        try {
-            const response = await fetch("/api/ask-ai", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    question: `Generate a warm, personalized greeting for ${profile?.first_name || "the user"}. Briefly mention 1-2 notable findings from their lab results and offer to discuss them. Keep it to 2-3 sentences plus 2 suggested questions.`,
-                    biomarkers: biomarkerData,
-                    symptoms: symptomData,
-                }),
-            });
-            const { answer } = await response.json();
-
-            setMessages([{
-                id: "1",
-                role: "assistant",
-                content: answer,
-            }]);
-        } catch {
-            setMessages([{
-                id: "1",
-                role: "assistant",
-                content: `Hi${profile?.first_name ? ` ${profile.first_name}` : ""}! I've reviewed your latest results. Ask me anything about your biomarkers — I'm here to help you understand them.`,
-            }]);
-        }
-
-        setLoading(false);
-    }, [router]);
-
-    useEffect(() => {
-        initAssistant();
-    }, [initAssistant]);
-
-    // Prefill query from URL param
-    useEffect(() => {
-        if (prefillQuery && !loading) {
-            setInput(decodeURIComponent(prefillQuery));
-            inputRef.current?.focus();
-        }
-    }, [prefillQuery, loading]);
-
-    // ── Send message ───────────────────────────────────────────────────────
-    const sendMessage = async () => {
-        if (!input.trim() || sending) return;
-
-        const userMessage: Message = {
-            id: Date.now().toString(),
-            role: "user",
-            content: input,
-        };
-        setMessages(prev => [...prev, userMessage]);
-        setInput("");
-        setSending(true);
-
-        try {
-            const response = await fetch("/api/ask-ai", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    question: input,
-                    biomarkers,
-                    symptoms,
-                }),
-            });
-
-            const { answer, error } = await response.json();
-
-            setMessages(prev => [...prev, {
-                id: Date.now().toString() + "_ai",
-                role: "assistant",
-                content: error
-                    ? "Sorry, I encountered an error. Please try again."
-                    : answer,
-            }]);
-        } catch {
-            setMessages(prev => [...prev, {
-                id: Date.now().toString() + "_ai",
-                role: "assistant",
-                content: "Sorry, something went wrong. Please try again in a moment.",
-            }]);
-        }
-
-        setSending(false);
     };
 
-    // ── Derive sidebar data from real biomarkers ───────────────────────────
-    const detectedEntities = [
-        ...symptoms.slice(0, 2).map((s, i) => ({
-            id: `s_${i}`,
-            label: s,
-            type: "symptom" as const,
-        })),
-        ...biomarkers
-            .filter(b => b.status !== "optimal")
-            .slice(0, 2)
-            .map((b, i) => ({
-                id: `b_${i}`,
-                label: b.name,
-                type: "lab" as const,
-            })),
-    ];
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
-    const biomarkerConfidence = biomarkers.length > 0
-        ? Math.round(biomarkers.reduce((sum, b) => sum + (b.status === "optimal" ? 95 : b.status === "warning" ? 75 : 55), 0) / biomarkers.length)
-        : 0;
+    const handleSendMessage = () => {
+        if (!inputValue.trim()) return;
 
-    // ── Loading state ──────────────────────────────────────────────────────
-    if (loading) {
-        return (
-            <div className="flex flex-col lg:flex-row h-screen lg:h-[100dvh] overflow-hidden bg-[#FAFAF7]">
-                <div className="flex flex-col flex-1 lg:w-[52%] lg:flex-none border-r-2 border-[#D4CBBB] bg-[#F7F6F2] h-full">
-                    <div className="h-16 border-b border-[#E2DFD8] bg-[#F0EEE8] flex-shrink-0" />
-                    <div className="flex-1 flex items-center justify-center">
-                        <div className="text-center">
-                            <BouncingDots message="Loading your health context..." />
-                        </div>
-                    </div>
-                    <div className="p-5 border-t border-[#E2DFD8] bg-[#F7F6F2]">
-                        <div className="h-11 bg-[#E8E6DF] rounded-[12px] animate-pulse" />
-                    </div>
-                </div>
-                <div className="flex-1 bg-[#1C2B3A] animate-pulse">
-                    <div className="h-16 border-b border-[#243447]" />
-                    <div className="p-6 space-y-6">
-                        <div className="h-12 bg-[#243447] rounded-lg" />
-                        <div className="h-24 bg-[#243447] rounded-lg" />
-                        <div className="h-40 bg-[#243447] rounded-lg" />
-                    </div>
-                </div>
-            </div>
-        );
-    }
+        const newUserMsg: Message = {
+            id: Date.now().toString(),
+            role: "user",
+            content: inputValue,
+            timestamp: new Date()
+        };
 
-    // ── Render ──────────────────────────────────────────────────────────────
+        setMessages(prev => [...prev, newUserMsg]);
+        setInputValue("");
+
+        // Mock AI Response
+        setTimeout(() => {
+            const newAiMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                role: "assistant",
+                content: "I can verify that for you. Based on the clinical guidelines, a drop in hemoglobin combined with low ferritin strongly suggests iron deficiency anemia. Would you like me to draft a message to your provider?",
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, newAiMsg]);
+        }, 1000);
+    };
+
+    const handleSuggestedQuestion = (question: string) => {
+        setInputValue(question);
+        // Optional: auto-send
+    };
+
     return (
-        <div className="flex flex-col lg:flex-row h-screen lg:h-[100dvh] overflow-hidden bg-[#FAFAF7]">
+        <div className="min-h-screen bg-[#FAFAF7] font-sans selection:bg-sky-100">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
 
-            {/* LEFT: Chat panel */}
-            <div className="flex flex-col flex-1 lg:w-[52%] lg:flex-none border-r-2 border-[#D4CBBB] bg-[#F7F6F2] h-full overflow-hidden">
-
-                {/* Chat header */}
-                <div className="h-16 flex items-center justify-between px-4 lg:px-5 
-                        border-b border-[#E2DFD8] bg-[#F0EEE8] flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                        <div className="lg:hidden w-8" />
-                        <span className="text-sm font-semibold text-[#1C1917]">
-                            Clinical Conversation
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
-                        <span className="text-xs text-sky-600 font-medium">
-                            {biomarkers.length > 0 ? "Context Active" : "No Lab Data"}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    {messages.length === 0 && !sending ? (
-                        /* Welcome state */
-                        <div className="space-y-6">
-                            <div className="flex gap-4">
-                                <div className="w-8 h-8 rounded-full bg-sky-100 border 
-                                    border-sky-200 flex items-center justify-center 
-                                    flex-shrink-0">
-                                    <Brain className="w-4 h-4 text-sky-500" />
-                                </div>
-                                <div className="bg-white rounded-[14px] rounded-tl-[4px] 
-                                    border border-[#EAE8E1] p-5 flex-1 shadow-sm">
-                                    <p className="text-sm text-[#57534E] leading-relaxed">
-                                        {biomarkers.length > 0
-                                            ? "I'm ready to discuss your lab results. What would you like to know?"
-                                            : "Welcome! Upload your lab results first, then I can provide personalized insights."
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Suggested prompts */}
-                            <div className="pl-12">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                                    text-[#A8A29E] mb-3">
-                                    Suggested Questions
-                                </p>
-                                <div className="space-y-2">
-                                    {(biomarkers.length > 0 ? [
-                                        "What are my most important findings?",
-                                        "Explain any out-of-range values",
-                                        "What should I ask my doctor?",
-                                        "Show me what's most urgent",
-                                    ] : [
-                                        "What kind of reports can you analyze?",
-                                        "What biomarkers do you track?",
-                                        "How does the analysis work?",
-                                    ]).map(prompt => (
-                                        <button
-                                            key={prompt}
-                                            onClick={() => {
-                                                setInput(prompt);
-                                                inputRef.current?.focus();
-                                            }}
-                                            className="w-full text-left px-4 py-3 bg-white 
-                                                hover:bg-[#F5F4EF] border border-[#E2DFD8] 
-                                                hover:border-[#D9D6CD] rounded-[10px] text-sm 
-                                                text-[#57534E] hover:text-[#1C1917] 
-                                                transition-all min-h-[44px] flex items-center shadow-sm"
-                                        >
-                                            {prompt}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            {messages.map(msg => (
-                                <MessageBubble key={msg.id} message={msg} />
-                            ))}
-
-                            {/* Typing indicator */}
-                            {sending && (
-                                <div className="flex gap-3 max-w-[85%]">
-                                    <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 
-                                        flex items-center justify-center flex-shrink-0">
-                                        <Brain className="w-4 h-4 text-emerald-700" />
-                                    </div>
-                                    <div className="p-4 rounded-[14px] rounded-tl-[4px] bg-[#F5F4EF] 
-                                        border border-[#E8E6DF] min-w-[80px]">
-                                        <BouncingDots dots={3} />
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    )}
-                    <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input */}
-                <div className="p-5 border-t border-[#E2DFD8] bg-[#F7F6F2]">
-                    <div className="flex gap-3 items-end">
-                        <div className="flex-1 relative">
-                            <textarea
-                                ref={inputRef}
-                                value={input}
-                                onChange={e => setInput(e.target.value)}
-                                placeholder="Describe symptoms or ask about your results..."
-                                rows={1}
-                                className="w-full px-4 py-3 bg-white border border-[#E2DFD8]
-                                    rounded-[12px] text-sm text-[#1C1917] 
-                                    placeholder-[#A8A29E] resize-none shadow-sm
-                                    focus:outline-none focus:border-sky-400 
-                                    focus:ring-2 focus:ring-sky-100/50 transition-all"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                        e.preventDefault();
-                                        sendMessage();
-                                    }
-                                }}
-                            />
-                            <button className="absolute right-3 bottom-3 text-[#A8A29E] 
-                                hover:text-sky-500 transition-colors">
-                                <Paperclip className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <button
-                            onClick={sendMessage}
-                            disabled={!input.trim() || sending}
-                            className="w-11 h-11 rounded-[12px] bg-sky-500 hover:bg-sky-600 
-                                disabled:bg-[#E2DFD8] text-white disabled:text-[#C5C2B8]
-                                flex items-center justify-center transition-colors 
-                                flex-shrink-0 shadow-sm"
-                        >
-                            <Send className="w-4 h-4" />
-                        </button>
-                    </div>
-                    <p className="text-[10px] text-[#A8A29E] text-center mt-3 italic">
-                        AI-generated insights only. Always consult a qualified physician.
-                    </p>
-                </div>
-            </div>
-
-            {/* RIGHT: Analysis panel */}
-            <div className="flex-1 bg-[#1C2B3A] overflow-y-auto flex flex-col">
-
-                <div className="h-16 flex items-center px-5 
-                        border-b border-[#243447] bg-[#1C2B3A]">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                        text-[#5B7A99]">
-                        Live Analysis Context
-                    </p>
-                </div>
-
-                <div className="p-6 space-y-6">
-                    {/* Model Confidence */}
+                {/* HEADER */}
+                <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                                text-[#5B7A99]">
-                                Model Confidence
-                            </p>
-                            <span className="font-display text-xl text-sky-400/80">
-                                {biomarkerConfidence > 0 ? `${biomarkerConfidence}%` : "—"}
-                            </span>
-                        </div>
-                        <div className="h-1 bg-[#243447] rounded-full">
-                            <div
-                                className="h-full bg-sky-600/70 rounded-full transition-all duration-700"
-                                style={{ width: `${biomarkerConfidence}%` }}
-                            />
-                        </div>
-                        <p className="text-xs text-[#8BA5C0] mt-2">
-                            {biomarkers.length > 0
-                                ? `Based on ${biomarkers.length} biomarker${biomarkers.length !== 1 ? "s" : ""} and ${symptoms.length} symptom${symptoms.length !== 1 ? "s" : ""}`
-                                : "Upload lab results to enable analysis"
-                            }
+                        <h1 className="font-display text-3xl text-[#1C1917]">
+                            AI Health Assistant
+                        </h1>
+                        <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-sky-500" />
+                            Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "Updated"} · Updated 2 min ago
                         </p>
                     </div>
 
-                    <div className="border-t border-[#243447]" />
+                    <button
+                        onClick={() => router.back()}
+                        className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Results
+                    </button>
+                </header>
 
-                    {/* Entities Detected */}
-                    <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                            text-[#5B7A99] mb-4">
-                            Entities Detected
+                {/* CONTEXT SUMMARY CARD */}
+                {contextData && (
+                    <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
+                            <Activity className="w-3 h-3" />
+                            Current Context
                         </p>
-                        {detectedEntities.length > 0 ? (
-                            <BadgeGroup badges={detectedEntities} />
-                        ) : (
-                            <p className="text-xs text-[#5B7A99]">No entities detected yet</p>
-                        )}
-                    </div>
 
-                    <div className="border-t border-[#243447]" />
-
-                    {/* Biomarker Summary */}
-                    {biomarkers.length > 0 && (
-                        <>
+                        <div className="flex items-start justify-between gap-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                                    text-[#5B7A99] mb-4">
-                                    Active Biomarker Context
+                                <p className="font-display text-xl text-sky-800">
+                                    {contextData.title} {contextData.value && `— ${contextData.value}`}
+                                </p>
+                                <p className="text-sm text-sky-700 mt-1">
+                                    {contextData.trend} {contextData.status === "critical" && "· Below optimal range"}
+                                </p>
+                            </div>
+
+                            {contextData.status === "critical" && (
+                                <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200">
+                                    Action Required
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* MAIN GRID Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100vh-300px)] min-h-[600px]">
+
+                    {/* LEFT: CONVERSATION PANEL */}
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm relative">
+
+                        {/* Messages Area */}
+                        <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                            {messages.map((msg) => (
+                                <div key={msg.id} className={cn(
+                                    "flex w-full",
+                                    msg.role === "user" ? "justify-end" : "justify-start"
+                                )}>
+                                    {/* MESSAGE BUBBLES */}
+                                    {msg.role === "user" ? (
+                                        <div className="bg-sky-500 text-white text-sm px-5 py-3.5 rounded-[14px] rounded-tr-sm max-w-[80%] shadow-md shadow-sky-500/10">
+                                            {msg.content}
+                                        </div>
+                                    ) : msg.role === "system_reasoning" ? (
+                                        <div className="bg-[#0F172A] rounded-[12px] p-4 max-w-[90%] border border-slate-800 shadow-xl">
+                                            <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-1.5">
+                                                <Sparkles className="w-3 h-3" />
+                                                Clinical Pattern Analysis
+                                            </p>
+                                            <p className="text-slate-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+                                                {msg.content}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                                            {msg.content}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Input Area */}
+                        <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                                    className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                                    placeholder="Ask about your results..."
+                                />
+                                <button
+                                    onClick={handleSendMessage}
+                                    className="px-4 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-[12px] transition-colors shadow-md shadow-sky-500/20"
+                                >
+                                    <Send className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL */}
+                    <div className="flex flex-col gap-5 overflow-y-auto">
+
+                        {/* 1. Related Biomarkers */}
+                        {contextData?.relatedMarkers && contextData.relatedMarkers.length > 0 && (
+                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
+                                <p className="text-sm font-semibold text-[#1C1917] mb-4 flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-[#A8A29E]" />
+                                    Related Markers
                                 </p>
                                 <div className="space-y-3">
-                                    {biomarkers.slice(0, 5).map((b, i) => (
-                                        <div key={i} className="flex items-center justify-between">
-                                            <span className="text-xs text-[#8BA5C0] font-medium truncate mr-2">
-                                                {b.name}
-                                            </span>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-[#5B7A99] font-mono">
-                                                    {b.value} {b.unit}
-                                                </span>
-                                                <div className={cn(
-                                                    "w-1.5 h-1.5 rounded-full",
-                                                    b.status === "optimal" ? "bg-emerald-500" :
-                                                        b.status === "warning" ? "bg-amber-500" : "bg-red-500"
-                                                )} />
-                                            </div>
+                                    {contextData.relatedMarkers.map((marker, idx) => (
+                                        <div key={idx} className="flex justify-between items-center text-sm p-2 bg-[#FAFAF7] rounded-lg border border-[#E8E6DF]/50">
+                                            <span className="text-[#57534E] font-medium">{marker.name}</span>
+                                            <span className={cn(
+                                                "font-semibold text-xs px-2 py-0.5 rounded-full",
+                                                marker.status === "Low" ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"
+                                            )}>{marker.status}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <div className="border-t border-[#243447]" />
-                        </>
-                    )}
-
-                    {/* Evidence Trail */}
-                    <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                            text-[#5B7A99] mb-4">
-                            Evidence Trail
-                        </p>
-                        <div className="space-y-3">
-                            {evidenceSteps.map(step => (
-                                <div key={step.id} className="flex items-start gap-3">
-                                    <div className="w-7 h-7 rounded-lg bg-[#243447] border 
-                                        border-[#2D4060] flex items-center justify-center 
-                                        flex-shrink-0">
-                                        <step.Icon className="w-3.5 h-3.5 text-sky-500/70" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-medium text-[#8BA5C0]">
-                                            {step.label}
-                                        </p>
-                                        <p className="text-[10px] text-[#5B7A99] mt-0.5">
-                                            {step.source} · {step.ms}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="border-t border-[#243447]" />
-
-                    {/* Cross-page CTAs */}
-                    <div className="space-y-3">
-                        <button
-                            onClick={() => router.push("/dashboard")}
-                            className="w-full px-4 py-3 bg-[#243447]/60 hover:bg-[#2D4060] 
-                                text-[#8BA5C0] hover:text-[#B8CDD9] text-sm rounded-[10px] 
-                                border border-[#2D4060] transition-all text-left 
-                                flex items-center justify-between group"
-                        >
-                            <span>See trends on dashboard</span>
-                            <ChevronRight className="w-4 h-4 text-[#5B7A99] group-hover:text-[#B8CDD9] transition-colors" />
-                        </button>
-                        <button
-                            onClick={() => router.push("/results")}
-                            className="w-full px-4 py-3 bg-[#243447]/60 hover:bg-[#2D4060] 
-                                text-[#8BA5C0] hover:text-[#B8CDD9] text-sm rounded-[10px] 
-                                border border-[#2D4060] transition-all text-left 
-                                flex items-center justify-between group"
-                        >
-                            <span>View full lab context</span>
-                            <ChevronRight className="w-4 h-4 text-[#5B7A99] group-hover:text-[#B8CDD9] transition-colors" />
-                        </button>
-                        {biomarkers.length === 0 && (
-                            <button
-                                onClick={() => router.push("/onboarding")}
-                                className="w-full px-4 py-3 bg-sky-600/20 hover:bg-sky-600/30 
-                                    text-sky-300 hover:text-sky-200 text-sm rounded-[10px] 
-                                    border border-sky-500/30 transition-all text-left 
-                                    flex items-center justify-between group"
-                            >
-                                <span className="flex items-center gap-2">
-                                    <Upload className="w-4 h-4" />
-                                    Upload lab report
-                                </span>
-                                <ChevronRight className="w-4 h-4 text-sky-500/60 group-hover:text-sky-200 transition-colors" />
-                            </button>
                         )}
+
+                        {/* 2. Suggested Questions */}
+                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
+                            <p className="text-sm font-semibold text-[#1C1917] mb-3 flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-[#A8A29E]" />
+                                Suggested Questions
+                            </p>
+                            <div className="space-y-2">
+                                {["What causes iron deficiency?", "Should I take supplements?", "How can I improve this through diet?"].map((q, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleSuggestedQuestion(q)}
+                                        className="w-full text-left px-3 py-2.5 bg-[#FAFAF7] hover:bg-[#EFEDE6] hover:border-[#D6D3C9] border border-transparent rounded-[10px] text-sm text-[#57534E] transition-all flex justify-between items-center group"
+                                    >
+                                        {q}
+                                        <ChevronRight className="w-3.5 h-3.5 text-[#D6D3C9] group-hover:text-[#A8A29E]" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 3. Recommended Actions */}
+                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
+                            <p className="text-sm font-semibold text-[#1C1917] mb-4 flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-[#A8A29E]" />
+                                Recommended Actions
+                            </p>
+                            <div className="space-y-3">
+                                <button className="w-full px-4 py-3 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-[10px] transition-colors shadow-md shadow-sky-500/10 flex items-center justify-center gap-2">
+                                    Schedule appointment
+                                </button>
+                                <button className="w-full px-4 py-3 bg-[#FAFAF7] hover:bg-[#EFEDE6] border border-[#E8E6DF] text-[#57534E] text-sm font-medium rounded-[10px] transition-colors flex items-center justify-center gap-2">
+                                    View full dashboard
+                                    <ArrowLeft className="w-3 h-3 rotate-180" />
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

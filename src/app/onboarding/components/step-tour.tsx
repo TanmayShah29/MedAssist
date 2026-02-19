@@ -1,31 +1,73 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion } from "motion/react";
-import { ChevronRight, ArrowRight, Activity, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Activity, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { saveLabResult } from "@/app/actions/user-data";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 export function StepTour() {
     const {
-        extractedLabValues,
-        healthScore,
-        riskLevel,
-        reset,
+        analysisResult,
     } = useOnboardingStore();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleFinish = () => {
-        // In a real app, we'd save the extracted data to Supabase here.
-        // For now, we update the dashboard store or local storage if needed.
-        // The onboarding store is persisted, so dashboard can read from it.
-        router.push("/dashboard");
-        // We don't verify reset() here so the dashboard can read the data.
-        // The dashboard should clear it after hydration if needed.
+    const handleFinish = async () => {
+        setIsLoading(true);
+
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            toast.error("You must be logged in to save your results.");
+            setIsLoading(false);
+            return;
+        }
+
+        if (!analysisResult) {
+            toast.error("Analysis data is missing.");
+            setIsLoading(false);
+            return;
+        }
+
+        const result = await saveLabResult({
+            userId: user.id,
+            healthScore: analysisResult.healthScore,
+            riskLevel: analysisResult.riskLevel,
+            summary: analysisResult.summary,
+            labValues: analysisResult.biomarkers,
+        });
+
+        setIsLoading(false);
+
+        if (result.success) {
+            toast.success("Your results have been saved to your profile!");
+            router.push("/dashboard");
+            // Consider resetting the store after a short delay
+            // setTimeout(() => reset(), 1000);
+        } else {
+            toast.error(result.error || "Failed to save your results. Please try again.");
+        }
     };
+    
+    if (!analysisResult) {
+        return (
+            <div className="max-w-4xl mx-auto w-full px-6 py-10 text-center">
+                <h2 className="font-display text-2xl text-[#1C1917]">Loading analysis results...</h2>
+                <p className="text-[#57534E] mt-2">
+                    If you see this for a while, please go back and re-analyze your report.
+                </p>
+            </div>
+        )
+    }
 
-    const criticalItems = extractedLabValues.filter(v => v.status === "critical");
-    const warningItems = extractedLabValues.filter(v => v.status === "warning");
+    const criticalItems = analysisResult.biomarkers.filter(v => v.status === "critical");
+    const warningItems = analysisResult.biomarkers.filter(v => v.status === "warning");
 
     return (
         <div className="max-w-4xl mx-auto w-full px-6 py-10">
@@ -40,7 +82,7 @@ export function StepTour() {
                     Here is what we found
                 </h2>
                 <p className="text-[#57534E]">
-                    We analyzed {extractedLabValues.length} biomarkers from your report.
+                    We analyzed {analysisResult.biomarkers.length} biomarkers from your report.
                 </p>
             </div>
 
@@ -62,11 +104,11 @@ export function StepTour() {
                         Overall Health Score
                     </span>
                     <div className="text-5xl font-display text-[#1C1917] mb-2">
-                        {healthScore}
+                        {analysisResult.healthScore}
                         <span className="text-2xl text-[#A8A29E]">/100</span>
                     </div>
                     <p className="text-xs text-[#57534E]">
-                        Based on {extractedLabValues.length} biomarkers
+                        Based on {analysisResult.biomarkers.length} biomarkers
                     </p>
                 </motion.div>
 
@@ -92,8 +134,8 @@ export function StepTour() {
                     </div>
 
                     <div className="space-y-3">
-                        {[...criticalItems, ...warningItems].map((item) => (
-                            <div key={item.name} className="flex items-start gap-3 p-3 
+                        {[...criticalItems, ...warningItems].map((item, index) => (
+                            <div key={index} className="flex items-start gap-3 p-3 
                                               bg-[#FAFAF7] rounded-[10px] border border-[#E8E6DF]">
                                 <div className={cn(
                                     "w-2 h-2 rounded-full mt-1.5 shrink-0",
@@ -121,12 +163,13 @@ export function StepTour() {
             <div className="flex justify-center">
                 <button
                     onClick={handleFinish}
+                    disabled={isLoading}
                     className="flex items-center gap-2 px-8 py-4 bg-sky-500 
                      hover:bg-sky-600 text-white font-semibold rounded-[14px] 
                      shadow-lg shadow-sky-500/25 transition-all 
-                     hover:-translate-y-0.5"
+                     hover:-translate-y-0.5 disabled:bg-sky-300 disabled:cursor-not-allowed"
                 >
-                    Go to my Dashboard
+                    {isLoading ? "Saving..." : "Go to my Dashboard"}
                     <ArrowRight className="w-5 h-5" />
                 </button>
             </div>

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({ request })
+    const response = NextResponse.next({ request })
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,10 +21,26 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
+    const { pathname } = request.nextUrl
+
+    // List of paths that don't require authentication
+    const publicPaths = ['/', '/login', '/auth/callback']
+    const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith('/auth/callback'))
+
+    // If logged in and trying to access login page, redirect to dashboard
+    if (user && (pathname === '/login' || pathname === '/auth')) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    // If not logged in and trying to access a protected route, redirect to login
+    if (!user && !isPublicPath) {
+        return NextResponse.redirect(new URL('/login', request.url))
+    }
+
     return response
 }
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 }

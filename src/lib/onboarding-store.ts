@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 export interface BasicInfo {
     firstName: string;
     lastName: string;
-    age: string;
+    age: number | ""; // Allow "" for initial empty state
     sex: "male" | "female" | "other" | "";
     bloodType: string;
     emergencyContact: string;
@@ -55,7 +55,7 @@ export interface OnboardingState {
     processingComplete: boolean;
 
     // Analysis result from API
-    analysisResult: { biomarkers: any[]; healthScore: number; riskLevel: string; summary: string } | null;
+    analysisResult: { biomarkers: ExtractedLabValue[]; healthScore: number; riskLevel: string; summary: string } | null;
 
     // Actions
     setStep: (step: number) => void;
@@ -69,7 +69,7 @@ export interface OnboardingState {
         healthScore: number;
         riskLevel: "low" | "moderate" | "high";
     }) => void;
-    setAnalysisResult: (result: { biomarkers: any[]; healthScore: number; riskLevel: string; summary: string }) => void;
+    setAnalysisResult: (result: { biomarkers: ExtractedLabValue[]; healthScore: number; riskLevel: string; summary: string }) => void;
     reset: () => void;
 }
 
@@ -81,7 +81,7 @@ export const useOnboardingStore = create<OnboardingState>()(
             basicInfo: {
                 firstName: "",
                 lastName: "",
-                age: "",
+                age: "", // Keep initial state as "" for empty input
                 sex: "",
                 bloodType: "",
                 emergencyContact: "",

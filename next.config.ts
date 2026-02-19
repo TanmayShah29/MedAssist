@@ -8,4 +8,6 @@ const nextConfig: NextConfig = {
   },
 };
 
+export const maxDuration = 60; // Support long-running AI analysis
+
 export default nextConfig;

@@ -9,7 +9,6 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from "recharts"
-import { motion } from "framer-motion"
 
 const data = [
     { subject: 'Metabolic', A: 90, fullMark: 100 },

@@ -6,7 +6,6 @@ export function MedAssistLogo({ className = "", collapsed = false, monochrome = 
     // Colors for "Teal Data Shield"
     const colorPrimary = monochrome ? "currentColor" : "#14B8A6"; // Teal-500
     const colorSecondary = monochrome ? "currentColor" : "#A2E9E2"; // Teal-200 (Light Accent)
-    const colorDark = monochrome ? "currentColor" : "#0F172A";    // Slate-900 (Background match)
 
     return (
         <div className={`flex items-center gap-3 ${className}`}>

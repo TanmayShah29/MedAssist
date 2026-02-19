@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/services/rateLimitService";
-import { generateClinicalInsight } from "@/app/actions/gemini"; // Groq-powered clinical insight generator
+import { generateClinicalInsight } from "@/app/actions/groq-actions"; // Groq-powered clinical insight generator
 import { logger } from "@/lib/logger";
+
+export const maxDuration = 60;
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
     try {
@@ -22,9 +25,7 @@ export async function POST(req: NextRequest) {
                 {
                     status: 429,
                     headers: {
-                        'Retry-After': String(limit.retryAfter || 60),
-                        'X-RateLimit-Limit': '10',
-                        'X-RateLimit-Remaining': '0'
+                        'Retry-After': String(limit.retryAfter || 60)
                     }
                 }
             );
@@ -46,8 +47,11 @@ export async function POST(req: NextRequest) {
         const result = await generateClinicalInsight(prompt, contextType || 'symptom');
 
         if (!result.success) {
-            // Handle internal errors from Groq helper
-            return NextResponse.json(result, { status: result.status || 500 });
+            logger.error(`[Assistant API] Clinical insight generation failed: ${result.error}`);
+            return NextResponse.json(
+                { success: false, error: result.error || "Clinical insight generation failed" },
+                { status: result.status || 500 }
+            );
         }
 
         return NextResponse.json(result);

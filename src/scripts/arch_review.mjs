@@ -8,9 +8,9 @@ const envPath = path.resolve(process.cwd(), '.env.local');
 let apiKey = "";
 try {
     const envContent = fs.readFileSync(envPath, 'utf-8');
-    const match = envContent.match(/GEMINI_API_KEY=(.+)/);
-    if (match) apiKey = match[1].trim();
-} catch (e) {
+    const _match = envContent.match(/GEMINI_API_KEY=(.+)/);
+    if (_match) apiKey = _match[1].trim();
+} catch (_) {
     console.error("Could not read .env.local");
     process.exit(1);
 }
@@ -59,7 +59,7 @@ async function getChat() {
                     }
                 ]
             });
-        } catch (e) {
+        } catch (_e) {
             console.warn(`Failed to connect to ${modelName}: ${e.message}`);
         }
     }

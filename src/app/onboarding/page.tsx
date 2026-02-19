@@ -1,7 +1,7 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Shield, Check } from "lucide-react";
 import { StepBasicInfo } from "./components/step-basic-info";
 import { StepSymptoms } from "./components/step-symptoms";

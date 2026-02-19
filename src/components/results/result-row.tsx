@@ -10,51 +10,49 @@ export interface ResultRowProps {
     unit: string
     range: { min: number, max: number }
     status: 'optimal' | 'warning' | 'critical' | 'monitor'
-    date: Date
     isSelected?: boolean
     onClick?: () => void
 }
 
-export function ResultRow({ name, value, unit, range, status, date, isSelected, onClick }: ResultRowProps) {
+export function ResultRow({ name, value, unit, range, status, isSelected, onClick }: ResultRowProps) {
     // Calculate position in range bar (clamped 0-100)
-    // Assuming range.min is 20% and range.max is 80% of the bar visual
-    const totalRange = range.max * 1.5; // Arbitrary visualization scale
+    const totalRange = range.max * 1.5;
     const percentage = Math.min(Math.max((value / totalRange) * 100, 0), 100);
 
     return (
         <motion.div
             onClick={onClick}
             className={cn(
-                "group flex items-center h-[44px] px-4 border-b border-slate-200 cursor-pointer transition-colors relative",
-                isSelected ? "bg-slate-100" : "hover:bg-slate-50 bg-white"
+                "group flex items-center h-[56px] px-5 border-b border-[#E8E6DF] cursor-pointer transition-all relative",
+                isSelected ? "bg-[#EFECE5]" : "hover:bg-[#EFEDE6] bg-white"
             )}
         >
             {/* Selected Indicator */}
             {isSelected && (
-                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#10B981]" />
+                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-sky-500" />
             )}
 
             {/* Status Dot */}
-            <div className="w-6 flex items-center justify-center mr-2">
+            <div className="w-8 flex items-center justify-center mr-2">
                 <div className={cn(
-                    "w-2 h-2 rounded-full",
-                    status === 'optimal' ? "bg-[#10B981]" :
-                        status === 'warning' ? "bg-[#F59E0B]" :
-                            status === 'critical' ? "bg-[#EF4444]" : "bg-[#0EA5E9]" // Sky-500
+                    "w-2.5 h-2.5 rounded-full shadow-sm",
+                    status === 'optimal' ? "bg-emerald-500" :
+                        status === 'warning' ? "bg-amber-500" :
+                            status === 'critical' ? "bg-red-500" : "bg-sky-500"
                 )} />
             </div>
 
             {/* Name */}
-            <div className="w-[180px] text-sm text-slate-900 font-medium truncate">
+            <div className="w-[200px] text-sm text-[#1C1917] font-semibold truncate">
                 {name}
             </div>
 
             {/* Range Bar (Mini) */}
-            <div className="flex-1 px-4 flex items-center">
-                <div className="h-1 w-[120px] bg-slate-200 rounded-full relative overflow-hidden">
-                    {/* Range zone (min to max) - simplified viz */}
+            <div className="flex-1 px-6 flex items-center">
+                <div className="h-1.5 w-full max-w-[140px] bg-[#E8E6DF] rounded-full relative overflow-hidden">
+                    {/* Range zone */}
                     <div
-                        className="absolute top-0 bottom-0 bg-slate-300"
+                        className="absolute top-0 bottom-0 bg-[#D6D3C9]"
                         style={{
                             left: `${(range.min / totalRange) * 100}%`,
                             width: `${((range.max - range.min) / totalRange) * 100}%`
@@ -63,9 +61,9 @@ export function ResultRow({ name, value, unit, range, status, date, isSelected, 
                     {/* Value Marker */}
                     <div
                         className={cn(
-                            "absolute top-0 bottom-0 w-1.5 rounded-full",
-                            status === 'optimal' ? "bg-[#10B981]" :
-                                status === 'warning' ? "bg-[#F59E0B]" : "bg-[#EF4444]"
+                            "absolute top-0 bottom-0 w-2 rounded-full shadow-sm",
+                            status === 'optimal' ? "bg-emerald-500" :
+                                status === 'warning' ? "bg-amber-500" : "bg-red-500"
                         )}
                         style={{ left: `${percentage}%` }}
                     />
@@ -73,20 +71,20 @@ export function ResultRow({ name, value, unit, range, status, date, isSelected, 
             </div>
 
             {/* Value */}
-            <div className="w-[100px] text-right text-sm font-medium">
+            <div className="w-[120px] text-right text-sm font-semibold">
                 <span className={cn(
-                    status === 'optimal' ? "text-slate-600" :
-                        status === 'warning' ? "text-[#F59E0B]" :
-                            status === 'critical' ? "text-[#EF4444]" : "text-[#0EA5E9]"
+                    status === 'optimal' ? "text-[#57534E]" :
+                        status === 'warning' ? "text-amber-600" :
+                            status === 'critical' ? "text-red-600" : "text-sky-600"
                 )}>{value}</span>
-                <span className="text-xs text-slate-400 ml-1">{unit}</span>
+                <span className="text-xs text-[#A8A29E] ml-1.5 font-medium">{unit}</span>
             </div>
 
             {/* Chevron */}
             <div className="w-8 flex items-center justify-end">
                 <ChevronRight className={cn(
-                    "w-4 h-4 text-slate-400 transition-transform",
-                    isSelected && "rotate-90 text-slate-600"
+                    "w-4 h-4 text-[#A8A29E] transition-transform duration-300",
+                    isSelected ? "rotate-90 text-[#1C1917]" : "group-hover:text-[#57534E]"
                 )} />
             </div>
         </motion.div>

@@ -7,28 +7,28 @@ import path from 'path';
 const envPath = path.resolve(process.cwd(), '.env.local');
 let apiKey = "";
 try {
-    const envContent = fs.readFileSync(envPath, 'utf-8');
-    const match = envContent.match(/GEMINI_API_KEY=(.+)/);
-    if (match) apiKey = match[1].trim();
-} catch (e) {
-    console.error("Could not read .env.local");
-    process.exit(1);
+   const envContent = fs.readFileSync(envPath, 'utf-8');
+   const _match = envContent.match(/GEMINI_API_KEY=(.+)/);
+   if (_match) apiKey = _match[1].trim();
+} catch (_) {
+   console.error("Could not read .env.local");
+   process.exit(1);
 }
 
 if (!apiKey) {
-    console.error("No API Key found");
-    process.exit(1);
+   console.error("No API Key found");
+   process.exit(1);
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 const chat = model.startChat({
-    history: [
-        {
-            role: "user",
-            parts: [{
-                text: `
+   history: [
+      {
+         role: "user",
+         parts: [{
+            text: `
             SYSTEM_INSTRUCTION: You are "Gemini Principal", a Senior Distinguished Engineer at Google specializing in Distributed Systems, Postgres, and Cloud Security. 
             
             Current Context: You are reviewing a Rate Limiting architecture implementation for "MedAssist", a medical AI application.
@@ -42,19 +42,19 @@ const chat = model.startChat({
             
             Do not be polite. Be rigorous.
             ` }]
-        },
-        {
-            role: "model",
-            parts: [{ text: "Acknowledged. I am initialized as Gemini Principal. Present the architecture specs. I will audit for concurrency race conditions, security bypasses, and scaling bottlenecks. Proceed." }]
-        }
-    ]
+      },
+      {
+         role: "model",
+         parts: [{ text: "Acknowledged. I am initialized as Gemini Principal. Present the architecture specs. I will audit for concurrency race conditions, security bypasses, and scaling bottlenecks. Proceed." }]
+      }
+   ]
 });
 
 async function runDialogue() {
-    console.log("🟦 [ANTIGRAVITY]: Initiating Architecture Review...\n");
+   console.log("🟦 [ANTIGRAVITY]: Initiating Architecture Review...\n");
 
-    // --- PHASE 1 ---
-    const p1 = `
+   // --- PHASE 1 ---
+   const p1 = `
     PHASE 1: ARCHITECTURE PRESENTATION
     
     Here is the deployed architecture for MedAssist Rate Limiting:
@@ -79,12 +79,12 @@ async function runDialogue() {
        
     Critique this approach. Is the Deterministic Bucket strategy sound?
     `;
-    console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p1.trim()}\n`);
-    const r1 = await chat.sendMessage(p1);
-    console.log(`\n🤖 [GEMINI]: ${r1.response.text().trim()}\n`);
+   console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p1.trim()}\n`);
+   const r1 = await chat.sendMessage(p1);
+   console.log(`\n🤖 [GEMINI]: ${r1.response.text().trim()}\n`);
 
-    // --- PHASE 2 ---
-    const p2 = `
+   // --- PHASE 2 ---
+   const p2 = `
     PHASE 2: ADVERSARIAL REVIEW
     
     Drill deeper. 
@@ -101,12 +101,12 @@ async function runDialogue() {
        - Is \`floor(extract(...))\` computed in App or DB? 
        - Currently in DB (PLPGSQL). Is that a bottleneck?
     `;
-    console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p2.trim()}\n`);
-    const r2 = await chat.sendMessage(p2);
-    console.log(`\n🤖 [GEMINI]: ${r2.response.text().trim()}\n`);
+   console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p2.trim()}\n`);
+   const r2 = await chat.sendMessage(p2);
+   console.log(`\n🤖 [GEMINI]: ${r2.response.text().trim()}\n`);
 
-    // --- PHASE 3 ---
-    const p3 = `
+   // --- PHASE 3 ---
+   const p3 = `
     PHASE 3: STRESS SCENARIOS
     
     Scenario: Multi-Region Traffic (US, EU, JP). DB is in US-East-1.
@@ -124,12 +124,12 @@ async function runDialogue() {
     Propose mitigations. Should we use Global Read Replicas? Or move RL to Edge Middleware with Redis (Backtracking)?
     Defend the Postgres choice.
     `;
-    console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p3.trim()}\n`);
-    const r3 = await chat.sendMessage(p3);
-    console.log(`\n🤖 [GEMINI]: ${r3.response.text().trim()}\n`);
+   console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p3.trim()}\n`);
+   const r3 = await chat.sendMessage(p3);
+   console.log(`\n🤖 [GEMINI]: ${r3.response.text().trim()}\n`);
 
-    // --- PHASE 4 ---
-    const p4 = `
+   // --- PHASE 4 ---
+   const p4 = `
     PHASE 4: SECURITY AUDIT
     
     1. **RLS Bypass**:
@@ -145,12 +145,12 @@ async function runDialogue() {
     3. **Replay**: 
        - Can I replay a valid RPC call? (No, because it comes from backend, not client).
     `;
-    console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p4.trim()}\n`);
-    const r4 = await chat.sendMessage(p4);
-    console.log(`\n🤖 [GEMINI]: ${r4.response.text().trim()}\n`);
+   console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p4.trim()}\n`);
+   const r4 = await chat.sendMessage(p4);
+   console.log(`\n🤖 [GEMINI]: ${r4.response.text().trim()}\n`);
 
-    // --- PHASE 5 ---
-    const p5 = `
+   // --- PHASE 5 ---
+   const p5 = `
     PHASE 5: FINAL SYNTHESIS
     
     Verdict time.
@@ -159,9 +159,9 @@ async function runDialogue() {
     2. **Go / No-Go** for Scale (1M Daily Active Users)?
     3. **Top 3 Pre-Flight Checks** I must run right now.
     `;
-    console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p5.trim()}\n`);
-    const r5 = await chat.sendMessage(p5);
-    console.log(`\n🤖 [GEMINI]: ${r5.response.text().trim()}\n`);
+   console.log(`\n👨‍💻 [ANTIGRAVITY]: ${p5.trim()}\n`);
+   const r5 = await chat.sendMessage(p5);
+   console.log(`\n🤖 [GEMINI]: ${r5.response.text().trim()}\n`);
 }
 
 runDialogue();

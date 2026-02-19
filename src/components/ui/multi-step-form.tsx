@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, ChevronLeft, User, Activity, Upload, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ const SYMPTOM_OPTIONS = [
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"];
 
 // ── Progress Bar ───────────────────────────────────────────────────────────
-function StepProgress({ current, total }: { current: number; total: number }) {
+function StepProgress({ current }: { current: number }) {
     return (
         <div className="flex items-center gap-2 mb-8">
             {STEPS.map((step, idx) => {
@@ -390,7 +390,7 @@ export function MultiStepForm({ onComplete, className }: MultiStepFormProps) {
             "w-full max-w-lg mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-8",
             className
         )}>
-            <StepProgress current={step} total={STEPS.length} />
+            <StepProgress current={step} />
 
             <div className="overflow-hidden">
                 <AnimatePresence mode="wait" custom={direction}>

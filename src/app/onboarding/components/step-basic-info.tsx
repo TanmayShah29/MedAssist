@@ -1,11 +1,10 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"];
+import { BLOOD_TYPES } from "@/lib/constants";
 
 export function StepBasicInfo() {
     const { basicInfo, setBasicInfo, setStep, completeStep } = useOnboardingStore();
@@ -96,7 +95,7 @@ export function StepBasicInfo() {
                         <input
                             type="number"
                             value={basicInfo.age}
-                            onChange={e => setBasicInfo({ age: e.target.value })}
+                            onChange={e => setBasicInfo({ age: parseInt(e.target.value, 10) || "" })}
                             placeholder="32"
                             min="1" max="120"
                             className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
@@ -115,7 +114,7 @@ export function StepBasicInfo() {
                             {["male", "female", "other"].map(s => (
                                 <button
                                     key={s}
-                                    onClick={() => setBasicInfo({ sex: s as any })}
+                                    onClick={() => setBasicInfo({ sex: s as "male" | "female" | "other" })}
                                     className={cn(
                                         "flex-1 py-3 rounded-[10px] text-sm font-medium",
                                         "border transition-all capitalize",

@@ -65,7 +65,7 @@ export function LabResultCard(props: LabResultCardProps) {
                 props.className
             )}
             onClick={() => setIsExpanded(!isExpanded)}
-            style={{ '--border-hover': isOptimal ? '#10B981' : result.status === 'critical' ? '#EF4444' : '#F59E0B' } as any}
+            style={{ '--border-hover': isOptimal ? '#10B8A6' : result.status === 'critical' ? '#EF4444' : '#F59E0B' } as React.CSSProperties & { '--border-hover': string }}
         >
             {/* Status indicator bar */}
             <motion.div

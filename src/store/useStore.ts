@@ -40,8 +40,8 @@ interface AppState {
     healthTrend: { date: string; score: number; ideal: number }[];
     labs: LabReport[];
     biomarkers: Biomarker[];
-    riskAnalysis: any | null;
-    insightAnalysis: any | null; // NEW: Engine Output
+    riskAnalysis: unknown | null;
+    insightAnalysis: unknown | null; // NEW: Engine Output
 
     // Actions
     updateUser: (profile: Partial<UserProfile>) => void;

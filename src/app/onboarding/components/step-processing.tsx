@@ -1,9 +1,9 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { Check, Shield, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft } from "lucide-react";
+import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Real processing stages related to API lifecycle
@@ -36,28 +36,17 @@ export function StepProcessing() {
                 return;
             }
 
-            // Convert file to base64 client-side
-            const base64 = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const result = reader.result as string;
-                    resolve(result.split(',')[1]);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+            // Create FormData for multipart/form-data upload
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("symptoms", JSON.stringify(symptoms)); // Send symptoms as stringified JSON field
 
             setState("analyzing"); // File read complete, sending to API
 
             const response = await fetch("/api/analyze-report", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    base64,
-                    mimeType: file.type || 'application/pdf',
-                    symptoms,
-                    fileName: file.name,
-                }),
+                // Do NOT set Content-Type header; browser sets it with boundary for FormData
+                body: formData,
             });
 
             const data = await response.json();
@@ -65,7 +54,7 @@ export function StepProcessing() {
             if (!response.ok) {
                 // Handle specific status codes if needed
                 if (response.status === 413) {
-                    setError("File is too large for the server. Please try a smaller file (max 4MB) or compress it.");
+                    setError("File is too large for the server. Please try a smaller file (max 10MB) or compress it.");
                 } else if (response.status === 429) {
                     setError("Too many requests (Rate Limit). Please wait a minute and try again.");
                 } else if (response.status === 504) {
@@ -79,13 +68,19 @@ export function StepProcessing() {
 
             setState("finalizing");
 
-            // Save to onboarding store
-            useOnboardingStore.getState().setAnalysisResult({
-                biomarkers: data.biomarkers,
-                healthScore: data.healthScore,
-                riskLevel: data.riskLevel,
-                summary: data.summary,
+            // The `analysis` field is a JSON string, parse it first.
+            const analysisData = JSON.parse(data.analysis);
+
+            // Save to onboarding store using the correct action
+            useOnboardingStore.getState().setExtractedData({
+                labValues: analysisData.details || [],
+                entities: [], // `analysisData` may not have entities, default to empty
+                healthScore: analysisData.healthScore || 0,
+                riskLevel: analysisData.riskLevel || "low",
             });
+
+            // Also save the raw analysis if needed elsewhere
+            setAnalysisResult(analysisData);
 
             // Short delay to show "Finalizing" state for UX
             setTimeout(() => {
@@ -93,8 +88,8 @@ export function StepProcessing() {
                 onComplete();
             }, 800);
 
-        } catch (err: any) {
-            setError(err.message || "Network error. Please check your connection.");
+        } catch (err: unknown) {
+            setError((err as Error).message || "Network error. Please check your connection.");
             setState("error");
         }
     };

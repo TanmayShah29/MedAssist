@@ -4,10 +4,13 @@ import Groq from "groq-sdk";
 import { checkRateLimit } from "@/services/rateLimitService";
 import { logger } from "@/lib/logger";
 
-// Initialize Groq
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
+// Initialize Groq (conditionally)
+let groq: Groq;
+if (process.env.GROQ_API_KEY) {
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+} else {
+    logger.error("GROQ_API_KEY is not set. Groq SDK will not be initialized.");
+}
 
 export interface ClinicalInsight {
     type: 'symptom' | 'lab';
@@ -26,7 +29,7 @@ export interface ClinicalInsight {
 }
 
 // Appointment prep using Groq AI
-export async function getAppointmentPrep(appointmentId: string) {
+export async function getAppointmentPrep() {
     try {
         const completion = await groq.chat.completions.create({
             messages: [
@@ -56,8 +59,8 @@ Return ONLY valid JSON with keys: summary, checklist (string array), questions (
             checklist: result.checklist || ["Bring recent lab results", "List current medications", "Note any new symptoms"],
             questions: result.questions || ["What do my recent results indicate?", "Should I adjust my current treatment?"]
         };
-    } catch (err) {
-        logger.error("Groq appointment prep failed", err);
+    } catch (err: unknown) {
+        logger.error("Groq appointment prep failed", (err as Error).message);
         // Fallback
         return {
             summary: "For your Hematology follow-up, Dr. Chen will focus on your recent hemoglobin drop.",
@@ -79,7 +82,7 @@ export type GroqResponse =
     | { success: true; data: ClinicalInsight }
     | { success: false; error: string; status: number; retryAfter?: number };
 
-export async function generateClinicalInsight(prompt: string, contextType: 'symptom' | 'lab'): Promise<GroqResponse> {
+export async function generateClinicalInsight(prompt: string, contextType: 'symptom' | 'lab' | 'report'): Promise<GroqResponse> {
     const limit = await checkRateLimit();
     if (!limit.success) {
         return {
@@ -90,17 +93,19 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
         };
     }
 
-    if (!process.env.GROQ_API_KEY) {
-        logger.error("Missing Groq API Key in environment");
+    if (!process.env.GROQ_API_KEY || !groq) { // Check if groq was initialized
+        logger.error("Missing Groq API Key or Groq SDK not initialized");
         return { success: false, error: "Configuration Error", status: 500 };
     }
 
+    const validContextTypes = ['symptom', 'lab', 'report'];
+    if (!validContextTypes.includes(contextType)) {
+        logger.error(`Invalid contextType provided: ${contextType}`);
+        return { success: false, error: "Invalid context type", status: 400 };
+    }
+
     try {
-        const completion = await groq.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: `You are a clinical AI engine. Analyze the input and return a STRICT JSON structure.
+        let systemPrompt = `You are a clinical AI engine. Analyze the input and return a STRICT JSON structure.
         No markdown.
         
         Input: "${prompt}"
@@ -113,7 +118,32 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
             "confidence": 0-100,
             "details": [{ "label": "Observation", "value": "Value", "status": "stable|warning|critical", "trend": "up|down|flat" }],
             "recommendations": ["Action 1", "Action 2"]
-        }`
+        }`;
+
+        if (contextType === 'report') {
+            systemPrompt = `You are an expert medical report analyzer. Given the text of a medical report, provide:
+   1. A clear summary of key findings
+   2. Any values outside normal reference ranges, highlighted
+   3. Possible conditions suggested by the results
+   4. Recommended follow-up actions
+   Always remind the user to consult a qualified doctor and not rely solely on AI analysis.
+   
+   Return the response in JSON format matching the schema:
+   {
+       "type": "report",
+       "summary": "Key findings summary...",
+       "riskLevel": "low|moderate|high|critical",
+       "confidence": 0-100,
+       "details": [{ "label": "Test Name", "value": "Result", "status": "normal|high|low|critical", "trend": "up|down|flat" }],
+       "recommendations": ["Follow-up 1", "Follow-up 2"]
+   }`;
+        }
+
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
                 },
                 {
                     role: "user",
@@ -121,7 +151,7 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
                 }
             ],
             model: "llama-3.3-70b-versatile",
-            temperature: 0.2,
+            temperature: 0.2, // Low temperature for consistent, factual results
             max_tokens: 2000,
             response_format: { type: "json_object" },
         });
@@ -129,8 +159,8 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
         const text = completion.choices[0].message.content || "{}";
         const data = JSON.parse(text);
         return { success: true, data };
-    } catch (err) {
-        logger.error("AI Generation Failed", err);
+    } catch (err: unknown) {
+        logger.error("AI Generation Failed", (err as Error).message);
         return { success: false, error: "AI Generation Failed", status: 500 };
     }
 }

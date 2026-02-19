@@ -1,18 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, Clock, MapPin, Video, ChevronRight, FileText, CheckCircle, BrainCircuit, Sparkles } from "lucide-react";
+import { Calendar, Video, ChevronRight, CheckCircle, BrainCircuit, Sparkles } from "lucide-react";
 import { MotionButton } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
-import { getAppointmentPrep } from "@/app/actions/gemini";
+import { getAppointmentPrep } from "@/app/actions/groq-actions";
+
+interface AppointmentPrepData {
+    summary: string;
+    checklist: string[];
+    questions: string[];
+}
 
 export default function AppointmentsPage() {
     const [analyzingId, setAnalyzingId] = useState<string | null>(null);
-    const [prepData, setPrepData] = useState<any | null>(null);
+    const [prepData, setPrepData] = useState<AppointmentPrepData | null>(null);
 
     const handleGeneratePrep = async (id: string) => {
         setAnalyzingId(id);
-        const data = await getAppointmentPrep(id);
+        const data = await getAppointmentPrep();
         setPrepData(data);
         setAnalyzingId(null);
     };
