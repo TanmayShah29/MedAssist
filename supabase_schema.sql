@@ -8,6 +8,12 @@ create table if not exists rate_limits (
 
 alter table rate_limits enable row level security;
 
+-- Insert policies
+CREATE POLICY "Users can insert their own lab results" ON lab_results
+FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own biomarkers" ON biomarkers
+FOR INSERT WITH CHECK (auth.uid() = user_id);
 -- Create policy to deny all access by default (Service Role will bypass this)
 create policy "Deny all access" on rate_limits for all using (false);
 

@@ -15,7 +15,8 @@ export interface ExtractedLabValue {
     value: number;
     unit: string;
     status: "optimal" | "warning" | "critical";
-    referenceRange: { min: number; max: number };
+    referenceMin: number | null;
+    referenceMax: number | null;
     rangePosition: number;    // 0-100 where value sits on range bar
     confidence: number;       // Groq AI confidence 0-100
     aiInterpretation: string; // Groq AI explanation

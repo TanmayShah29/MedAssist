@@ -99,7 +99,7 @@ export function StepProcessing() {
 
             // Save to store
             useOnboardingStore.getState().setExtractedData({
-                labValues: analysisData.details || [],
+                labValues: analysisData.biomarkers || [],
                 entities: [],
                 healthScore: analysisData.healthScore || 0,
                 riskLevel: analysisData.riskLevel || "low",

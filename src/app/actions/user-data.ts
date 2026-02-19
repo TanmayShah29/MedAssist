@@ -52,8 +52,8 @@ export async function saveLabResult(args: SaveLabResultArgs) {
             value: value.value,
             unit: value.unit,
             status: value.status,
-            reference_range_min: value.referenceRange.min,
-            reference_range_max: value.referenceRange.max,
+            reference_range_min: value.referenceMin,
+            reference_range_max: value.referenceMax,
             ai_interpretation: value.aiInterpretation,
         }));
 
