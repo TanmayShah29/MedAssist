@@ -137,47 +137,93 @@ export default function DashboardPage() {
                 </button>
             </div>
 
-            {/* ── Health Score Hero Card ── */}
-            <div className="bg-sky-500 rounded-[18px] p-8 mb-6 text-white relative overflow-hidden">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
-                    <div>
-                        <span className="text-[10px] font-semibold uppercase text-white/70 tracking-wider">HEALTH SCORE</span>
-                        <div className="flex items-baseline gap-3 mt-1">
-                            <span className="text-[48px] font-bold font-display leading-none">{healthScore}</span>
-                            <div className="flex flex-col">
-                                <span
-                                    className="text-[15px] font-bold px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-sm self-start mb-1"
-                                    style={{ color: scoreLabel.color === '#EF4444' ? '#FECACA' : '#D1FAE5' }} // Lighten colors for dark bg
-                                >
-                                    {scoreLabel.label}
-                                </span>
-                                <span className="text-[13px] text-white/70">out of 100</span>
+            {/* ── Health Score Hero Card OR Empty State ── */}
+            {totalCount === 0 ? (
+                <div style={{
+                    background: '#F5F4EF',
+                    border: '1px solid #E8E6DF',
+                    borderRadius: 18,
+                    padding: '48px 32px',
+                    textAlign: 'center',
+                    marginBottom: 24
+                }}>
+                    <div style={{ fontSize: 48, marginBottom: 16 }}>🔬</div>
+                    <h2 style={{
+                        fontFamily: 'Instrument Serif',
+                        fontSize: 28,
+                        fontWeight: 700,
+                        color: '#1C1917',
+                        margin: '0 0 12px 0'
+                    }}>
+                        Ready when you are
+                    </h2>
+                    <p style={{ fontSize: 15, color: '#57534E', maxWidth: 400, margin: '0 auto 24px auto', lineHeight: 1.6 }}>
+                        Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
+                    </p>
+                    <button
+                        onClick={() => {
+                            setLoading(true);
+                            router.push('/onboarding?step=upload'); // Or a dedicated upload page if exists, keeping consistency with existing header button
+                        }}
+                        style={{
+                            background: '#0EA5E9',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 10,
+                            padding: '12px 24px',
+                            fontSize: 15,
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Upload my first report
+                    </button>
+                    <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 12 }}>
+                        Supports digital PDF lab reports · Takes 20–40 seconds
+                    </p>
+                </div>
+            ) : (
+                <div className="bg-sky-500 rounded-[18px] p-8 mb-6 text-white relative overflow-hidden">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
+                        <div>
+                            <span className="text-[10px] font-semibold uppercase text-white/70 tracking-wider">HEALTH SCORE</span>
+                            <div className="flex items-baseline gap-3 mt-1">
+                                <span className="text-[48px] font-bold font-display leading-none">{healthScore}</span>
+                                <div className="flex flex-col">
+                                    <span
+                                        className="text-[15px] font-bold px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-sm self-start mb-1"
+                                        style={{ color: scoreLabel.color === '#EF4444' ? '#FECACA' : '#D1FAE5' }} // Lighten colors for dark bg
+                                    >
+                                        {scoreLabel.label}
+                                    </span>
+                                    <span className="text-[13px] text-white/70">out of 100</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                <span className="text-[14px] font-medium">{optimalCount} Optimal</span>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                                <span className="text-[14px] font-medium">{warningCount} Monitor</span>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                                <span className="text-[14px] font-medium">{criticalCount} Action</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-                            <span className="text-[14px] font-medium">{optimalCount} Optimal</span>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-amber-400"></div>
-                            <span className="text-[14px] font-medium">{warningCount} Monitor</span>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                            <span className="text-[14px] font-medium">{criticalCount} Action</span>
-                        </div>
+                    <div className="mt-8 pt-4 border-t border-white/20 relative z-10">
+                        <p className="text-[15px] text-white/90">
+                            Based on {totalCount} biomarkers from your latest report
+                        </p>
                     </div>
                 </div>
-
-                <div className="mt-8 pt-4 border-t border-white/20 relative z-10">
-                    <p className="text-[15px] text-white/90">
-                        Based on {totalCount} biomarkers from your latest report
-                    </p>
-                </div>
-            </div>
+            )}
 
             {/* ── Engagement Nudge (Only if 1 report) ── */}
             {labCount === 1 && (

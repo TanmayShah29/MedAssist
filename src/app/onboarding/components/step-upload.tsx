@@ -55,6 +55,86 @@ export function StepUpload() {
         }
     };
 
+    const [showOptions, setShowOptions] = useState(true);
+
+    // If user has already selected a file (e.g. went back and forth), default to upload view
+    if (uploadedFile && showOptions) {
+        setShowOptions(false);
+    }
+
+    const onSkip = () => {
+        setUploadedFile(null);
+        completeStep(3);
+        setStep(5); // Skip processing (step 4), go straight to tour (step 5)
+    };
+
+    if (showOptions && !uploadedFile) {
+        return (
+            <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-8">
+                <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">
+                        Step 3 of 5
+                    </p>
+                    <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                        Upload your lab report
+                    </h2>
+                    <p className="text-[#57534E] text-sm">
+                        Choice is yours: upload now for instant analysis, or explore the app first.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    {/* Option 1 — Upload now */}
+                    <div
+                        onClick={() => setShowOptions(false)}
+                        className="bg-[#F5F4EF] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-500 group"
+                    >
+                        <div className="text-[32px] mb-3">📄</div>
+                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-sky-600 transition-colors">
+                            Upload my report now
+                        </h3>
+                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                            Get instant AI analysis, health score, and personalized insights from your latest lab results
+                        </p>
+                        <span className="inline-block bg-sky-500 text-white rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-600 transition-colors shadow-sm shadow-sky-500/20">
+                            Upload PDF
+                        </span>
+                    </div>
+
+                    {/* Option 2 — Not yet */}
+                    <div
+                        onClick={onSkip}
+                        className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group"
+                    >
+                        <div className="text-[32px] mb-3">🗓️</div>
+                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-[#57534E] transition-colors">
+                            I don&apos;t have one yet
+                        </h3>
+                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                            No problem — explore the app first and upload when you get your next lab results
+                        </p>
+                        <span className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors">
+                            Continue without report
+                        </span>
+                    </div>
+                </div>
+
+                {/* Back Button */}
+                <div className="pt-2">
+                    <button
+                        onClick={() => setStep(2)}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px]
+                         text-sm font-medium text-[#57534E] 
+                         hover:bg-[#E8E6DF] transition-colors"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                        Back
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-8">
 
@@ -150,7 +230,7 @@ export function StepUpload() {
             {/* Navigation */}
             <div className="flex items-center justify-between pt-2">
                 <button
-                    onClick={() => setStep(2)}
+                    onClick={() => setShowOptions(true)}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px]
                      text-sm font-medium text-[#57534E] 
                      hover:bg-[#E8E6DF] transition-colors"

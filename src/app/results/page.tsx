@@ -136,6 +136,23 @@ export default function ResultsPage() {
                                 <div key={i} className="h-16 bg-[#E8E6DF] rounded-lg animate-pulse" />
                             ))}
                         </div>
+                    ) : biomarkers.length === 0 && selectedCategory === 'all' ? (
+                        <div style={{ textAlign: 'center', padding: '64px 32px' }}>
+                            <div style={{ fontSize: 40, marginBottom: 16 }}>📋</div>
+                            <h3 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', margin: '0 0 8px 0' }}>
+                                No results yet
+                            </h3>
+                            <p style={{ fontSize: 15, color: '#57534E', margin: '0 0 24px 0' }}>
+                                Upload a lab report from your dashboard to see your biomarkers here.
+                            </p>
+                            <button onClick={() => router.push('/dashboard')} style={{
+                                background: '#0EA5E9', color: 'white', border: 'none',
+                                borderRadius: 10, padding: '10px 20px', fontSize: 14,
+                                fontWeight: 600, cursor: 'pointer'
+                            }}>
+                                Go to dashboard
+                            </button>
+                        </div>
                     ) : biomarkers.length === 0 ? (
                         <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
                             <div className="w-12 h-12 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-4">

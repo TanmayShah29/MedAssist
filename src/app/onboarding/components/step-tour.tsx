@@ -24,44 +24,72 @@ export function StepTour() {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
-            toast.error("You must be logged in to save your results.");
+            toast.error("You must be logged in to save results.");
             setIsLoading(false);
             return;
         }
 
-        if (!analysisResult) {
-            toast.error("Analysis data is missing.");
+        // Always mark onboarding as complete
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ onboarding_complete: true })
+            .eq('id', user.id);
+
+        if (profileError) {
+            console.error("Profile update error:", profileError);
+            toast.error("Failed to update profile status.");
             setIsLoading(false);
             return;
         }
 
-        const result = await saveLabResult({
-            userId: user.id,
-            healthScore: analysisResult.healthScore,
-            riskLevel: analysisResult.riskLevel,
-            summary: analysisResult.summary,
-            labValues: analysisResult.biomarkers,
-        });
+        // Only save results if we actually have them
+        if (analysisResult) {
+            const result = await saveLabResult({
+                userId: user.id,
+                healthScore: analysisResult.healthScore,
+                riskLevel: analysisResult.riskLevel,
+                summary: analysisResult.summary,
+                labValues: analysisResult.biomarkers,
+            });
 
-        setIsLoading(false);
-
-        if (result.success) {
-            toast.success("Your results have been saved to your profile!");
-            router.push("/dashboard");
-            // Consider resetting the store after a short delay
-            // setTimeout(() => reset(), 1000);
+            if (!result.success) {
+                toast.error(result.error || "Failed to save results, but profile created.");
+            } else {
+                toast.success("Results saved successfully!");
+            }
         } else {
-            toast.error(result.error || "Failed to save your results. Please try again.");
+            toast.success("Welcome to MedAssist!");
         }
+
+        router.push("/dashboard");
     };
-    
+
+    // If no analysis result (user skipped), show empty but happy state
     if (!analysisResult) {
         return (
-            <div className="max-w-4xl mx-auto w-full px-6 py-10 text-center">
-                <h2 className="font-display text-2xl text-[#1C1917]">Loading analysis results...</h2>
-                <p className="text-[#57534E] mt-2">
-                    If you see this for a while, please go back and re-analyze your report.
+            <div className="max-w-4xl mx-auto w-full px-6 py-20 text-center">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                </div>
+                <h2 className="font-display text-3xl text-[#1C1917] mb-4">
+                    You&apos;re all set!
+                </h2>
+                <p className="text-[#57534E] max-w-md mx-auto mb-8 text-lg">
+                    Your profile is created. You can explore the dashboard now and upload your first lab report whenever you&apos;re ready.
                 </p>
+                <div className="flex justify-center">
+                    <button
+                        onClick={handleFinish}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 px-8 py-4 bg-sky-500 
+                         hover:bg-sky-600 text-white font-semibold rounded-[14px] 
+                         shadow-lg shadow-sky-500/25 transition-all 
+                         hover:-translate-y-0.5 disabled:opacity-70"
+                    >
+                        {isLoading ? "Setting up..." : "Go to Dashboard"}
+                        <ArrowRight className="w-5 h-5" />
+                    </button>
+                </div>
             </div>
         )
     }

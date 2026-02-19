@@ -41,7 +41,7 @@ export default function AssistantPage() {
         {
             id: "1",
             role: "assistant",
-            content: "Hello. I've analyzed your latest results. How can I help you understand them?",
+            content: "Hello. I'm ready to help answer your health questions.",
             timestamp: new Date()
         }
     ]);
@@ -209,6 +209,22 @@ export default function AssistantPage() {
 
                     {/* LEFT: CONVERSATION PANEL */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm relative">
+
+                        {/* Welcome Banner (No Results) */}
+                        {biomarkers.length === 0 && (
+                            <div style={{
+                                background: '#F5F4EF',
+                                borderBottom: '1px solid #E8E6DF',
+                                padding: 24,
+                            }}>
+                                <p style={{ fontSize: 15, color: '#1C1917', fontWeight: 600, margin: '0 0 8px 0' }}>
+                                    👋 Welcome to your AI health assistant
+                                </p>
+                                <p style={{ fontSize: 14, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
+                                    I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.
+                                </p>
+                            </div>
+                        )}
 
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-5 space-y-6">
