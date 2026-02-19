@@ -149,14 +149,20 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="font-display text-3xl sm:text-4xl 
-                           text-[#1C1917] text-center mb-8">
+            <h2 style={{
+              fontFamily: 'Instrument Serif',
+              fontSize: 32,
+              fontWeight: 700,
+              color: '#1C1917',
+              textAlign: 'center',
+              marginBottom: 32
+            }}>
               You get your lab results back.
               <br />
               Now what?
             </h2>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               {[
                 "Numbers on a page that mean nothing to you",
                 "Google searches that make you worry more",
@@ -169,21 +175,37 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="flex items-start gap-3 p-4 bg-[#FAFAF7] 
-                             rounded-[12px] border border-[#E8E6DF]"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 12,
+                    padding: 16,
+                    background: '#FAFAF7',
+                    borderRadius: 12,
+                    border: '1px solid #E8E6DF'
+                  }}
                 >
-                  <div className="w-6 h-6 rounded-full bg-amber-100 
-                                  flex items-center justify-center 
-                                  flex-shrink-0 mt-0.5">
-                    <span className="text-amber-600 text-sm">✕</span>
+                  <div style={{
+                    width: 24,
+                    height: 24,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginTop: 2
+                  }}>
+                    <span style={{ color: '#EF4444', fontSize: 16, fontWeight: 600 }}>✕</span>
                   </div>
-                  <p className="text-[#57534E] leading-relaxed">{problem}</p>
+                  <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', lineHeight: 1.6, margin: 0 }}>
+                    {problem}
+                  </p>
                 </motion.div>
               ))}
             </div>
 
             <p style={{
-              fontSize: 14,
+              fontFamily: 'DM Sans',
+              fontSize: 15,
               color: '#57534E',
               textAlign: 'center',
               maxWidth: 480,
@@ -201,11 +223,16 @@ export default function LandingPage() {
       <section className="py-20 px-6" ref={pipelineRef}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl 
-                           text-[#1C1917] mb-3">
+            <h2 style={{
+              fontFamily: 'Instrument Serif',
+              fontSize: 32,
+              fontWeight: 700,
+              color: '#1C1917',
+              marginBottom: 12
+            }}>
               How MedAssist works
             </h2>
-            <p className="text-[#57534E] max-w-xl mx-auto">
+            <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
               From lab report to health insights in 3 simple steps
             </p>
           </div>
@@ -272,13 +299,13 @@ export default function LandingPage() {
 
                   {/* Content */}
                   <div className="flex-1 pt-1">
-                    <h3 className="text-xl font-semibold text-[#1C1917] mb-2">
+                    <h3 style={{ fontFamily: 'Instrument Serif', fontSize: 20, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>
                       {item.title}
                     </h3>
-                    <p className="text-[#57534E] leading-relaxed mb-2">
+                    <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', lineHeight: 1.6, marginBottom: 8 }}>
                       {item.description}
                     </p>
-                    <p className="text-xs font-medium text-[#A8A29E]">
+                    <p style={{ fontSize: 12, fontWeight: 500, color: '#A8A29E' }}>
                       {item.detail}
                     </p>
                   </div>
@@ -293,8 +320,13 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6 }}
-            className="mt-14 p-6 bg-[#E0F2FE] rounded-[16px] 
-                       border border-[#BAE6FD]"
+            style={{
+              padding: 24,
+              background: '#F0F9FF',
+              borderRadius: 16,
+              border: '1px solid #BAE6FD',
+              marginTop: 56
+            }}
           >
             <p className="text-sm font-semibold text-sky-800 mb-3">
               What you get in your dashboard:
@@ -319,12 +351,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Technical Pipeline Section */}
+      {/* ── TECHNICAL PIPELINE SECTION ───────────────── */}
       <section style={{
         padding: '80px 24px',
-        background: '#1C1917',  // dark background to contrast with rest of page
+        background: '#FAFAF7', // Page background
       }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{
+          maxWidth: 900,
+          margin: '0 auto',
+          background: '#F5F4EF',
+          border: '1px solid #E8E6DF',
+          borderRadius: 18,
+          padding: '64px 24px'
+        }}>
 
           {/* Section label */}
           <p style={{
@@ -343,7 +382,7 @@ export default function LandingPage() {
             fontFamily: 'Instrument Serif',
             fontSize: 32,
             fontWeight: 700,
-            color: '#FAFAF7',
+            color: '#1C1917',
             textAlign: 'center',
             margin: '0 0 8px 0'
           }}>
@@ -351,8 +390,9 @@ export default function LandingPage() {
           </h2>
 
           <p style={{
+            fontFamily: 'DM Sans',
             fontSize: 15,
-            color: '#A8A29E',
+            color: '#57534E',
             textAlign: 'center',
             margin: '0 auto 56px auto',
             maxWidth: 520,
@@ -417,16 +457,16 @@ export default function LandingPage() {
                     right: -1,
                     width: 2,
                     height: 20,
-                    background: '#2C2926',
+                    background: '#E8E6DF',
                     zIndex: 1,
                   }} />
                 )}
 
                 <div style={{
                   padding: '24px 20px',
-                  borderLeft: index === 0 ? 'none' : '1px solid #2C2926',
+                  borderLeft: index === 0 ? 'none' : '1px solid #E8E6DF',
                 }}
-                  className={index > 0 ? "border-l border-[#2C2926] md:border-l" : ""}
+                  className={index > 0 ? "border-l border-[#E8E6DF] md:border-l" : ""}
                 >
                   {/* Step number */}
                   <div style={{
@@ -441,10 +481,11 @@ export default function LandingPage() {
 
                   {/* Title */}
                   <h3 style={{
-                    fontSize: 15,
+                    fontFamily: 'Instrument Serif',
+                    fontSize: 18,
                     fontWeight: 600,
-                    color: '#FAFAF7',
-                    margin: '0 0 4px 0'
+                    color: '#1C1917',
+                    margin: '0 0 6px 0'
                   }}>
                     {item.title}
                   </h3>
@@ -452,8 +493,8 @@ export default function LandingPage() {
                   {/* Tech badge */}
                   <div style={{
                     display: 'inline-block',
-                    background: '#2C2926',
-                    color: '#A8A29E',
+                    background: '#E8E6DF',
+                    color: '#57534E',
                     fontSize: 11,
                     padding: '2px 8px',
                     borderRadius: 4,
@@ -465,8 +506,9 @@ export default function LandingPage() {
 
                   {/* Description */}
                   <p style={{
+                    fontFamily: 'DM Sans',
                     fontSize: 13,
-                    color: '#78716C',
+                    color: '#57534E',
                     margin: 0,
                     lineHeight: 1.6
                   }}>
@@ -481,14 +523,14 @@ export default function LandingPage() {
           <div style={{
             marginTop: 48,
             paddingTop: 32,
-            borderTop: '1px solid #2C2926',
+            borderTop: '1px solid #E8E6DF',
             display: 'flex',
             flexWrap: 'wrap',
             gap: 12,
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            <span style={{ fontSize: 12, color: '#57534E', marginRight: 8 }}>
+            <span style={{ fontFamily: 'DM Sans', fontSize: 13, color: '#57534E', marginRight: 8 }}>
               Built with:
             </span>
             {[
@@ -504,8 +546,8 @@ export default function LandingPage() {
               'Zustand'
             ].map(tech => (
               <span key={tech} style={{
-                background: '#2C2926',
-                color: '#A8A29E',
+                background: '#E8E6DF',
+                color: '#57534E', // darkened from #A8A29E
                 fontSize: 12,
                 padding: '4px 10px',
                 borderRadius: 6,
@@ -520,20 +562,34 @@ export default function LandingPage() {
       </section>
 
       {/* ── WHY CONSISTENCY MATTERS ───────────────────── */}
-      <section className="py-20 px-6 bg-[#F5F4EF] border-y border-[#E8E6DF]">
+      <section className="py-20 px-6 bg-[#FaFaF7]">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-display text-3xl sm:text-4xl 
-                           text-[#1C1917] text-center mb-4">
+            <h2 style={{
+              fontFamily: 'Instrument Serif',
+              fontSize: 32,
+              fontWeight: 700,
+              color: '#1C1917',
+              textAlign: 'center',
+              marginBottom: 12
+            }}>
               Health tracking works when
               <br />
               you actually stick with it
             </h2>
-            <p className="text-[#57534E] text-center max-w-2xl mx-auto mb-12">
+            <p style={{
+              fontFamily: 'DM Sans',
+              fontSize: 15,
+              color: '#57534E',
+              textAlign: 'center',
+              maxWidth: 600,
+              margin: '0 auto 48px auto',
+              lineHeight: 1.6
+            }}>
               One lab report tells you where you are.
               <br />
               <span className="font-semibold text-[#1C1917]">
@@ -568,8 +624,13 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="bg-white rounded-[14px] border border-[#E8E6DF] 
-                             p-5 text-center"
+                  style={{
+                    background: '#F5F4EF',
+                    borderRadius: 14,
+                    border: '1px solid #E8E6DF',
+                    padding: 24,
+                    textAlign: 'center'
+                  }}
                 >
                   <div className="text-2xl font-bold bg-sky-100 text-sky-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                     {stage.icon}
@@ -578,10 +639,10 @@ export default function LandingPage() {
                                 tracking-[0.12em] text-sky-500 mb-2">
                     {stage.timeline}
                   </p>
-                  <h3 className="text-base font-semibold text-[#1C1917] mb-2">
+                  <h3 style={{ fontFamily: 'Instrument Serif', fontSize: 18, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>
                     {stage.title}
                   </h3>
-                  <p className="text-sm text-[#57534E] leading-relaxed">
+                  <p style={{ fontFamily: 'DM Sans', fontSize: 14, color: '#57534E', lineHeight: 1.6 }}>
                     {stage.description}
                   </p>
                 </motion.div>
@@ -639,7 +700,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ─────────────────────────────────── */}
-      <div style={{ textAlign: 'center', padding: '64px 24px', background: '#F5F4EF' }}>
+      <div style={{ textAlign: 'center', padding: '64px 24px', background: '#F5F4EF', borderTop: '1px solid #E8E6DF' }}>
         <h2 style={{
           fontFamily: 'Instrument Serif',
           fontSize: 32,
@@ -649,7 +710,16 @@ export default function LandingPage() {
         }}>
           Ready to understand your health?
         </h2>
-        <p style={{ fontSize: 15, color: '#57534E', margin: '0 0 32px 0', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
+        <p style={{
+          fontFamily: 'DM Sans',
+          fontSize: 15,
+          color: '#57534E',
+          margin: '0 0 32px 0',
+          maxWidth: 400,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          lineHeight: 1.6
+        }}>
           Upload your first lab report and get your health score, plain-English explanations, and personalized insights in under a minute.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
