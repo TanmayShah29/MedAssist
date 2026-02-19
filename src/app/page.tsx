@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
@@ -46,7 +47,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 
                         flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-sky-500 
                             flex items-center justify-center
                             shadow-sm shadow-sky-500/20">
@@ -55,7 +56,7 @@ export default function LandingPage() {
             <span className="font-display text-xl text-[#1C1917]">
               MedAssist
             </span>
-          </div>
+          </Link>
 
           {/* Nav CTAs */}
           <div className="flex items-center gap-4">

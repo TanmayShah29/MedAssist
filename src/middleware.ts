@@ -24,8 +24,13 @@ export async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     const { pathname } = request.nextUrl
 
+    // ALWAYS allow landing page
+    if (pathname === '/') {
+        return response
+    }
+
     // Public paths — anyone can access
-    const publicPaths = ['/', '/auth', '/auth/callback']
+    const publicPaths = ['/auth', '/auth/callback']
     // Allow public paths and anything starting with /auth/ (like /auth/callback)
     const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/auth/')
 
@@ -99,7 +104,7 @@ export async function middleware(request: NextRequest) {
         }
 
         // Scenario B: Accessing Auth page while logged in
-        if (pathname === '/auth' || pathname === '/') {
+        if (pathname === '/auth') {
             // Redirect to dashboard or onboarding based on status
             return redirect(onboardingComplete ? '/dashboard' : '/onboarding')
         }

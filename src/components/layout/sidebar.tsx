@@ -91,13 +91,13 @@ export function Sidebar({ className }: { className?: string }) {
             {/* Logo — 64px height */}
             <div className="h-16 flex items-center justify-between px-5 
                       border-b border-[#E8E6DF]">
-                <div className="flex items-center gap-2.5">
+                <Link href="/" className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center 
                           justify-center shadow-sm shadow-sky-500/30">
                         <Shield className="w-4 h-4 text-white" />
                     </div>
                     <span className="font-display text-lg text-[#1C1917]">MedAssist</span>
-                </div>
+                </Link>
                 {/* Live status dot */}
                 <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute h-2 w-2 rounded-full 
