@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import {
     Shield,
     LogOut
 } from "lucide-react";
+import { createBrowserClient } from '@supabase/ssr';
 
 const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
@@ -24,6 +25,7 @@ const navItems = [
 ];
 
 export function Sidebar({ className }: { className?: string }) {
+    const router = useRouter();
     const pathname = usePathname();
     const [userName, setUserName] = useState<string | null>(null);
     const [userInitials, setUserInitials] = useState("?");
@@ -64,6 +66,20 @@ export function Sidebar({ className }: { className?: string }) {
         setUserName("John Doe");
         setUserInitials("JD");
     }, []);
+
+    const handleSignOut = async () => {
+        // Clear the onboarding cookie
+        document.cookie = "onboarding_complete=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+        // Sign out from Supabase
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        await supabase.auth.signOut();
+        router.push('/');
+        router.refresh();
+    };
 
     return (
         <aside className={cn(`
@@ -116,7 +132,8 @@ export function Sidebar({ className }: { className?: string }) {
                             </div>
                             <span className={cn(
                                 "text-[10px] font-mono",
-                                isActive ? "text-sky-200" : "text-[#C5C2B8] group-hover:text-[#A8A29E]"
+                                "text-[#C5C2B8] group-hover:text-[#A8A29E]",
+                                isActive && "text-sky-200"
                             )}>
                                 {item.shortcut}
                             </span>
@@ -146,7 +163,6 @@ export function Sidebar({ className }: { className?: string }) {
             </div>
 
             {/* User */}
-            {/* User */}
             <div className="p-4 border-t border-[#E8E6DF] flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-sky-100 border border-sky-200
                         flex items-center justify-center flex-shrink-0">
@@ -162,10 +178,15 @@ export function Sidebar({ className }: { className?: string }) {
                     </p>
                     <p className="text-[11px] text-[#A8A29E]">Patient</p>
                 </div>
-                <button className="text-[#A8A29E] hover:text-[#57534E] transition-colors">
+                <button
+                    onClick={handleSignOut}
+                    className="text-[#A8A29E] hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                    title="Sign Out"
+                >
                     <LogOut className="w-4 h-4" />
                 </button>
             </div>
         </aside>
     );
+
 }

@@ -44,7 +44,7 @@ export default function LandingPage() {
 
           {/* CTA */}
           <button
-            onClick={() => router.push("/login?mode=signup")}
+            onClick={() => router.push("/auth?mode=signup")}
             className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 
                        text-white text-sm font-semibold rounded-[10px] 
                        transition-all shadow-sm shadow-sky-500/20
@@ -90,7 +90,7 @@ export default function LandingPage() {
 
             {/* CTA */}
             <button
-              onClick={() => router.push("/login?mode=signup")}
+              onClick={() => router.push("/auth?mode=signup")}
               className="inline-flex items-center gap-2.5 px-8 py-4 
                          bg-sky-500 hover:bg-sky-600 text-white 
                          font-semibold rounded-[14px] text-base
