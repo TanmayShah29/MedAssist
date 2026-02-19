@@ -2,7 +2,8 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
+import { createBrowserClient } from '@supabase/ssr';
 import {
   Shield,
   Upload,
@@ -17,6 +18,20 @@ export default function LandingPage() {
   const router = useRouter();
   const pipelineRef = useRef(null);
   const isPipelineInView = useInView(pipelineRef, { once: true, margin: "-100px" });
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsSignedIn(!!user);
+    }
+    checkUser();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
@@ -45,19 +60,19 @@ export default function LandingPage() {
           {/* Nav CTAs */}
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/auth?mode=login")}
-              className="text-sm font-semibold text-[#57534E] hover:text-[#1C1917] transition-colors"
+              onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=login')}
+              style={{
+                background: '#0EA5E9',
+                color: 'white',
+                border: 'none',
+                borderRadius: 8,
+                padding: '8px 18px',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
             >
-              Sign in
-            </button>
-            <button
-              onClick={() => router.push("/auth?mode=signup")}
-              className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 
-                         text-white text-sm font-semibold rounded-[10px] 
-                         transition-all shadow-sm shadow-sky-500/20
-                         hover:shadow-sky-500/30 hover:-translate-y-0.5"
-            >
-              Get started
+              {isSignedIn ? 'Go to Dashboard' : 'Sign in'}
             </button>
           </div>
         </div>
