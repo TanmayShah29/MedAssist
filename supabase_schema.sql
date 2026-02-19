@@ -96,5 +96,31 @@ create table if not exists symptoms (
 );
 
 alter table symptoms enable row level security;
-create policy "Users can manage their own symptoms" on symptoms for all using (auth.uid() = user_id);
+
+-- Updates for Honesty Audit & Schema mismatch fix
+
+-- Add missing columns to lab_results
+ALTER TABLE lab_results
+ADD COLUMN IF NOT EXISTS file_name text,
+ADD COLUMN IF NOT EXISTS processed boolean DEFAULT false,
+ADD COLUMN IF NOT EXISTS processing_time_ms integer;
+
+-- Add missing columns to biomarkers
+ALTER TABLE biomarkers
+ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
+ADD COLUMN IF NOT EXISTS category text,
+ADD COLUMN IF NOT EXISTS confidence numeric,
+ADD COLUMN IF NOT EXISTS reference_range_min numeric,
+ADD COLUMN IF NOT EXISTS reference_range_max numeric;
+
+-- Drop old misnamed columns if they exist
+ALTER TABLE biomarkers
+DROP COLUMN IF EXISTS reference_min,
+DROP COLUMN IF EXISTS reference_max;
+
+-- Update RLS policy for biomarkers
+DROP POLICY IF EXISTS "Users see own biomarkers" ON biomarkers;
+
+CREATE POLICY "Users see own biomarkers" ON biomarkers
+FOR ALL USING (auth.uid() = user_id);
 

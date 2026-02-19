@@ -17,8 +17,8 @@ import {
 
 const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
-    { id: "assistant", label: "Assistant", path: "/assistant", icon: Brain, shortcut: "⌘A" },
     { id: "results", label: "Results", path: "/results", icon: FlaskConical, shortcut: "⌘R" },
+    { id: "assistant", label: "Assistant", path: "/assistant", icon: Brain, shortcut: "⌘A" },
     { id: "profile", label: "Profile", path: "/profile", icon: User, shortcut: "⌘P" },
     { id: "settings", label: "Settings", path: "/settings", icon: Settings, shortcut: "⌘S" },
 ];

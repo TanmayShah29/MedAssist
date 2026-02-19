@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Send, Sparkles, ChevronRight, Activity, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 // Types
 type Message = {
@@ -21,25 +22,12 @@ type ContextData = {
     relatedMarkers?: { name: string; status: string }[];
 };
 
-// Mock Context Data Loader
-const getContextData = (context: string | null): ContextData => {
-    if (context === "hemoglobin") {
-        return {
-            title: "Hemoglobin",
-            value: "12.8 g/dL",
-            trend: "↓ 8% from last month",
-            status: "critical",
-            relatedMarkers: [
-                { name: "Ferritin", status: "Low" },
-                { name: "MCV", status: "Trending ↓" }
-            ]
-        };
-    }
-    return {
-        title: "Health Overview",
-        status: "optimal",
-        relatedMarkers: []
-    };
+type Biomarker = {
+    name: string;
+    value: number;
+    unit: string;
+    status: "optimal" | "warning" | "critical";
+    category: string;
 };
 
 export default function AssistantPage() {
@@ -47,6 +35,8 @@ export default function AssistantPage() {
     const searchParams = useSearchParams();
     const contextParam = searchParams.get("context");
     const [contextData, setContextData] = useState<ContextData | null>(null);
+    const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);
+    const [symptoms, setSymptoms] = useState<string[]>([]);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "1",
@@ -59,24 +49,38 @@ export default function AssistantPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // Fetch Data
     useEffect(() => {
-        if (contextParam) {
-            const data = getContextData(contextParam);
-            setContextData(data);
-            // Simulate initial AI analysis based on context
-            if (data.title === "Hemoglobin") {
-                setMessages(prev => [
-                    ...prev,
-                    {
-                        id: "2",
-                        role: "system_reasoning",
-                        content: "Hemoglobin ↓ 8%\nFerritin ↓ 12%\nMCV trending lower\n\nPattern consistent with early iron deficiency.",
-                        timestamp: new Date()
-                    }
-                ])
+        const fetchData = async () => {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const [bResponse, sResponse] = await Promise.all([
+                supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+                supabase.from('symptoms').select('symptom').eq('user_id', user.id)
+            ]);
+
+            if (bResponse.data) setBiomarkers(bResponse.data);
+            if (sResponse.data) setSymptoms(sResponse.data.map((s: { symptom: string }) => s.symptom));
+        };
+        fetchData();
+    }, []);
+
+    // Set Context from Real Data
+    useEffect(() => {
+        if (contextParam && biomarkers.length > 0) {
+            const found = biomarkers.find(b => b.name.toLowerCase() === contextParam.toLowerCase());
+            if (found) {
+                setContextData({
+                    title: found.name,
+                    value: `${found.value} ${found.unit}`,
+                    status: found.status,
+                    relatedMarkers: [] // Could imply related from category if needed
+                });
             }
         }
-    }, [contextParam]);
+    }, [contextParam, biomarkers]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,7 +90,7 @@ export default function AssistantPage() {
         scrollToBottom();
     }, [messages]);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!inputValue.trim() || isProcessing) return;
 
         const newUserMsg: Message = {
@@ -100,17 +104,47 @@ export default function AssistantPage() {
         setInputValue("");
         setIsProcessing(true);
 
-        // Mock AI Response
-        setTimeout(() => {
+        try {
+            const response = await fetch('/api/ask-ai', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: inputValue,
+                    biomarkers: biomarkers,
+                    symptoms: symptoms
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error);
+
+            const aiContent = data.answer || "I'm sorry, I couldn't process that.";
+
+            // Add engagement nudge if strictly needed
+            const showNudge = biomarkers.length > 0 && biomarkers.length < 20;
+            const finalContent = showNudge
+                ? `${aiContent}\n\n💡 The more reports you upload, the more personalized my analysis becomes.`
+                : aiContent;
+
             const newAiMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 role: "assistant",
-                content: "I can verify that for you. Based on the clinical guidelines, a drop in hemoglobin combined with low ferritin strongly suggests iron deficiency anemia. Would you like me to draft a message to your provider?",
+                content: finalContent,
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, newAiMsg]);
+        } catch (error) {
+            const errorMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                role: "assistant",
+                content: "I'm having trouble connecting to the server. Please try again later.",
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMsg]);
+        } finally {
             setIsProcessing(false);
-        }, 1500);
+        }
     };
 
     const handleSuggestedQuestion = (question: string) => {
@@ -238,6 +272,9 @@ export default function AssistantPage() {
                                     )}
                                 </button>
                             </div>
+                            <p className="text-[11px] text-[#A8A29E] text-center mt-3">
+                                AI-generated insights for educational purposes only. Always consult your physician.
+                            </p>
                         </div>
                     </div>
 
@@ -293,9 +330,6 @@ export default function AssistantPage() {
                             </p>
                             <div className="space-y-3">
                                 <button className="w-full px-4 py-3 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-[10px] transition-colors shadow-md shadow-sky-500/10 flex items-center justify-center gap-2">
-                                    Schedule appointment
-                                </button>
-                                <button className="w-full px-4 py-3 bg-[#FAFAF7] hover:bg-[#EFEDE6] border border-[#E8E6DF] text-[#57534E] text-sm font-medium rounded-[10px] transition-colors flex items-center justify-center gap-2">
                                     View full dashboard
                                     <ArrowLeft className="w-3 h-3 rotate-180" />
                                 </button>

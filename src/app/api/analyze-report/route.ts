@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractPdfText } from '@/lib/extractPdfText';
-import { generateClinicalInsight } from '@/app/actions/groq-actions';
-import { checkRateLimit } from '@/services/rateLimitService'; // Import the rate limit service
-import { logger } from '@/lib/logger'; // Import logger
-import { createServerClient, type CookieOptions } from '@supabase/ssr'; // Import directly from SSR package
-import { cookies } from 'next/headers'; // Import cookies utility
+import { extractAndInterpretBiomarkers } from '@/lib/groq-medical';
+import { checkRateLimit } from '@/services/rateLimitService';
+import { logger } from '@/lib/logger';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-// Configure route settings for long-running processes
-export const maxDuration = 60; // 60 seconds (Vercel Pro/Hobby limit)
+export const maxDuration = 60;
 export const runtime = "nodejs";
 
-// Groq is now handled in the action
-
 export async function POST(req: NextRequest) {
+    const startTime = Date.now();
     try {
         // 0. Check Rate Limit
         const rateLimitResult = await checkRateLimit();
@@ -37,33 +35,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'File size exceeds 10MB limit' }, { status: 400 });
         }
 
-        // 2. Read File as ArrayBuffer -> Buffer
+        // 2. Read File
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // 3. Step 1: Extract Text using Gemini (PDF -> Text)
-        logger.info("Starting text extraction with Gemini...");
+        // 3. Extract Text
+        logger.info("Starting text extraction...");
         const extractedText = await extractPdfText(buffer);
         logger.info("Text extracted successfully.");
 
-        // 4. Step 2: Analyze Text using Groq (Text -> Analysis)
-        logger.info("Starting analysis with Groq (via Action)...");
-
-        const analysisResult = await generateClinicalInsight(extractedText, 'report');
-
-        if (!analysisResult.success) {
-            logger.error(`Clinical insight generation failed: ${analysisResult.error}`);
-            throw new Error(analysisResult.error || 'Clinical insight generation failed');
-        }
-
-        const analysis = JSON.stringify(analysisResult.data);
+        // 4. Analyze with Groq (Extraction + Interpretation)
+        logger.info("Starting analysis with Groq (groq-medical)...");
+        // Passing empty symptoms array as we don't have them in this request context yet
+        const analysisResult = await extractAndInterpretBiomarkers(extractedText, []);
 
         // 5. EXTRACTED DATA PERSISTENCE
-        // We need to save the lab result and biomarkers to Supabase
-
-        // Initialize Supabase Server Client
         const cookieStore = await cookies();
-
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -80,49 +67,48 @@ export async function POST(req: NextRequest) {
 
         if (user) {
             // A. Save Lab Result
+            const fileName = file.name;
             const { data: labResult, error: labError } = await supabase
                 .from('lab_results')
                 .insert({
                     user_id: user.id,
-                    file_name: file.name || 'Lab Report',
+                    file_name: fileName || 'Lab Report',
                     processed: true,
-                    processing_time_ms: Date.now() - (req as any).startTime || 0 // approximate if not tracked
+                    processing_time_ms: Date.now() - startTime
                 })
                 .select()
-                .single();
+                .single()
 
             if (labError) {
-                logger.error("Failed to save lab result", labError);
-                // We don't block response, but we log it. 
-                // actually user requested to throw error if fails? 
-                // "If the insert code is missing ... add it ... if (labError) throw new Error..."
-                throw new Error('Failed to save lab result: ' + labError.message);
+                console.error('Lab result insert error:', labError)
+                throw new Error('Failed to save lab result: ' + labError.message)
             }
 
             // B. Save Biomarkers
-            const biomarkers = analysisResult.data.biomarkers || analysisResult.data.details || [];
-            if (biomarkers.length > 0) {
+            const result = analysisResult; // mapping to user provided code variable name
+            if (result.biomarkers?.length > 0) {
                 const { error: bioError } = await supabase
                     .from('biomarkers')
                     .insert(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        biomarkers.map((b: any) => ({
+                        result.biomarkers.map((b: any) => ({
                             user_id: user.id,
                             lab_result_id: labResult.id,
-                            name: b.name || b.label, // handle both schema variations
-                            value: typeof b.value === 'string' ? parseFloat(b.value.replace(/[^0-9.]/g, '')) : b.value,
-                            unit: b.unit || '',
+                            name: b.name,
+                            value: b.value,
+                            unit: b.unit,
                             status: normalizeStatus(b.status),
-                            reference_min: b.range ? b.range[0] : null,
-                            reference_max: b.range ? b.range[1] : null,
-                            category: b.category || 'general',
-                            confidence: analysisResult.data.confidence || 0,
-                            ai_interpretation: b.aiInterpretation || analysisResult.data.summary
+                            reference_range_min: b.referenceMin ?? null, // Use flat fields
+                            reference_range_max: b.referenceMax ?? null, // Use flat fields
+                            category: b.category ?? 'other',
+                            confidence: b.confidence ?? 0.8,
+                            ai_interpretation: b.aiInterpretation ?? ''
                         }))
-                    );
+                    )
 
                 if (bioError) {
-                    throw new Error('Failed to save biomarkers: ' + bioError.message);
+                    console.error('Biomarker insert error:', bioError)
+                    throw new Error('Failed to save biomarkers: ' + bioError.message)
                 }
             }
         }
@@ -130,7 +116,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             success: true,
             extractedText,
-            analysis
+            analysis: JSON.stringify(analysisResult)
         });
 
     } catch (error: unknown) {

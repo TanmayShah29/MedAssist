@@ -241,3 +241,137 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
         );
     }
 }
+
+// ── Appointment Prep ───────────────────────────────────────────────────────
+
+export async function getAppointmentPrep(context: string): Promise<{ summary: string, checklist: string[], questions: string[] }> {
+    try {
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a medical appointment preparation assistant. Generate a concise prep guide with:
+- summary: 1-2 sentence overview of what to expect
+- checklist: 3 items to bring/prepare
+- questions: 2 important questions to ask the doctor
+
+Return ONLY valid JSON with keys: summary, checklist (string array), questions (string array). No markdown.`
+                },
+                {
+                    role: "user",
+                    content: `Generate preparation for: ${context}`
+                }
+            ],
+            model: MODEL,
+            temperature: 0.3,
+            max_tokens: 500,
+            response_format: { type: "json_object" },
+        });
+
+        const result = JSON.parse(completion.choices[0].message.content || "{}");
+        return {
+            summary: result.summary || "Prepare for your appointment by reviewing recent health changes.",
+            checklist: result.checklist || ["Bring recent lab results", "List current medications", "Note any new symptoms"],
+            questions: result.questions || ["What do my findings indicate?", "What are the next steps?"]
+        };
+    } catch (err: unknown) {
+        console.error("Groq appointment prep failed", (err as Error).message);
+        // Fallback
+        return {
+            summary: "Please bring your recent lab results and a list of questions.",
+            checklist: ["Lab results", "Medication list", "Symptom log"],
+            questions: ["What do these results mean?", "Do I need to change my routine?"]
+        };
+    }
+}
+
+// ── Clinical Insight (Generic) ─────────────────────────────────────────────
+
+export interface ClinicalInsight {
+    type: 'symptom' | 'lab' | 'report';
+    summary: string;
+    riskLevel: 'low' | 'moderate' | 'high' | 'critical';
+    confidence: number;
+    details: Array<{
+        label: string;
+        value: string;
+        status: 'stable' | 'warning' | 'critical' | 'optimal';
+        trend?: 'up' | 'down' | 'flat';
+    }>;
+    chartData?: Array<{ key: string; data: number }>;
+    biomarkers?: Array<BiomarkerResult>;
+    recommendations: string[];
+}
+
+export type GroqResponse =
+    | { success: true; data: ClinicalInsight }
+    | { success: false; error: string; status: number; retryAfter?: number };
+
+export async function generateClinicalInsight(prompt: string, contextType: 'symptom' | 'lab' | 'report'): Promise<GroqResponse> {
+    try {
+        let systemPrompt = `You are a clinical AI engine. Analyze the input and return a STRICT JSON structure.
+        No markdown.
+        
+        Input: "${prompt}"
+        
+        Return this schema:
+        {
+            "type": "${contextType}",
+            "summary": "Clinical summary...",
+            "riskLevel": "low|moderate|high|critical",
+            "confidence": 0-100,
+            "details": [{ "label": "Observation", "value": "Value", "status": "stable|warning|critical", "trend": "up|down|flat" }],
+            "recommendations": ["Action 1", "Action 2"]
+        }`;
+
+        if (contextType === 'report') {
+            systemPrompt = `You are an expert medical report analyzer. Given the text of a medical report, provide:
+   1. A clear summary of key findings
+   2. Any values outside normal reference ranges, highlighted
+   3. Possible conditions suggested by the results
+   4. Recommended follow-up actions
+   Always remind the user to consult a qualified doctor and not rely solely on AI analysis.
+   
+   Return the response in JSON format matching the schema:
+   {
+       "type": "report",
+       "summary": "Key findings summary...",
+       "riskLevel": "low|moderate|high|critical",
+       "confidence": 0-100,
+       "details": [{ "label": "Test Name", "value": "Result", "status": "optimal|warning|critical", "trend": "up|down|flat" }],
+       "biomarkers": [{ "name": "Name", "value": 0, "unit": "unit", "status": "optimal|warning|critical", "category": "category", "referenceMin": 0, "referenceMax": 0, "aiInterpretation": "string" }],
+       "recommendations": ["Follow-up 1", "Follow-up 2"]
+   }
+   
+   IMPORTANT: "status" must be exactly one of: "optimal", "warning", or "critical"
+   - optimal = value is within reference range
+   - warning = slightly outside reference range
+   - critical = significantly outside reference range`;
+        }
+
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            model: MODEL,
+            temperature: 0.2,
+            max_tokens: 2000,
+            response_format: { type: "json_object" },
+        });
+
+        const text = completion.choices[0].message.content || "{}";
+        const data = JSON.parse(text);
+        return { success: true, data };
+    } catch (err: unknown) {
+        console.error("AI Generation Failed", (err as Error).message);
+        return { success: false, error: "AI Generation Failed", status: 500 };
+    }
+}
+

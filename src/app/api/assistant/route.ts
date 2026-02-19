@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/services/rateLimitService";
-import { generateClinicalInsight } from "@/app/actions/groq-actions"; // Groq-powered clinical insight generator
+import { generateClinicalInsight } from "@/lib/groq-medical"; // Groq-powered clinical insight generator
 import { logger } from "@/lib/logger";
 
 export const maxDuration = 60;

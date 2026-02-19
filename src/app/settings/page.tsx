@@ -48,23 +48,7 @@ export default function SettingsPage() {
                 </p>
             </div>
 
-            {/* Unreviewed alerts banner */}
-            <div className="bg-[#FFFBEB] rounded-[14px] border border-[#FDE68A] p-4 
-                      flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <span className="h-2 w-2 rounded-full bg-amber-500" />
-                    <p className="text-sm font-medium text-amber-800">
-                        You have 2 unreviewed alerts
-                    </p>
-                </div>
-                <button
-                    onClick={() => router.push('/dashboard')}
-                    className="text-xs font-semibold text-amber-700 hover:text-amber-900 
-                     transition-colors flex items-center gap-1"
-                >
-                    Go to Dashboard <ChevronRight className="w-3 h-3" />
-                </button>
-            </div>
+
 
             {/* Alert Thresholds */}
             <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5">

@@ -33,6 +33,7 @@ export default function DashboardPage() {
     const [profile, setProfile] = useState<Profile | null>(null)
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
     const [symptoms, setSymptoms] = useState<string[]>([])
+    const [labCount, setLabCount] = useState(0)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,15 +45,17 @@ export default function DashboardPage() {
                 return
             }
 
-            const [profileResponse, biomarkerResponse, symptomResponse] = await Promise.all([
+            const [profileResponse, biomarkerResponse, symptomResponse, labResponse] = await Promise.all([
                 supabase.from('profiles').select('first_name, last_name').eq('id', user.id).single(),
                 supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-                supabase.from('symptoms').select('symptom').eq('user_id', user.id)
+                supabase.from('symptoms').select('symptom').eq('user_id', user.id),
+                supabase.from('lab_results').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
             ])
 
             setProfile(profileResponse.data)
             setBiomarkers((biomarkerResponse.data as Biomarker[]) || [])
             setSymptoms((symptomResponse.data || []).map((s: { symptom: string }) => s.symptom))
+            setLabCount(labResponse.count || 0)
             setLoading(false)
         }
         fetchData()
@@ -150,6 +153,32 @@ export default function DashboardPage() {
                     </p>
                 </div>
             </div>
+
+            {/* ── Engagement Nudge (Only if 1 report) ── */}
+            {labCount === 1 && (
+                <div style={{
+                    background: '#E0F2FE',
+                    border: '1px solid #BAE6FD',
+                    borderRadius: 14,
+                    padding: '16px 20px',
+                    marginBottom: 24,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 12
+                }}>
+                    <span style={{ fontSize: 20 }}>📈</span>
+                    <div>
+                        <p style={{ color: '#0369A1', fontWeight: 600, fontSize: 15, margin: 0 }}>
+                            Your AI gets smarter with every report
+                        </p>
+                        <p style={{ color: '#0284C7', fontSize: 13, margin: '4px 0 0 0' }}>
+                            You have 1 report uploaded. Upload your next report after your upcoming blood test
+                            and MedAssist will start showing you trends — like whether your hemoglobin is improving
+                            or your vitamin D is responding to supplements.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* ── "Today's Priorities" section ── */}
             <div className="mb-6">

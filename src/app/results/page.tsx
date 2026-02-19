@@ -70,6 +70,7 @@ export default function ResultsPage() {
                 <div>
                     <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
                     <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
+                    <p className="text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -250,6 +251,44 @@ export default function ResultsPage() {
                     </div>
                 </div>
 
+            </div>
+
+            {/* ── Sticky Nudge Bar ── */}
+            <div style={{
+                background: '#F5F4EF',
+                border: '1px solid #E8E6DF',
+                borderRadius: 14,
+                padding: '16px 20px',
+                marginTop: 32,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <div>
+                    <p style={{ fontWeight: 600, fontSize: 15, color: '#1C1917', margin: 0 }}>
+                        Had a recent blood test?
+                    </p>
+                    <p style={{ fontSize: 13, color: '#57534E', margin: '4px 0 0 0' }}>
+                        Upload it now so MedAssist can track how your values are changing over time.
+                    </p>
+                </div>
+                <button
+                    onClick={() => router.push('/dashboard')} // Navigate to dashboard/upload is likely better but dashboard has the button
+                    style={{
+                        background: '#0EA5E9',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 10,
+                        padding: '8px 16px',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        marginLeft: 16
+                    }}
+                >
+                    Upload report →
+                </button>
             </div>
         </div>
     )
