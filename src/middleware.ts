@@ -25,17 +25,17 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // List of paths that don't require authentication
-    const publicPaths = ['/', '/login', '/auth', '/auth/callback']
+    const publicPaths = ['/', '/login', '/auth/callback']
     const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith('/auth/callback'))
 
     // If logged in and trying to access login page, redirect to dashboard
-    if (user && (pathname === '/login' || pathname === '/auth')) {
+    if (user && pathname === '/login') {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     // If not logged in and trying to access a protected route, redirect to login
     if (!user && !isPublicPath) {
-        return NextResponse.redirect(new URL('/auth', request.url))
+        return NextResponse.redirect(new URL('/login', request.url))
     }
 
     return response

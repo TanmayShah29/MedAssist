@@ -20,7 +20,7 @@ const APP_SHELL_ROUTES = [
 // Pages that are completely standalone (no nav, no sidebar)
 const STANDALONE_ROUTES = [
   "/",
-  "/auth",
+  "/login",
   "/onboarding",
 ];
 

@@ -13,7 +13,7 @@ const getErrorMessage = (error: string) => {
     if (error.includes('Rate limit') || error.includes('429'))
         return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true }
     if (error.includes('Unauthorized') || error.includes('401'))
-        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth' }
+        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/login' }
     if (error.includes('invalid format'))
         return { title: 'AI parsing error', detail: 'The AI had trouble reading this report format. Try a different PDF.', canRetry: true }
     return { title: 'Something went wrong', detail: error, canRetry: true }
