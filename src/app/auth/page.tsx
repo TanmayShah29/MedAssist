@@ -10,7 +10,9 @@ import Link from "next/link";
 function AuthContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [mode, setMode] = useState<'login' | 'signup'>('login');
+    const [mode, setMode] = useState<'login' | 'signup'>(
+        searchParams.get('mode') === 'login' ? 'login' : 'signup'
+    );
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,7 @@ function AuthContent() {
     useEffect(() => {
         const modeParam = searchParams.get('mode');
         if (modeParam === 'signup') setMode('signup');
-        else setMode('login');
+        else if (modeParam === 'login') setMode('login');
     }, [searchParams]);
 
     const handleAuth = async (e: React.FormEvent) => {

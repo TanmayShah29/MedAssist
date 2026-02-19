@@ -42,16 +42,24 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* CTA */}
-          <button
-            onClick={() => router.push("/auth?mode=signup")}
-            className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 
-                       text-white text-sm font-semibold rounded-[10px] 
-                       transition-all shadow-sm shadow-sky-500/20
-                       hover:shadow-sky-500/30 hover:-translate-y-0.5"
-          >
-            Get started free
-          </button>
+          {/* Nav CTAs */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push("/auth?mode=login")}
+              className="text-sm font-semibold text-[#57534E] hover:text-[#1C1917] transition-colors"
+            >
+              Sign in
+            </button>
+            <button
+              onClick={() => router.push("/auth?mode=signup")}
+              className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 
+                         text-white text-sm font-semibold rounded-[10px] 
+                         transition-all shadow-sm shadow-sky-500/20
+                         hover:shadow-sky-500/30 hover:-translate-y-0.5"
+            >
+              Get started
+            </button>
+          </div>
         </div>
       </header>
 
@@ -88,22 +96,30 @@ export default function LandingPage() {
               Know exactly what to ask your doctor.
             </p>
 
-            {/* CTA */}
-            <button
-              onClick={() => router.push("/auth?mode=signup")}
-              className="inline-flex items-center gap-2.5 px-8 py-4 
-                         bg-sky-500 hover:bg-sky-600 text-white 
-                         font-semibold rounded-[14px] text-base
-                         transition-all shadow-lg shadow-sky-500/25
-                         hover:shadow-sky-500/40 hover:-translate-y-1"
-            >
-              Start understanding your health
-              <ArrowRight className="w-5 h-5" />
-            </button>
-
-            <p className="text-xs text-[#A8A29E] mt-4">
-              Free to start · No credit card required · Takes 3 minutes
-            </p>
+            {/* Primary CTA */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}>
+              <button
+                onClick={() => router.push('/auth?mode=signup')}
+                style={{
+                  background: '#0EA5E9',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 10,
+                  padding: '14px 32px',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#0284C7'}
+                onMouseLeave={e => e.currentTarget.style.background = '#0EA5E9'}
+              >
+                Get started free
+              </button>
+              <p style={{ fontSize: 13, color: '#A8A29E', margin: 0 }}>
+                Free to start · No credit card required · Takes 3 minutes
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -150,16 +166,17 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <div className="mt-10 text-center">
-              <p className="text-base font-semibold text-[#1C1917] mb-2">
-                MedAssist changes that.
-              </p>
-              <p className="text-sm text-[#57534E] max-w-lg mx-auto">
-                Upload your lab report once. Get instant explanations,
-                track trends over time, and know exactly what to discuss
-                with your doctor.
-              </p>
-            </div>
+            <p style={{
+              fontSize: 14,
+              color: '#57534E',
+              textAlign: 'center',
+              maxWidth: 480,
+              margin: '24px auto 0 auto',
+              lineHeight: 1.6
+            }}>
+              MedAssist is free to use. No credit card, no subscription, no catch.
+              Just upload your lab report and get instant plain-English explanations.
+            </p>
           </motion.div>
         </div>
       </section>
@@ -189,7 +206,7 @@ export default function LandingPage() {
                   step: "1",
                   icon: <Upload className="w-5 h-5 text-white" />,
                   title: "Upload your lab report",
-                  description: "Drop in your PDF or photo. Any lab format works — Quest, LabCorp, hospital reports.",
+                  description: "Works with digital PDF lab reports from any lab.",
                   detail: "Takes 5 seconds",
                   color: "sky",
                 },
@@ -197,8 +214,8 @@ export default function LandingPage() {
                   step: "2",
                   icon: <Brain className="w-5 h-5 text-white" />,
                   title: "AI reads every value",
-                  description: "Groq AI (Llama 3.3) extracts every biomarker — Hemoglobin, CRP, Vitamin D, Glucose — and compares them to clinical reference ranges.",
-                  detail: "Happens automatically in ~10 seconds",
+                  description: "Groq AI extracts every biomarker — Hemoglobin, CRP, Vitamin D, Glucose — and compares them to clinical reference ranges.",
+                  detail: "Takes 20–40 seconds",
                   color: "sky",
                 },
                 {
@@ -314,19 +331,19 @@ export default function LandingPage() {
                   timeline: "Upload #1",
                   title: "See your baseline",
                   description: "Know what's optimal and what needs work",
-                  icon: "📊",
+                  icon: "1",
                 },
                 {
                   timeline: "Upload #2",
                   title: "Track your progress",
                   description: "Did that vitamin D supplement help? Is hemoglobin improving?",
-                  icon: "📈",
+                  icon: "2",
                 },
                 {
                   timeline: "Upload #3+",
                   title: "Understand your body",
                   description: "Patterns emerge. You know what works for YOU.",
-                  icon: "✨",
+                  icon: "3",
                 },
               ].map((stage, idx) => (
                 <motion.div
@@ -338,7 +355,9 @@ export default function LandingPage() {
                   className="bg-white rounded-[14px] border border-[#E8E6DF] 
                              p-5 text-center"
                 >
-                  <div className="text-3xl mb-3">{stage.icon}</div>
+                  <div className="text-2xl font-bold bg-sky-100 text-sky-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                    {stage.icon}
+                  </div>
                   <p className="text-[10px] font-semibold uppercase 
                                 tracking-[0.12em] text-sky-500 mb-2">
                     {stage.timeline}
@@ -384,7 +403,7 @@ export default function LandingPage() {
               {[
                 "Not a doctor — this is education, not diagnosis",
                 "Not a replacement for medical care",
-                "Powered by Groq AI — using actual medical literature",
+                "Powered by Groq AI",
                 "Not complex — you don't need a medical degree to use it",
               ].map(clarification => (
                 <div key={clarification}
@@ -404,39 +423,55 @@ export default function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ─────────────────────────────────── */}
-      <section className="py-20 px-6 bg-sky-500">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+      <div style={{ textAlign: 'center', padding: '64px 24px', background: '#F5F4EF' }}>
+        <h2 style={{
+          fontFamily: 'Instrument Serif',
+          fontSize: 32,
+          fontWeight: 700,
+          color: '#1C1917',
+          margin: '0 0 12px 0'
+        }}>
+          Ready to understand your health?
+        </h2>
+        <p style={{ fontSize: 15, color: '#57534E', margin: '0 0 32px 0', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
+          Upload your first lab report and get your health score, plain-English explanations, and personalized insights in under a minute.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => router.push('/auth?mode=signup')}
+            style={{
+              background: '#0EA5E9',
+              color: 'white',
+              border: 'none',
+              borderRadius: 10,
+              padding: '12px 28px',
+              fontSize: 15,
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
           >
-            <h2 className="font-display text-3xl sm:text-4xl text-white mb-4">
-              Start understanding your health today
-            </h2>
-            <p className="text-sky-100 text-lg mb-8 max-w-xl mx-auto">
-              Upload your lab report. Get instant insights.
-              Track your progress. Free to start.
-            </p>
-
-            <button
-              onClick={() => router.push("/login?mode=signup")}
-              className="inline-flex items-center gap-2.5 px-8 py-4 
-                         bg-white hover:bg-sky-50 text-sky-600 
-                         font-semibold rounded-[14px] text-base
-                         transition-all shadow-lg 
-                         hover:shadow-xl hover:-translate-y-1"
-            >
-              Get started free
-              <ArrowRight className="w-5 h-5" />
-            </button>
-
-            <p className="text-xs text-sky-100 mt-4">
-              No credit card required · Takes 3 minutes · Try it right now
-            </p>
-          </motion.div>
+            Create free account
+          </button>
+          <button
+            onClick={() => router.push('/auth?mode=login')}
+            style={{
+              background: 'transparent',
+              color: '#57534E',
+              border: '1px solid #D9D6CD',
+              borderRadius: 10,
+              padding: '12px 28px',
+              fontSize: 15,
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Sign in
+          </button>
         </div>
-      </section>
+        <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 16 }}>
+          Already have an account? Click Sign in above.
+        </p>
+      </div>
 
       {/* ── FOOTER ────────────────────────────────────── */}
       <footer className="py-8 px-6 border-t border-[#E8E6DF] bg-[#FAFAF7]">
