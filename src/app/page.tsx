@@ -303,6 +303,206 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Technical Pipeline Section */}
+      <section style={{
+        padding: '80px 24px',
+        background: '#1C1917',  // dark background to contrast with rest of page
+      }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+
+          {/* Section label */}
+          <p style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#A8A29E',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            textAlign: 'center',
+            margin: '0 0 12px 0'
+          }}>
+            TECHNICAL PIPELINE
+          </p>
+
+          <h2 style={{
+            fontFamily: 'Instrument Serif',
+            fontSize: 32,
+            fontWeight: 700,
+            color: '#FAFAF7',
+            textAlign: 'center',
+            margin: '0 0 8px 0'
+          }}>
+            How the AI actually works
+          </h2>
+
+          <p style={{
+            fontSize: 15,
+            color: '#A8A29E',
+            textAlign: 'center',
+            margin: '0 auto 56px auto',
+            maxWidth: 520,
+            lineHeight: 1.6
+          }}>
+            MedAssist uses a multi-stage AI pipeline to extract, interpret,
+            and structure your lab data with high accuracy.
+          </p>
+
+          {/* Pipeline steps */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: 0,
+            position: 'relative'
+          }}>
+
+            {[
+              {
+                step: '01',
+                title: 'PDF Upload',
+                tech: 'Next.js 16',
+                description: 'User uploads a digital lab report PDF through a secure file handler. File is read as binary and passed to the extraction layer.',
+                color: '#0EA5E9'
+              },
+              {
+                step: '02',
+                title: 'OCR Extraction',
+                tech: 'OCR.space API',
+                description: 'Optical Character Recognition reads every value, unit, and reference range from the PDF — including complex lab table layouts.',
+                color: '#8B5CF6'
+              },
+              {
+                step: '03',
+                title: 'AI Interpretation',
+                tech: 'Groq · Llama 3.3 70B',
+                description: 'Extracted text is structured into a JSON schema by a large language model. Each biomarker is classified, scored, and given a plain-English explanation.',
+                color: '#10B981'
+              },
+              {
+                step: '04',
+                title: 'Data Persistence',
+                tech: 'Supabase · PostgreSQL',
+                description: 'Biomarkers, health score, and AI interpretations are stored with row-level security. Each user can only access their own data.',
+                color: '#F59E0B'
+              },
+              {
+                step: '05',
+                title: 'Visualisation',
+                tech: 'Recharts · React',
+                description: 'Results are rendered as interactive charts — range bars, trend lines, and radar charts — so patterns are immediately visible.',
+                color: '#EF4444'
+              }
+            ].map((item, index, arr) => (
+              <div key={item.step} style={{ position: 'relative' }}>
+
+                {/* Connector line between steps */}
+                {index < arr.length - 1 && (
+                  <div className="hidden md:block" style={{
+                    position: 'absolute',
+                    top: 28,
+                    right: -1,
+                    width: 2,
+                    height: 20,
+                    background: '#2C2926',
+                    zIndex: 1,
+                  }} />
+                )}
+
+                <div style={{
+                  padding: '24px 20px',
+                  borderLeft: index === 0 ? 'none' : '1px solid #2C2926',
+                }}
+                  className={index > 0 ? "border-l border-[#2C2926] md:border-l" : ""}
+                >
+                  {/* Step number */}
+                  <div style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: item.color,
+                    letterSpacing: '0.05em',
+                    marginBottom: 12
+                  }}>
+                    {item.step}
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: '#FAFAF7',
+                    margin: '0 0 4px 0'
+                  }}>
+                    {item.title}
+                  </h3>
+
+                  {/* Tech badge */}
+                  <div style={{
+                    display: 'inline-block',
+                    background: '#2C2926',
+                    color: '#A8A29E',
+                    fontSize: 11,
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                    marginBottom: 12,
+                    fontFamily: 'monospace'
+                  }}>
+                    {item.tech}
+                  </div>
+
+                  {/* Description */}
+                  <p style={{
+                    fontSize: 13,
+                    color: '#78716C',
+                    margin: 0,
+                    lineHeight: 1.6
+                  }}>
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tech stack row at bottom */}
+          <div style={{
+            marginTop: 48,
+            paddingTop: 32,
+            borderTop: '1px solid #2C2926',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 12,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: 12, color: '#57534E', marginRight: 8 }}>
+              Built with:
+            </span>
+            {[
+              'Next.js 16',
+              'TypeScript',
+              'Supabase',
+              'PostgreSQL',
+              'Groq AI',
+              'Llama 3.3 70B',
+              'OCR.space',
+              'Recharts',
+              'Vercel',
+              'Zustand'
+            ].map(tech => (
+              <span key={tech} style={{
+                background: '#2C2926',
+                color: '#A8A29E',
+                fontSize: 12,
+                padding: '4px 10px',
+                borderRadius: 6,
+                fontFamily: 'monospace'
+              }}>
+                {tech}
+              </span>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
       {/* ── WHY CONSISTENCY MATTERS ───────────────────── */}
       <section className="py-20 px-6 bg-[#F5F4EF] border-y border-[#E8E6DF]">
         <div className="max-w-4xl mx-auto">
