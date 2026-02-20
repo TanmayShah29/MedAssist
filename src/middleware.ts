@@ -49,8 +49,10 @@ export async function middleware(request: NextRequest) {
     const cachedOnboarding = request.cookies.get('onboarding_complete')?.value
     let onboardingComplete: boolean
 
-    if (cachedOnboarding !== undefined) {
-        onboardingComplete = cachedOnboarding === 'true'
+    if (cachedOnboarding === 'true') {
+        onboardingComplete = true
+    } else if (cachedOnboarding === 'false') {
+        onboardingComplete = false
     } else {
         const { data: profile } = await supabase
             .from('profiles')
@@ -60,7 +62,8 @@ export async function middleware(request: NextRequest) {
         onboardingComplete = profile?.onboarding_complete === true
         response.cookies.set('onboarding_complete', String(onboardingComplete), {
             httpOnly: true,
-            maxAge: 60 * 60 * 24 * 7
+            maxAge: 60 * 60 * 24 * 7,
+            path: '/'
         })
     }
 

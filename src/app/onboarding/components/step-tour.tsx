@@ -29,7 +29,7 @@ export function StepTour() {
             return;
         }
 
-        // Always mark onboarding as complete
+        // 1. Mark onboarding as complete in DB
         const { error: profileError } = await supabase
             .from('profiles')
             .update({ onboarding_complete: true })
@@ -42,7 +42,7 @@ export function StepTour() {
             return;
         }
 
-        // Only save results if we actually have them
+        // 2. Only save results if we actually have them
         if (analysisResult) {
             const result = await saveLabResult({
                 userId: user.id,
@@ -53,18 +53,18 @@ export function StepTour() {
             });
 
             if (!result.success) {
-                toast.error(result.error || "Failed to save results, but profile created.");
-            } else {
-                toast.success("Results saved successfully!");
+                console.error("Failed to save results:", result.error);
+                // We still continue because onboarding_complete is true in DB
             }
-        } else {
-            toast.success("Welcome to MedAssist!");
         }
 
-        // Set cookie so middleware doesn't hit database again
-        document.cookie = 'onboarding_complete=true; max-age=604800; path=/'
+        // 3. Set cookie so middleware doesn't hit database again
+        document.cookie = 'onboarding_complete=true; max-age=604800; path=/';
 
-        // Force hard navigation to bypass middleware cache
+        // 4. Small delay to ensure cookie is written before navigation
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 5. Force hard navigation to bypass middleware cache
         window.location.href = '/dashboard';
     };
 

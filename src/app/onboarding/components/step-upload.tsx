@@ -75,6 +75,7 @@ export function StepUpload() {
             await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
         }
         document.cookie = 'onboarding_complete=true; max-age=604800; path=/'
+        await new Promise(resolve => setTimeout(resolve, 100));
         window.location.href = '/dashboard';
     };
 
