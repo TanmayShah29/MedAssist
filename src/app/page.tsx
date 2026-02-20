@@ -117,7 +117,7 @@ export default function LandingPage() {
             <p className="text-lg sm:text-xl text-[#57534E] 
                           max-w-2xl mx-auto leading-relaxed mb-10">
               Upload your blood work. Get plain-language explanations
-              of what every number means. Track your health over time.
+              of what every number means. Build your health timeline report by report.
               Know exactly what to ask your doctor.
             </p>
 
@@ -796,6 +796,11 @@ export default function LandingPage() {
               MedAssist does not provide medical diagnosis.
               Always consult a qualified physician.
             </p>
+
+            <div className="flex gap-6 text-xs text-[#A8A29E]">
+              <Link href="/terms" className="hover:text-[#57534E] transition-colors">Terms of Service</Link>
+              <Link href="/privacy" className="hover:text-[#57534E] transition-colors">Privacy Policy</Link>
+            </div>
 
             {/* Credits */}
             <div className="flex items-center gap-4 text-xs text-[#A8A29E]">

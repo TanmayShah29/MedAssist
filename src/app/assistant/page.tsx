@@ -56,12 +56,38 @@ export default function AssistantPage() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const [bResponse, sResponse] = await Promise.all([
+            const [bResponse, sResponse, cResponse] = await Promise.all([
                 supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-                supabase.from('symptoms').select('symptom').eq('user_id', user.id)
+                supabase.from('symptoms').select('symptom').eq('user_id', user.id),
+                supabase.from('conversations').select('id, role, content, created_at').eq('user_id', user.id).order('created_at', { ascending: true }).limit(50)
             ]);
 
-            if (bResponse.data) setBiomarkers(bResponse.data);
+            if (bResponse.data && bResponse.data.length > 0) {
+                setBiomarkers(bResponse.data);
+            }
+
+            if (cResponse.data && cResponse.data.length > 0) {
+                setMessages(cResponse.data.map((m: any) => ({
+                    id: m.id,
+                    role: m.role as "user" | "assistant",
+                    content: m.content,
+                    timestamp: new Date(m.created_at)
+                })));
+            } else if (bResponse.data && bResponse.data.length > 0) {
+                // Find most critical biomarker
+                const critical = bResponse.data.find((b: any) => b.status === "critical")
+                    || bResponse.data.find((b: any) => b.status === "warning")
+                    || bResponse.data[0];
+
+                setMessages([
+                    {
+                        id: "1",
+                        role: "assistant",
+                        content: `Hello! I'm here to help you understand your health data. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}. What would you like to know about your results?`,
+                        timestamp: new Date()
+                    }
+                ]);
+            }
             if (sResponse.data) setSymptoms(sResponse.data.map((s: { symptom: string }) => s.symptom));
         };
         fetchData();

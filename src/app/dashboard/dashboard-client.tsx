@@ -10,6 +10,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer
 } from 'recharts'
+import { UploadModal } from '@/components/upload-modal'
 
 // Define types based on usage
 interface Profile {
@@ -34,55 +35,6 @@ interface Symptom {
 
 // ── Chart Components ──
 
-function HealthScoreGauge({ score }: { score: number }) {
-    const color = score >= 70 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444'
-
-    return (
-        <div style={{ position: 'relative', width: 180, height: 180 }}>
-            <RadialBarChart
-                width={180}
-                height={180}
-                cx={90}
-                cy={90}
-                innerRadius={60}
-                outerRadius={85}
-                barSize={14}
-                data={[{ value: score, fill: color }]}
-                startAngle={90}
-                endAngle={-270}
-            >
-                <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-                <RadialBar
-                    background={{ fill: '#E8E6DF' }}
-                    dataKey="value"
-                    angleAxisId={0}
-                    cornerRadius={8}
-                />
-            </RadialBarChart>
-            {/* Center text overlay */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                textAlign: 'center'
-            }}>
-                <div style={{
-                    fontFamily: 'Instrument Serif',
-                    fontSize: 36,
-                    fontWeight: 700,
-                    color: 'white',
-                    lineHeight: 1
-                }}>
-                    {score}
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
-                    out of 100
-                </div>
-            </div>
-        </div>
-    )
-}
 
 function CategoryRadar({ biomarkers }: { biomarkers: Biomarker[] }) {
     const categories = ['hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
@@ -221,6 +173,7 @@ export default function DashboardClient({
 }) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [showUploadModal, setShowUploadModal] = useState(false)
     const profile = initialProfile;
     const biomarkers = initialBiomarkers;
     const symptoms = initialSymptoms;
@@ -270,20 +223,15 @@ export default function DashboardClient({
                     <p className="text-[15px] text-[#57534E]">Welcome back, {profile?.first_name || 'there'}</p>
                 </div>
                 <button
-                    onClick={() => {
-                        setLoading(true);
-                        router.push('/upload');
-                    }}
-                    disabled={loading}
+                    onClick={() => setShowUploadModal(true)}
                     style={{
-                        background: loading ? '#7DD3FC' : '#0EA5E9',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        opacity: loading ? 0.8 : 1,
+                        background: '#0EA5E9',
+                        cursor: 'pointer',
                         transition: 'all 0.15s ease'
                     }}
-                    className="text-white rounded-[10px] px-4 py-2 text-[15px] font-medium"
+                    className="text-white rounded-[10px] px-4 py-2 text-[15px] font-medium hover:bg-[#0284C7]"
                 >
-                    {loading ? 'Processing...' : 'Upload Report'}
+                    Upload Report
                 </button>
             </div>
 
@@ -322,10 +270,7 @@ export default function DashboardClient({
                         Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
                     </p>
                     <button
-                        onClick={() => {
-                            setLoading(true);
-                            router.push('/onboarding?step=upload');
-                        }}
+                        onClick={() => setShowUploadModal(true)}
                         style={{
                             background: '#0EA5E9',
                             color: 'white',
@@ -345,23 +290,81 @@ export default function DashboardClient({
                 </div>
             ) : (
                 <div className="bg-sky-500 rounded-[18px] p-8 mb-6 text-white relative overflow-hidden">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
-                        {/* Left: Gauge */}
-                        <div className="flex flex-col items-center">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+                        {/* Left: Score Box */}
+                        <div className="flex flex-col">
                             <span className="text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2">HEALTH SCORE</span>
-                            <HealthScoreGauge score={healthScore} />
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                                <div style={{
+                                    fontFamily: 'Instrument Serif',
+                                    fontSize: 64,
+                                    fontWeight: 700,
+                                    color: 'white',
+                                    lineHeight: 1
+                                }}>
+                                    {healthScore}
+                                </div>
+                                <div style={{
+                                    background: 'rgba(255,255,255,0.2)',
+                                    color: 'white',
+                                    borderRadius: 8,
+                                    padding: '4px 10px',
+                                    fontSize: 14,
+                                    fontWeight: 600
+                                }}>
+                                    {scoreLabel.label}
+                                </div>
+                            </div>
+
+                            <div style={{ marginTop: 16 }}>
+                                <div style={{
+                                    fontSize: 13,
+                                    color: 'rgba(255,255,255,0.9)',
+                                    marginBottom: 8
+                                }}>
+                                    Score ranges:
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: 12,
+                                    flexWrap: 'wrap',
+                                    fontSize: 12
+                                }}>
+                                    {[
+                                        { range: '85-100', label: 'Excellent', color: '#10B981' },
+                                        { range: '70-84', label: 'Good', color: '#10B981' },
+                                        { range: '55-69', label: 'Fair', color: '#F59E0B' },
+                                        { range: 'Below 55', label: 'Needs attention', color: '#EF4444' }
+                                    ].map(item => (
+                                        <div key={item.range} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4
+                                        }}>
+                                            <div style={{
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: '50%',
+                                                background: item.color
+                                            }} />
+                                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>
+                                                {item.range}: {item.label}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p style={{
+                                    fontSize: 12,
+                                    color: 'rgba(255,255,255,0.6)',
+                                    marginTop: 8
+                                }}>
+                                    Most healthy adults score between 70–85
+                                </p>
+                            </div>
                         </div>
 
                         {/* Right: Stats */}
-                        <div className="flex-1 w-full max-w-md">
-                            <div className="flex justify-between items-baseline mb-6 border-b border-white/20 pb-4">
-                                <div>
-                                    <h3 className="text-xl font-bold font-display">{scoreLabel.label}</h3>
-                                    <p className="text-sm text-white/80">Overall Status</p>
-                                </div>
-                                <span className="text-3xl font-bold">{healthScore}</span>
-                            </div>
-
+                        <div className="flex-1 w-full max-w-md mt-6 md:mt-0">
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-3">
                                     <div className="flex items-center gap-3">
@@ -433,20 +436,15 @@ export default function DashboardClient({
                             Upload your first lab report to see your health overview and priorities.
                         </p>
                         <button
-                            onClick={() => {
-                                setLoading(true);
-                                router.push('/upload');
-                            }}
-                            disabled={loading}
+                            onClick={() => setShowUploadModal(true)}
                             style={{
-                                background: loading ? '#7DD3FC' : '#0EA5E9',
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                opacity: loading ? 0.8 : 1,
+                                background: '#0EA5E9',
+                                cursor: 'pointer',
                                 transition: 'all 0.15s ease'
                             }}
-                            className="text-white rounded-[10px] px-6 py-3 font-medium flex items-center gap-2"
+                            className="text-white rounded-[10px] px-6 py-3 font-medium flex items-center gap-2 hover:bg-[#0284C7]"
                         >
-                            {loading ? 'Processing...' : 'Upload your first report'}
+                            Upload your first report
                         </button>
                     </div>
                 ) : (
@@ -705,6 +703,12 @@ export default function DashboardClient({
 
                 </div>
             </div>
+
+            <UploadModal
+                isOpen={showUploadModal}
+                onClose={() => setShowUploadModal(false)}
+                onSuccess={() => router.refresh()}
+            />
         </div>
     )
 }

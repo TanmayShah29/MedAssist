@@ -13,8 +13,8 @@ interface Biomarker {
     unit: string
     status: 'optimal' | 'warning' | 'critical'
     category: string
-    reference_min?: number
-    reference_max?: number
+    reference_range_min?: number
+    reference_range_max?: number
     ai_interpretation?: string
     confidence?: number
     created_at: string
@@ -119,6 +119,7 @@ export default function ResultsPage() {
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
+    const [doctorQuestions, setDoctorQuestions] = useState<string>('Generating questions for your doctor...')
 
     useEffect(() => {
         const fetchBiomarkers = async () => {
@@ -133,8 +134,8 @@ export default function ResultsPage() {
 
             let query = supabase
                 .from('biomarkers')
-                .select('*')
-                .eq('user_id', user.id)
+                .select('*, lab_results!inner(user_id)')
+                .eq('lab_results.user_id', user.id)
                 .order('created_at', { ascending: false })
 
             if (selectedCategory !== 'all') {
@@ -152,6 +153,23 @@ export default function ResultsPage() {
     const optimalCount = biomarkers.filter(b => b.status === 'optimal').length
     const warningCount = biomarkers.filter(b => b.status === 'warning').length
     const criticalCount = biomarkers.filter(b => b.status === 'critical').length
+
+    useEffect(() => {
+        if (biomarkers.length > 0 && doctorQuestions === 'Generating questions for your doctor...') {
+            fetch('/api/generate-questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ biomarkers })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.questions) setDoctorQuestions(data.questions);
+                })
+                .catch(err => {
+                    setDoctorQuestions('Could not load questions. Try refreshing.');
+                });
+        }
+    }, [biomarkers, doctorQuestions]);
 
     return (
         <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
@@ -288,16 +306,16 @@ export default function ResultsPage() {
                                         </div>
                                         <div className="text-[15px] text-[#57534E]">
                                             {b.value} {b.unit}
-                                            {(b.reference_min !== undefined || b.reference_max !== undefined) && (
+                                            {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) && (
                                                 <span className="text-[12px] text-[#A8A29E] ml-2">
-                                                    (ref: {b.reference_min}–{b.reference_max})
+                                                    (ref: {b.reference_range_min}–{b.reference_range_max})
                                                 </span>
                                             )}
                                         </div>
                                         <RangeBar
                                             value={b.value}
-                                            min={b.reference_min || null}
-                                            max={b.reference_max || null}
+                                            min={b.reference_range_min || null}
+                                            max={b.reference_range_max || null}
                                             status={b.status}
                                         />
                                     </div>
@@ -339,9 +357,9 @@ export default function ResultsPage() {
                                     <div className="text-[32px] font-bold font-display leading-none mb-1">
                                         {selectedBiomarker.value} {selectedBiomarker.unit}
                                     </div>
-                                    {(selectedBiomarker.reference_min !== undefined || selectedBiomarker.reference_max !== undefined) && (
+                                    {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) && (
                                         <p className="text-[12px] text-[#A8A29E]">
-                                            Reference: {selectedBiomarker.reference_min} – {selectedBiomarker.reference_max}
+                                            Reference: {selectedBiomarker.reference_range_min} – {selectedBiomarker.reference_range_max}
                                         </p>
                                     )}
                                 </div>
@@ -377,6 +395,31 @@ export default function ResultsPage() {
                 </div>
 
             </div>
+
+            {/* ── Doctor Questions ── */}
+            {biomarkers.length > 0 && (
+                <div style={{
+                    background: '#F5F4EF',
+                    border: '1px solid #E8E6DF',
+                    borderRadius: 14,
+                    padding: 24,
+                    marginTop: 32
+                }}>
+                    <p style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: '#A8A29E',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        margin: '0 0 16px 0'
+                    }}>
+                        QUESTIONS TO ASK YOUR DOCTOR
+                    </p>
+                    <div style={{ fontSize: 14, color: '#57534E', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                        {doctorQuestions}
+                    </div>
+                </div>
+            )}
 
             {/* ── Sticky Nudge Bar ── */}
             <div style={{

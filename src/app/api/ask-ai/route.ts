@@ -29,14 +29,36 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { question, biomarkers, symptoms } = await request.json()
+    const { question, symptoms } = await request.json()
 
     if (!question || question.trim().length === 0) {
         return NextResponse.json({ error: 'Question is required' }, { status: 400 })
     }
 
+    // Fetch biomarkers server-side for integrity
+    const { data: biomarkers } = await supabase
+        .from('biomarkers')
+        .select('name, value, unit, status, reference_range_min, reference_range_max, ai_interpretation')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+    const { data: previousMessages } = await supabase
+        .from('conversations')
+        .select('role, content')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .limit(20)
+
     try {
-        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [])
+        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [], previousMessages || [])
+
+        // Save history
+        await supabase.from('conversations').insert([
+            { user_id: user.id, role: 'user', content: question },
+            { user_id: user.id, role: 'assistant', content: answer }
+        ])
+
         return NextResponse.json({ answer })
     } catch (error: unknown) {
         if ((error as Error).message?.startsWith('RATE_LIMIT')) {

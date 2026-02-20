@@ -32,6 +32,9 @@ export interface BiomarkerContext {
     value: number;
     unit: string;
     status: string;
+    reference_range_min?: number;
+    reference_range_max?: number;
+    ai_interpretation?: string;
 }
 
 // ── Extraction ─────────────────────────────────────────────────────────────
@@ -73,10 +76,25 @@ Return only a JSON object with this structure:
   "summary": string (2-3 sentences)
 }
 
+Calculate a health score from 0-100 using this exact formula:
+- Each biomarker with status "optimal" contributes 100 points
+- Each biomarker with status "warning" contributes 75 points  
+- Each biomarker with status "critical" contributes 40 points
+- Final score = sum of all points divided by (total biomarkers × 100) × 100
+- Apply a minimum floor: if any biomarkers are optimal, score cannot be below 50
+- Round to nearest whole number
+
+Score interpretation:
+- 85-100: Excellent
+- 70-84: Good
+- 55-69: Fair
+- Below 55: Needs Attention
+
+Return the score as an integer in the "healthScore" field.
+
 Rules:
 - Extract every biomarker present in the text
 - status: "optimal" if within range, "warning" if slightly outside, "critical" if far outside
-- healthScore: 0-100 based on proportion of optimal vs warning vs critical values
 - aiInterpretation: plain English a non-medical person can understand. NEVER say "you have", "diagnosed with", or "you are suffering from"
 - summary: 2-3 sentence plain English overview. Educational tone only.
 - Return ONLY the JSON object. No other text.`,
@@ -132,33 +150,34 @@ Rules:
 export async function answerHealthQuestion(
     question: string,
     biomarkers: BiomarkerContext[],
-    symptoms: string[]
+    symptoms: string[],
+    previousMessages: { role: 'user' | 'assistant', content: string }[] = []
 ): Promise<string> {
-    const biomarkerSummary = biomarkers
-        .map((b) => `${b.name}: ${b.value} ${b.unit} (${b.status})`)
-        .join("\n");
+    const biomarkerContextStr = biomarkers?.length > 0
+        ? `The user has the following biomarkers from their lab report:\n${biomarkers.map(b =>
+            `- ${b.name}: ${b.value} ${b.unit} (status: ${b.status}, reference: ${b.reference_range_min}-${b.reference_range_max})`
+        ).join('\n')}`
+        : 'The user has not uploaded a lab report yet.'
+
+    const systemPrompt = `You are a personal health assistant for MedAssist. You help users understand their lab results in plain English.
+
+${biomarkerContextStr}
+${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` : ""}
+Rules:
+- Never diagnose or prescribe
+- Always recommend consulting a physician
+- Reference the user's specific values when answering
+- Be warm, clear, and educational
+- Keep responses concise and actionable`
 
     try {
         const completion = await groq.chat.completions.create({
             messages: [
                 {
                     role: "system",
-                    content: `You are an educational health data assistant. You are NOT a doctor.
-
-You help users understand their lab results in plain, approachable language.
-
-STRICT RULES:
-- NEVER use the words: diagnose, prescribe, treatment plan, "you have", "you are suffering"
-- Keep answers under 200 words
-- Always end your response with: "For personalized medical advice, please consult your physician."
-- Use educational, not clinical, tone
-- If you don't know something, say so honestly
-
-User's lab results:
-${biomarkerSummary}
-
-User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}`,
+                    content: systemPrompt
                 },
+                ...previousMessages,
                 {
                     role: "user",
                     content: question,

@@ -2,7 +2,7 @@
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
@@ -244,13 +244,26 @@ export function StepUpload() {
             )}
 
             {/* Security note */}
-            <div className="flex items-start gap-3 p-4 bg-[#F5F4EF] 
-                      rounded-[12px] border border-[#E8E6DF]">
-                <Shield className="w-4 h-4 text-[#A8A29E] mt-0.5" />
-                <p className="text-xs text-[#57534E] leading-relaxed">
-                    Your data is encrypted end-to-end. We delete the raw file
-                    after extraction is complete. Only the extracted values
-                    are stored in your secure health profile.
+            <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8,
+                background: '#F5F4EF',
+                border: '1px solid #E8E6DF',
+                borderRadius: 10,
+                padding: '12px 16px',
+                marginTop: 16
+            }}>
+                <Lock size={14} color="#A8A29E" style={{ marginTop: 2, flexShrink: 0 }} />
+                <p style={{
+                    fontSize: 12,
+                    color: '#78716C',
+                    margin: 0,
+                    lineHeight: 1.6
+                }}>
+                    Your report is processed securely. Only the extracted values are stored —
+                    the original PDF is never saved to our servers. Your health data is private
+                    and only visible to you.
                 </p>
             </div>
 

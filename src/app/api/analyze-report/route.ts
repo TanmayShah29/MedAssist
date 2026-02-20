@@ -9,6 +9,22 @@ import { cookies } from 'next/headers';
 export const maxDuration = 60;
 export const runtime = "nodejs";
 
+function validateAndRecalculateScore(groqScore: number, biomarkers: any[]): number {
+    if (!groqScore || groqScore < 0 || groqScore > 100) {
+        const optimal = biomarkers.filter(b => b.status === 'optimal').length
+        const warning = biomarkers.filter(b => b.status === 'warning').length
+        const critical = biomarkers.filter(b => b.status === 'critical').length
+        const total = biomarkers.length
+
+        if (total === 0) return 0
+
+        const rawScore = ((optimal * 100) + (warning * 75) + (critical * 40)) / total
+        const floor = optimal > 0 ? 50 : 30
+        return Math.round(Math.max(floor, rawScore))
+    }
+    return groqScore
+}
+
 export async function POST(req: NextRequest) {
     const startTime = Date.now();
     try {
@@ -50,6 +66,7 @@ export async function POST(req: NextRequest) {
 
         // Passing empty symptoms array as we don't have them in this request context yet
         const analysisResult = await extractAndInterpretBiomarkers(extractedText, []);
+        analysisResult.healthScore = validateAndRecalculateScore(analysisResult.healthScore, analysisResult.biomarkers);
 
         // 5. EXTRACTED DATA PERSISTENCE
         const cookieStore = await cookies();

@@ -6,6 +6,8 @@ import { Preloader } from "@/components/ui/preloader";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { BottomMenu } from "@/components/ui/bottom-menu";
+import { FeedbackButton } from "@/components/feedback-button";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 // Pages that should show the full app shell
@@ -147,6 +149,9 @@ export default function RootLayout({
           </div>
         )}
 
+        {/* Global UI Elements */}
+        <FeedbackButton />
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );

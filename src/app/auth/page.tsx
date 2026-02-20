@@ -160,6 +160,11 @@ function AuthContent() {
                         : "Already have an account? Sign in"}
                 </button>
             </div>
+
+            <div className="mt-6 flex justify-center gap-6 text-xs text-[#A8A29E]">
+                <Link href="/terms" className="hover:text-[#57534E] transition-colors">Terms of Service</Link>
+                <Link href="/privacy" className="hover:text-[#57534E] transition-colors">Privacy Policy</Link>
+            </div>
         </div>
     );
 }

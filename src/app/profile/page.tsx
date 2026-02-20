@@ -2,17 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { FileText } from "lucide-react";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
     const router = useRouter();
-    const [profile, setProfile] = useState<{ first_name: string; last_name: string } | null>(null);
+    const [profile, setProfile] = useState<{ first_name: string; last_name: string; age?: number; sex?: string; blood_type?: string } | null>(null);
     const [reports, setReports] = useState<{ id: string; created_at: string; summary: string }[]>([]);
     const [symptoms, setSymptoms] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +25,7 @@ export default function ProfilePage() {
             }
 
             const [profileRes, reportsRes, symptomsRes] = await Promise.all([
-                supabase.from('profiles').select('first_name, last_name').eq('id', user.id).single(),
+                supabase.from('profiles').select('first_name, last_name, age, sex, blood_type').eq('id', user.id).single(),
                 supabase.from('lab_results').select('id, created_at, summary').eq('user_id', user.id).order('created_at', { ascending: false }),
                 supabase.from('symptoms').select('symptom').eq('user_id', user.id)
             ]);
@@ -36,6 +37,34 @@ export default function ProfilePage() {
         };
         fetchData();
     }, [router]);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            setIsSaving(false);
+            return;
+        }
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({
+                first_name: profile?.first_name || null,
+                last_name: profile?.last_name || null,
+                age: profile?.age ? parseInt(profile.age.toString()) : null,
+                sex: profile?.sex || null,
+                blood_type: profile?.blood_type || null
+            })
+            .eq('id', user.id);
+
+        setIsSaving(false);
+        if (error) {
+            toast.error("Failed to update profile: " + error.message);
+        } else {
+            toast.success("Profile updated successfully!");
+        }
+    };
 
     if (loading) return <div className="p-8 text-center text-[#A8A29E]">Loading...</div>;
 
@@ -49,7 +78,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-[#A8A29E] mt-1">{profile?.first_name} {profile?.last_name} · Patient</p>
             </div>
 
-            {/* Completion card — simplified for honesty */}
+            {/* Completion card */}
             <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-6">
                 <div className="flex items-start gap-4">
                     <div className="p-3 bg-sky-100 rounded-lg text-sky-600">
@@ -73,19 +102,70 @@ export default function ProfilePage() {
 
                 {/* Left Column */}
                 <div className="flex flex-col gap-5">
-                    {/* Personal Information - Real Data Only */}
+                    {/* Personal Information */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col">
-                        <p className="text-base font-semibold text-[#1C1917] mb-4">
-                            Personal Information
-                        </p>
+                        <div className="flex justify-between items-center mb-4">
+                            <p className="text-base font-semibold text-[#1C1917]">
+                                Personal Information
+                            </p>
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-[10px] font-semibold tracking-wide hover:bg-sky-600 transition-colors disabled:opacity-50"
+                            >
+                                {isSaving ? "Saving..." : "Save Changes"}
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E]">Full Name</p>
-                                <p className="text-sm font-medium text-[#1C1917] mt-0.5">{profile?.first_name} {profile?.last_name}</p>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">First Name</label>
+                                <input
+                                    type="text"
+                                    value={profile?.first_name || ''}
+                                    onChange={(e) => setProfile(prev => prev ? { ...prev, first_name: e.target.value } : null)}
+                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                />
                             </div>
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E]">Role</p>
-                                <p className="text-sm font-medium text-[#1C1917] mt-0.5">Patient</p>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Last Name</label>
+                                <input
+                                    type="text"
+                                    value={profile?.last_name || ''}
+                                    onChange={(e) => setProfile(prev => prev ? { ...prev, last_name: e.target.value } : null)}
+                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Age</label>
+                                <input
+                                    type="number"
+                                    value={profile?.age || ''}
+                                    onChange={(e) => setProfile(prev => prev ? { ...prev, age: parseInt(e.target.value) } : null)}
+                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Sex</label>
+                                <select
+                                    value={profile?.sex || ''}
+                                    onChange={(e) => setProfile(prev => prev ? { ...prev, sex: e.target.value } : null)}
+                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                >
+                                    <option value="">Select...</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div className="col-span-2 sm:col-span-1">
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Blood Type</label>
+                                <input
+                                    type="text"
+                                    value={profile?.blood_type || ''}
+                                    onChange={(e) => setProfile(prev => prev ? { ...prev, blood_type: e.target.value } : null)}
+                                    placeholder="e.g. O+, A-"
+                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                />
                             </div>
                         </div>
                     </div>
@@ -97,35 +177,37 @@ export default function ProfilePage() {
                                 Uploaded Reports
                             </p>
                             <button
-                                onClick={() => router.push('/upload')}
-                                className="text-xs text-sky-500 font-medium hover:text-sky-600 transition-colors"
+                                onClick={() => router.push('/dashboard')}
+                                className="text-xs text-sky-500 font-semibold tracking-wide hover:text-sky-600 transition-colors bg-white px-2 py-1 rounded-[6px] border border-[#E8E6DF] hover:border-sky-200"
                             >
                                 + Upload new
                             </button>
                         </div>
                         <div className="space-y-2.5">
                             {reports.length > 0 ? reports.map(report => (
-                                <div key={report.id} className="flex items-center gap-3 p-3 bg-[#FAFAF7] rounded-[10px] border border-[#E8E6DF]">
-                                    <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0">
-                                        <FileText className="w-4 h-4 text-sky-500" />
+                                <div key={report.id} className="flex items-center gap-3 p-3 bg-[#FAFAF7] rounded-[10px] border border-[#E8E6DF] transition-colors hover:bg-white group cursor-pointer" onClick={() => router.push('/results')}>
+                                    <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-500 transition-colors">
+                                        <FileText className="w-4 h-4 text-sky-500 group-hover:text-white transition-colors" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium text-[#1C1917] truncate">
-                                            Lab Report
+                                            Blood Panel Report
                                         </p>
-                                        <p className="text-xs text-[#A8A29E]">
-                                            {new Date(report.created_at).toLocaleDateString()}
+                                        <p className="text-xs text-[#A8A29E] mt-0.5">
+                                            {new Date(report.created_at).toLocaleDateString(undefined, {
+                                                year: 'numeric', month: 'short', day: 'numeric'
+                                            })}
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={() => router.push('/results')}
-                                        className="text-xs text-sky-500 hover:text-sky-600 font-medium flex-shrink-0"
-                                    >
-                                        View →
-                                    </button>
+                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors">
+                                        View Details →
+                                    </div>
                                 </div>
                             )) : (
-                                <p className="text-sm text-[#A8A29E] italic">No reports uploaded yet.</p>
+                                <div className="text-center py-6 bg-white border border-[#E8E6DF] border-dashed rounded-[10px]">
+                                    <FileText className="w-6 h-6 text-[#D6D3C9] mx-auto mb-2" />
+                                    <p className="text-sm text-[#A8A29E] font-medium">No reports uploaded yet.</p>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -140,19 +222,21 @@ export default function ProfilePage() {
                         </p>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-1.5">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-2">
                                     Reported Symptoms
                                 </p>
                                 {symptoms.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
                                         {symptoms.map(s => (
-                                            <span key={s} className="text-xs bg-white border border-[#E8E6DF] px-2 py-1 rounded-md text-[#57534E]">
+                                            <span key={s} className="text-xs font-medium bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-[8px] text-[#57534E] shadow-sm">
                                                 {s}
                                             </span>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-[#A8A29E] italic">No symptoms reported.</p>
+                                    <div className="px-3 py-2 bg-white rounded-[8px] border border-[#E8E6DF]">
+                                        <p className="text-sm text-[#A8A29E] italic">No symptoms reported during onboarding.</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
