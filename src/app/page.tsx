@@ -58,23 +58,8 @@ export default function LandingPage() {
             </span>
           </Link>
 
-          {/* Nav CTAs */}
+          {/* Nav CTAs removed to keep only the Hero CTA */}
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=signup')}
-              style={{
-                background: '#0EA5E9',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                padding: '8px 18px',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
-            >
-              {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
-            </button>
           </div>
         </div>
       </header>
@@ -115,7 +100,15 @@ export default function LandingPage() {
             {/* Primary CTA */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}>
               <button
-                onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=signup')}
+                onClick={() => {
+                  if (isSignedIn) {
+                    // Reset cookie so middleware fetches fresh state from DB
+                    document.cookie = "onboarding_complete=; path=/; max-age=0";
+                    router.push('/dashboard');
+                  } else {
+                    router.push('/auth?mode=signup');
+                  }
+                }}
                 style={{
                   background: '#0EA5E9',
                   color: 'white',

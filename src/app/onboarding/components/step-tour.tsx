@@ -64,10 +64,7 @@ export function StepTour() {
         router.push("/dashboard");
     };
 
-    // If no analysis result (user skipped), they shouldn't even be here based on new flow, but just in case:
-    if (!analysisResult) {
-        return null;
-    }
+    // (Removed null check for analysisResult so fallback UI always renders)
 
     return (
         <div style={{ textAlign: 'center', padding: '48px 24px' }}>

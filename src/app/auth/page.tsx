@@ -31,7 +31,7 @@ function AuthContent() {
 
         try {
             if (mode === 'signup') {
-                const { error } = await supabase.auth.signUp({
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
@@ -39,7 +39,13 @@ function AuthContent() {
                     },
                 });
                 if (error) throw error;
-                toast.success("Check your email to confirm your account");
+
+                if (data.user && !data.session) {
+                    toast.success("Check your email to confirm your account, then sign in.");
+                    return;
+                }
+
+                router.push('/onboarding');
             } else {
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
