@@ -61,7 +61,7 @@ export async function middleware(request: NextRequest) {
             .single()
         onboardingComplete = profile?.onboarding_complete === true
         response.cookies.set('onboarding_complete', String(onboardingComplete), {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 60 * 60 * 24 * 7,
             path: '/'
         })

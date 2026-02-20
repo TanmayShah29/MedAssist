@@ -6,7 +6,7 @@ import { ArrowRight, Activity, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { saveLabResult } from "@/app/actions/user-data";
+import { saveLabResult, completeOnboarding } from "@/app/actions/user-data";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
@@ -29,43 +29,34 @@ export function StepTour() {
             return;
         }
 
-        // 1. Mark onboarding as complete in DB
-        const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ onboarding_complete: true })
-            .eq('id', user.id);
+        try {
+            // 1. Only save results if we actually have them
+            if (analysisResult) {
+                const result = await saveLabResult({
+                    userId: user.id,
+                    healthScore: analysisResult.healthScore,
+                    riskLevel: analysisResult.riskLevel,
+                    summary: analysisResult.summary,
+                    labValues: analysisResult.biomarkers || [],
+                });
 
-        if (profileError) {
-            console.error("Profile update error:", profileError);
-            toast.error("Failed to update profile status.");
-            setIsLoading(false);
-            return;
-        }
-
-        // 2. Only save results if we actually have them
-        if (analysisResult) {
-            const result = await saveLabResult({
-                userId: user.id,
-                healthScore: analysisResult.healthScore,
-                riskLevel: analysisResult.riskLevel,
-                summary: analysisResult.summary,
-                labValues: analysisResult.biomarkers,
-            });
-
-            if (!result.success) {
-                console.error("Failed to save results:", result.error);
-                // We still continue because onboarding_complete is true in DB
+                if (!result.success) {
+                    console.error("Failed to save results:", result.error);
+                }
             }
+
+            // 2. Mark onboarding as complete via Server Action (handles both DB and server-side Cookie)
+            const completeResult = await completeOnboarding();
+            if (!completeResult.success) {
+                console.error("Profile update error:", completeResult.error);
+                toast.error("Failed to update profile status, but continuing...");
+            }
+        } catch (err) {
+            console.error("Non-fatal error completing onboarding:", err);
+        } finally {
+            // 3. Force hard navigation to bypass middleware cache
+            window.location.href = '/dashboard';
         }
-
-        // 3. Set cookie so middleware doesn't hit database again
-        document.cookie = 'onboarding_complete=true; max-age=604800; path=/';
-
-        // 4. Small delay to ensure cookie is written before navigation
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // 5. Force hard navigation to bypass middleware cache
-        window.location.href = '/dashboard';
     };
 
     // (Removed null check for analysisResult so fallback UI always renders)

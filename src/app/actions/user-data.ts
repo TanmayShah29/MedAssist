@@ -76,3 +76,36 @@ export async function saveLabResult(args: SaveLabResultArgs) {
         return { success: false, error: "Failed to save lab result." };
     }
 }
+
+import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+
+export async function completeOnboarding() {
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return { success: false, error: "Not authenticated" };
+
+        const { error } = await supabase
+            .from("profiles")
+            .update({ onboarding_complete: true })
+            .eq("id", user.id);
+
+        if (error) {
+            logger.error("Error updating profile completion:", error);
+            return { success: false, error: error.message };
+        }
+
+        const cookieStore = await cookies();
+        cookieStore.set("onboarding_complete", "true", {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+            httpOnly: false
+        });
+
+        return { success: true };
+    } catch (err: unknown) {
+        logger.error("Server Action completeOnboarding failed:", (err as Error).message);
+        return { success: false, error: "Internal Error" };
+    }
+}

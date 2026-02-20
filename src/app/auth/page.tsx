@@ -45,6 +45,11 @@ function AuthContent() {
                     return;
                 }
 
+                // Clear any leftover onboarding state from previous users before starting
+                if (typeof window !== 'undefined') {
+                    window.localStorage.removeItem('medassist-onboarding');
+                }
+
                 router.push('/onboarding');
             } else {
                 const { data, error } = await supabase.auth.signInWithPassword({

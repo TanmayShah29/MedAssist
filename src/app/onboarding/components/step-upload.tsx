@@ -65,18 +65,30 @@ export function StepUpload() {
         setShowOptions(false);
     }
 
-    const onSkip = async () => {
-        setUploadedFile(null);
-        completeStep(3);
+    const [isSkipping, setIsSkipping] = useState(false);
 
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
+    const onSkip = async () => {
+        try {
+            console.log("onSkip initiated");
+            setIsSkipping(true);
+            setUploadedFile(null);
+            completeStep(3);
+
+            // Import Server Action inline or fetch dynamically
+            const { completeOnboarding } = await import("@/app/actions/user-data");
+
+            const result = await completeOnboarding();
+            if (!result.success) {
+                console.error("Profile update failed during skip:", result.error);
+                toast.error("Error updating profile, but continuing...");
+            }
+        } catch (err) {
+            console.error("Error during skip operations:", err);
+            toast.error("Error updating profile, but continuing anyway...");
+        } finally {
+            console.log("Forcing navigation to dashboard");
+            window.location.href = '/dashboard';
         }
-        document.cookie = 'onboarding_complete=true; max-age=604800; path=/'
-        await new Promise(resolve => setTimeout(resolve, 100));
-        window.location.href = '/dashboard';
     };
 
     if (showOptions && !uploadedFile) {
