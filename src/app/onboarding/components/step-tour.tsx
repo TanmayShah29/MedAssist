@@ -64,144 +64,53 @@ export function StepTour() {
         router.push("/dashboard");
     };
 
-    // If no analysis result (user skipped), show empty but happy state
+    // If no analysis result (user skipped), they shouldn't even be here based on new flow, but just in case:
     if (!analysisResult) {
-        return (
-            <div className="max-w-4xl mx-auto w-full px-6 py-20 text-center">
-                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle2 className="w-10 h-10 text-emerald-600" />
-                </div>
-                <h2 className="font-display text-3xl text-[#1C1917] mb-4">
-                    You&apos;re all set!
-                </h2>
-                <p className="text-[#57534E] max-w-md mx-auto mb-8 text-lg">
-                    Your profile is created. You can explore the dashboard now and upload your first lab report whenever you&apos;re ready.
-                </p>
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleFinish}
-                        disabled={isLoading}
-                        className="flex items-center gap-2 px-8 py-4 bg-sky-500 
-                         hover:bg-sky-600 text-white font-semibold rounded-[14px] 
-                         shadow-lg shadow-sky-500/25 transition-all 
-                         hover:-translate-y-0.5 disabled:opacity-70"
-                    >
-                        {isLoading ? "Setting up..." : "Go to Dashboard"}
-                        <ArrowRight className="w-5 h-5" />
-                    </button>
-                </div>
-            </div>
-        )
+        return null;
     }
 
-    const criticalItems = analysisResult.biomarkers.filter(v => v.status === "critical");
-    const warningItems = analysisResult.biomarkers.filter(v => v.status === "warning");
-
     return (
-        <div className="max-w-4xl mx-auto w-full px-6 py-10">
-
-            <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 
-                        text-emerald-700 rounded-full text-xs font-semibold mb-4">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Analysis Complete
-                </div>
-                <h2 className="font-display text-4xl text-[#1C1917] mb-3">
-                    Here is what we found
-                </h2>
-                <p className="text-[#57534E]">
-                    We analyzed {analysisResult.biomarkers.length} biomarkers from your report.
-                </p>
+        <div style={{ textAlign: 'center', padding: '48px 24px' }}>
+            <div style={{
+                width: 64,
+                height: 64,
+                borderRadius: '50%',
+                background: '#D1FAE5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px auto'
+            }}>
+                <CheckCircle2 size={32} color="#10B981" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-
-                {/* Health Score Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[20px] border border-[#E8E6DF] p-6 
-                     shadow-sm flex flex-col items-center text-center"
-                >
-                    <div className="w-12 h-12 rounded-[14px] bg-sky-100 
-                          flex items-center justify-center mb-4">
-                        <Activity className="w-6 h-6 text-sky-600" />
-                    </div>
-                    <span className="text-[10px] font-semibold uppercase 
-                           tracking-[0.12em] text-[#A8A29E] mb-1">
-                        Overall Health Score
-                    </span>
-                    <div className="text-5xl font-display text-[#1C1917] mb-2">
-                        {analysisResult.healthScore}
-                        <span className="text-2xl text-[#A8A29E]">/100</span>
-                    </div>
-                    <p className="text-xs text-[#57534E]">
-                        Based on {analysisResult.biomarkers.length} biomarkers
-                    </p>
-                </motion.div>
-
-                {/* Action Items Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-white rounded-[20px] border border-[#E8E6DF] p-6 
-                     shadow-sm col-span-1 md:col-span-2"
-                >
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-[12px] bg-amber-100 
-                            flex items-center justify-center">
-                            <AlertTriangle className="w-5 h-5 text-amber-600" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-[#1C1917]">Attention Needed</h3>
-                            <p className="text-xs text-[#57534E]">
-                                {criticalItems.length + warningItems.length} items flagged for review
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        {[...criticalItems, ...warningItems].map((item, index) => (
-                            <div key={index} className="flex items-start gap-3 p-3 
-                                              bg-[#FAFAF7] rounded-[10px] border border-[#E8E6DF]">
-                                <div className={cn(
-                                    "w-2 h-2 rounded-full mt-1.5 shrink-0",
-                                    item.status === "critical" ? "bg-red-500" : "bg-amber-500"
-                                )} />
-                                <div>
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <span className="font-medium text-sm text-[#1C1917]">
-                                            {item.name}
-                                        </span>
-                                        <span className="text-xs font-mono text-[#57534E]">
-                                            {item.value} {item.unit}
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-[#57534E] leading-relaxed">
-                                        {item.aiInterpretation}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
-            </div>
-
-            <div className="flex justify-center">
-                <button
-                    onClick={handleFinish}
-                    disabled={isLoading}
-                    className="flex items-center gap-2 px-8 py-4 bg-sky-500 
-                     hover:bg-sky-600 text-white font-semibold rounded-[14px] 
-                     shadow-lg shadow-sky-500/25 transition-all 
-                     hover:-translate-y-0.5 disabled:bg-sky-300 disabled:cursor-not-allowed"
-                >
-                    {isLoading ? "Saving..." : "Go to my Dashboard"}
-                    <ArrowRight className="w-5 h-5" />
-                </button>
-            </div>
-
+            <h2 style={{
+                fontFamily: 'Instrument Serif',
+                fontSize: 32,
+                color: '#1C1917',
+                margin: '0 0 12px 0'
+            }}>
+                Your dashboard is ready
+            </h2>
+            <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32, maxWidth: 360, margin: '0 auto 32px auto' }}>
+                Your health data is loaded and waiting. Upload your next report after your upcoming blood test to start tracking trends.
+            </p>
+            <button
+                onClick={() => handleFinish()}
+                disabled={isLoading}
+                style={{
+                    background: '#0EA5E9',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 10,
+                    padding: '14px 36px',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    opacity: isLoading ? 0.7 : 1
+                }}
+            >
+                {isLoading ? 'Saving...' : 'Go to my dashboard →'}
+            </button>
         </div>
     );
 }

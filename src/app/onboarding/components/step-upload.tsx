@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar } from
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export function StepUpload() {
     const {
@@ -17,6 +19,7 @@ export function StepUpload() {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const router = useRouter();
 
     // Handle drag events
     const handleDragOver = (e: React.DragEvent) => {
@@ -62,10 +65,17 @@ export function StepUpload() {
         setShowOptions(false);
     }
 
-    const onSkip = () => {
+    const onSkip = async () => {
         setUploadedFile(null);
         completeStep(3);
-        setStep(5); // Skip processing (step 4), go straight to tour (step 5)
+
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
+        }
+
+        router.push('/dashboard');
     };
 
     if (showOptions && !uploadedFile) {

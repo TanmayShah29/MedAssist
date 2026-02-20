@@ -61,7 +61,7 @@ export default function LandingPage() {
           {/* Nav CTAs */}
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=login')}
+              onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=signup')}
               style={{
                 background: '#0EA5E9',
                 color: 'white',
@@ -73,7 +73,7 @@ export default function LandingPage() {
                 cursor: 'pointer'
               }}
             >
-              {isSignedIn ? 'Go to Dashboard' : 'Sign in'}
+              {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
             </button>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function LandingPage() {
             {/* Primary CTA */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}>
               <button
-                onClick={() => router.push('/auth?mode=signup')}
+                onClick={() => router.push(isSignedIn ? '/dashboard' : '/auth?mode=signup')}
                 style={{
                   background: '#0EA5E9',
                   color: 'white',
@@ -130,7 +130,7 @@ export default function LandingPage() {
                 onMouseEnter={e => e.currentTarget.style.background = '#0284C7'}
                 onMouseLeave={e => e.currentTarget.style.background = '#0EA5E9'}
               >
-                Get started free
+                {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
               </button>
               <p style={{ fontSize: 13, color: '#A8A29E', margin: 0 }}>
                 Free to start · No credit card required · Takes 3 minutes

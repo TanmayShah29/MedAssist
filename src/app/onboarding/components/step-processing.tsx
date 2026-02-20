@@ -20,7 +20,7 @@ const getErrorMessage = (error: string) => {
 }
 
 export function StepProcessing() {
-    const { setStep, completeStep, setAnalysisResult } = useOnboardingStore();
+    const { setStep, completeStep, setAnalysisResult, analysisResult } = useOnboardingStore();
     const [state, setState] = useState<ProcessingState>("uploading");
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string } | null>(null);
@@ -129,14 +129,7 @@ export function StepProcessing() {
 
             setAnalysisResult(analysisData);
 
-            // Wait for animation to finish at least to step 4 or 5 ideally, but we'll show complete when ready
-            // For better UX, we could force the stages to complete, but for now we'll jump to complete
             setState("complete");
-
-            // Success animation delay
-            setTimeout(() => {
-                onComplete();
-            }, 1000);
 
         } catch (err: unknown) {
             setErrorData(getErrorMessage((err as Error).message || "Network error"));
@@ -221,25 +214,94 @@ export function StepProcessing() {
     }
 
     // Success State
-    if (state === "complete") {
+    if (state === "complete" && analysisResult) {
+        const biomarkerCount = analysisResult.biomarkers.length;
+        const healthScore = analysisResult.healthScore;
+        const optimalCount = analysisResult.biomarkers.filter((b: any) => b.status === "optimal").length;
+        const warningCount = analysisResult.biomarkers.filter((b: any) => b.status === "warning").length;
+        const criticalCount = analysisResult.biomarkers.filter((b: any) => b.status === "critical").length;
+
         return (
-            <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center justify-center min-h-[400px]">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center"
-                >
-                    <div className="mb-6">
-                        <CheckCircle2 className="w-16 h-16 text-emerald-500" />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{ textAlign: 'center', padding: '48px 24px', maxWidth: 600, margin: '0 auto' }}
+            >
+                <p style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: '#A8A29E',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    marginBottom: 8
+                }}>
+                    DATA EXTRACTED
+                </p>
+                <h2 style={{
+                    fontFamily: 'Instrument Serif',
+                    fontSize: 32,
+                    color: '#1C1917',
+                    margin: '0 0 8px 0'
+                }}>
+                    Want to see your health score?
+                </h2>
+                <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32 }}>
+                    We found {biomarkerCount} biomarkers in your report. Here is what they mean.
+                </p>
+
+                {/* Health score display */}
+                <div style={{
+                    background: '#F5F4EF',
+                    border: '1px solid #E8E6DF',
+                    borderRadius: 18,
+                    padding: '32px 24px',
+                    marginBottom: 24,
+                    maxWidth: 400,
+                    margin: '0 auto 24px auto'
+                }}>
+                    <div style={{
+                        fontFamily: 'Instrument Serif',
+                        fontSize: 72,
+                        fontWeight: 700,
+                        color: '#0EA5E9',
+                        lineHeight: 1
+                    }}>
+                        {healthScore}
                     </div>
-                    <h3 className="text-[#1C1917] text-[24px] font-bold font-display mb-2">
-                        Analysis complete!
-                    </h3>
-                    <p className="text-[#57534E] text-[16px]">
-                        Redirecting to your results...
-                    </p>
-                </motion.div>
-            </div>
+                    <div style={{ fontSize: 14, color: '#57534E', marginTop: 8 }}>
+                        out of 100
+                    </div>
+                    <div style={{
+                        marginTop: 16,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 16
+                    }}>
+                        <span style={{ fontSize: 13, color: '#10B981', fontWeight: 500 }}>
+                            {optimalCount} optimal
+                        </span>
+                        <span style={{ fontSize: 13, color: '#F59E0B', fontWeight: 500 }}>
+                            {warningCount} monitor
+                        </span>
+                        <span style={{ fontSize: 13, color: '#EF4444', fontWeight: 500 }}>
+                            {criticalCount} action needed
+                        </span>
+                    </div>
+                </div>
+
+                <button onClick={() => onComplete()} style={{
+                    background: '#0EA5E9',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 10,
+                    padding: '12px 32px',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                }}>
+                    See full breakdown →
+                </button>
+            </motion.div>
         );
     }
 

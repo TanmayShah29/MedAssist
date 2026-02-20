@@ -5,19 +5,23 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    // ALWAYS let these through — no exceptions
+    // Landing page — NEVER redirect, always show
+    if (pathname === '/') {
+        return NextResponse.next()
+    }
+
+    // Static files and API — never redirect
     if (
-        pathname === '/' ||
-        pathname.startsWith('/auth') ||
         pathname.startsWith('/api') ||
         pathname.startsWith('/_next') ||
+        pathname.startsWith('/auth') ||
         pathname.includes('.')
     ) {
         return NextResponse.next()
     }
 
+    // Check auth session
     let response = NextResponse.next({ request })
-
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -29,76 +33,50 @@ export async function middleware(request: NextRequest) {
                         request.cookies.set(name, value)
                         response.cookies.set(name, value, options)
                     })
-                },
-            },
+                }
+            }
         }
     )
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // --- Not logged in ---
+    // Not signed in — redirect to auth
     if (!user) {
-        const url = new URL('/auth', request.url)
-        url.searchParams.set('mode', 'login')
-        return NextResponse.redirect(url)
+        return NextResponse.redirect(new URL('/auth', request.url))
     }
 
-    // --- Logged in ---
-    if (user) {
-        let onboardingComplete = false
-        const cachedOnboarding = request.cookies.get('onboarding_complete')?.value
-        let needToSetCookie = false
+    // Signed in — check onboarding
+    const cachedOnboarding = request.cookies.get('onboarding_complete')?.value
+    let onboardingComplete: boolean
 
-        if (cachedOnboarding !== undefined) {
-            onboardingComplete = cachedOnboarding === 'true'
-        } else {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('onboarding_complete')
-                .eq('id', user.id)
-                .single()
+    if (cachedOnboarding !== undefined) {
+        onboardingComplete = cachedOnboarding === 'true'
+    } else {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('onboarding_complete')
+            .eq('id', user.id)
+            .single()
+        onboardingComplete = profile?.onboarding_complete === true
+        response.cookies.set('onboarding_complete', String(onboardingComplete), {
+            httpOnly: true,
+            maxAge: 60 * 60 * 24 * 7
+        })
+    }
 
-            onboardingComplete = profile?.onboarding_complete === true
-            needToSetCookie = true
-        }
+    // Signed in but onboarding incomplete — send to onboarding
+    if (!onboardingComplete && pathname !== '/onboarding') {
+        return NextResponse.redirect(new URL('/onboarding', request.url))
+    }
 
-        // Helper to redirect and set cookie if needed
-        const redirect = (path: string) => {
-            const res = NextResponse.redirect(new URL(path, request.url))
-            const cookiesToSet = response.cookies.getAll()
-            cookiesToSet.forEach(c => res.cookies.set(c))
-
-            if (needToSetCookie) {
-                res.cookies.set('onboarding_complete', String(onboardingComplete), {
-                    httpOnly: true,
-                    maxAge: 60 * 60 * 24 * 7 // 7 days
-                })
-            }
-            return res
-        }
-
-        // User needs to complete onboarding but isn't there
-        if (!onboardingComplete && pathname !== '/onboarding') {
-            return redirect('/onboarding')
-        }
-        // User completed onboarding but tries to go back to it
-        if (onboardingComplete && pathname === '/onboarding') {
-            return redirect('/dashboard')
-        }
-
-        // Normal access: just Ensure cookie is set on the response if needed
-        if (needToSetCookie) {
-            response.cookies.set('onboarding_complete', String(onboardingComplete), {
-                httpOnly: true,
-                maxAge: 60 * 60 * 24 * 7 // 7 days
-            })
-        }
-        return response
+    // Signed in and onboarding complete but trying to access onboarding
+    if (onboardingComplete && pathname === '/onboarding') {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     return response
 }
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)']
 }
