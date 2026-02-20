@@ -86,7 +86,13 @@ export function StepProcessing() {
             const symptoms = useOnboardingStore.getState().selectedSymptoms;
 
             if (!file || !(file instanceof File)) {
-                goBackToUpload();
+                setErrorData({
+                    title: "Session Interrupted",
+                    detail: "Your uploaded file was lost due to a page refresh. Please go back and re-upload.",
+                    canRetry: false
+                });
+                setState("error");
+                hasStarted.current = false;
                 return;
             }
 

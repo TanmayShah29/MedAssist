@@ -57,6 +57,7 @@ export function StepBasicInfo() {
                         </label>
                         <input
                             type="text"
+                            name="firstName"
                             value={basicInfo.firstName}
                             onChange={e => setBasicInfo({ firstName: e.target.value })}
                             placeholder="John"
@@ -74,6 +75,7 @@ export function StepBasicInfo() {
                         </label>
                         <input
                             type="text"
+                            name="lastName"
                             value={basicInfo.lastName}
                             onChange={e => setBasicInfo({ lastName: e.target.value })}
                             placeholder="Doe"
@@ -94,6 +96,7 @@ export function StepBasicInfo() {
                         </label>
                         <input
                             type="number"
+                            name="age"
                             value={basicInfo.age}
                             onChange={e => setBasicInfo({ age: parseInt(e.target.value, 10) || "" })}
                             placeholder="32"

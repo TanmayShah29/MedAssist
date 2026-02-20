@@ -92,13 +92,14 @@ function AuthContent() {
                 </p>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleAuth} className="space-y-4">
                 <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
                         Email Address
                     </label>
                     <input
                         type="email"
+                        name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -114,6 +115,7 @@ function AuthContent() {
                     </label>
                     <input
                         type="password"
+                        name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -125,7 +127,7 @@ function AuthContent() {
                 </div>
 
                 <button
-                    onClick={() => handleAuth()}
+                    type="submit"
                     disabled={isLoading}
                     className="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white rounded-[12px] 
                              font-semibold shadow-lg shadow-sky-500/20 transition-all 
@@ -141,7 +143,7 @@ function AuthContent() {
                         </>
                     )}
                 </button>
-            </div>
+            </form>
 
             <div className="mt-6 text-center">
                 <button
