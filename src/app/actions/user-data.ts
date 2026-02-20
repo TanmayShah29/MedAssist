@@ -48,6 +48,7 @@ export async function saveLabResult(args: SaveLabResultArgs) {
         // Step 2: Prepare and insert all the biomarker records
         const biomarkersToInsert = labValues.map((value) => ({
             lab_result_id: labResultId,
+            user_id: userId,
             name: value.name,
             value: value.value,
             unit: value.unit,

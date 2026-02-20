@@ -36,12 +36,12 @@ export default async function DashboardPage() {
 
     const [profileResponse, biomarkerResponse, symptomResponse, labResponse] = await Promise.all([
         supabase.from('profiles').select('first_name, last_name, onboarding_complete').eq('id', user.id).single(),
-        supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('biomarkers').select('*').eq('user_id', user.id).order('id', { ascending: false }),
         supabase.from('symptoms').select('symptom').eq('user_id', user.id),
         supabase.from('lab_results')
             .select('*')
             .eq('user_id', user.id)
-            .order('uploaded_at', { ascending: true })
+            .order('created_at', { ascending: true })
     ])
 
     const profile = profileResponse.data

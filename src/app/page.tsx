@@ -58,8 +58,32 @@ export default function LandingPage() {
             </span>
           </Link>
 
-          {/* Nav CTAs removed to keep only the Hero CTA */}
+          {/* Nav CTAs */}
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                if (isSignedIn) {
+                  router.push('/dashboard');
+                } else {
+                  router.push('/auth?mode=signup');
+                }
+              }}
+              style={{
+                background: '#0EA5E9',
+                color: 'white',
+                border: 'none',
+                borderRadius: 10,
+                padding: '8px 20px',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#0284C7'}
+              onMouseLeave={e => e.currentTarget.style.background = '#0EA5E9'}
+            >
+              {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
+            </button>
           </div>
         </div>
       </header>
