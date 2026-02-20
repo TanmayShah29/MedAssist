@@ -74,8 +74,8 @@ export function StepUpload() {
         if (user) {
             await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
         }
-
-        router.push('/dashboard');
+        document.cookie = 'onboarding_complete=true; max-age=604800; path=/'
+        window.location.href = '/dashboard';
     };
 
     if (showOptions && !uploadedFile) {

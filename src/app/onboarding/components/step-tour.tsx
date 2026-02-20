@@ -61,7 +61,11 @@ export function StepTour() {
             toast.success("Welcome to MedAssist!");
         }
 
-        router.push("/dashboard");
+        // Set cookie so middleware doesn't hit database again
+        document.cookie = 'onboarding_complete=true; max-age=604800; path=/'
+
+        // Force hard navigation to bypass middleware cache
+        window.location.href = '/dashboard';
     };
 
     // (Removed null check for analysisResult so fallback UI always renders)
