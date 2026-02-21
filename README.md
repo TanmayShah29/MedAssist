@@ -14,6 +14,7 @@
 - **PWA & Offline Resilience**: Full Progressive Web App support with `manifest.json` and `apple-touch-icon`. Implements local caching for lab results to ensure your health data is accessible even without an internet connection.
 - **Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
 - **Smart Doctor Preparation**: Automatically generates structured, context-aware questions for your next medical appointment based on flagged biomarkers, complete with "Why ask this" clinical rationale.
+- **Supplement & Medication Correlation**: A dedicated "Medicine Cabinet" to log intake, which automatically overlays correlation markers on biomarker trend charts to visualize the impact of your actions.
 - **Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
 - **Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
 - **Engaging Onboarding**: A verified, step-by-step processing flow that keeps you informed while the AI analyzes your data.
@@ -34,7 +35,6 @@
 MedAssist is evolving from a lab analyzer into a comprehensive health intelligence platform. Upcoming features include:
 
 - **Integrated Health Timeline**: A chronological medical diary interweaving lab results, symptom logs, and AI milestones to visualize your complete health story.
-- **Supplement & Medication Correlation**: Log your supplements and medications to see real-time correlation markers on your biomarker trend charts.
 - **Biomarker Simulation**: "What-if" scenarios to understand how specific lifestyle or dietary changes might influence your clinical results.
 
 ## How it Works

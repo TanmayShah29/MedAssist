@@ -5,6 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { createBrowserClient } from '@supabase/ssr';
+import { cn } from "@/lib/utils";
 import {
   Shield,
   Upload,
@@ -176,24 +177,39 @@ export default function LandingPage() {
                 Real-world <span className="text-indigo-400">correlations.</span>
               </h2>
               <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                We're building the first clinical intelligence platform that understands the "why" behind your numbers by connecting your actions to your outcomes.
+                MedAssist is the first clinical intelligence platform that understands the "why" behind your numbers by connecting your actions to your outcomes.
               </p>
               
               <div className="space-y-6">
                 {[
                   {
-                    title: "Health Timeline",
-                    desc: "A medical diary that connects symptoms, lab reports, and AI insights."
+                    title: "Supplement Correlation",
+                    desc: "Log your intake and see exactly how it affects your biomarkers with automated chart markers.",
+                    status: "LIVE"
                   },
                   {
-                    title: "Supplement Tracking",
-                    desc: "See exactly how that new supplement affects your biomarkers over time."
+                    title: "Health Timeline",
+                    desc: "A medical diary that connects symptoms, lab reports, and AI insights.",
+                    status: "COMING SOON"
                   }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4">
-                    <div className="w-1 h-auto bg-indigo-500/30 rounded-full" />
+                    <div className={cn(
+                        "w-1 h-auto rounded-full",
+                        item.status === "LIVE" ? "bg-emerald-500" : "bg-indigo-500/30"
+                    )} />
                     <div>
-                      <h4 className="font-bold text-slate-200">{item.title}</h4>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h4 className="font-bold text-slate-200">{item.title}</h4>
+                        <span className={cn(
+                            "text-[9px] font-bold px-1.5 py-0.5 rounded border",
+                            item.status === "LIVE" 
+                                ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" 
+                                : "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"
+                        )}>
+                            {item.status}
+                        </span>
+                      </div>
                       <p className="text-sm text-slate-500">{item.desc}</p>
                     </div>
                   </div>
@@ -425,6 +441,7 @@ export default function LandingPage() {
                 "Trend charts showing if you're improving",
                 "Plain-language explanations of every number",
                 "AI assistant to answer your questions",
+                "Supplement & Medication tracking",
                 "Professional print-ready reports",
                 "What to ask your doctor at your next visit",
               ].map(feature => (
