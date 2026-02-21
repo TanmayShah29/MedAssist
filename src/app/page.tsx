@@ -188,10 +188,6 @@ export default function LandingPage() {
                   {
                     title: "Supplement Tracking",
                     desc: "See exactly how that new supplement affects your biomarkers over time."
-                  },
-                  {
-                    title: "Family Profiles",
-                    desc: "Manage your family's health with the same clinical precision."
                   }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4">
