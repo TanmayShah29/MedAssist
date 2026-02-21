@@ -4,6 +4,14 @@ Resolved multiple build failures in the dashboard and assistant pages, including
 
 ## Changes Made
 
+### AI Optimization: Two-Tier Caching System (New Optimization)
+- **Local Per-Report Cache**: Generated "Ask Your Doctor" questions are now stored directly within the `lab_results` table after the first generation. This eliminates repeated Groq calls for the same report across multiple sessions for a single user.
+- **Global Clinical Pattern Cache**: 
+    - Created a `global_ai_cache` table to store anonymized clinical interpretations.
+    - Implemented a deterministic "Pattern Key" based on the sorted set of critical biomarkers and their statuses.
+    - **Sharing Intelligence**: If two different users have the same set of flagged biomarkers (e.g., High LDL and Low Vitamin D), the system now reuses the previously generated AI analysis instantly without hitting the Groq API.
+- **Result**: Drastically reduced AI token usage and near-instant load times for common clinical patterns.
+
 ### Supplement & Medication Correlation (New Feature)
 - **Database Schema**: Added `supplements` table to track names, dosages, and start dates.
 - **Medicine Cabinet UI**: Created a new management component (`src/components/dashboard/medicine-cabinet.tsx`) allowing users to log their intake.
@@ -41,6 +49,6 @@ Resolved multiple build failures in the dashboard and assistant pages, including
     - Generated all static pages and API routes.
 
 ```bash
-✓ Compiled successfully in 3.9s
+✓ Compiled successfully in 3.8s
 ✓ Finished TypeScript in 4.0s
 ```
