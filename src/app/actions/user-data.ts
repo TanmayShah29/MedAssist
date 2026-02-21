@@ -78,34 +78,53 @@ export async function saveLabResult(args: SaveLabResultArgs) {
 }
 
 import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 
 export async function completeOnboarding() {
-    try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { success: false, error: "Not authenticated" };
+    const cookieStore = await cookies()
 
-        const { error } = await supabase
-            .from("profiles")
-            .update({ onboarding_complete: true })
-            .eq("id", user.id);
-
-        if (error) {
-            logger.error("Error updating profile completion:", error);
-            return { success: false, error: error.message };
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() { return cookieStore.getAll() },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        cookieStore.set(name, value, options)
+                    )
+                }
+            }
         }
+    )
 
-        const cookieStore = await cookies();
-        cookieStore.set("onboarding_complete", "true", {
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7,
-            httpOnly: false
-        });
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-        return { success: true };
-    } catch (err: unknown) {
-        logger.error("Server Action completeOnboarding failed:", (err as Error).message);
-        return { success: false, error: "Internal Error" };
+    if (userError || !user) {
+        console.error('completeOnboarding — no user found:', userError)
+        return { success: false, error: 'No user session' }
     }
+
+    console.log('completeOnboarding — updating user:', user.id)
+
+    const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ onboarding_complete: true })
+        .eq('id', user.id)
+
+    if (updateError) {
+        console.error('completeOnboarding — update failed:', updateError)
+        return { success: false, error: updateError.message }
+    }
+
+    console.log('completeOnboarding — success, setting cookie')
+
+    cookieStore.set('onboarding_complete', 'true', {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/'
+    })
+
+    return { success: true }
 }
+

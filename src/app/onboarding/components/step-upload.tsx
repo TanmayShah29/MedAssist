@@ -78,16 +78,16 @@ export function StepUpload() {
             const { completeOnboarding } = await import("@/app/actions/user-data");
 
             const result = await completeOnboarding();
+
             if (!result.success) {
-                console.error("Profile update failed during skip:", result.error);
-                toast.error("Error updating profile, but continuing...");
+                console.error("Failed to complete onboarding:", result.error);
+                // Still navigate — don't block the user
             }
+
+            window.location.href = "/dashboard";
         } catch (err) {
-            console.error("Error during skip operations:", err);
-            toast.error("Error updating profile, but continuing anyway...");
-        } finally {
-            console.log("Forcing navigation to dashboard");
-            window.location.href = '/dashboard';
+            console.error("Non-fatal error skipping onboarding:", err);
+            window.location.href = "/dashboard";
         }
     };
 

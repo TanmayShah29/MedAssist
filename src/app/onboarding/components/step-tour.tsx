@@ -46,16 +46,17 @@ export function StepTour() {
             }
 
             // 2. Mark onboarding as complete via Server Action (handles both DB and server-side Cookie)
-            const completeResult = await completeOnboarding();
-            if (!completeResult.success) {
-                console.error("Profile update error:", completeResult.error);
-                toast.error("Failed to update profile status, but continuing...");
+            const result = await completeOnboarding();
+
+            if (!result.success) {
+                console.error("Failed to complete onboarding:", result.error);
+                // Still navigate — don't block the user
             }
+
+            window.location.href = "/dashboard";
         } catch (err) {
             console.error("Non-fatal error completing onboarding:", err);
-        } finally {
-            // 3. Force hard navigation to bypass middleware cache
-            window.location.href = '/dashboard';
+            window.location.href = "/dashboard";
         }
     };
 
