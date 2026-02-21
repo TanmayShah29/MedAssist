@@ -1,3 +1,7 @@
+/** User-facing message when PDF is image-based (scanned) and text extraction fails. */
+export const IMAGE_BASED_PDF_MESSAGE =
+    'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
+
 export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
     const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
 
@@ -32,7 +36,7 @@ export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'app
         .join('\n') || ''
 
     if (!text || text.trim().length < 50) {
-        throw new Error('Could not extract text from PDF. File may be empty or corrupted.')
+        throw new Error(IMAGE_BASED_PDF_MESSAGE);
     }
 
     return text

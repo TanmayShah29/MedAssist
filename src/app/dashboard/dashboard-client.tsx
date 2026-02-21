@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { 
     ClipboardList, 
@@ -43,6 +43,7 @@ import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { MedicineCabinet } from '@/components/dashboard/medicine-cabinet'
+import { TrustLayer } from '@/components/trust-layer'
 import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 import { Biomarker, Profile } from '@/types/medical'
@@ -274,6 +275,7 @@ export default function DashboardClient({
     initialLabResults: any[]
 }) {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [loading, setLoading] = useState(false)
     const [showUploadModal, setShowUploadModal] = useState(false)
     const profile = initialProfile;
@@ -301,6 +303,14 @@ export default function DashboardClient({
         };
         fetchSupps();
     }, []);
+
+    // Open upload modal when arriving with ?openUpload=1 (e.g. from Results "Upload New Report")
+    useEffect(() => {
+        if (searchParams.get('openUpload') === '1') {
+            setShowUploadModal(true);
+            router.replace('/dashboard', { scroll: false });
+        }
+    }, [searchParams, router]);
 
     // Derived Data taking Demo Mode into account
     const displayLabResults = demoMode
@@ -429,6 +439,7 @@ export default function DashboardClient({
                         {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
                         {profile?.first_name || 'Patient'}
                     </p>
+                    <TrustLayer variant="compact" className="mt-2" />
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -448,6 +459,21 @@ export default function DashboardClient({
                     </button>
                 </div>
             </div>
+
+            {/* ── Demo mode banner: avoid mistaking sample data for real data ── */}
+            {demoMode && (
+                <div className="mb-6 flex items-center justify-between gap-4 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 print:hidden">
+                    <p className="text-sm font-semibold text-amber-900">
+                        You&apos;re viewing <strong>sample data</strong> — not your personal results. Health score and biomarkers below are for demo only.
+                    </p>
+                    <button
+                        onClick={() => setDemoMode(false)}
+                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                    >
+                        Show my data
+                    </button>
+                </div>
+            )}
 
             {/* ── Developer Tools Overlay (Subtle) ── */}
             <div className="fixed bottom-24 right-6 z-[45] flex flex-col gap-2 print:hidden">
@@ -513,21 +539,30 @@ export default function DashboardClient({
                     <p style={{ fontSize: 15, color: '#57534E', maxWidth: 400, margin: '0 auto 24px auto', lineHeight: 1.6 }}>
                         Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
                     </p>
-                    <button
-                        onClick={() => setShowUploadModal(true)}
-                        style={{
-                            background: '#0EA5E9',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 10,
-                            padding: '12px 24px',
-                            fontSize: 15,
-                            fontWeight: 600,
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Upload my first report
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                        <button
+                            onClick={() => setShowUploadModal(true)}
+                            style={{
+                                background: '#0EA5E9',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: 10,
+                                padding: '12px 24px',
+                                fontSize: 15,
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Upload my first report
+                        </button>
+                        <button
+                            onClick={() => setDemoMode(true)}
+                            className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors"
+                        >
+                            <PlayCircle size={18} />
+                            Try with sample lab report
+                        </button>
+                    </div>
                     <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 12 }}>
                         Supports digital PDF lab reports · Takes 20–40 seconds
                     </p>

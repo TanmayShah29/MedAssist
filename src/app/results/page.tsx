@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, MessageSquare, ClipboardCopy, CheckCircle2 } from 'lucide-react'
+import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, MessageSquare, ClipboardCopy, CheckCircle2, RefreshCw } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
+import { TrustLayer } from '@/components/trust-layer'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -25,6 +26,8 @@ interface Biomarker {
     ai_interpretation?: string
     confidence?: number
     created_at: string
+    lab_result_id?: number
+    lab_results?: { created_at: string }
 }
 
 const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
@@ -55,7 +58,13 @@ function RangeBar({ value, min, max, status }: {
     const dotColor = status === 'optimal' ? '#10B981' : status === 'warning' ? '#F59E0B' : '#EF4444'
 
     return (
-        <div style={{ position: 'relative', height: 24, marginTop: 8, width: '100%', maxWidth: '200px' }}>
+        <div style={{ position: 'relative', marginTop: 8, width: '100%', maxWidth: '220px' }}>
+            <div style={{ fontSize: 9, color: '#A8A29E', marginBottom: 4, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <span>Low</span>
+                <span>Normal</span>
+                <span>High</span>
+            </div>
+            <div style={{ position: 'relative', height: 24, width: '100%' }}>
             {/* Background track */}
             <div style={{
                 position: 'absolute',
@@ -116,6 +125,7 @@ function RangeBar({ value, min, max, status }: {
             }}>
                 {max}
             </div>
+            </div>
         </div>
     )
 }
@@ -131,6 +141,7 @@ export default function ResultsPage() {
     const [loadingTrends, setLoadingTrends] = useState(false)
     const [isDebugMode, setIsDebugMode] = useState(false)
     const [supplements, setSupplements] = useState<any[]>([])
+    const [refreshKey, setRefreshKey] = useState(0)
 
     useEffect(() => {
         setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true")
@@ -181,13 +192,14 @@ export default function ResultsPage() {
             const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
-                router.push('/login')
+                setLoading(false)
+                router.push('/auth?mode=login')
                 return
             }
 
             let query = supabase
                 .from('biomarkers')
-                .select('*, lab_results!inner(user_id)')
+                .select('*, lab_results!inner(user_id, created_at)')
                 .eq('lab_results.user_id', user.id)
                 .order('created_at', { ascending: false })
 
@@ -200,7 +212,7 @@ export default function ResultsPage() {
             setLoading(false)
         }
         fetchBiomarkers()
-    }, [selectedCategory, router])
+    }, [selectedCategory, router, refreshKey])
 
     // Derived counts for status summary
     const filteredBiomarkers = biomarkers.filter(b => 
@@ -231,8 +243,18 @@ export default function ResultsPage() {
                     <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
                     <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
                     <p className="text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
+                <TrustLayer variant="compact" className="mt-3" />
                 </div>
                 <div className="flex gap-3">
+                    <button
+                        onClick={() => setRefreshKey((k) => k + 1)}
+                        disabled={loading}
+                        className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 font-medium flex items-center gap-2 hover:bg-[#F5F4EF] transition-colors print:hidden disabled:opacity-50"
+                        title="Refresh results"
+                    >
+                        <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
                     <button
                         onClick={handlePrint}
                         className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 font-medium flex items-center gap-2 hover:bg-[#F5F4EF] transition-colors print:hidden"
@@ -241,20 +263,10 @@ export default function ResultsPage() {
                         Export PDF
                     </button>
                     <button
-                        onClick={() => {
-                            setLoading(true);
-                            router.push('/upload');
-                        }}
-                        disabled={loading}
-                        style={{
-                            background: loading ? '#7DD3FC' : '#0EA5E9',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            opacity: loading ? 0.8 : 1,
-                            transition: 'all 0.15s ease'
-                        }}
-                        className="text-white rounded-[10px] px-4 py-2 font-medium print:hidden"
+                        onClick={() => router.push('/dashboard?openUpload=1')}
+                        className="text-white rounded-[10px] px-4 py-2 font-medium print:hidden bg-sky-500 hover:bg-sky-600 transition-colors"
                     >
-                        {loading ? 'Processing...' : 'Upload New Report'}
+                        Upload New Report
                     </button>
                 </div>
             </div>
@@ -360,7 +372,10 @@ export default function ResultsPage() {
                                     key={b.id}
                                     onClick={() => setSelectedBiomarker(b)}
                                     className={`flex items-center p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
-                                        } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''}`}
+                                        } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${
+                                        b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
+                                        b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
+                                        }`}
                                 >
                                     <div className={`w-2.5 h-2.5 rounded-full shrink-0 mr-3 ${b.status === 'optimal' ? 'bg-emerald-500' :
                                         b.status === 'warning' ? 'amber-500' : 'bg-red-500' // Corrected amber-500 to bg-amber-500 implicitly via 'warning' check in next update if needed, but user spec said #F59E0B which is amber-500. 
@@ -384,6 +399,11 @@ export default function ResultsPage() {
                                                 </span>
                                             )}
                                         </div>
+                                        {b.lab_results?.created_at && (
+                                            <p className="text-[11px] text-[#A8A29E] mt-0.5">
+                                                From report {new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </p>
+                                        )}
                                         <RangeBar
                                             value={b.value}
                                             min={b.reference_range_min || null}
@@ -527,7 +547,7 @@ export default function ResultsPage() {
                     </p>
                 </div>
                 <button
-                    onClick={() => router.push('/dashboard')} // Navigate to dashboard/upload is likely better but dashboard has the button
+                    onClick={() => router.push('/dashboard?openUpload=1')}
                     style={{
                         background: '#0EA5E9',
                         color: 'white',

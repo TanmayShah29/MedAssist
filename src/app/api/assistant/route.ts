@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { checkRateLimit } from "@/services/rateLimitService";
-import { generateClinicalInsight } from "@/lib/groq-medical"; // Groq-powered clinical insight generator
+import { generateClinicalInsight } from "@/lib/groq-medical";
 import { logger } from "@/lib/logger";
 
 export const maxDuration = 60;
@@ -8,11 +10,17 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
     try {
-        // 1. IP Extraction is handled inside checkRateLimit (via headers()), 
-        // but NextRequest headers are also available here. 
-        // rateLimitService uses `next/headers` which works in Route Handlers too.
+        const cookieStore = await cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+        );
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+        }
 
-        // 2. Check Rate Limit
         const limit = await checkRateLimit();
 
         if (!limit.success) {

@@ -22,7 +22,8 @@ export default function ProfilePage() {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                router.push("/login");
+                setLoading(false);
+                router.push("/auth?mode=login");
                 return;
             }
 

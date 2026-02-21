@@ -10,6 +10,16 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next()
     }
 
+    // Legacy /login → show sign-in form
+    if (pathname === '/login') {
+        return NextResponse.redirect(new URL('/auth?mode=login', request.url))
+    }
+
+    // /upload does not exist; send to dashboard where upload modal lives
+    if (pathname === '/upload') {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
     // Static files and API — never redirect
     if (
         pathname.startsWith('/api') ||

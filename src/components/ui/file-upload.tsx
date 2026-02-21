@@ -37,8 +37,8 @@ export const FileUpload = ({
             'image/*': ['.png', '.jpg', '.jpeg']
         },
         onDrop: handleFileChange,
-        onDropRejected: (error) => {
-            console.log(error)
+        onDropRejected: () => {
+            // File type/size rejected by react-dropzone; validation message shown via accept/size
         },
     })
 

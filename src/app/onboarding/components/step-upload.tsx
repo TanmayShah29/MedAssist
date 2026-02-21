@@ -1,13 +1,25 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
+import type { ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar, Lock, PenLine, Plus, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+function nextId() {
+    return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+interface ManualRow {
+    id: string;
+    name: string;
+    value: string;
+    unit: string;
+}
 
 export function StepUpload() {
     const {
@@ -15,6 +27,7 @@ export function StepUpload() {
         setUploadedFile,
         setStep,
         completeStep,
+        setAnalysisResult,
     } = useOnboardingStore();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,17 +72,77 @@ export function StepUpload() {
     };
 
     const [showOptions, setShowOptions] = useState(true);
+    const [showManualEntry, setShowManualEntry] = useState(false);
+    const [manualRows, setManualRows] = useState<ManualRow[]>([
+        { id: nextId(), name: "", value: "", unit: "mg/dL" },
+    ]);
+    const [isManualSubmitting, setIsManualSubmitting] = useState(false);
 
     // If user has already selected a file (e.g. went back and forth), default to upload view
-    if (uploadedFile && showOptions) {
+    if (uploadedFile && showOptions && !showManualEntry) {
         setShowOptions(false);
     }
 
     const [isSkipping, setIsSkipping] = useState(false);
 
+    const addManualRow = () => setManualRows((p) => [...p, { id: nextId(), name: "", value: "", unit: "mg/dL" }]);
+    const updateManualRow = (id: string, field: keyof ManualRow, value: string) =>
+        setManualRows((p) => p.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+    const removeManualRow = (id: string) =>
+        setManualRows((p) => (p.length > 1 ? p.filter((r) => r.id !== id) : p));
+
+    const onSubmitManualEntry = async () => {
+        const biomarkers = manualRows
+            .map((r) => ({ name: r.name.trim(), value: parseFloat(r.value), unit: r.unit.trim() || "unit" }))
+            .filter((b) => b.name && !Number.isNaN(b.value));
+        if (biomarkers.length === 0) {
+            toast.error("Add at least one biomarker with name and value.");
+            return;
+        }
+        setIsManualSubmitting(true);
+        try {
+            const formData = new FormData();
+            formData.append("manualPayload", JSON.stringify({ biomarkers }));
+            const res = await fetch("/api/analyze-report", { method: "POST", body: formData });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || "Analysis failed");
+                setIsManualSubmitting(false);
+                return;
+            }
+            const analysis = JSON.parse(data.analysis);
+            const labValues: ExtractedLabValue[] = (analysis.biomarkers || []).map((b: Record<string, unknown>) => ({
+                name: b.name as string,
+                value: b.value as number,
+                unit: b.unit as string,
+                status: (b.status as ExtractedLabValue["status"]) || "optimal",
+                referenceMin: (b.referenceMin as number | null) ?? null,
+                referenceMax: (b.referenceMax as number | null) ?? null,
+                rangePosition: 50,
+                confidence: (b.confidence as number) ?? 0.8,
+                aiInterpretation: (b.aiInterpretation as string) || "See your doctor for interpretation.",
+                trend: "",
+                category: (["hematology", "inflammation", "metabolic", "vitamins"].includes((b.category as string) || "")
+                    ? (b.category as ExtractedLabValue["category"])
+                    : "metabolic",
+            }));
+            setAnalysisResult({
+                biomarkers: labValues,
+                healthScore: analysis.healthScore ?? 0,
+                riskLevel: analysis.riskLevel ?? "low",
+                summary: analysis.summary ?? "",
+            });
+            completeStep(3);
+            setStep(5);
+        } catch (err) {
+            toast.error((err as Error).message || "Something went wrong");
+        } finally {
+            setIsManualSubmitting(false);
+        }
+    };
+
     const onSkip = async () => {
         try {
-            console.log("onSkip initiated");
             setIsSkipping(true);
             setUploadedFile(null);
             completeStep(3);
@@ -91,6 +164,95 @@ export function StepUpload() {
         }
     };
 
+    if (showManualEntry) {
+        return (
+            <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-6">
+                <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">Step 3 of 5</p>
+                    <h2 className="font-display text-3xl text-[#1C1917] mb-2">Enter lab values manually</h2>
+                    <p className="text-[#57534E] text-sm">
+                        No PDF? Add your results below. Use units from your report (e.g. mg/dL or mmol/L).
+                    </p>
+                </div>
+                <div className="space-y-3 max-h-[280px] overflow-y-auto">
+                    {manualRows.map((row) => (
+                        <div key={row.id} className="flex gap-2 items-center">
+                            <input
+                                type="text"
+                                placeholder="Name (e.g. Glucose)"
+                                value={row.name}
+                                onChange={(e) => updateManualRow(row.id, "name", e.target.value)}
+                                className="flex-1 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                            />
+                            <input
+                                type="text"
+                                inputMode="decimal"
+                                placeholder="Value"
+                                value={row.value}
+                                onChange={(e) => updateManualRow(row.id, "value", e.target.value)}
+                                className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Unit"
+                                value={row.unit}
+                                onChange={(e) => updateManualRow(row.id, "unit", e.target.value)}
+                                className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removeManualRow(row.id)}
+                                className="p-2 text-[#A8A29E] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <button
+                    type="button"
+                    onClick={addManualRow}
+                    className="flex items-center gap-2 text-sm font-medium text-sky-600 hover:text-sky-700"
+                >
+                    <Plus size={16} />
+                    Add another value
+                </button>
+                <div className="flex items-center justify-between pt-2">
+                    <button
+                        onClick={() => setShowManualEntry(false)}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-sm font-medium text-[#57534E] hover:bg-[#E8E6DF] transition-colors"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                        Back
+                    </button>
+                    <motion.button
+                        onClick={onSubmitManualEntry}
+                        disabled={isManualSubmitting}
+                        whileTap={{ scale: 0.97 }}
+                        className={cn(
+                            "flex items-center gap-2 px-6 py-3 rounded-[10px] text-sm font-semibold transition-all",
+                            isManualSubmitting
+                                ? "bg-[#E8E6DF] text-[#A8A29E] cursor-wait"
+                                : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
+                        )}
+                    >
+                        {isManualSubmitting ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>
+                                Analyze & continue
+                                <ChevronRight className="w-4 h-4" />
+                            </>
+                        )}
+                    </motion.button>
+                </div>
+            </div>
+        );
+    }
+
     if (showOptions && !uploadedFile) {
         return (
             <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-8">
@@ -102,7 +264,7 @@ export function StepUpload() {
                         Upload your lab report
                     </h2>
                     <p className="text-[#57534E] text-sm">
-                        Choice is yours: upload now for instant analysis, or explore the app first.
+                        Choice is yours: upload now for instant analysis, enter values manually, or explore the app first.
                     </p>
                 </div>
 
@@ -126,10 +288,29 @@ export function StepUpload() {
                         </span>
                     </div>
 
-                    {/* Option 2 — Not yet */}
+                    {/* Option 2 — Enter manually */}
+                    <div
+                        onClick={() => setShowManualEntry(true)}
+                        className="bg-[#F0F9FF] border-2 border-sky-100 rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-400 group"
+                    >
+                        <div className="flex justify-center mb-3">
+                            <PenLine className="w-8 h-8 text-sky-500 group-hover:text-sky-600 transition-colors" />
+                        </div>
+                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-sky-600 transition-colors">
+                            Enter values manually
+                        </h3>
+                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                            No PDF? Type in your lab values and get the same AI analysis and health score
+                        </p>
+                        <span className="inline-block bg-sky-100 text-sky-700 rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-200 transition-colors">
+                            Add values
+                        </span>
+                    </div>
+
+                    {/* Option 3 — Not yet */}
                     <div
                         onClick={onSkip}
-                        className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group"
+                        className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group sm:col-span-2"
                     >
                         <div className="flex justify-center mb-3">
                             <Calendar className="w-8 h-8 text-[#A8A29E] group-hover:text-[#57534E] transition-colors" />

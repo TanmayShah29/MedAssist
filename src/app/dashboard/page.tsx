@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import DashboardClient from './dashboard-client'
 
 export const dynamic = 'force-dynamic';
@@ -50,11 +51,13 @@ export default async function DashboardPage() {
     const labResults = labResponse.data || []
 
     return (
-        <DashboardClient
-            initialProfile={profile}
-            initialBiomarkers={biomarkers}
-            initialSymptoms={symptoms}
-            initialLabResults={labResults}
-        />
+        <Suspense fallback={<div className="min-h-screen bg-[#FAFAF7] flex items-center justify-center"><div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" /></div>}>
+            <DashboardClient
+                initialProfile={profile}
+                initialBiomarkers={biomarkers}
+                initialSymptoms={symptoms}
+                initialLabResults={labResults}
+            />
+        </Suspense>
     )
 }

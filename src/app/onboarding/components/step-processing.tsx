@@ -9,13 +9,17 @@ import { cn } from "@/lib/utils";
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
 
+const IMAGE_BASED_MSG = 'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
+
 const getErrorMessage = (error: string) => {
     if (error.includes('Rate limit') || error.includes('429'))
         return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true }
     if (error.includes('Unauthorized') || error.includes('401'))
-        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/login' }
+        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth?mode=login' }
     if (error.includes('invalid format'))
         return { title: 'AI parsing error', detail: 'The AI had trouble reading this report format. Try a different PDF.', canRetry: true }
+    if (error.includes('image-based') || error === IMAGE_BASED_MSG)
+        return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true }
     return { title: 'Something went wrong', detail: error, canRetry: true }
 }
 
@@ -23,7 +27,7 @@ export function StepProcessing() {
     const { setStep, completeStep, setAnalysisResult, analysisResult } = useOnboardingStore();
     const [state, setState] = useState<ProcessingState>("uploading");
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
-    const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string } | null>(null);
+    const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string, isImageBased?: boolean } | null>(null);
     const hasStarted = useRef(false);
 
     // New stages configuration with durations
@@ -115,6 +119,7 @@ export function StepProcessing() {
                 if (response.status === 413) errorMessage = "File is too large (max 10MB)";
                 else if (response.status === 429) errorMessage = "Rate limit exceeded";
                 else if (response.status === 504) errorMessage = "Analysis timed out";
+                if (data.code === 'IMAGE_BASED_PDF') errorMessage = IMAGE_BASED_MSG;
 
                 setErrorData(getErrorMessage(errorMessage));
                 setState("error");
@@ -205,6 +210,11 @@ export function StepProcessing() {
                         </a>
                     )}
 
+                    {errorData.isImageBased && (
+                        <p className="mt-3 text-[13px] text-[#57534E] text-center">
+                            You can also enter your lab values manually from the dashboard after onboarding.
+                        </p>
+                    )}
                     <button
                         onClick={goBackToUpload}
                         className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 

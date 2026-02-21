@@ -48,12 +48,14 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Transform for Recharts
-    const trends = data.map((b: any) => ({
-        date: new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        value: b.value,
-        unit: b.unit
-    }));
+    // Transform for Recharts (lab_results may be null if join fails)
+    const trends = data
+        .filter((b: { lab_results?: { created_at: string } }) => b.lab_results?.created_at)
+        .map((b: { value: number; unit: string; lab_results: { created_at: string } }) => ({
+            date: new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            value: b.value,
+            unit: b.unit
+        }));
 
     return NextResponse.json({ trends });
 }

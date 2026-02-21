@@ -27,7 +27,6 @@ function AuthContent() {
 
     const handleAuth = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        console.log('handleAuth called, mode:', mode);
         setIsLoading(true);
 
         try {

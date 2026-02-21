@@ -9,14 +9,14 @@ export const BiomarkerCategorySchema = z.string().transform(val => {
 
 export const BiomarkerSchema = z.object({
     name: z.string().min(1, "Biomarker name is required"),
-    value: z.coerce.number(),
+    value: z.coerce.number().refine((n) => !Number.isNaN(n), "Value must be a number"),
     unit: z.string().default("unit"),
-    referenceMin: z.coerce.number().nullable(),
-    referenceMax: z.coerce.number().nullable(),
+    referenceMin: z.union([z.coerce.number(), z.null(), z.undefined()]).optional().nullable().transform((v) => (v === undefined || v === null || Number.isNaN(Number(v)) ? null : Number(v))),
+    referenceMax: z.union([z.coerce.number(), z.null(), z.undefined()]).optional().nullable().transform((v) => (v === undefined || v === null || Number.isNaN(Number(v)) ? null : Number(v))),
     status: BiomarkerStatusSchema,
     category: BiomarkerCategorySchema,
     confidence: z.number().min(0).max(1).default(0.8),
-    aiInterpretation: z.string().min(5, "Interpretation is too short"),
+    aiInterpretation: z.string().min(5, "Interpretation is too short").catch("No interpretation available."),
 });
 
 export const ExtractionResultSchema = z.object({

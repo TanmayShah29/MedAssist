@@ -34,7 +34,7 @@ const APP_SHELL_ROUTES = [
 // Pages that are completely standalone (no nav, no sidebar)
 const STANDALONE_ROUTES = [
   "/",
-  "/login",
+  "/auth",
   "/onboarding",
 ];
 
@@ -82,10 +82,10 @@ export default function RootLayout({
   useEffect(() => {
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('SW registered: ', registration);
-        }).catch(registrationError => {
-          console.log('SW registration failed: ', registrationError);
+        navigator.serviceWorker.register('/sw.js').then(() => {
+          // SW registered
+        }).catch(() => {
+          // SW registration failed (non-critical)
         });
       });
     }
@@ -101,7 +101,7 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0EA5E9" />
-        <link rel="apple-touch-icon" href="/next.svg" />
+        <link rel="apple-touch-icon" href="/window.svg" />
       </head>
       <body
         className="bg-[#FAFAF7] font-sans overflow-x-hidden"

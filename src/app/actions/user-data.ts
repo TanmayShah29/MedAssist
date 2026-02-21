@@ -169,23 +169,19 @@ export async function completeOnboarding() {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
     if (userError || !user) {
-        console.error('completeOnboarding — no user found:', userError)
-        return { success: false, error: 'No user session' }
+        logger.error('completeOnboarding — no user found', userError);
+        return { success: false, error: 'No user session' };
     }
-
-    console.log('completeOnboarding — updating user:', user.id)
 
     const { error: updateError } = await supabase
         .from('profiles')
         .update({ onboarding_complete: true })
-        .eq('id', user.id)
+        .eq('id', user.id);
 
     if (updateError) {
-        console.error('completeOnboarding — update failed:', updateError)
-        return { success: false, error: updateError.message }
+        logger.error('completeOnboarding — update failed', updateError);
+        return { success: false, error: updateError.message };
     }
-
-    console.log('completeOnboarding — success, setting cookie')
 
     cookieStore.set('onboarding_complete', 'true', {
         httpOnly: true,
