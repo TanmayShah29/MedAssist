@@ -73,6 +73,16 @@ export function Sidebar({ className }: { className?: string }) {
         };
 
         fetchUser();
+
+        // Listen for profile updates from other components
+        const handleUpdate = () => fetchUser();
+        window.addEventListener('medassist_profile_updated', handleUpdate);
+        window.addEventListener('storage', handleUpdate);
+
+        return () => {
+            window.removeEventListener('medassist_profile_updated', handleUpdate);
+            window.removeEventListener('storage', handleUpdate);
+        };
     }, []);
 
     const handleSignOut = async () => {
@@ -81,6 +91,14 @@ export function Sidebar({ className }: { className?: string }) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
         await supabase.auth.signOut();
+        
+        // Clear all persistent states
+        localStorage.removeItem("medassist-onboarding");
+        localStorage.removeItem("medassist_debug_mode");
+        localStorage.removeItem("medassist_cached_lab_results");
+        localStorage.removeItem("medassist_cached_biomarkers");
+        sessionStorage.removeItem("medassist_loaded");
+        
         document.cookie = 'onboarding_complete=; max-age=0; path=/';
         router.push('/');
     };
@@ -95,7 +113,7 @@ export function Sidebar({ className }: { className?: string }) {
             {/* Logo — 64px height */}
             <div className="h-16 flex items-center justify-between px-5 
                       border-b border-[#E8E6DF]">
-                <Link href="/" className="flex items-center gap-2.5">
+                <Link href="/dashboard" className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center 
                           justify-center shadow-sm shadow-sky-500/30">
                         <Shield className="w-4 h-4 text-white" />

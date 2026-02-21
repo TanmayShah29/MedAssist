@@ -289,7 +289,7 @@ export default function AssistantPage() {
                         className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center gap-2"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Results
+                        Back
                     </button>
                 </header>
 

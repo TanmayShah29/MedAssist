@@ -189,9 +189,9 @@ export default function ResultsPage() {
     const filteredBiomarkers = biomarkers.filter(b => 
         b.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    const optimalCount = biomarkers.filter(b => b.status === 'optimal').length
-    const warningCount = biomarkers.filter(b => b.status === 'warning').length
-    const criticalCount = biomarkers.filter(b => b.status === 'critical').length
+    const optimalCount = filteredBiomarkers.filter(b => b.status === 'optimal').length
+    const warningCount = filteredBiomarkers.filter(b => b.status === 'warning').length
+    const criticalCount = filteredBiomarkers.filter(b => b.status === 'critical').length
 
     useEffect(() => {
         if (biomarkers.length > 0 && doctorQuestions === 'Generating questions for your doctor...') {

@@ -61,6 +61,8 @@ export default function ProfilePage() {
 
             if (res.success) {
                 toast.success("Profile updated successfully!");
+                // Trigger sidebar update
+                window.dispatchEvent(new Event('medassist_profile_updated'));
             } else {
                 toast.error(res.error || "Failed to update profile");
             }
