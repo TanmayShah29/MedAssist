@@ -40,6 +40,7 @@ import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
+import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 import { Biomarker, Profile } from '@/types/medical'
@@ -781,6 +782,14 @@ export default function DashboardClient({
                     </Link>
                 </div>
             </div>
+
+            {/* ── Doctor Questions ── */}
+            {totalCount > 0 && (
+                <div className="mb-6">
+                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PREPARATION</h3>
+                    <DoctorQuestions biomarkers={displayBiomarkers} />
+                </div>
+            )}
 
             {/* ── Two column grid ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight } from 'lucide-react'
+import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, MessageSquare, ClipboardCopy, CheckCircle2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -128,7 +129,6 @@ export default function ResultsPage() {
     const [searchQuery, setSearchValue] = useState('')
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
     const [loadingTrends, setLoadingTrends] = useState(false)
-    const [doctorQuestions, setDoctorQuestions] = useState<string>('Generating questions for your doctor...')
     const [isDebugMode, setIsDebugMode] = useState(false)
 
     useEffect(() => {
@@ -197,23 +197,6 @@ export default function ResultsPage() {
     const optimalCount = filteredBiomarkers.filter(b => b.status === 'optimal').length
     const warningCount = filteredBiomarkers.filter(b => b.status === 'warning').length
     const criticalCount = filteredBiomarkers.filter(b => b.status === 'critical').length
-
-    useEffect(() => {
-        if (biomarkers.length > 0 && doctorQuestions === 'Generating questions for your doctor...') {
-            fetch('/api/generate-questions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ biomarkers })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.questions) setDoctorQuestions(data.questions);
-                })
-                .catch(err => {
-                    setDoctorQuestions('Could not load questions. Try refreshing.');
-                });
-        }
-    }, [biomarkers, doctorQuestions]);
 
     return (
         <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
@@ -506,29 +489,7 @@ export default function ResultsPage() {
             </div>
 
             {/* ── Doctor Questions ── */}
-            {biomarkers.length > 0 && (
-                <div style={{
-                    background: '#F5F4EF',
-                    border: '1px solid #E8E6DF',
-                    borderRadius: 14,
-                    padding: 24,
-                    marginTop: 32
-                }}>
-                    <p style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: '#A8A29E',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        margin: '0 0 16px 0'
-                    }}>
-                        QUESTIONS TO ASK YOUR DOCTOR
-                    </p>
-                    <div style={{ fontSize: 14, color: '#57534E', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                        {doctorQuestions}
-                    </div>
-                </div>
-            )}
+            <DoctorQuestions biomarkers={biomarkers} className="mt-8" />
 
             {/* ── Sticky Nudge Bar ── */}
             <div style={{

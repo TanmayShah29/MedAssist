@@ -13,6 +13,7 @@
 - **Professional Clinical Printing**: Optimized `@media print` styling that transforms the dashboard into a professional, clean medical report suitable for sharing with healthcare providers.
 - **PWA & Offline Resilience**: Full Progressive Web App support with `manifest.json` and `apple-touch-icon`. Implements local caching for lab results to ensure your health data is accessible even without an internet connection.
 - **Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
+- **Smart Doctor Preparation**: Automatically generates structured, context-aware questions for your next medical appointment based on flagged biomarkers, complete with "Why ask this" clinical rationale.
 - **Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
 - **Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
 - **Engaging Onboarding**: A verified, step-by-step processing flow that keeps you informed while the AI analyzes your data.

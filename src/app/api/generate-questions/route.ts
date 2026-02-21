@@ -52,16 +52,38 @@ export async function POST(request: NextRequest) {
 ${criticalBiomarkers.map((b: any) => `${b.name}: ${b.value} ${b.unit} (${b.status})`).join('\n')}
 
 Generate 3-5 specific questions this person should ask their doctor at their next appointment. 
-Be specific and reference the actual values. Format as a simple numbered list.`
+For each question, provide a brief "Why ask this" context.
+
+Return the response EXCLUSIVELY as a JSON array of objects with the following structure:
+[
+  {
+    "question": "The actual question for the doctor",
+    "context": "Why this question is important based on the specific results"
+  }
+]
+Do not include any preamble or postamble.`
 
         const completion = await groq.chat.completions.create({
             messages: [{ role: "user", content: questionsPrompt }],
             model: "llama-3.3-70b-versatile",
-            temperature: 0.3,
-            max_tokens: 300,
+            temperature: 0.1,
+            response_format: { type: "json_object" },
+            max_tokens: 600,
         });
 
-        const questions = completion.choices[0].message.content || "Could not generate questions. Please ask your doctor about your flagged biomarkers.";
+        let questions = [];
+        try {
+            const content = completion.choices[0].message.content || "[]";
+            const parsed = JSON.parse(content);
+            // Handle both { questions: [...] } and [...] formats
+            questions = Array.isArray(parsed) ? parsed : (parsed.questions || []);
+        } catch (e) {
+            console.error("Failed to parse AI response as JSON", e);
+            questions = [{ 
+                question: "Could not generate structured questions. Please ask your doctor about your flagged biomarkers.",
+                context: "There was an error processing the detailed questions."
+            }];
+        }
 
         return NextResponse.json({ questions })
     } catch (error: unknown) {
