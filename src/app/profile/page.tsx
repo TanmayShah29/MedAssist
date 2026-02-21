@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FileText, ChevronRight } from "lucide-react";
+import { FileText, ChevronRight, Trash2, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { deleteLabResult, updateUserProfile } from "@/app/actions/user-data";
+import { SYMPTOM_OPTIONS } from "@/lib/constants";
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -47,23 +49,45 @@ export default function ProfilePage() {
             return;
         }
 
-        const { error } = await supabase
-            .from('profiles')
-            .update({
-                first_name: profile?.first_name || null,
-                last_name: profile?.last_name || null,
-                age: profile?.age ? parseInt(profile.age.toString()) : null,
-                sex: profile?.sex || null,
-                blood_type: profile?.blood_type || null
-            })
-            .eq('id', user.id);
+        try {
+            const res = await updateUserProfile(user.id, {
+                first_name: profile?.first_name,
+                last_name: profile?.last_name,
+                symptoms: symptoms
+            });
 
-        setIsSaving(false);
-        if (error) {
-            toast.error("Failed to update profile: " + error.message);
-        } else {
-            toast.success("Profile updated successfully!");
+            if (res.success) {
+                toast.success("Profile updated successfully!");
+            } else {
+                toast.error(res.error || "Failed to update profile");
+            }
+        } catch (err) {
+            toast.error("An error occurred while saving");
+        } finally {
+            setIsSaving(false);
         }
+    };
+
+    const handleDeleteReport = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this report? This will remove all associated biomarkers.")) return;
+
+        try {
+            const res = await deleteLabResult(parseInt(id));
+            if (res.success) {
+                setReports(prev => prev.filter(r => r.id !== id));
+                toast.success("Report deleted successfully");
+            } else {
+                toast.error(res.error || "Failed to delete report");
+            }
+        } catch (err) {
+            toast.error("An error occurred while deleting");
+        }
+    };
+
+    const handleToggleSymptom = (s: string) => {
+        setSymptoms(prev =>
+            prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+        );
     };
 
     if (loading) return <div className="p-8 text-center text-[#A8A29E]">Loading...</div>;
@@ -199,10 +223,20 @@ export default function ProfilePage() {
                                             })}
                                         </p>
                                     </div>
-                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors flex items-center gap-1">
+                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors flex items-center gap-1" onClick={() => router.push('/results')}>
                                         View Details
                                         <ChevronRight size={14} />
                                     </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteReport(report.id);
+                                        }}
+                                        className="p-2 text-[#A8A29E] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1"
+                                        title="Delete report"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
                                 </div>
                             )) : (
                                 <div className="text-center py-6 bg-white border border-[#E8E6DF] border-dashed rounded-[10px]">
@@ -218,27 +252,55 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-5">
                     {/* Health Summary - Only showing real symptoms */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col flex-1">
-                        <p className="text-base font-semibold text-[#1C1917] mb-4">
-                            Health Context
-                        </p>
+                        <div className="flex justify-between items-center mb-4">
+                            <p className="text-base font-semibold text-[#1C1917]">
+                                Health Context
+                            </p>
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-[10px] font-semibold tracking-wide hover:bg-sky-600 transition-colors disabled:opacity-50"
+                            >
+                                {isSaving ? "Update Context" : "Update Context"}
+                            </button>
+                        </div>
                         <div className="space-y-4">
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-2">
                                     Reported Symptoms
                                 </p>
-                                {symptoms.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {symptoms.map(s => (
-                                            <span key={s} className="text-xs font-medium bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-[8px] text-[#57534E] shadow-sm">
-                                                {s}
-                                            </span>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="px-3 py-2 bg-white rounded-[8px] border border-[#E8E6DF]">
-                                        <p className="text-sm text-[#A8A29E] italic">No symptoms reported during onboarding.</p>
-                                    </div>
-                                )}
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {symptoms.length > 0 ? symptoms.map(s => (
+                                        <span key={s} className="text-xs font-medium bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-[8px] text-[#57534E] shadow-sm flex items-center gap-2 group">
+                                            {s}
+                                            <button onClick={() => handleToggleSymptom(s)} className="text-[#A8A29E] hover:text-red-500 transition-colors">
+                                                <X size={12} />
+                                            </button>
+                                        </span>
+                                    )) : (
+                                        <p className="text-sm text-[#A8A29E] italic">No symptoms selected.</p>
+                                    )}
+                                </div>
+
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-2">
+                                    Quick Add
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {SYMPTOM_OPTIONS.map(opt => (
+                                        <button
+                                            key={opt.label}
+                                            onClick={() => handleToggleSymptom(opt.label)}
+                                            className={cn(
+                                                "text-xs px-2 py-1 rounded-md border transition-all",
+                                                symptoms.includes(opt.label)
+                                                    ? "bg-sky-500 text-white border-sky-500"
+                                                    : "bg-white text-[#57534E] border-[#E8E6DF] hover:border-sky-300"
+                                            )}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

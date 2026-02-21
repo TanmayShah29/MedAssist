@@ -14,7 +14,11 @@ import {
 import { UploadModal } from '@/components/upload-modal'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { DebugTraceView } from '@/components/dashboard/DebugTraceView'
-import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shield, Printer } from 'lucide-react'
+import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shield, Printer, Trash2, ChevronRight } from 'lucide-react'
+import { deleteLabResult } from '@/app/actions/user-data'
+import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
+import { ActionItems } from '@/components/dashboard/action-items'
+import { toast } from 'sonner'
 import { Profile, Biomarker, Symptom } from '@/types/medical'
 import { ProfileSwitcher } from '@/components/dashboard/ProfileSwitcher'
 import { DEMO_HISTORY, DEMO_LAB_RESULT, MOCK_FAMILY_PROFILES } from '@/lib/demo-data'
@@ -274,6 +278,25 @@ export default function DashboardClient({
 
     const handlePrint = () => {
         window.print();
+    };
+
+    const handleDeleteReport = async (id: number) => {
+        if (!confirm("Are you sure you want to delete this report? This will also remove its biomarkers from your trends.")) return;
+
+        setLoading(true);
+        try {
+            const res = await deleteLabResult(id);
+            if (res.success) {
+                toast.success("Report deleted successfully");
+                router.refresh();
+            } else {
+                toast.error(res.error || "Failed to delete report");
+            }
+        } catch (err) {
+            toast.error("An error occurred while deleting");
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Derived values
@@ -587,6 +610,17 @@ export default function DashboardClient({
                             and MedAssist will start showing you trends — like whether your hemoglobin is improving
                             or your vitamin D is responding to supplements.
                         </p>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Real Insights Feed ── */}
+            {totalCount > 0 && (
+                <div className="mb-6">
+                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider text-center lg:text-left">PERSONALIZED INSIGHTS</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
+                        <AIInsightsFeed analysis={{ summary: latestLabResult?.summary || "" }} />
+                        <ActionItems biomarkers={biomarkers} />
                     </div>
                 </div>
             )}

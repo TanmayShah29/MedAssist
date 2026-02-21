@@ -57,6 +57,63 @@ export async function saveLabResult(args: SaveLabResultArgs) {
     }
 }
 
+export async function deleteLabResult(labResultId: number) {
+    if (!supabaseAdmin) {
+        return { success: false, error: "Database connection unavailable" };
+    }
+
+    try {
+        const { error } = await supabaseAdmin
+            .from("lab_results")
+            .delete()
+            .eq("id", labResultId);
+
+        if (error) throw error;
+        return { success: true };
+    } catch (error: any) {
+        logger.error("Delete failed:", error.message);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateUserProfile(userId: string, data: { first_name?: string, last_name?: string, symptoms?: string[] }) {
+    if (!supabaseAdmin) return { success: false, error: "Database connection unavailable" };
+
+    try {
+        const { first_name, last_name, symptoms } = data;
+
+        // 1. Update profile
+        if (first_name || last_name) {
+            const { error: profileError } = await supabaseAdmin
+                .from("profiles")
+                .update({ first_name, last_name, updated_at: new Date().toISOString() })
+                .eq("id", userId);
+
+            if (profileError) throw profileError;
+        }
+
+        // 2. Update symptoms if provided
+        if (symptoms) {
+            // Delete old symptoms
+            await supabaseAdmin.from("symptoms").delete().eq("user_id", userId);
+
+            // Insert new ones
+            if (symptoms.length > 0) {
+                const { error: sympError } = await supabaseAdmin
+                    .from("symptoms")
+                    .insert(symptoms.map(s => ({ user_id: userId, symptom_text: s })));
+
+                if (sympError) throw sympError;
+            }
+        }
+
+        return { success: true };
+    } catch (error: any) {
+        logger.error("Update profile failed:", error.message);
+        return { success: false, error: error.message };
+    }
+}
+
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 

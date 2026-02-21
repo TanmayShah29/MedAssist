@@ -120,6 +120,7 @@ export default function ResultsPage() {
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
+    const [searchQuery, setSearchValue] = useState('')
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
     const [loadingTrends, setLoadingTrends] = useState(false)
     const [doctorQuestions, setDoctorQuestions] = useState<string>('Generating questions for your doctor...')
@@ -185,6 +186,9 @@ export default function ResultsPage() {
     }, [selectedCategory, router])
 
     // Derived counts for status summary
+    const filteredBiomarkers = biomarkers.filter(b => 
+        b.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     const optimalCount = biomarkers.filter(b => b.status === 'optimal').length
     const warningCount = biomarkers.filter(b => b.status === 'warning').length
     const criticalCount = biomarkers.filter(b => b.status === 'critical').length
@@ -259,23 +263,35 @@ export default function ResultsPage() {
                 </div>
             </div>
 
-            {/* ── Category tabs ── */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
-                {CATEGORIES.map(category => (
-                    <button
-                        key={category}
-                        onClick={() => {
-                            setSelectedCategory(category)
-                            setSelectedBiomarker(null)
-                        }}
-                        className={`px-4 py-2 rounded-[10px] text-[15px] font-semibold capitalize whitespace-nowrap transition-colors ${selectedCategory === category
-                            ? 'bg-sky-500 text-white'
-                            : 'bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] hover:bg-[#EFEDE6]'
-                            }`}
-                    >
-                        {category}
-                    </button>
-                ))}
+            {/* ── Category tabs & Search ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+                    {CATEGORIES.map(category => (
+                        <button
+                            key={category}
+                            onClick={() => {
+                                setSelectedCategory(category)
+                                setSelectedBiomarker(null)
+                            }}
+                            className={`px-4 py-2 rounded-[10px] text-[15px] font-semibold capitalize whitespace-nowrap transition-colors ${selectedCategory === category
+                                ? 'bg-sky-500 text-white'
+                                : 'bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] hover:bg-[#EFEDE6]'
+                                }`}
+                        >
+                            {category}
+                        </button>
+                    ))}
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A8A29E]" />
+                    <input
+                        type="text"
+                        placeholder="Search biomarkers..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full md:w-64 transition-all"
+                    />
+                </div>
             </div>
 
             {/* ── Two column layout ── */}
@@ -317,17 +333,17 @@ export default function ResultsPage() {
                                 Go to dashboard
                             </button>
                         </div>
-                    ) : biomarkers.length === 0 ? (
+                    ) : filteredBiomarkers.length === 0 ? (
                         <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
                             <div className="w-12 h-12 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-4">
                                 <Search className="w-6 h-6 text-[#A8A29E]" />
                             </div>
-                            <p className="text-[15px] text-[#57534E] font-medium">No results in this category.</p>
-                            <p className="text-[13px] text-[#A8A29E] mt-1">Try selecting a different filter.</p>
+                            <p className="text-[15px] text-[#57534E] font-medium">No results found.</p>
+                            <p className="text-[13px] text-[#A8A29E] mt-1">Try a different search or filter.</p>
                         </div>
                     ) : (
                         <div>
-                            {biomarkers.map((b, i) => (
+                            {filteredBiomarkers.map((b, i) => (
                                 <div
                                     key={b.id}
                                     onClick={() => setSelectedBiomarker(b)}
