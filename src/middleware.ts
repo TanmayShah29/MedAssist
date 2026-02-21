@@ -15,10 +15,13 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/api') ||
         pathname.startsWith('/_next') ||
         pathname.startsWith('/auth') ||
+        pathname === '/terms' ||
+        pathname === '/privacy' ||
         pathname.includes('.')
     ) {
         return NextResponse.next()
     }
+
 
     // Check auth session
     let response = NextResponse.next({ request })
