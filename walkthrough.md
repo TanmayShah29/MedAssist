@@ -4,6 +4,15 @@ Resolved multiple build failures in the dashboard and assistant pages, including
 
 ## Changes Made
 
+### Supplement & Medication Correlation (New Feature)
+- **Database Schema**: Added `supplements` table to track names, dosages, and start dates.
+- **Medicine Cabinet UI**: Created a new management component (`src/components/dashboard/medicine-cabinet.tsx`) allowing users to log their intake.
+- **API Integration**: Implemented `/api/supplements` for CRUD operations on supplement data.
+- **Trend Visualization**: 
+    - Updated `WellnessTrendChart` and the internal `TrendChart` to display vertical "Correlation Markers" (rose-colored dotted lines and dots) on the exact date a supplement was started.
+    - Enhanced tooltips to show "Started: [Supplement Name]" when hovering over correlation points.
+- **Dashboard Integration**: Added the "Medicine Cabinet" to the main dashboard for high-visibility management.
+
 ### Expanded 'Ask Your Doctor' Feature
 - **API Update**: Enhanced `/api/generate-questions` to return structured JSON data, including a "Why ask this" context for each question.
 - **New Component**: Created `src/components/dashboard/doctor-questions.tsx`, a polished UI component that displays personalized medical questions in an interactive list.
@@ -14,10 +23,10 @@ Resolved multiple build failures in the dashboard and assistant pages, including
 - **File**: `src/app/dashboard/dashboard-client.tsx`
 - **Fixes**:
     - Consolidated multiple `lucide-react` imports into a single block.
-    - Added missing `Brain` icon import.
-    - Restored `loading` and `setLoading` state variables which were used in the `handleDeleteReport` function but were missing from the component definition.
+    - Added missing `Brain` and `Pill` icon imports.
+    - Restored `loading` and `setLoading` state variables.
     - Removed duplicate `ChevronRight` import.
-    - Integrated the new `DoctorQuestions` component.
+    - Integrated the new `DoctorQuestions` and `MedicineCabinet` components.
 
 ### Assistant Page
 - **File**: `src/app/assistant/page.tsx`
@@ -32,6 +41,6 @@ Resolved multiple build failures in the dashboard and assistant pages, including
     - Generated all static pages and API routes.
 
 ```bash
-✓ Compiled successfully in 4.5s
-✓ Finished TypeScript in 3.8s
+✓ Compiled successfully in 3.9s
+✓ Finished TypeScript in 4.0s
 ```

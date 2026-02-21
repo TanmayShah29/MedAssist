@@ -130,9 +130,21 @@ export default function ResultsPage() {
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
     const [loadingTrends, setLoadingTrends] = useState(false)
     const [isDebugMode, setIsDebugMode] = useState(false)
+    const [supplements, setSupplements] = useState<any[]>([])
 
     useEffect(() => {
         setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true")
+        
+        const fetchSupps = async () => {
+            try {
+                const res = await fetch('/api/supplements');
+                const data = await res.json();
+                if (data.supplements) setSupplements(data.supplements);
+            } catch (err) {
+                console.error("Failed to fetch supplements", err);
+            }
+        };
+        fetchSupps();
     }, [])
 
     const handlePrint = () => {
@@ -448,7 +460,11 @@ export default function ResultsPage() {
                                         </div>
                                     ) : biomarkerTrends.length > 1 ? (
                                         <div className="h-full w-full scale-95 origin-top">
-                                            <WellnessTrendChart data={biomarkerTrends} className="col-span-1" />
+                                            <WellnessTrendChart 
+                                                data={biomarkerTrends} 
+                                                supplements={supplements}
+                                                className="col-span-1" 
+                                            />
                                         </div>
                                     ) : (
                                         <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-lg flex flex-col items-center justify-center p-4 text-center">

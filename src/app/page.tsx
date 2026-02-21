@@ -159,6 +159,78 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── COMING SOON: ADVANCED INTELLIGENCE ────────── */}
+      <section className="py-20 px-6 bg-[#0F172A] text-white overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 
+                             bg-indigo-500/10 border border-indigo-500/20 
+                             rounded-full text-[10px] font-bold text-indigo-400 
+                             uppercase tracking-widest mb-6">
+                Next Generation Health Intelligence
+              </div>
+              <h2 className="font-display text-4xl sm:text-5xl leading-tight mb-6">
+                Beyond just <span className="text-indigo-400">results.</span>
+                <br />
+                Real-world <span className="text-indigo-400">correlations.</span>
+              </h2>
+              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                We're building the first clinical intelligence platform that understands the "why" behind your numbers by connecting your actions to your outcomes.
+              </p>
+              
+              <div className="space-y-6">
+                {[
+                  {
+                    title: "Health Timeline",
+                    desc: "A medical diary that connects symptoms, lab reports, and AI insights."
+                  },
+                  {
+                    title: "Supplement Tracking",
+                    desc: "See exactly how that new supplement affects your biomarkers over time."
+                  },
+                  {
+                    title: "Family Profiles",
+                    desc: "Manage your family's health with the same clinical precision."
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex gap-4">
+                    <div className="w-1 h-auto bg-indigo-500/30 rounded-full" />
+                    <div>
+                      <h4 className="font-bold text-slate-200">{item.title}</h4>
+                      <p className="text-sm text-slate-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex-1 relative">
+              {/* Visual representation of a timeline/correlation */}
+              <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/10 rounded-[32px] border border-white/5 p-8 relative overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full space-y-4 opacity-50 blur-[1px]">
+                     <div className="h-2 bg-indigo-500/20 rounded-full w-3/4 mx-auto" />
+                     <div className="h-2 bg-sky-500/20 rounded-full w-1/2 mx-auto" />
+                     <div className="h-2 bg-emerald-500/20 rounded-full w-2/3 mx-auto" />
+                  </div>
+                </div>
+                <div className="relative z-10 flex flex-col justify-center h-full">
+                  <div className="bg-[#1E293B] border border-white/10 p-5 rounded-2xl shadow-2xl transform -rotate-3 mb-4">
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase mb-2">CORRELATION DETECTED</p>
+                    <p className="text-sm font-medium">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
+                  </div>
+                  <div className="bg-[#1E293B] border border-white/10 p-5 rounded-2xl shadow-2xl transform rotate-2 ml-8">
+                    <p className="text-[10px] text-emerald-400 font-bold uppercase mb-2">TIMELINE EVENT</p>
+                    <p className="text-sm font-medium">Symptom "Fatigue" disappeared 4 days after Hemoglobin returned to optimal.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── THE PROBLEM ───────────────────────────────── */}
       <section className="py-16 px-6 bg-[#F5F4EF] border-y border-[#E8E6DF]">
         <div className="max-w-3xl mx-auto">

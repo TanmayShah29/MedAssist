@@ -16,7 +16,8 @@ import {
     ChevronRight, 
     Info, 
     WifiOff,
-    Brain 
+    Brain,
+    Pill 
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -41,6 +42,7 @@ import { ActionItems } from '@/components/dashboard/action-items'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
+import { MedicineCabinet } from '@/components/dashboard/medicine-cabinet'
 import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 import { Biomarker, Profile } from '@/types/medical'
@@ -104,7 +106,7 @@ function CategoryRadar({ biomarkers }: { biomarkers: Biomarker[] }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers: Biomarker[] }) {
+function TrendChart({ labResults, biomarkers, supplements = [] }: { labResults: any[], biomarkers: Biomarker[], supplements?: any[] }) {
     const [selectedBiomarker, setSelectedBiomarker] = useState<string>('Health Score');
 
     if (labResults.length < 1) return null;
@@ -116,12 +118,13 @@ function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers:
     );
 
     const chartData = labResults.map(report => {
-        const date = new Date(report.uploaded_at || report.created_at).toLocaleDateString('en-US', {
+        const reportDate = new Date(report.uploaded_at || report.created_at);
+        const date = reportDate.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric'
         });
 
-        const dataPoint: any = { date };
+        const dataPoint: any = { date, originalDate: reportDate };
 
         if (selectedBiomarker === 'Health Score') {
             dataPoint.value = report.health_score || 0;
@@ -130,6 +133,13 @@ function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers:
             dataPoint.value = b ? b.value : null;
             dataPoint.unit = b?.unit;
         }
+
+        // Add supplement info if started on this date
+        const supp = supplements.find(s => {
+            const sDate = new Date(s.start_date);
+            return sDate.toLocaleDateString() === reportDate.toLocaleDateString();
+        });
+        if (supp) dataPoint.supplement = supp.name;
 
         return dataPoint;
     });
@@ -198,6 +208,7 @@ function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers:
                         <Tooltip
                             content={({ active, payload }) => {
                                 if (active && payload && payload.length) {
+                                    const supp = payload[0].payload.supplement;
                                     return (
                                         <div style={{
                                             background: '#FAFAF7',
@@ -207,9 +218,17 @@ function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers:
                                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                                         }}>
                                             <p style={{ fontSize: 10, color: '#A8A29E', margin: '0 0 4px 0' }}>{payload[0].payload.date}</p>
-                                            <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', margin: 0 }}>
-                                                {payload[0].value} <span style={{ fontSize: 11, fontWeight: 400, color: '#57534E' }}>{displayUnit}</span>
-                                            </p>
+                                            <div className="flex flex-col gap-1">
+                                                <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', margin: 0 }}>
+                                                    {payload[0].value} <span style={{ fontSize: 11, fontWeight: 400, color: '#57534E' }}>{displayUnit}</span>
+                                                </p>
+                                                {supp && (
+                                                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                                                        <Pill size={10} className="text-rose-500" />
+                                                        <span className="text-[10px] font-bold text-rose-600 uppercase">Started: {supp}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     );
                                 }
@@ -221,7 +240,18 @@ function TrendChart({ labResults, biomarkers }: { labResults: any[], biomarkers:
                             dataKey="value"
                             stroke="#0EA5E9"
                             strokeWidth={3}
-                            dot={{ fill: '#0EA5E9', strokeWidth: 2, r: 4, stroke: 'white' }}
+                            dot={(props: any) => {
+                                const { cx, cy, payload } = props;
+                                if (payload.supplement) {
+                                    return (
+                                        <g key={props.key}>
+                                            <circle cx={cx} cy={cy} r={6} fill="#F43F5E" stroke="white" strokeWidth={2} />
+                                            <path d={`M${cx} ${cy-15} L${cx} ${cy}`} stroke="#F43F5E" strokeWidth={1} strokeDasharray="2 2" />
+                                        </g>
+                                    );
+                                }
+                                return <circle key={props.key} cx={cx} cy={cy} r={4} fill="#0EA5E9" stroke="white" strokeWidth={2} />;
+                            }}
                             activeDot={{ r: 6, strokeWidth: 0 }}
                             connectNulls
                         />
@@ -257,6 +287,20 @@ export default function DashboardClient({
     const [isOffline, setIsOffline] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
     const [showScoreModal, setShowScoreModal] = useState(false);
+    const [supplements, setSupplements] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchSupps = async () => {
+            try {
+                const res = await fetch('/api/supplements');
+                const data = await res.json();
+                if (data.supplements) setSupplements(data.supplements);
+            } catch (err) {
+                console.error("Failed to fetch supplements", err);
+            }
+        };
+        fetchSupps();
+    }, []);
 
     // Derived Data taking Demo Mode into account
     const displayLabResults = demoMode
@@ -666,7 +710,7 @@ export default function DashboardClient({
             {/* ── Charts Grid (Trend & Radar) ── */}
             {totalCount > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <TrendChart labResults={labResults} biomarkers={biomarkers} />
+                    <TrendChart labResults={labResults} biomarkers={biomarkers} supplements={supplements} />
                     <CategoryRadar biomarkers={biomarkers} />
                 </div>
             )}
@@ -786,8 +830,11 @@ export default function DashboardClient({
             {/* ── Doctor Questions ── */}
             {totalCount > 0 && (
                 <div className="mb-6">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PREPARATION</h3>
-                    <DoctorQuestions biomarkers={displayBiomarkers} />
+                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PREPARATION & CARE</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <DoctorQuestions biomarkers={displayBiomarkers} />
+                        <MedicineCabinet />
+                    </div>
                 </div>
             )}
 

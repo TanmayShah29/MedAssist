@@ -9,29 +9,41 @@ import {
     Tooltip,
     XAxis,
     YAxis,
+    ReferenceLine,
+    ReferenceDot,
 } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 // Phase 7: Add Framer Motion and state for filters
 import { motion } from "framer-motion"
 import { useState } from "react"
+import { Pill } from "lucide-react"
 
 const timeFilters = ['3M', '6M', '1Y', 'ALL'] as const;
 
+interface Supplement {
+    id: number;
+    name: string;
+    start_date: string;
+}
+
 interface WellnessTrendChartProps {
     data: { date: string; score: number; ideal?: number }[]
+    supplements?: Supplement[]
     className?: string
 }
 
 interface CustomTooltipProps {
     active?: boolean;
-    payload?: Array<{ value: number; payload: { ideal?: number } }>;
+    payload?: Array<{ value: number; payload: { ideal?: number; supplement?: string } }>;
     label?: string;
 }
 
 // Custom animated tooltip
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     if (!active || !payload?.[0]) return null;
+
+    const supplement = payload[0].payload.supplement;
 
     return (
         <motion.div
@@ -40,26 +52,35 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
             transition={{ duration: 0.15 }}
             // Glassmorphism style - Light Mode
-            className="rounded-lg border bg-white/90 backdrop-blur-md p-4 shadow-xl ring-1 ring-slate-200/50"
+            className="rounded-lg border bg-white/90 backdrop-blur-md p-4 shadow-xl ring-1 ring-slate-200/50 z-50"
         >
             <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">{label}</p>
-            <div className="flex items-center gap-4">
-                <div className="flex flex-col">
-                    <span className="text-[0.65rem] uppercase text-slate-400 font-bold">
-                        Wellness Score
-                    </span>
-                    <span className="text-2xl font-bold bg-gradient-to-br from-sky-500 to-sky-700 bg-clip-text text-transparent">
-                        {payload[0].value}
-                    </span>
-                </div>
-                {payload[0].payload.ideal && (
-                    <div className="flex flex-col border-l pl-4 border-slate-200">
+            <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col">
                         <span className="text-[0.65rem] uppercase text-slate-400 font-bold">
-                            Target
+                            Wellness Score
                         </span>
-                        <span className="text-2xl font-bold text-slate-300">
-                            {payload[0].payload.ideal}
+                        <span className="text-2xl font-bold bg-gradient-to-br from-sky-500 to-sky-700 bg-clip-text text-transparent">
+                            {payload[0].value}
                         </span>
+                    </div>
+                    {payload[0].payload.ideal && (
+                        <div className="flex flex-col border-l pl-4 border-slate-200">
+                            <span className="text-[0.65rem] uppercase text-slate-400 font-bold">
+                                Target
+                            </span>
+                            <span className="text-2xl font-bold text-slate-300">
+                                {payload[0].payload.ideal}
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                {supplement && (
+                    <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
+                        <Pill size={12} className="text-rose-500" />
+                        <span className="text-xs font-medium text-rose-600">Started: {supplement}</span>
                     </div>
                 )}
             </div>
@@ -67,9 +88,26 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     );
 }
 
-export function WellnessTrendChart({ data, className }: WellnessTrendChartProps) {
+export function WellnessTrendChart({ data, supplements = [], className }: WellnessTrendChartProps) {
     useTheme() // Call useTheme to ensure hook rules are followed, but don't destructure theme
     const [filter, setFilter] = useState<typeof timeFilters[number]>('6M');
+
+    // Enrich data with supplements
+    const enrichedData = data.map(item => {
+        const itemDate = new Date(item.date);
+        // Find supplement started on this date (or closest to it for visualization)
+        const supp = supplements.find(s => {
+            const sDate = new Date(s.start_date);
+            // Simple match for same day/month for mock/demo purposes
+            // In real app, we might want more complex logic to snap to chart points
+            return sDate.toLocaleDateString() === itemDate.toLocaleDateString();
+        });
+
+        return {
+            ...item,
+            supplement: supp?.name
+        };
+    });
 
     return (
         <motion.div
@@ -116,7 +154,7 @@ export function WellnessTrendChart({ data, className }: WellnessTrendChartProps)
                     <div className="absolute inset-0 w-full h-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart
-                                data={data}
+                                data={enrichedData}
                                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                             >
                                 <defs>
@@ -155,6 +193,33 @@ export function WellnessTrendChart({ data, className }: WellnessTrendChartProps)
                                     content={<CustomTooltip />}
                                     cursor={{ stroke: '#0EA5E9', strokeWidth: 1, strokeDasharray: '4 4', opacity: 0.5 }}
                                 />
+
+                                {enrichedData.map((entry, index) => (
+                                    entry.supplement ? (
+                                        <ReferenceLine
+                                            key={`line-${index}`}
+                                            x={entry.date}
+                                            stroke="#F43F5E"
+                                            strokeDasharray="3 3"
+                                            strokeWidth={1}
+                                        />
+                                    ) : null
+                                ))}
+
+                                {enrichedData.map((entry, index) => (
+                                    entry.supplement ? (
+                                        <ReferenceDot
+                                            key={`dot-${index}`}
+                                            x={entry.date}
+                                            y={entry.score}
+                                            r={4}
+                                            fill="#F43F5E"
+                                            stroke="#fff"
+                                            strokeWidth={2}
+                                        />
+                                    ) : null
+                                ))}
+
                                 <Area
                                     type="monotone"
                                     dataKey="score"

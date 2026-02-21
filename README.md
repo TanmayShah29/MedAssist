@@ -29,6 +29,15 @@
   - [Groq SDK](https://groq.com/) (Llama 3.3 70B for medical reasoning)
 - **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
 
+## Future Roadmap
+
+MedAssist is evolving from a lab analyzer into a comprehensive health intelligence platform. Upcoming features include:
+
+- **Integrated Health Timeline**: A chronological medical diary interweaving lab results, symptom logs, and AI milestones to visualize your complete health story.
+- **Supplement & Medication Correlation**: Log your supplements and medications to see real-time correlation markers on your biomarker trend charts.
+- **Family & Multi-Profile Support**: Securely manage and switch between multiple health profiles (e.g., parents, children) within a single account.
+- **Biomarker Simulation**: "What-if" scenarios to understand how specific lifestyle or dietary changes might influence your clinical results.
+
 ## How it Works
 
 MedAssist operates on a sophisticated pipeline designed to transform raw medical data into actionable health insights.
