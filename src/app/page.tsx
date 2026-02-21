@@ -13,7 +13,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  X
+  X,
+  Printer
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -283,7 +284,7 @@ export default function LandingPage() {
                   step: "3",
                   icon: <LineChart className="w-5 h-5 text-white" />,
                   title: "See what it all means",
-                  description: "Your dashboard shows: What's optimal. What needs attention. What trends you should track. All in plain language you can actually understand.",
+                  description: "Your dashboard shows: What's optimal. What needs attention. What trends you should track. All in plain language you can actually understand — and with professional print styling for your next doctor's visit.",
                   detail: "Updated every time you upload",
                   color: "emerald",
                 },
@@ -356,6 +357,7 @@ export default function LandingPage() {
                 "Trend charts showing if you're improving",
                 "Plain-language explanations of every number",
                 "AI assistant to answer your questions",
+                "Professional print-ready reports",
                 "What to ask your doctor at your next visit",
               ].map(feature => (
                 <div key={feature}
