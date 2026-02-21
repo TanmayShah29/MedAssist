@@ -9,7 +9,9 @@
 ## Key Features
 
 - **AI Lab Report Analysis**: Upload a PDF of your lab report. MedAssist uses **OCR.space** for precise text extraction and **Groq (Llama 3.3 70B)** to extract biomarkers, interpret results (Optimal, Warning, Critical), and provide a plain-English summary.
-- **Optimistic Health Scoring**: A proprietary, forgiving health score algorithm that rewards "Optimal" values while providing context for areas needing attention. No more demoralizing scores for minor deviations.
+- **Optimistic Health Scoring**: A proprietary, forgiving health score algorithm that rewards "Optimal" values while providing context for areas needing attention. Includes **Algorithmic Transparency** with a methodology modal explaining the calculation logic.
+- **Professional Clinical Printing**: Optimized `@media print` styling that transforms the dashboard into a professional, clean medical report suitable for sharing with healthcare providers.
+- **PWA & Offline Resilience**: Full Progressive Web App support with `manifest.json` and `apple-touch-icon`. Implements local caching for lab results to ensure your health data is accessible even without an internet connection.
 - **Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
 - **Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
 - **Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
