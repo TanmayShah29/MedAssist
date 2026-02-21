@@ -16,6 +16,7 @@ function AuthContent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
     useEffect(() => {
@@ -126,9 +127,32 @@ function AuthContent() {
                     />
                 </div>
 
+                {mode === 'signup' && (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 8 }}>
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            checked={agreedToTerms}
+                            onChange={e => setAgreedToTerms(e.target.checked)}
+                            style={{ marginTop: 2, cursor: 'pointer', accentColor: '#0EA5E9' }}
+                        />
+                        <label htmlFor="terms" style={{ fontSize: 13, color: '#57534E', lineHeight: 1.5 }}>
+                            I agree to the{' '}
+                            <a href="/terms" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
+                                Terms of Service
+                            </a>
+                            {' '}and{' '}
+                            <a href="/privacy" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
+                                Privacy Policy
+                            </a>
+                        </label>
+                    </div>
+                )}
+
+
                 <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || (mode === 'signup' && !agreedToTerms)}
                     className="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white rounded-[12px] 
                              font-semibold shadow-lg shadow-sky-500/20 transition-all 
                              hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0
