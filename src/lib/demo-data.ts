@@ -12,86 +12,114 @@ export interface DemoLabResult {
 }
 
 export const DEMO_HISTORY: Biomarker[] = [
-    // Glucose History (Rising trend)
+    // Metabolic Profile - Glucose Trending Up
     {
-        id: 101,
+        id: "demo-g-1",
         name: "Glucose",
         value: 92,
         unit: "mg/dL",
         status: "optimal",
         category: "metabolic",
-        created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(), // 3 months ago
+        created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Glucose is within optimal range."
     },
     {
-        id: 102,
-        name: "Glucose",
-        value: 98,
-        unit: "mg/dL",
-        status: "optimal",
-        category: "metabolic",
-        created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(), // 2 months ago
-        ai_interpretation: "Glucose is stable but slightly higher than last time."
-    },
-    {
-        id: 103,
+        id: "demo-g-2",
         name: "Glucose",
         value: 106,
         unit: "mg/dL",
         status: "warning",
         category: "metabolic",
-        created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 1 month ago
-        ai_interpretation: "Glucose has entered a warning range. Watch your carbohydrate intake."
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        ai_interpretation: "Glucose has risen 15% over the last quarter. This confirms a pre-diabetic trend that warrants dietary review."
     },
-    // Vitamin D History (Improving trend)
+    // Vitamin Profile - Significantly Improved
     {
-        id: 201,
+        id: "demo-v-1",
         name: "Vitamin D",
         value: 18,
         unit: "ng/mL",
         status: "critical",
         category: "vitamins",
         created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Severely low Vitamin D levels."
+        ai_interpretation: "Severely low. Risk of bone density loss."
     },
     {
-        id: 202,
-        name: "Vitamin D",
-        value: 28,
-        unit: "ng/mL",
-        status: "warning",
-        category: "vitamins",
-        created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Improving Vitamin D levels, but still below optimal."
-    },
-    {
-        id: 203,
+        id: "demo-v-2",
         name: "Vitamin D",
         value: 42,
         unit: "ng/mL",
         status: "optimal",
         category: "vitamins",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Vitamin D has reached an optimal level. Great progress."
+        ai_interpretation: "Excellent recovery. Supplementation protocol is highly effective."
     },
-    // Hemoglobin History
+    // Lipid Profile
     {
-        id: 301,
+        id: "demo-l-1",
+        name: "LDL Cholesterol",
+        value: 145,
+        unit: "mg/dL",
+        status: "warning",
+        category: "lipids",
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        ai_interpretation: "Borderline high. Recommend increasing soluble fiber intake."
+    },
+    {
+        id: "demo-l-2",
+        name: "HDL Cholesterol",
+        value: 58,
+        unit: "mg/dL",
+        status: "optimal",
+        category: "lipids",
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    // CBC
+    {
+        id: "demo-h-1",
         name: "Hemoglobin",
-        value: 13.2,
+        value: 13.5,
         unit: "g/dL",
         status: "optimal",
         category: "hematology",
         created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
-        id: 302,
+        id: "demo-h-2",
         name: "Hemoglobin",
         value: 11.8,
         unit: "g/dL",
         status: "warning",
         category: "hematology",
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        ai_interpretation: "Downward trend detected. Monitor for symptoms of fatigue."
+    },
+    {
+        id: "demo-r-1",
+        name: "Resting Heart Rate",
+        value: 72,
+        unit: "bpm",
+        status: "optimal",
+        category: "vitals",
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+        id: "demo-m-1",
+        name: "Magnesium",
+        value: 2.1,
+        unit: "mg/dL",
+        status: "optimal",
+        category: "metabolic",
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+        id: "demo-t-1",
+        name: "TSH",
+        value: 2.4,
+        unit: "uIU/mL",
+        status: "optimal",
+        category: "thyroid",
+        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     }
 ];
 
@@ -99,19 +127,20 @@ export const DEMO_LAB_RESULT: DemoLabResult = {
     id: "demo-latest",
     created_at: new Date().toISOString(),
     raw_ai_json: {
-        healthScore: 78,
+        healthScore: 82,
         riskLevel: "moderate",
-        summary: "Your metabolic markers show a rising trend in glucose, while your vitamin profile has significantly improved through supplementation.",
+        summary: "Clinical analysis of your latest report reveals a significant recovery in Vitamin D levels and a robust lipid profile. However, there is a persistent upward trend in Glucose and a slight decline in Hemoglobin that requires attention.",
         longitudinalInsights: [
-            "Metabolic Alert: Glucose has risen 15% over the last 3 months.",
-            "Supplement Efficacy: Vitamin D has improved from critical (18) to optimal (42).",
-            "Anemic Pattern: Hemoglobin is trending downward as Ferritin remains stable."
+            "Metabolic Alert: Glucose has risen 15% over the last 3 months, indicating a transition to pre-diabetic ranges.",
+            "Supplement Efficacy: Vitamin D has successfully recovered from a critical level (18) to an optimal maintenance level (42).",
+            "Anemic Pattern: Hemoglobin is trending downward as Ferritin remains stable; monitor dietary iron intake.",
+            "Thyroid Stability: TSH levels remain ideal, suggesting no metabolic impact from thyroid function."
         ]
     }
 };
 
 export const MOCK_FAMILY_PROFILES = [
-    { id: "owner-1", first_name: "Test", last_name: "User", role: "Patient", parent_id: null },
+    { id: "owner-1", first_name: "Tanmay", last_name: "User", role: "Patient", parent_id: null },
     { id: "child-1", first_name: "Sarah", last_name: "User (Daughter)", role: "Patient", parent_id: "owner-1" },
     { id: "parent-1", first_name: "Robert", last_name: "User (Father)", role: "Patient", parent_id: "owner-1" },
 ];

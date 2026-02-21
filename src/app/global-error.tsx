@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 export default function GlobalError({
     error,
     reset,
@@ -17,12 +19,29 @@ export default function GlobalError({
                         <br />
                         Digest: {error.digest}
                     </p>
-                    <button
-                        onClick={() => reset()}
-                        className="px-4 py-2 bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                    >
-                        Try again
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => reset()}
+                            className="px-4 py-2 bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                        >
+                            Try again
+                        </button>
+                        <button
+                            onClick={() => {
+                                // Clear Supabase cookies manually as an emergency reset
+                                document.cookie.split(";").forEach((c) => {
+                                    const name = c.split("=")[0].trim();
+                                    if (name.includes('supabase') || name.includes('sb-')) {
+                                        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                                    }
+                                });
+                                window.location.href = '/auth';
+                            }}
+                            className="px-4 py-2 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors border border-slate-600"
+                        >
+                            Sign Out & Reset
+                        </button>
+                    </div>
                 </div>
             </body>
         </html>

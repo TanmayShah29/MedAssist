@@ -321,6 +321,17 @@ export default function DashboardClient({
         ? [...DEMO_HISTORY, ...initialBiomarkers]
         : initialBiomarkers;
 
+    // Deduplicate to get the latest entry for each biomarker name
+    const latestBiomarkers = Array.from(
+        displayBiomarkers.reduce((acc, current) => {
+            const existing = acc.get(current.name);
+            if (!existing || new Date(current.created_at || 0) > new Date(existing.created_at || 0)) {
+                acc.set(current.name, current);
+            }
+            return acc;
+        }, new Map<string, Biomarker>()).values()
+    );
+
     const latestLabResult = displayLabResults[0];
     const longitudinalInsights: string[] = latestLabResult?.raw_ai_json?.longitudinalInsights || [];
 
@@ -374,11 +385,11 @@ export default function DashboardClient({
         }
     };
 
-    // Derived values
-    const optimalCount = displayBiomarkers.filter(b => b.status === 'optimal').length
-    const warningCount = displayBiomarkers.filter(b => b.status === 'warning').length
-    const criticalCount = displayBiomarkers.filter(b => b.status === 'critical').length
-    const totalCount = displayBiomarkers.length
+    // Derived values - use latestBiomarkers for current state summary
+    const optimalCount = latestBiomarkers.filter(b => b.status === 'optimal').length
+    const warningCount = latestBiomarkers.filter(b => b.status === 'warning').length
+    const criticalCount = latestBiomarkers.filter(b => b.status === 'critical').length
+    const totalCount = latestBiomarkers.length
 
     // Optimistic scoring calculation
     let healthScore = 0
@@ -398,7 +409,7 @@ export default function DashboardClient({
 
     const scoreLabel = getScoreLabel(healthScore)
 
-    const priorities = [...displayBiomarkers]
+    const priorities = [...latestBiomarkers]
         .sort((a, b) => {
             const order = { critical: 0, warning: 1, optimal: 2 }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -885,11 +896,11 @@ export default function DashboardClient({
                     </div>
 
                     <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-                        {displayBiomarkers.length > 0 ? (
-                            displayBiomarkers.map((b, i) => (
+                        {latestBiomarkers.length > 0 ? (
+                            latestBiomarkers.map((b, i) => (
                                 <div
                                     key={b.id || i}
-                                    className={`flex items-center py-3 cursor-pointer hover:bg-slate-50 px-2 -mx-2 rounded-lg transition-colors group ${i !== displayBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]/50' : ''}`}
+                                    className={`flex items-center py-3 cursor-pointer hover:bg-slate-50 px-2 -mx-2 rounded-lg transition-colors group ${i !== latestBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]/50' : ''}`}
                                     onClick={() => handleBiomarkerClick(b)}
                                 >
                                     <div className={`w-2 h-2 rounded-full shrink-0 ${b.status === 'optimal' ? 'bg-emerald-500' :
