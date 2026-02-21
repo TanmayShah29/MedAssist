@@ -49,13 +49,16 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform for Recharts (lab_results may be null if join fails)
-    const trends = data
-        .filter((b: { lab_results?: { created_at: string } }) => b.lab_results?.created_at)
-        .map((b: { value: number; unit: string; lab_results: { created_at: string } }) => ({
-            date: new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            value: b.value,
-            unit: b.unit
-        }));
+    const trends = (data || [])
+        .filter((b: any) => Array.isArray(b.lab_results) ? b.lab_results[0]?.created_at : b.lab_results?.created_at)
+        .map((b: any) => {
+            const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+            return {
+                date: new Date(lr.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                value: b.value,
+                unit: b.unit
+            };
+        });
 
     return NextResponse.json({ trends });
 }
