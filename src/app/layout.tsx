@@ -99,6 +99,9 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, 
                    maximum-scale=1, viewport-fit=cover"
         />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0EA5E9" />
+        <link rel="apple-touch-icon" href="/next.svg" />
       </head>
       <body
         className="bg-[#FAFAF7] font-sans overflow-x-hidden"

@@ -22,7 +22,7 @@ const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr
 import { UploadModal } from '@/components/upload-modal'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { DebugTraceView } from '@/components/dashboard/DebugTraceView'
-import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shield, Printer, Trash2, ChevronRight } from 'lucide-react'
+import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shield, Printer, Trash2, ChevronRight, Info } from 'lucide-react'
 import { deleteLabResult } from '@/app/actions/user-data'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
@@ -242,6 +242,7 @@ export default function DashboardClient({
     const [debugMode, setDebugMode] = useState(false);
     const [isOffline, setIsOffline] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
+    const [showScoreModal, setShowScoreModal] = useState(false);
 
     // Derived Data taking Demo Mode into account
     const displayLabResults = demoMode
@@ -475,7 +476,13 @@ export default function DashboardClient({
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
                         {/* Left: Score Box */}
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2">HEALTH SCORE</span>
+                            <button 
+                                onClick={() => setShowScoreModal(true)}
+                                className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2 hover:text-white transition-colors w-fit"
+                            >
+                                HEALTH SCORE
+                                <Info size={12} />
+                            </button>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
                                 <div style={{
                                     fontFamily: 'Instrument Serif',
@@ -844,6 +851,62 @@ export default function DashboardClient({
                 biomarker={selectedBiomarkerData}
                 history={displayBiomarkers}
             />
+
+            {/* ── Score Methodology Modal ── */}
+            <AnimatePresence>
+                {showScoreModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowScoreModal(false)}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
+                            
+                            <h3 className="text-2xl font-bold text-[#1C1917] mb-4 relative">Scoring Methodology</h3>
+                            <p className="text-sm text-[#57534E] mb-6 relative">
+                                Your health score is an optimistic calculation designed to provide clinical clarity while rewarding healthy biomarkers.
+                            </p>
+
+                            <div className="space-y-4 relative mb-8">
+                                <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                                    <span className="text-xs font-bold text-emerald-700 uppercase">Optimal Value</span>
+                                    <span className="text-sm font-bold text-emerald-700">+100 pts</span>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
+                                    <span className="text-xs font-bold text-amber-700 uppercase">Monitor (Warning)</span>
+                                    <span className="text-sm font-bold text-amber-700">+75 pts</span>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
+                                    <span className="text-xs font-bold text-red-700 uppercase">Action Needed</span>
+                                    <span className="text-sm font-bold text-red-700">+40 pts</span>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-[#F5F4EF] rounded-xl border border-[#E8E6DF] mb-6">
+                                <p className="text-[11px] leading-relaxed text-[#57534E]">
+                                    <strong>The Optimism Rule:</strong> If your report contains at least one Optimal biomarker, your score cannot fall below 50. This prevents minor deviations from being demoralizing while still highlighting areas for focus.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setShowScoreModal(false)}
+                                className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black transition-all"
+                            >
+                                Understood
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* ── Mandatory Medical Disclaimer Footer ── */}
             <div className="mt-12 py-8 border-t border-[#E8E6DF] text-center">
