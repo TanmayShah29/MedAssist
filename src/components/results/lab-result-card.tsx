@@ -55,7 +55,7 @@ export function LabResultCard(props: LabResultCardProps) {
             whileHover={{ scale: 1.01, borderColor: 'var(--border-hover)' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className={cn(
-                'group relative bg-card rounded-xl p-5 cursor-pointer',
+                'group relative bg-card rounded-lg p-5 cursor-pointer',
                 'border-2 transition-colors shadow-sm hover:shadow-md',
                 props.isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : '', // Handle isSelected
                 result.status === 'critical' ? 'border-red-200 dark:border-red-900/50 hover:border-red-400' :

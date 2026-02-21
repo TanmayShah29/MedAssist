@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Shield, Download, Trash2, KeyRound } from "lucide-react";
+import { Shield, Download, Trash2, KeyRound, Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SettingsPage() {
     const supabase = createClient();
@@ -14,6 +15,19 @@ export default function SettingsPage() {
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isDebugMode, setIsDebugMode] = useState(false);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("medassist_debug_mode") === "true";
+        setIsDebugMode(saved);
+    }, []);
+
+    const toggleDebugMode = () => {
+        const next = !isDebugMode;
+        setIsDebugMode(next);
+        localStorage.setItem("medassist_debug_mode", next.toString());
+        toast.info(next ? "Debug mode enabled" : "Debug mode disabled");
+    };
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -147,7 +161,31 @@ export default function SettingsPage() {
                 </button>
             </section>
 
-            <section className="bg-white border border-red-200 rounded-[16px] p-6 shadow-sm">
+            <section className="bg-white border border-[#E8E6DF] rounded-[16px] p-6 mb-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-2">
+                    <Terminal className="w-5 h-5 text-indigo-500" />
+                    <h2 className="text-lg font-semibold text-[#1C1917]">Developer Settings</h2>
+                </div>
+                <p className="text-sm text-[#57534E] mb-4">
+                    Enable extra diagnostic information and view raw AI/OCR data. Useful for project presentations.
+                </p>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={toggleDebugMode}
+                        className={`px-4 py-2 rounded-[10px] text-sm font-medium transition-colors ${isDebugMode
+                            ? "bg-indigo-500 text-white"
+                            : "bg-[#FAFAF7] border border-[#E8E6DF] text-[#1C1917]"
+                            }`}
+                    >
+                        {isDebugMode ? "Debug Mode: ON" : "Debug Mode: OFF"}
+                    </button>
+                </div>
+            </section>
+
+            <section className="bg-white border-2 border-red-100 rounded-[16px] p-6 shadow-sm relative overflow-hidden">
+                <div className="absolute right-0 top-0 opacity-5 p-4">
+                    <Trash2 className="w-16 h-16 text-red-500" />
+                </div>
                 <div className="flex items-center gap-3 mb-2">
                     <Trash2 className="w-5 h-5 text-red-500" />
                     <h2 className="text-lg font-semibold text-[#1C1917]">Danger Zone</h2>

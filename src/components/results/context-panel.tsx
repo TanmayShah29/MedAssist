@@ -42,7 +42,7 @@ export function ContextPanel({ result }: { result: LabResult }) {
                     </ul>
                 </div>
 
-                <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
                     <h4 className="flex items-center gap-2 font-semibold text-emerald-900 mb-2">
                         <ThumbsUp className="w-4 h-4 text-emerald-600" />
                         Recommended Actions

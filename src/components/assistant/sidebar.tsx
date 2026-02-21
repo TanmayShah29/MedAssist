@@ -5,7 +5,7 @@ export function AssistantSidebar() {
     return (
         <div className="space-y-6">
             {/* Recent Labs Context */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
                 <h3 className="flex items-center gap-2 font-semibold text-slate-900 mb-4">
                     <FileText className="w-4 h-4 text-emerald-500" />
                     Recent Context
@@ -30,7 +30,7 @@ export function AssistantSidebar() {
             </div>
 
             {/* Suggested Questions */}
-            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-100">
+            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-[14px] p-6 border border-indigo-100">
                 <h3 className="flex items-center gap-2 font-semibold text-indigo-900 mb-4">
                     <HelpCircle className="w-4 h-4 text-indigo-500" />
                     Suggested Questions
@@ -52,7 +52,7 @@ export function AssistantSidebar() {
             </div>
 
             {/* History / Export */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
                 <h3 className="flex items-center gap-2 font-semibold text-slate-900 mb-4">
                     <MessageSquare className="w-4 h-4 text-slate-400" />
                     History

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FileText } from "lucide-react";
+import { FileText, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
@@ -199,8 +199,9 @@ export default function ProfilePage() {
                                             })}
                                         </p>
                                     </div>
-                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors">
-                                        View Details →
+                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors flex items-center gap-1">
+                                        View Details
+                                        <ChevronRight size={14} />
                                     </div>
                                 </div>
                             )) : (

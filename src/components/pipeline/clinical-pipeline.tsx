@@ -59,7 +59,7 @@ export function ClinicalPipelineStatus() {
     }, [steps])
 
     return (
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 mr-6 h-full flex flex-col">
+        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mr-6 h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Live Analysis Pipeline</h3>
                 <div className="flex items-center gap-2">

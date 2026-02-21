@@ -130,3 +130,69 @@ DROP POLICY IF EXISTS "Users see own biomarkers" ON biomarkers;
 CREATE POLICY "Users see own biomarkers" ON biomarkers
 FOR ALL USING (auth.uid() = user_id);
 
+-- Atomic Save Function
+CREATE OR REPLACE FUNCTION save_complete_report(
+  p_user_id UUID,
+  p_file_name TEXT,
+  p_health_score INT,
+  p_risk_level TEXT,
+  p_summary TEXT,
+  p_biomarkers JSONB
+) RETURNS BIGINT AS $$
+DECLARE
+  v_report_id BIGINT;
+BEGIN
+  -- 1. Insert into lab_results
+  INSERT INTO lab_results (
+    user_id, 
+    file_name, 
+    health_score, 
+    risk_level, 
+    summary, 
+    processed
+  )
+  VALUES (
+    p_user_id, 
+    p_file_name, 
+    p_health_score, 
+    p_risk_level, 
+    p_summary, 
+    true
+  )
+  RETURNING id INTO v_report_id;
+
+  -- 2. Insert biomarkers from JSONB array
+  INSERT INTO biomarkers (
+    user_id, 
+    lab_result_id, 
+    name, 
+    value, 
+    unit, 
+    status, 
+    reference_range_min, 
+    reference_range_max, 
+    category, 
+    confidence, 
+    ai_interpretation
+  )
+  SELECT 
+    p_user_id,
+    v_report_id,
+    (b->>'name')::TEXT,
+    (b->>'value')::FLOAT,
+    (b->>'unit')::TEXT,
+    (b->>'status')::TEXT,
+    (b->>'referenceMin')::FLOAT,
+    (b->>'referenceMax')::FLOAT,
+    (b->>'category')::TEXT,
+    (b->>'confidence')::FLOAT,
+    (b->>'aiInterpretation')::TEXT
+  FROM jsonb_array_elements(p_biomarkers) AS b;
+
+  RETURN v_report_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execution to authenticated users
+GRANT EXECUTE ON FUNCTION save_complete_report(UUID, TEXT, INT, TEXT, TEXT, JSONB) TO authenticated;
+

@@ -3,7 +3,7 @@ import { CheckCircle, AlertTriangle, AlertOctagon } from "lucide-react"
 export function ResultSummary({ optimal, warning, critical }: { optimal: number, warning: number, critical: number }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 border-2 border-emerald-100 shadow-lg relative overflow-hidden">
+            <div className="bg-white rounded-lg p-6 border-2 border-emerald-100 shadow-lg relative overflow-hidden">
                 <div className="absolute right-0 top-0 opacity-5 p-4 transform translate-x-1/4 -translate-y-1/4">
                     <CheckCircle className="w-32 h-32 text-emerald-500" />
                 </div>
@@ -17,7 +17,7 @@ export function ResultSummary({ optimal, warning, critical }: { optimal: number,
                 <p className="text-sm text-slate-500 relative z-10">Biomarkers within healthy limits</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 border-2 border-amber-100 shadow-lg relative overflow-hidden">
+            <div className="bg-white rounded-lg p-6 border-2 border-amber-100 shadow-lg relative overflow-hidden">
                 <div className="absolute right-0 top-0 opacity-5 p-4 transform translate-x-1/4 -translate-y-1/4">
                     <AlertTriangle className="w-32 h-32 text-amber-500" />
                 </div>
@@ -31,7 +31,7 @@ export function ResultSummary({ optimal, warning, critical }: { optimal: number,
                 <p className="text-sm text-slate-500 relative z-10">Slightly outside typical range</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 border-2 border-red-100 shadow-lg relative overflow-hidden">
+            <div className="bg-white rounded-lg p-6 border-2 border-red-100 shadow-lg relative overflow-hidden">
                 <div className="absolute right-0 top-0 opacity-5 p-4 transform translate-x-1/4 -translate-y-1/4">
                     <AlertOctagon className="w-32 h-32 text-red-500" />
                 </div>

@@ -1,4 +1,4 @@
-# MedAssist 🏥
+# MedAssist
 
 **MedAssist** is an intelligent, AI-powered medical assistant designed to help users understand their health data, analyze lab reports, and manage their wellness journey. Built with **Next.js 16**, **Supabase**, and advanced LLMs (**Groq/Llama 3.3**), it provides a secure and meaningful way to interpret complex medical information.
 
@@ -6,16 +6,16 @@
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- **📄 AI Lab Report Analysis**: Upload a PDF of your lab report. MedAssist uses **OCR.space** for precise text extraction and **Groq (Llama 3.3 70B)** to extract biomarkers, interpret results (Optimal, Warning, Critical), and provide a plain-English summary.
-- **📈 Optimistic Health Scoring**: A proprietary, forgiving health score algorithm that rewards "Optimal" values while providing context for areas needing attention. No more demoralizing scores for minor deviations.
-- **🤖 Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
-- **📊 Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
-- **🔐 Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
-- **⏳ Engaging Onboarding**: A verified, step-by-step processing flow that keeps you informed while the AI analyzes your data.
+- **AI Lab Report Analysis**: Upload a PDF of your lab report. MedAssist uses **OCR.space** for precise text extraction and **Groq (Llama 3.3 70B)** to extract biomarkers, interpret results (Optimal, Warning, Critical), and provide a plain-English summary.
+- **Optimistic Health Scoring**: A proprietary, forgiving health score algorithm that rewards "Optimal" values while providing context for areas needing attention. No more demoralizing scores for minor deviations.
+- **Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
+- **Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
+- **Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
+- **Engaging Onboarding**: A verified, step-by-step processing flow that keeps you informed while the AI analyzes your data.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions)
 - **Language**: TypeScript
@@ -26,7 +26,7 @@
   - [Groq SDK](https://groq.com/) (Llama 3.3 70B for medical reasoning)
 - **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
 
-## 🔍 How it Works
+## How it Works
 
 MedAssist operates on a sophisticated pipeline designed to transform raw medical data into actionable health insights.
 
@@ -46,7 +46,7 @@ MedAssist operates on a sophisticated pipeline designed to transform raw medical
 3.  **RAG-Powered Q&A**: 
     - User questions trigger a Retrieval-Augmented Generation flow, pulling the user's *actual* recent biomarkers to provide personalized answers.
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to set up the project locally.
 
@@ -97,7 +97,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 src/
@@ -115,10 +115,10 @@ src/
 └── store/                # Zustand stores
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.

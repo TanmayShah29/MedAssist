@@ -7,7 +7,7 @@ export const supabaseAdmin = (() => {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!url || !key) {
-        console.warn('⚠ Missing SUPABASE_SERVICE_ROLE_KEY')
+        console.warn('Missing SUPABASE_SERVICE_ROLE_KEY')
         return null
     }
 

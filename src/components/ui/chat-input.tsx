@@ -22,7 +22,7 @@ const ChatInput = React.forwardRef<
                 // Disabled state
                 "disabled:cursor-not-allowed disabled:opacity-50",
                 // Layout
-                "w-full rounded-xl flex items-center h-16 resize-none",
+                "w-full rounded-lg flex items-center h-16 resize-none",
                 // Border
                 "border border-slate-200",
                 className,

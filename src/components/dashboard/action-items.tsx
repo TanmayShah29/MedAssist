@@ -2,7 +2,7 @@ import { AlertTriangle, ArrowRight, Pill, ClipboardCheck } from "lucide-react"
 
 export function ActionItems() {
     return (
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow h-full">
+        <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow h-full">
             <h3 className="font-semibold text-slate-900 flex items-center gap-2 mb-4">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
                 Action Required

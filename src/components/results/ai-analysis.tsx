@@ -9,7 +9,7 @@ export function AIAnalysisSection({ results }: { results: LabResult[] }) {
         <section className="bg-slate-900 text-white rounded-3xl overflow-hidden shadow-2xl mt-12">
             <div className="grid md:grid-cols-5">
                 <div className="md:col-span-2 bg-gradient-to-br from-indigo-900 to-slate-900 p-8 flex flex-col justify-center border-r border-white/5">
-                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
+                    <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center mb-6">
                         <Sparkles className="w-6 h-6 text-indigo-400" />
                     </div>
                     <h2 className="text-2xl font-bold mb-4">AI Analysis</h2>
@@ -24,7 +24,7 @@ export function AIAnalysisSection({ results }: { results: LabResult[] }) {
                 <div className="md:col-span-3 p-8">
                     <h3 className="font-semibold text-slate-300 mb-6 uppercase tracking-wider text-xs">Generated Insights</h3>
                     <div className="space-y-4">
-                        <div className="bg-white/5 border border-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className="bg-white/5 border border-white/5 p-4 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-semibold text-emerald-300">Overall Trends Positive</h4>
                                 <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">High Confidence</span>
@@ -34,7 +34,7 @@ export function AIAnalysisSection({ results }: { results: LabResult[] }) {
                             </p>
                         </div>
 
-                        <div className="bg-white/5 border border-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className="bg-white/5 border border-white/5 p-4 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-semibold text-amber-300">Vitamin D Absorption</h4>
                                 <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">Moderate Confidence</span>

@@ -21,7 +21,7 @@ export function VercelMetricCard({ label, value, trend, subtext, icon, status }:
         <motion.div
             whileHover={{ y: -2 }}
             className={cn(
-                "group bg-white border border-slate-200 rounded-xl p-6 relative overflow-hidden transition-all duration-300",
+                "group bg-white border border-slate-200 rounded-[14px] p-6 relative overflow-hidden transition-all duration-300",
                 "hover:shadow-lg hover:shadow-slate-200/50 hover:border-slate-300",
                 status === 'optimal' && "hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]",
                 status === 'warning' && "hover:shadow-[0_0_20px_rgba(245,158,11,0.1)]",

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X, ClipboardList, Search } from 'lucide-react'
+import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight } from 'lucide-react'
+import { WellnessTrendChart } from '@/components/charts/wellness-trend-chart'
 
 // Define types
 interface Biomarker {
@@ -119,7 +120,41 @@ export default function ResultsPage() {
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
+    const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
+    const [loadingTrends, setLoadingTrends] = useState(false)
     const [doctorQuestions, setDoctorQuestions] = useState<string>('Generating questions for your doctor...')
+    const [isDebugMode, setIsDebugMode] = useState(false)
+
+    useEffect(() => {
+        setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true")
+    }, [])
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    useEffect(() => {
+        if (selectedBiomarker) {
+            const fetchTrends = async () => {
+                setLoadingTrends(true)
+                try {
+                    const res = await fetch(`/api/biomarker-trends?name=${encodeURIComponent(selectedBiomarker.name)}`)
+                    const data = await res.json()
+                    if (data.trends) {
+                        setBiomarkerTrends(data.trends.map((t: any) => ({
+                            date: t.date,
+                            score: t.value
+                        })))
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch trends", err)
+                } finally {
+                    setLoadingTrends(false)
+                }
+            }
+            fetchTrends()
+        }
+    }, [selectedBiomarker])
 
     useEffect(() => {
         const fetchBiomarkers = async () => {
@@ -181,22 +216,31 @@ export default function ResultsPage() {
                     <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
                     <p className="text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setLoading(true);
-                        router.push('/upload');
-                    }}
-                    disabled={loading}
-                    style={{
-                        background: loading ? '#7DD3FC' : '#0EA5E9',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        opacity: loading ? 0.8 : 1,
-                        transition: 'all 0.15s ease'
-                    }}
-                    className="text-white rounded-[10px] px-4 py-2 font-medium"
-                >
-                    {loading ? 'Processing...' : 'Upload New Report'}
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={handlePrint}
+                        className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 font-medium flex items-center gap-2 hover:bg-[#F5F4EF] transition-colors print:hidden"
+                    >
+                        <Printer size={18} />
+                        Export PDF
+                    </button>
+                    <button
+                        onClick={() => {
+                            setLoading(true);
+                            router.push('/upload');
+                        }}
+                        disabled={loading}
+                        style={{
+                            background: loading ? '#7DD3FC' : '#0EA5E9',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            opacity: loading ? 0.8 : 1,
+                            transition: 'all 0.15s ease'
+                        }}
+                        className="text-white rounded-[10px] px-4 py-2 font-medium print:hidden"
+                    >
+                        {loading ? 'Processing...' : 'Upload New Report'}
+                    </button>
+                </div>
             </div>
 
             {/* ── Status summary row ── */}
@@ -372,15 +416,47 @@ export default function ResultsPage() {
                                 </div>
 
                                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-2 tracking-wider">AI INTERPRETATION</h3>
-                                <p className="text-[15px] text-[#57534E] leading-relaxed mb-4">
+                                <p className="text-[15px] text-[#57534E] leading-relaxed mb-6">
                                     {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
                                 </p>
 
-                                <div className="flex justify-between items-center pt-4 border-t border-[#E8E6DF] mt-4">
+                                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-3 tracking-wider flex items-center gap-2">
+                                    <TrendingUp size={12} className="text-sky-500" />
+                                    HISTORICAL TREND
+                                </h3>
+
+                                <div className="mb-6 h-[200px]">
+                                    {loadingTrends ? (
+                                        <div className="h-full w-full bg-white/50 rounded-lg flex items-center justify-center animate-pulse">
+                                            <span className="text-xs text-slate-400">Loading history...</span>
+                                        </div>
+                                    ) : biomarkerTrends.length > 1 ? (
+                                        <div className="h-full w-full scale-95 origin-top">
+                                            <WellnessTrendChart data={biomarkerTrends} className="col-span-1" />
+                                        </div>
+                                    ) : (
+                                        <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-lg flex flex-col items-center justify-center p-4 text-center">
+                                            <Info size={24} className="text-[#A8A29E] mb-2 opacity-30" />
+                                            <p className="text-[11px] text-[#A8A29E]">Not enough data to show a trend line yet. Upload more reports to track progress.</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-between items-center pt-4 border-t border-[#E8E6DF]">
                                     <span className="text-[12px] text-[#A8A29E]">Confidence</span>
-                                    <span className="text-[12px] font-semibold text-[#1C1917]">
-                                        {selectedBiomarker.confidence ? Math.round(selectedBiomarker.confidence * 100) : 0}%
-                                    </span>
+                                    <div className="flex items-center gap-4">
+                                        {isDebugMode && (
+                                            <button
+                                                onClick={() => alert(JSON.stringify(selectedBiomarker, null, 2))}
+                                                className="text-[10px] font-bold text-indigo-500 hover:underline"
+                                            >
+                                                RAW JSON
+                                            </button>
+                                        )}
+                                        <span className="text-[12px] font-semibold text-[#1C1917]">
+                                            {selectedBiomarker.confidence ? Math.round(selectedBiomarker.confidence * 100) : 0}%
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <button
@@ -454,8 +530,10 @@ export default function ResultsPage() {
                         whiteSpace: 'nowrap',
                         marginLeft: 16
                     }}
+                    className="flex items-center gap-2"
                 >
-                    Upload report →
+                    Upload report
+                    <ArrowRight size={16} />
                 </button>
             </div>
         </div>

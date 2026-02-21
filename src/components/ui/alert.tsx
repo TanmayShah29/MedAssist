@@ -104,7 +104,7 @@ export function Alert({
                     exit={{ opacity: 0, y: -8, scale: 0.98, height: 0, marginBottom: 0 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
-                        "relative flex gap-3 rounded-xl border overflow-hidden",
+                        "relative flex gap-3 rounded-lg border overflow-hidden",
                         compact ? "px-3 py-2.5" : "px-4 py-4",
                         cfg.bg,
                         cfg.border,
@@ -194,7 +194,7 @@ export function ClinicalAlert({
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
-                "relative flex gap-3 rounded-xl border p-4 overflow-hidden",
+                "relative flex gap-3 rounded-lg border p-4 overflow-hidden",
                 urgent
                     ? "bg-red-50 border-red-200"
                     : "bg-amber-50 border-amber-200"

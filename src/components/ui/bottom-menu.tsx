@@ -67,7 +67,7 @@ export function BottomMenu({
                             key={item.id}
                             onClick={() => handleSelect(item.id)}
                             className="relative flex flex-col items-center gap-1 px-3 py-3 
-                         min-w-[56px] rounded-xl transition-colors"
+                         min-w-[56px] rounded-lg transition-colors"
                             aria-label={item.label}
                         >
                             {/* Active Dot Indicator - NEW DESIGN */}

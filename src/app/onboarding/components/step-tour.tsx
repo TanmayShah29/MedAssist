@@ -101,8 +101,10 @@ export function StepTour() {
                     cursor: isLoading ? 'not-allowed' : 'pointer',
                     opacity: isLoading ? 0.7 : 1
                 }}
+                className="flex items-center gap-2 mx-auto"
             >
-                {isLoading ? 'Saving...' : 'Go to my dashboard →'}
+                {isLoading ? 'Saving...' : 'Go to my dashboard'}
+                {!isLoading && <ArrowRight size={18} />}
             </button>
         </div>
     );

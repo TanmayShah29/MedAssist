@@ -10,10 +10,13 @@ interface SaveLabResultArgs {
     riskLevel: string;
     summary: string;
     labValues: ExtractedLabValue[];
+    fileName?: string;
+    rawOcrText?: string;
+    rawAiJson?: any;
 }
 
 export async function saveLabResult(args: SaveLabResultArgs) {
-    const { userId, healthScore, riskLevel, summary, labValues } = args;
+    const { userId, healthScore, riskLevel, summary, labValues, fileName = "Lab Report", rawOcrText, rawAiJson } = args;
 
     if (!userId) {
         logger.error("User ID is missing, cannot save lab result.");
@@ -26,50 +29,27 @@ export async function saveLabResult(args: SaveLabResultArgs) {
     }
 
     try {
-        // Step 1: Insert the main lab result and get its ID
-        const { data: labResultData, error: labResultError } = await supabaseAdmin
-            .from("lab_results")
-            .insert({
-                user_id: userId,
-                health_score: healthScore,
-                risk_level: riskLevel,
-                summary: summary,
-            })
-            .select("id")
-            .single();
+        // Use RPC for Atomic Transaction
+        const { data: labResultId, error: rpcError } = await supabaseAdmin.rpc(
+            "save_complete_report",
+            {
+                p_user_id: userId,
+                p_file_name: fileName,
+                p_health_score: healthScore,
+                p_risk_level: riskLevel,
+                p_summary: summary,
+                p_biomarkers: labValues, // Pass the whole array, Postgres handles JSONB
+                p_raw_ocr_text: rawOcrText,
+                p_raw_ai_json: rawAiJson
+            }
+        );
 
-        if (labResultError) {
-            logger.error("Error inserting into lab_results:", labResultError);
-            throw new Error(labResultError.message);
+        if (rpcError) {
+            logger.error("RPC Error in save_complete_report:", rpcError);
+            throw new Error(rpcError.message);
         }
 
-        const labResultId = labResultData.id;
-
-        // Step 2: Prepare and insert all the biomarker records
-        const biomarkersToInsert = labValues.map((value) => ({
-            lab_result_id: labResultId,
-            user_id: userId,
-            name: value.name,
-            value: value.value,
-            unit: value.unit,
-            status: value.status,
-            reference_range_min: value.referenceMin,
-            reference_range_max: value.referenceMax,
-            ai_interpretation: value.aiInterpretation,
-        }));
-
-        const { error: biomarkersError } = await supabaseAdmin
-            .from("biomarkers")
-            .insert(biomarkersToInsert);
-
-        if (biomarkersError) {
-            // If biomarker insert fails, we should ideally roll back the lab_result insert.
-            // For now, we will log the error. A transaction would be better here.
-            logger.error("Error inserting into biomarkers:", biomarkersError);
-            throw new Error(biomarkersError.message);
-        }
-
-        return { success: true, labResultId: labResultId };
+        return { success: true, labResultId };
 
     } catch (error: unknown) {
         logger.error("Failed to save lab result:", (error as Error).message);
@@ -79,6 +59,25 @@ export async function saveLabResult(args: SaveLabResultArgs) {
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+
+export async function getUserBiomarkerHistory(userId: string) {
+    if (!userId || !supabaseAdmin) return [];
+
+    try {
+        const { data, error } = await supabaseAdmin
+            .from("biomarkers")
+            .select("name, value, unit, status, reference_range_min, reference_range_max, ai_interpretation, created_at")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        logger.error("Failed to fetch biomarker history:", (error as Error).message);
+        return [];
+    }
+}
 
 export async function completeOnboarding() {
     const cookieStore = await cookies()

@@ -47,7 +47,7 @@ export const FileUpload = ({
             <motion.div
                 onClick={handleClick}
                 whileHover="animate"
-                className="p-8 group/file block rounded-xl cursor-pointer w-full 
+                className="p-8 group/file block rounded-lg cursor-pointer w-full 
                    relative overflow-hidden border-2 border-dashed 
                    border-slate-200 hover:border-sky-400 transition-colors
                    bg-slate-50"

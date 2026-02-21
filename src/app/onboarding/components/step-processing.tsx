@@ -3,7 +3,7 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, FileText, BarChart, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, FileText, BarChart, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Real processing stages related to API lifecycle
@@ -304,8 +304,9 @@ export function StepProcessing() {
                     fontSize: 15,
                     fontWeight: 600,
                     cursor: 'pointer'
-                }}>
-                    See full breakdown →
+                }} className="flex items-center gap-2 mx-auto">
+                    See full breakdown
+                    <ArrowRight size={18} />
                 </button>
             </motion.div>
         );

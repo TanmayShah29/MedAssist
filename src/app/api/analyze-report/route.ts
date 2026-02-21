@@ -1,29 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractPdfText } from '@/lib/extractPdfText';
-import { extractAndInterpretBiomarkers } from '@/lib/groq-medical';
+import { extractAndInterpretBiomarkers, BiomarkerContext } from '@/lib/groq-medical';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
+import { saveLabResult, getUserBiomarkerHistory } from '@/app/actions/user-data';
+import { validateAndRecalculateScore } from '@/lib/health-logic';
 
 export const maxDuration = 60;
 export const runtime = "nodejs";
-
-function validateAndRecalculateScore(groqScore: number, biomarkers: any[]): number {
-    if (!groqScore || groqScore < 0 || groqScore > 100) {
-        const optimal = biomarkers.filter(b => b.status === 'optimal').length
-        const warning = biomarkers.filter(b => b.status === 'warning').length
-        const critical = biomarkers.filter(b => b.status === 'critical').length
-        const total = biomarkers.length
-
-        if (total === 0) return 0
-
-        const rawScore = ((optimal * 100) + (warning * 75) + (critical * 40)) / total
-        const floor = optimal > 0 ? 50 : 30
-        return Math.round(Math.max(floor, rawScore))
-    }
-    return groqScore
-}
 
 export async function POST(req: NextRequest) {
     const startTime = Date.now();
@@ -61,14 +48,7 @@ export async function POST(req: NextRequest) {
         const extractedText = await extractPdfText(buffer, file.type);
         logger.info("Text extracted successfully.");
 
-        // 4. Analyze with Groq (Extraction + Interpretation)
-        logger.info("Starting analysis with Groq (groq-medical)...");
-
-        // Passing empty symptoms array as we don't have them in this request context yet
-        const analysisResult = await extractAndInterpretBiomarkers(extractedText, []);
-        analysisResult.healthScore = validateAndRecalculateScore(analysisResult.healthScore, analysisResult.biomarkers);
-
-        // 5. EXTRACTED DATA PERSISTENCE
+        // 4. Authenticate & Fetch History
         const cookieStore = await cookies();
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -83,53 +63,35 @@ export async function POST(req: NextRequest) {
         );
 
         const { data: { user } } = await supabase.auth.getUser();
-
+        let history: BiomarkerContext[] = [];
+        
         if (user) {
-            // A. Save Lab Result
-            const fileName = file.name;
-            const { data: labResult, error: labError } = await supabase
-                .from('lab_results')
-                .insert({
-                    user_id: user.id,
-                    file_name: fileName || 'Lab Report',
-                    processed: true,
-                    processing_time_ms: Date.now() - startTime,
-                    health_score: analysisResult.healthScore
-                })
-                .select()
-                .single()
+            history = await getUserBiomarkerHistory(user.id);
+            logger.info(`Fetched ${history.length} historical biomarkers for user ${user.id}`);
+        }
 
-            if (labError) {
-                console.error('Lab result insert error:', labError)
-                throw new Error('Failed to save lab result: ' + labError.message)
-            }
+        // 5. Analyze with Groq (Extraction + Interpretation)
+        logger.info("Starting analysis with Groq (groq-medical)...");
 
-            // B. Save Biomarkers
-            const result = analysisResult; // mapping to user provided code variable name
-            if (result.biomarkers?.length > 0) {
-                const { error: bioError } = await supabase
-                    .from('biomarkers')
-                    .insert(
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        result.biomarkers.map((b: any) => ({
-                            user_id: user.id,
-                            lab_result_id: labResult.id,
-                            name: b.name,
-                            value: b.value,
-                            unit: b.unit,
-                            status: normalizeStatus(b.status),
-                            reference_range_min: b.referenceMin ?? null, // Use flat fields
-                            reference_range_max: b.referenceMax ?? null, // Use flat fields
-                            category: b.category ?? 'other',
-                            confidence: b.confidence ?? 0.8,
-                            ai_interpretation: b.aiInterpretation ?? ''
-                        }))
-                    )
+        // Passing empty symptoms array as we don't have them in this request context yet
+        const analysisResult = await extractAndInterpretBiomarkers(extractedText, [], history);
+        analysisResult.healthScore = validateAndRecalculateScore(analysisResult.healthScore, analysisResult.biomarkers);
 
-                if (bioError) {
-                    console.error('Biomarker insert error:', bioError)
-                    throw new Error('Failed to save biomarkers: ' + bioError.message)
-                }
+        // 6. Data Persistence
+        if (user) {
+            const saveResult = await saveLabResult({
+                userId: user.id,
+                healthScore: analysisResult.healthScore,
+                riskLevel: analysisResult.riskLevel,
+                summary: analysisResult.summary,
+                labValues: analysisResult.biomarkers as any,
+                fileName: file.name,
+                rawOcrText: extractedText,
+                rawAiJson: analysisResult
+            });
+
+            if (!saveResult.success) {
+                logger.error("Failed to save via action:", saveResult.error);
             }
         }
 
@@ -140,15 +102,16 @@ export async function POST(req: NextRequest) {
         });
 
     } catch (error: unknown) {
+        if (error instanceof z.ZodError) {
+            logger.error("Validation Error:", error.issues);
+            return NextResponse.json({
+                success: false,
+                error: 'AI analysis validation failed. The report format may be unsupported.',
+                details: error.issues
+            }, { status: 422 });
+        }
+
         logger.error("Pipeline Error:", (error as Error).message);
         return NextResponse.json({ success: false, error: (error as Error).message || 'Analysis failed' }, { status: 500 });
     }
-}
-
-function normalizeStatus(status: string): 'optimal' | 'warning' | 'critical' {
-    const s = status?.toLowerCase();
-    if (s === 'normal' || s === 'optimal' || s === 'stable') return 'optimal';
-    if (s === 'warning' || s === 'monitor' || s === 'borderline') return 'warning';
-    if (s === 'critical' || s === 'high' || s === 'low' || s === 'action') return 'critical';
-    return 'warning';
 }

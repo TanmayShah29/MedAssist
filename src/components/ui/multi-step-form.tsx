@@ -239,7 +239,7 @@ function StepUpload({ file, onFile }: {
                 onDrop={handleDrop}
                 onClick={() => inputRef.current?.click()}
                 className={cn(
-                    "relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer",
+                    "relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer",
                     "transition-all hover:border-sky-400 hover:bg-sky-50/50",
                     dragging ? "border-sky-400 bg-sky-50" : "border-slate-200 bg-slate-50/50"
                 )}
@@ -253,7 +253,7 @@ function StepUpload({ file, onFile }: {
                 />
                 {file ? (
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                        <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                        <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center mx-auto mb-3">
                             <Check className="w-6 h-6 text-emerald-600" />
                         </div>
                         <p className="text-sm font-semibold text-slate-900">{file.name}</p>
@@ -263,7 +263,7 @@ function StepUpload({ file, onFile }: {
                     </motion.div>
                 ) : (
                     <div>
-                        <div className="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center mx-auto mb-3">
+                        <div className="w-12 h-12 rounded-lg bg-sky-100 flex items-center justify-center mx-auto mb-3">
                             <Upload className="w-6 h-6 text-sky-500" />
                         </div>
                         <p className="text-sm font-semibold text-slate-700">

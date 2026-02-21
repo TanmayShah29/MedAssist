@@ -38,7 +38,7 @@ export default function TermsPage() {
                 },
                 {
                     title: 'Deleting your data',
-                    content: 'You can delete your account and all associated data at any time from Settings → Delete Account. This action is permanent and cannot be undone.'
+                    content: 'You can delete your account and all associated data at any time from Settings > Delete Account. This action is permanent and cannot be undone.'
                 },
                 {
                     title: 'Changes to these terms',

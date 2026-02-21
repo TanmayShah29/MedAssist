@@ -1,75 +1,47 @@
 @import "tailwindcss";
 
 @layer base {
-
-  /* Ensure all grid rows stretch to equal height */
-  .equal-height-grid {
-    display: grid;
-    align-items: stretch;
-  }
-
-  .equal-height-grid>* {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .equal-height-grid>*>.card-content-fill {
-    flex: 1;
-  }
-
-  /* Remove ALL white backgrounds */
-  * {
-    --tw-bg-opacity: 1;
-  }
-
-  /* Cream base */
-  body {
-    background-color: #FAFAF7;
-    font-family: 'DM Sans', system-ui, sans-serif;
-    color: #1C1917;
-  }
-
-  /* No pure white surfaces */
-  .bg-white {
-    background-color: #F5F4EF !important;
-  }
-
   :root {
-    /* New Clinical Light Theme (Slate/Sky) */
-    --bg-base: #F8FAFC;
-    /* Slate-50 */
-    --bg-elevated: #FFFFFF;
-    /* White */
-    --bg-overlay: #F1F5F9;
-    /* Slate-100 */
-    --bg-active: #E2E8F0;
-    /* Slate-200 */
-
-    --border-base: #E2E8F0;
-    /* Slate-200 */
-    --border-hover: #CBD5E1;
-    /* Slate-300 */
-
-    --text-primary: #0F172A;
-    /* Slate-900 */
-    --text-secondary: #334155;
-    /* Slate-700 */
-    --text-muted: #94A3B8;
-    /* Slate-400 */
-
+    /* Design Tokens — Warm Cream Theme */
+    --bg-page: #FAFAF7;
+    --bg-card: #F5F4EF;
+    --bg-card-hover: #EFEDE6;
+    
+    --border-light: #E8E6DF;
+    --border-medium: #D9D6CD;
+    
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+    
+    --brand-primary: #0EA5E9;
+    --brand-primary-hover: #0284C7;
+    
     --status-optimal: #10B981;
     --status-warning: #F59E0B;
     --status-critical: #EF4444;
-    --status-info: #0EA5E9;
-    /* Sky-500 */
+
+    /* Shadcn UI compatibility (optional but good for plugins) */
+    --background: 40 33% 98%; /* #FAFAF7 */
+    --foreground: 20 14% 10%; /* #1C1917 */
+    --radius: 14px;
   }
 
   body {
-    background-color: var(--bg-base);
+    background-color: var(--bg-page);
     color: var(--text-primary);
-    font-family: var(--font-inter), system-ui, sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Force cream theme on existing white surfaces to prevent "flash of white" */
+  .bg-white {
+    background-color: var(--bg-card) !important;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Instrument Serif', Georgia, serif;
   }
 }
 
@@ -83,7 +55,6 @@
       opacity: 0;
       transform: translateY(8px);
     }
-
     to {
       opacity: 1;
       transform: translateY(0);

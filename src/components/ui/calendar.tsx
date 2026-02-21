@@ -212,7 +212,7 @@ export function Calendar({
                                 key={event.id}
                                 initial={{ opacity: 0, y: 4 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                                className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100"
                             >
                                 <div className={cn(
                                     "w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0",

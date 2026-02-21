@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { ExtractionResultSchema } from "./validations/analysis";
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
@@ -23,8 +24,9 @@ export interface BiomarkerResult {
 export interface ExtractionResult {
     biomarkers: BiomarkerResult[];
     healthScore: number;
-    riskLevel: string;
+    riskLevel: "low" | "moderate" | "high";
     summary: string;
+    longitudinalInsights?: string[];
 }
 
 export interface BiomarkerContext {
@@ -39,10 +41,22 @@ export interface BiomarkerContext {
 
 // ── Extraction ─────────────────────────────────────────────────────────────
 
+export class AIExtractionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "AIExtractionError";
+    }
+}
+
 export async function extractAndInterpretBiomarkers(
     pdfText: string,
-    symptoms: string[]
+    symptoms: string[],
+    history: BiomarkerContext[] = []
 ): Promise<ExtractionResult> {
+    const historicalContext = history.length > 0
+        ? `\n\nUser's Historical Lab Data:\n${history.map(b => `- ${b.name}: ${b.value} ${b.unit} (${b.status})`).join("\n")}`
+        : "";
+
     try {
         const completion = await groq.chat.completions.create({
             messages: [
@@ -52,9 +66,15 @@ export async function extractAndInterpretBiomarkers(
 
 Extract ALL biomarker values from the provided lab report text. Return ONLY valid JSON — no markdown, no backticks, no explanation outside the JSON.
 
+MANDATORY: Every interpretation or summary MUST end with "Always consult your doctor before making health decisions."
+
+Do not use emojis in your interpretations or summary.
+
+If historical data is provided, identify trends (e.g., "Glucose has risen 5% since last month") and recognize patterns (e.g., if Ferritin and Hemoglobin are both low, note the correlation).
+
 If the user has reported symptoms, consider them when writing interpretations, but NEVER use diagnostic language.
 
-User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}
+User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}${historicalContext}
 
 Return only a JSON object with this structure:
 {
@@ -73,7 +93,8 @@ Return only a JSON object with this structure:
   ],
   "healthScore": number (0-100),
   "riskLevel": "low" | "moderate" | "high",
-  "summary": string (2-3 sentences)
+  "summary": string (2-3 sentences),
+  "longitudinalInsights": string[] (optional, list of detected trends or multi-biomarker patterns)
 }
 
 Calculate a health score from 0-100 using this exact formula:
@@ -91,6 +112,8 @@ Score interpretation:
 - Below 55: Needs Attention
 
 Return the score as an integer in the "healthScore" field.
+
+MANDATORY: AI summary MUST end with "Always consult your doctor before making health decisions."
 
 Rules:
 - Extract every biomarker present in the text
@@ -118,28 +141,30 @@ Rules:
             .replace(/\s*```$/i, "")
             .trim();
 
-        let parsed: ExtractionResult;
+        let parsedJson;
         try {
-            parsed = JSON.parse(cleaned);
-        } catch {
-            throw new Error("AI returned invalid format. Please try again.");
+            parsedJson = JSON.parse(cleaned);
+        } catch (err) {
+            console.error("AI JSON Parse Error:", err);
+            throw new AIExtractionError("AI returned malformed JSON data. Please try again.");
         }
 
-        return {
-            biomarkers: parsed.biomarkers || [],
-            healthScore: parsed.healthScore ?? 0,
-            riskLevel: parsed.riskLevel ?? "low",
-            summary: parsed.summary ?? "",
-        };
+        try {
+            // Validate with Zod
+            return ExtractionResultSchema.parse(parsedJson);
+        } catch (err) {
+            console.error("AI Validation Error:", err);
+            throw new AIExtractionError("AI returned data that failed health-safety validation. Please try again.");
+        }
     } catch (error: unknown) {
+        if (error instanceof AIExtractionError) {
+            throw error;
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
-        }
-        if ((error as Error).message?.startsWith("AI returned")) {
-            throw error;
         }
         throw new Error(`AI analysis failed: ${(error as Error).message || "Unknown error"}`);
     }
@@ -168,7 +193,8 @@ Rules:
 - Always recommend consulting a physician
 - Reference the user's specific values when answering
 - Be warm, clear, and educational
-- Keep responses concise and actionable`
+- Keep responses concise and actionable
+- Do not use any emojis in your response`
 
     try {
         const completion = await groq.chat.completions.create({
@@ -231,6 +257,7 @@ RULES:
 - Then add 2 suggested follow-up questions the user might want to ask, formatted naturally like:
   "You might want to ask me: ..."
 - NEVER use the words: diagnose, prescribe, "you have", "you are suffering"
+- DO NOT use any emojis in your response
 
 User's lab results:
 ${biomarkerSummary}

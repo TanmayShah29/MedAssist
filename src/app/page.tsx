@@ -13,6 +13,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
+  X
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -48,7 +49,7 @@ export default function LandingPage() {
                         flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-sky-500 
+            <div className="w-8 h-8 rounded-lg bg-sky-500 
                             flex items-center justify-center
                             shadow-sm shadow-sky-500/20">
               <Shield className="w-4 h-4 text-white" />
@@ -211,7 +212,7 @@ export default function LandingPage() {
                     flexShrink: 0,
                     marginTop: 2
                   }}>
-                    <span style={{ color: '#EF4444', fontSize: 16, fontWeight: 600 }}>✕</span>
+                    <X className="w-4 h-4 text-red-500" />
                   </div>
                   <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', lineHeight: 1.6, margin: 0 }}>
                     {problem}

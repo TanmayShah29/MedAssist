@@ -8,6 +8,7 @@ import { StepSymptoms } from "./components/step-symptoms";
 import { StepUpload } from "./components/step-upload";
 import { StepProcessing } from "./components/step-processing";
 import { StepTour } from "./components/step-tour";
+import { ExtractionErrorBoundary } from "@/components/pipeline/ExtractionErrorBoundary";
 
 const STEP_LABELS = [
     "Your Profile",
@@ -29,7 +30,7 @@ export default function OnboardingPage() {
 
                     {/* Logo */}
                     <div className="flex items-center gap-2 mb-6">
-                        <div className="w-7 h-7 rounded-xl bg-sky-500 
+                        <div className="w-7 h-7 rounded-lg bg-sky-500 
                             flex items-center justify-center">
                             <Shield className="w-3.5 h-3.5 text-white" />
                         </div>
@@ -108,7 +109,11 @@ export default function OnboardingPage() {
                         {currentStep === 1 && <StepBasicInfo />}
                         {currentStep === 2 && <StepSymptoms />}
                         {currentStep === 3 && <StepUpload />}
-                        {currentStep === 4 && <StepProcessing />}
+                        {currentStep === 4 && (
+                            <ExtractionErrorBoundary>
+                                <StepProcessing />
+                            </ExtractionErrorBoundary>
+                        )}
                         {currentStep === 5 && <StepTour />}
                     </motion.div>
                 </AnimatePresence>

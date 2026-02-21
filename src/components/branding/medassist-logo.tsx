@@ -3,9 +3,9 @@
 import React from "react";
 
 export function MedAssistLogo({ className = "", collapsed = false, monochrome = false }: { className?: string; collapsed?: boolean; monochrome?: boolean }) {
-    // Colors for "Teal Data Shield"
-    const colorPrimary = monochrome ? "currentColor" : "#14B8A6"; // Teal-500
-    const colorSecondary = monochrome ? "currentColor" : "#A2E9E2"; // Teal-200 (Light Accent)
+    // Colors for "Sky Data Shield"
+    const colorPrimary = monochrome ? "currentColor" : "#0EA5E9"; // Sky-500
+    const colorSecondary = monochrome ? "currentColor" : "#BAE6FD"; // Sky-200 (Light Accent)
 
     return (
         <div className={`flex items-center gap-3 ${className}`}>
@@ -43,7 +43,7 @@ export function MedAssistLogo({ className = "", collapsed = false, monochrome = 
                     <span className={`text-lg font-bold tracking-tight leading-none ${monochrome ? "currentColor" : "text-slate-100"}`}>
                         MedAssist
                     </span>
-                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${monochrome ? "opacity-70" : "text-teal-400"}`}>
+                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${monochrome ? "opacity-70" : "text-sky-400"}`}>
                         Intelligence
                     </span>
                 </div>

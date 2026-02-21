@@ -5,7 +5,7 @@ export function AIInsightsFeed() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Insight Card 1 */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4 mb-4">
                     <div className="p-2 bg-emerald-50 rounded-lg">
                         <Brain className="w-6 h-6 text-emerald-600" />
@@ -24,7 +24,7 @@ export function AIInsightsFeed() {
             </div>
 
             {/* Insight Card 2 */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4 mb-4">
                     <div className="p-2 bg-sky-50 rounded-lg">
                         <Lightbulb className="w-6 h-6 text-sky-600" />
@@ -43,7 +43,7 @@ export function AIInsightsFeed() {
             </div>
 
             {/* CTA Card - Now Consistent White */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center justify-center">
+            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center justify-center">
                 <h4 className="font-bold text-xl text-slate-900 mb-2">Have a specific question?</h4>
                 <p className="text-slate-500 text-sm mb-6">
                     Our AI can analyze your data against millions of medical studies.

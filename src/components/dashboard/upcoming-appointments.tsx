@@ -24,7 +24,7 @@ const appointments = [
 
 export function UpcomingAppointments() {
     return (
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow h-full">
+        <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow h-full">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-slate-900">Upcoming Appointments</h3>
                 <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-8 text-xs">
