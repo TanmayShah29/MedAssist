@@ -306,10 +306,10 @@ export default function DashboardClient({
     };
 
     // Derived values
-    const optimalCount = biomarkers.filter(b => b.status === 'optimal').length
-    const warningCount = biomarkers.filter(b => b.status === 'warning').length
-    const criticalCount = biomarkers.filter(b => b.status === 'critical').length
-    const totalCount = biomarkers.length
+    const optimalCount = displayBiomarkers.filter(b => b.status === 'optimal').length
+    const warningCount = displayBiomarkers.filter(b => b.status === 'warning').length
+    const criticalCount = displayBiomarkers.filter(b => b.status === 'critical').length
+    const totalCount = displayBiomarkers.length
 
     // Optimistic scoring calculation
     let healthScore = 0
@@ -329,7 +329,7 @@ export default function DashboardClient({
 
     const scoreLabel = getScoreLabel(healthScore)
 
-    const priorities = [...biomarkers]
+    const priorities = [...displayBiomarkers]
         .sort((a, b) => {
             const order = { critical: 0, warning: 1, optimal: 2 }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
