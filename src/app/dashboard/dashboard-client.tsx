@@ -18,6 +18,8 @@ import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shie
 import { deleteLabResult } from '@/app/actions/user-data'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
+import { RecentActivity } from '@/components/dashboard/recent-activity'
+import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
 import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 
@@ -677,24 +679,80 @@ export default function DashboardClient({
                 )}
             </div>
 
+            {/* ── Secondary row: Activity & Distribution ── */}
+            {totalCount > 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <RecentActivity labResults={displayLabResults} />
+                    <StatusDistributionChart 
+                        optimal={optimalCount} 
+                        warning={warningCount} 
+                        critical={criticalCount} 
+                    />
+                </div>
+            )}
+
+            {/* ── Quick Actions ── */}
+            <div className="mb-6">
+                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">QUICK ACTIONS</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Link
+                        href="/results"
+                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-sky-100 rounded-lg text-sky-600">
+                                <Activity size={18} />
+                            </div>
+                            <span className="text-[15px] font-bold text-[#1C1917]">View Full Results</span>
+                        </div>
+                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
+                    </Link>
+
+                    <Link
+                        href="/assistant"
+                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-violet-100 rounded-lg text-violet-600">
+                                <Brain size={18} />
+                            </div>
+                            <span className="text-[15px] font-bold text-[#1C1917]">Consult Assistant</span>
+                        </div>
+                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
+                    </Link>
+
+                    <Link
+                        href="/profile"
+                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                                <CheckCircle size={18} />
+                            </div>
+                            <span className="text-[15px] font-bold text-[#1C1917]">Update Health Profile</span>
+                        </div>
+                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
+                    </Link>
+                </div>
+            </div>
+
             {/* ── Two column grid ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
                 {/* Left column: All Biomarkers */}
-                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6">
+                <div className="bg-white border border-[#E8E6DF] rounded-[14px] p-6 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        <h2 className="text-[20px] font-semibold font-display text-[#1C1917]">All Biomarkers</h2>
-                        <span className="bg-sky-100 text-sky-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                            {totalCount}
+                        <h2 className="text-[18px] font-bold text-[#1C1917]">Latest Biomarkers</h2>
+                        <span className="bg-sky-100 text-sky-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                            {totalCount} Total
                         </span>
                     </div>
 
-                    <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
-                        {biomarkers.length > 0 ? (
-                            biomarkers.map((b, i) => (
+                    <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                        {displayBiomarkers.length > 0 ? (
+                            displayBiomarkers.map((b, i) => (
                                 <div
-                                    key={b.id}
-                                    className={`flex items-center py-3 cursor-pointer hover:bg-white/50 px-2 -mx-2 rounded-lg transition-colors group ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''}`}
+                                    key={b.id || i}
+                                    className={`flex items-center py-3 cursor-pointer hover:bg-slate-50 px-2 -mx-2 rounded-lg transition-colors group ${i !== displayBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]/50' : ''}`}
                                     onClick={() => handleBiomarkerClick(b)}
                                 >
                                     <div className={`w-2 h-2 rounded-full shrink-0 ${b.status === 'optimal' ? 'bg-emerald-500' :
@@ -702,96 +760,52 @@ export default function DashboardClient({
                                         }`} />
 
                                     <div className="flex-1 ml-3 mr-4 min-w-0">
-                                        <p className="text-[15px] font-medium text-[#1C1917] truncate group-hover:text-sky-600 transition-colors">{b.name}</p>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-[12px] bg-sky-100 text-sky-700 px-1.5 py-0.5 rounded-[6px] truncate max-w-[120px]">
-                                                {b.category}
-                                            </span>
-                                        </div>
+                                        <p className="text-sm font-bold text-[#1C1917] truncate group-hover:text-sky-600 transition-colors">{b.name}</p>
+                                        <p className="text-[10px] text-[#A8A29E] font-bold uppercase tracking-wider mt-0.5">{b.category}</p>
                                     </div>
 
-                                    <div className="text-[15px] text-[#57534E] font-medium whitespace-nowrap">
-                                        {b.value} <span className="text-[13px] text-[#A8A29E]">{b.unit}</span>
+                                    <div className="text-sm text-[#1C1917] font-bold whitespace-nowrap">
+                                        {b.value} <span className="text-xs text-[#A8A29E] font-medium">{b.unit}</span>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-8 text-[#A8A29E]">No biomarkers found</div>
+                            <div className="text-center py-12">
+                                <FileText className="w-8 h-8 text-[#D6D3C9] mx-auto mb-2 opacity-30" />
+                                <p className="text-sm text-[#A8A29E]">No biomarkers found</p>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right column: Symptoms & Quick Actions */}
-                <div className="space-y-6">
+                {/* Right column: Symptoms Reported */}
+                <div className="bg-white border border-[#E8E6DF] rounded-[14px] p-6 shadow-sm h-fit">
+                    <h2 className="text-[18px] font-bold text-[#1C1917] mb-4">Current Symptoms</h2>
 
-                    {/* Symptoms Reported */}
-                    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6">
-                        <h2 className="text-[20px] font-semibold font-display text-[#1C1917] mb-4">Symptoms Reported</h2>
-
-                        {symptoms.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {symptoms.map((s, i) => (
-                                    <span
-                                        key={i}
-                                        className="bg-sky-100 text-sky-700 text-[12px] font-semibold px-2.5 py-1 rounded-[6px]"
-                                    >
-                                        {s}
-                                    </span>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-[15px] text-[#A8A29E] italic">
-                                No symptoms reported during onboarding.
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6">
-                        <h2 className="text-[20px] font-semibold font-display text-[#1C1917] mb-4">Quick Actions</h2>
-
-                        <div className="space-y-2">
-                            <Link
-                                href="/results"
-                                className="flex items-center justify-between p-3 rounded-[10px] hover:bg-[#EFEDE6] transition-colors group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg border border-[#E8E6DF] text-sky-500">
-                                        <Activity size={16} />
-                                    </div>
-                                    <span className="text-[15px] font-medium text-[#1C1917]">View full results</span>
-                                </div>
-                                <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                            </Link>
-
-                            <Link
-                                href="/assistant"
-                                className="flex items-center justify-between p-3 rounded-[10px] hover:bg-[#EFEDE6] transition-colors group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg border border-[#E8E6DF] text-violet-500">
-                                        <AlertCircle size={16} />
-                                    </div>
-                                    <span className="text-[15px] font-medium text-[#1C1917]">Ask AI assistant</span>
-                                </div>
-                                <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                            </Link>
-
-                            <Link
-                                href="/profile"
-                                className="flex items-center justify-between p-3 rounded-[10px] hover:bg-[#EFEDE6] transition-colors group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg border border-[#E8E6DF] text-emerald-500">
-                                        <CheckCircle size={16} />
-                                    </div>
-                                    <span className="text-[15px] font-medium text-[#1C1917]">Update profile</span>
-                                </div>
-                                <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                            </Link>
+                    {symptoms.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {symptoms.map((s, i) => (
+                                <span
+                                    key={i}
+                                    className="bg-slate-50 text-[#57534E] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#E8E6DF] uppercase tracking-wider"
+                                >
+                                    {s}
+                                </span>
+                            ))}
                         </div>
-                    </div>
-
+                    ) : (
+                        <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#E8E6DF]">
+                            <p className="text-xs text-[#A8A29E] font-medium italic">
+                                No symptoms reported.
+                            </p>
+                        </div>
+                    )}
+                    
+                    <Link href="/profile" className="mt-6 block">
+                        <button className="w-full py-2.5 text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 rounded-[10px] border border-sky-100 transition-colors">
+                            Update Symptoms Context
+                        </button>
+                    </Link>
                 </div>
             </div>
 
@@ -805,7 +819,7 @@ export default function DashboardClient({
                 isOpen={showDetailSheet}
                 onClose={() => setShowDetailSheet(false)}
                 biomarker={selectedBiomarkerData}
-                history={biomarkers}
+                history={displayBiomarkers}
             />
 
             {/* ── Mandatory Medical Disclaimer Footer ── */}
@@ -822,53 +836,6 @@ export default function DashboardClient({
                     </p>
                 </div>
             </div>
-            {/* ── Add Profile Modal Placeholder ── */}
-            <AnimatePresence>
-                {showAddProfileModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.95, y: 20 }}
-                            className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
-
-                            <div className="relative mb-6">
-                                <div className="w-14 h-14 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-600 mb-4">
-                                    <PlusCircle size={28} />
-                                </div>
-                                <h3 className="text-2xl font-bold text-[#1C1917]">Add Family Member</h3>
-                                <p className="text-[#57534E] mt-2">Create a sub-profile to manage health records for your child, parent, or partner.</p>
-                            </div>
-
-                            <div className="space-y-4 relative">
-                                <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-                                    <div className="flex gap-3">
-                                        <Shield className="w-6 h-6 text-amber-600 shrink-0" />
-                                        <div className="text-sm">
-                                            <p className="font-bold text-amber-900">Database Schema Required</p>
-                                            <p className="text-amber-800 mt-1">This feature requires the SQL migration to be applied in Supabase. Once applied, this form will be fully functional.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={() => setShowAddProfileModal(false)}
-                                    className="w-full py-4 bg-[#1C1917] text-white rounded-2xl font-bold hover:bg-[#2D2A27] transition-all"
-                                >
-                                    Dismiss
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     )
 }
