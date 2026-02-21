@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight } from 'lucide-react'
-import { WellnessTrendChart } from '@/components/charts/wellness-trend-chart'
+import dynamic from 'next/dynamic'
+
+const WellnessTrendChart = dynamic(
+    () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
+    { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" /> }
+)
 
 // Define types
 interface Biomarker {

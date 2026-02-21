@@ -8,7 +8,19 @@ import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { BottomMenu } from "@/components/ui/bottom-menu";
 import { FeedbackButton } from "@/components/feedback-button";
 import { Toaster } from "sonner";
+import { Instrument_Serif, DM_Sans } from "next/font/google";
 import "./globals.css";
+
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-instrument",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
 
 // Pages that should show the full app shell
 const APP_SHELL_ROUTES = [
@@ -80,23 +92,16 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${instrumentSerif.variable} ${dmSans.variable}`}>
       <head>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, 
                    maximum-scale=1, viewport-fit=cover"
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@300;400;500;600&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body
         className="bg-[#FAFAF7] font-sans overflow-x-hidden"
-        style={{ fontFamily: '"DM Sans", system-ui, sans-serif' }}
       >
 
         {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
