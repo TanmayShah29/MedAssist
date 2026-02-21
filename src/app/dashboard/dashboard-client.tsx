@@ -372,44 +372,47 @@ export default function DashboardClient({
                         {profile?.first_name || 'Patient'}
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setDemoMode(!demoMode)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold transition-all ${demoMode
-                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm'
-                            : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:border-emerald-200'
-                            }`}
-                        title="Toggle mock data for demonstration"
-                    >
-                        <PlayCircle size={14} />
-                        {demoMode ? 'DEMO ACTIVE' : 'DEMO MODE'}
-                    </button>
-
+                <div className="flex items-center gap-3">
                     <button
                         onClick={handlePrint}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E8E6DF] rounded-full text-[13px] font-bold text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden"
+                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden"
+                        title="Print Report"
                     >
-                        <Printer className="w-4 h-4" />
-                        Print
+                        <Printer className="w-5 h-5" />
                     </button>
 
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="flex items-center gap-2 px-6 py-2 bg-[#0EA5E9] text-white rounded-full text-[14px] font-bold hover:bg-[#0284C7] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#0284C7] transition-all shadow-md shadow-sky-500/20"
                     >
                         <Upload className="w-4 h-4" />
                         Upload
                     </button>
+                </div>
+            </div>
 
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F5F4EF] border border-[#E8E6DF] rounded-full">
-                        <span className="text-[10px] font-bold text-[#A8A29E] uppercase tracking-wider">Debug</span>
-                        <input
-                            type="checkbox"
-                            checked={debugMode}
-                            onChange={(e) => setDebugMode(e.target.checked)}
-                            className="w-3.5 h-3.5 accent-sky-500 cursor-pointer"
-                        />
-                    </div>
+            {/* ── Developer Tools Overlay (Subtle) ── */}
+            <div className="fixed bottom-24 right-6 z-[45] flex flex-col gap-2 print:hidden">
+                <button
+                    onClick={() => setDemoMode(!demoMode)}
+                    className={`flex items-center justify-center w-10 h-10 rounded-full transition-all shadow-lg ${demoMode
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-white text-[#A8A29E] border border-[#E8E6DF] hover:text-[#57534E]'
+                        }`}
+                    title="Toggle Demo Mode"
+                >
+                    <PlayCircle size={20} />
+                </button>
+                <div 
+                    className={`flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E8E6DF] transition-all shadow-lg ${debugMode ? 'text-sky-500 border-sky-200' : 'text-[#A8A29E]'}`}
+                    title="Toggle Debug Info"
+                >
+                    <input
+                        type="checkbox"
+                        checked={debugMode}
+                        onChange={(e) => setDebugMode(e.target.checked)}
+                        className="w-4 h-4 accent-sky-500 cursor-pointer"
+                    />
                 </div>
             </div>
 
