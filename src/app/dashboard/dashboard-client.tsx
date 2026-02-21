@@ -342,6 +342,18 @@ export default function DashboardClient({
     return (
         <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans" id="dashboard-content">
 
+            {/* ── Print-only Header ── */}
+            <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold uppercase tracking-tight">MedAssist Health Overview</h1>
+                    <p className="text-sm font-medium mt-1">Summary of Clinical Biomarkers & Wellness Trends</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm font-bold">DATE: {new Date().toLocaleDateString()}</p>
+                    <p className="text-xs">Patient: {profile?.first_name} {profile?.last_name}</p>
+                </div>
+            </div>
+
             {/* ── Header row ── */}
             <div className="flex justify-between items-center mb-8">
                 <div>
