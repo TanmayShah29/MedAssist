@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, Sparkles, ChevronRight, Activity, Calendar } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ChevronRight, Activity, Calendar, Layout } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { AssistantSidebar } from "@/components/assistant/sidebar";
+import { AnalysisPanel } from "@/components/assistant/analysis-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/animated-tabs";
 
 // Types
 type Message = {
@@ -321,63 +324,11 @@ export default function AssistantPage() {
                     </div>
 
                     {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL */}
-                    <div className="flex flex-col gap-5 overflow-y-auto">
-
-                        {/* 1. Related Biomarkers */}
-                        {contextData?.relatedMarkers && contextData.relatedMarkers.length > 0 && (
-                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
-                                <p className="text-sm font-semibold text-[#1C1917] mb-4 flex items-center gap-2">
-                                    <Activity className="w-4 h-4 text-[#A8A29E]" />
-                                    Related Markers
-                                </p>
-                                <div className="space-y-3">
-                                    {contextData.relatedMarkers.map((marker, idx) => (
-                                        <div key={idx} className="flex justify-between items-center text-sm p-2 bg-[#FAFAF7] rounded-lg border border-[#E8E6DF]/50">
-                                            <span className="text-[#57534E] font-medium">{marker.name}</span>
-                                            <span className={cn(
-                                                "font-semibold text-xs px-2 py-0.5 rounded-full",
-                                                marker.status === "Low" ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"
-                                            )}>{marker.status}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 2. Suggested Questions */}
-                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
-                            <p className="text-sm font-semibold text-[#1C1917] mb-3 flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 text-[#A8A29E]" />
-                                Suggested Questions
-                            </p>
-                            <div className="space-y-2">
-                                {["What causes iron deficiency?", "Should I take supplements?", "How can I improve this through diet?"].map((q, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleSuggestedQuestion(q)}
-                                        className="w-full text-left px-3 py-2.5 bg-[#FAFAF7] hover:bg-[#EFEDE6] hover:border-[#D6D3C9] border border-transparent rounded-[10px] text-sm text-[#57534E] transition-all flex justify-between items-center group"
-                                    >
-                                        {q}
-                                        <ChevronRight className="w-3.5 h-3.5 text-[#D6D3C9] group-hover:text-[#A8A29E]" />
-                                    </button>
-                                ))}
-                            </div>
+                    <div className="hidden lg:block space-y-5 overflow-y-auto">
+                        <AssistantSidebar biomarkers={biomarkers} />
+                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
+                            <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
                         </div>
-
-                        {/* 3. Recommended Actions */}
-                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 shadow-sm">
-                            <p className="text-sm font-semibold text-[#1C1917] mb-4 flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-[#A8A29E]" />
-                                Recommended Actions
-                            </p>
-                            <div className="space-y-3">
-                                <button className="w-full px-4 py-3 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-[10px] transition-colors shadow-md shadow-sky-500/10 flex items-center justify-center gap-2">
-                                    View full dashboard
-                                    <ArrowLeft className="w-3 h-3 rotate-180" />
-                                </button>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 

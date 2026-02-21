@@ -176,9 +176,17 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 <p className="text-[16px] font-semibold text-[#1C1917] mb-1">
                                                     Click or drag PDF here
                                                 </p>
-                                                <p className="text-[14px] text-[#A8A29E]">
+                                                <p className="text-[14px] text-[#A8A29E] mb-4">
                                                     Maximum file size 10MB
                                                 </p>
+                                                <a
+                                                    href="/samples/sample-report.pdf"
+                                                    download
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100 transition-colors"
+                                                >
+                                                    Need a test file? Download sample
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

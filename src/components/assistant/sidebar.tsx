@@ -1,69 +1,55 @@
 import { MessageSquare, FileText, HelpCircle, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function AssistantSidebar() {
+interface AssistantSidebarProps {
+    biomarkers: any[]
+}
+
+export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
+    const displayMarkers = biomarkers.slice(0, 3);
+
     return (
         <div className="space-y-6">
             {/* Recent Labs Context */}
             <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
                 <h3 className="flex items-center gap-2 font-semibold text-slate-900 mb-4">
-                    <FileText className="w-4 h-4 text-emerald-500" />
+                    <FileText className="w-4 h-4 text-sky-500" />
                     Recent Context
                 </h3>
-                <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
-                        <span className="text-slate-600">Hemoglobin A1c</span>
-                        <span className="font-semibold text-slate-900">5.7%</span>
+                {displayMarkers.length > 0 ? (
+                    <div className="space-y-3">
+                        {displayMarkers.map((b, i) => (
+                            <div key={i} className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
+                                <span className="text-slate-600 truncate mr-2">{b.name}</span>
+                                <span className={`font-semibold shrink-0 ${b.status === 'optimal' ? 'text-emerald-600' :
+                                    b.status === 'critical' ? 'text-red-600' : 'text-amber-600'
+                                    }`}>
+                                    {b.value} {b.unit}
+                                </span>
+                            </div>
+                        ))}
                     </div>
-                    <div className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
-                        <span className="text-slate-600">Vitamin D</span>
-                        <span className="font-semibold text-amber-600">24 ng/mL</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
-                        <span className="text-slate-600">Heart Rate</span>
-                        <span className="font-semibold text-emerald-600">72 bpm</span>
-                    </div>
-                </div>
+                ) : (
+                    <p className="text-sm text-slate-500 italic text-center py-4">No lab data found</p>
+                )}
                 <p className="text-xs text-slate-400 mt-4 text-center">
-                    AI has access to these metrics
+                    AI has access to your full health history
                 </p>
             </div>
 
             {/* Suggested Questions */}
-            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-[14px] p-6 border border-indigo-100">
-                <h3 className="flex items-center gap-2 font-semibold text-indigo-900 mb-4">
-                    <HelpCircle className="w-4 h-4 text-indigo-500" />
-                    Suggested Questions
+            <div className="bg-[#F5F4EF] rounded-[14px] p-6 border border-[#E8E6DF]">
+                <h3 className="flex items-center gap-2 font-semibold text-[#1C1917] mb-4">
+                    <HelpCircle className="w-4 h-4 text-sky-500" />
+                    Help & Guidance
                 </h3>
-                <div className="space-y-2">
-                    <button className="w-full text-left text-sm p-3 bg-white rounded-lg border border-indigo-100 hover:border-indigo-300 hover:shadow-md transition-all text-indigo-800 flex items-center justify-between group">
-                        <span>How can I improve my Vitamin D?</span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                    <button className="w-full text-left text-sm p-3 bg-white rounded-lg border border-indigo-100 hover:border-indigo-300 hover:shadow-md transition-all text-indigo-800 flex items-center justify-between group">
-                        <span>Interpret my latest lipid panel</span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                    <button className="w-full text-left text-sm p-3 bg-white rounded-lg border border-indigo-100 hover:border-indigo-300 hover:shadow-md transition-all text-indigo-800 flex items-center justify-between group">
-                        <span>Is my sleep pattern affecting recovery?</span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                </div>
-            </div>
-
-            {/* History / Export */}
-            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
-                <h3 className="flex items-center gap-2 font-semibold text-slate-900 mb-4">
-                    <MessageSquare className="w-4 h-4 text-slate-400" />
-                    History
-                </h3>
-                <div className="space-y-3">
-                    <p className="text-sm text-slate-500 italic text-center py-4">
-                        No previous conversations
-                    </p>
-                    <Button variant="outline" className="w-full text-xs h-8">
-                        View Archive
-                    </Button>
+                <div className="space-y-2 text-sm text-[#57534E] leading-relaxed">
+                    <p>You can ask things like:</p>
+                    <ul className="list-disc ml-4 space-y-1">
+                        <li>"What does my low Vitamin D mean?"</li>
+                        <li>"How can I improve my Glucose levels?"</li>
+                        <li>"Are my inflammation markers normal?"</li>
+                    </ul>
                 </div>
             </div>
         </div>

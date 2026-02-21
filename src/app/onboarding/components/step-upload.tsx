@@ -208,9 +208,17 @@ export function StepUpload() {
                     <p className="text-sm font-semibold text-[#1C1917] mb-1">
                         Click to upload or drag & drop
                     </p>
-                    <p className="text-xs text-[#A8A29E]">
+                    <p className="text-xs text-[#A8A29E] mb-4">
                         PDF, JPG, PNG up to 10MB
                     </p>
+                    <a
+                        href="/samples/sample-report.pdf"
+                        download
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100 transition-colors"
+                    >
+                        Don't have a report? Download a sample
+                    </a>
                 </div>
             ) : (
                 <motion.div
