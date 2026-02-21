@@ -18,9 +18,18 @@ export async function GET(req: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value
+                getAll() {
+                    return cookieStore.getAll()
                 },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // Ignored
+                    }
+                }
             },
         }
     );
@@ -53,8 +62,11 @@ export async function GET(req: NextRequest) {
         .filter((b: any) => Array.isArray(b.lab_results) ? b.lab_results[0]?.created_at : b.lab_results?.created_at)
         .map((b: any) => {
             const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+            const d = new Date(lr.created_at);
+            const month = d.toLocaleString('en-US', { month: 'short' });
+            const day = d.getDate();
             return {
-                date: new Date(lr.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                date: `${month} ${day}`,
                 value: b.value,
                 unit: b.unit
             };

@@ -4,20 +4,20 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { 
-    ClipboardList, 
-    AlertCircle, 
-    CheckCircle, 
-    Activity, 
-    FileText, 
-    Upload, 
-    PlayCircle, 
-    Printer, 
-    ChevronRight, 
-    Info, 
+import {
+    ClipboardList,
+    AlertCircle,
+    CheckCircle,
+    Activity,
+    FileText,
+    Upload,
+    PlayCircle,
+    Printer,
+    ChevronRight,
+    Info,
     WifiOff,
     Brain,
-    Pill 
+    Pill
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -247,7 +247,7 @@ function TrendChart({ labResults, biomarkers, supplements = [] }: { labResults: 
                                     return (
                                         <g key={props.key}>
                                             <circle cx={cx} cy={cy} r={6} fill="#F43F5E" stroke="white" strokeWidth={2} />
-                                            <path d={`M${cx} ${cy-15} L${cx} ${cy}`} stroke="#F43F5E" strokeWidth={1} strokeDasharray="2 2" />
+                                            <path d={`M${cx} ${cy - 15} L${cx} ${cy}`} stroke="#F43F5E" strokeWidth={1} strokeDasharray="2 2" />
                                         </g>
                                     );
                                 }
@@ -418,7 +418,7 @@ export default function DashboardClient({
                     <p className="text-sm font-medium mt-1">Summary of Clinical Biomarkers & Wellness Trends</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-sm font-bold">DATE: {new Date().toLocaleDateString()}</p>
+                    <p className="text-sm font-bold" suppressHydrationWarning>DATE: {new Date().toLocaleDateString('en-US')}</p>
                     <p className="text-xs">Patient: {profile?.first_name} {profile?.last_name}</p>
                 </div>
             </div>
@@ -487,7 +487,7 @@ export default function DashboardClient({
                 >
                     <PlayCircle size={20} />
                 </button>
-                <div 
+                <div
                     className={`flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E8E6DF] transition-all shadow-lg ${debugMode ? 'text-sky-500 border-sky-200' : 'text-[#A8A29E]'}`}
                     title="Toggle Debug Info"
                 >
@@ -572,7 +572,7 @@ export default function DashboardClient({
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
                         {/* Left: Score Box */}
                         <div className="flex flex-col">
-                            <button 
+                            <button
                                 onClick={() => setShowScoreModal(true)}
                                 className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2 hover:text-white transition-colors w-fit"
                             >
@@ -809,10 +809,10 @@ export default function DashboardClient({
             {totalCount > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <RecentActivity labResults={displayLabResults} />
-                    <StatusDistributionChart 
-                        optimal={optimalCount} 
-                        warning={warningCount} 
-                        critical={criticalCount} 
+                    <StatusDistributionChart
+                        optimal={optimalCount}
+                        warning={warningCount}
+                        critical={criticalCount}
                     />
                 </div>
             )}
@@ -937,7 +937,7 @@ export default function DashboardClient({
                             </p>
                         </div>
                     )}
-                    
+
                     <Link href="/profile" className="mt-6 block">
                         <button className="w-full py-2.5 text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 rounded-[10px] border border-sky-100 transition-colors">
                             Update Symptoms Context
@@ -977,7 +977,7 @@ export default function DashboardClient({
                             className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
-                            
+
                             <h3 className="text-2xl font-bold text-[#1C1917] mb-4 relative">Scoring Methodology</h3>
                             <p className="text-sm text-[#57534E] mb-6 relative">
                                 Your health score is an optimistic calculation designed to provide clinical clarity while rewarding healthy biomarkers.

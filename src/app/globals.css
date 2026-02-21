@@ -6,24 +6,26 @@
     --bg-page: #FAFAF7;
     --bg-card: #F5F4EF;
     --bg-card-hover: #EFEDE6;
-    
+
     --border-light: #E8E6DF;
     --border-medium: #D9D6CD;
-    
+
     --text-primary: #1C1917;
     --text-secondary: #57534E;
     --text-muted: #A8A29E;
-    
+
     --brand-primary: #0EA5E9;
     --brand-primary-hover: #0284C7;
-    
+
     --status-optimal: #10B981;
     --status-warning: #F59E0B;
     --status-critical: #EF4444;
 
     /* Shadcn UI compatibility (optional but good for plugins) */
-    --background: 40 33% 98%; /* #FAFAF7 */
-    --foreground: 20 14% 10%; /* #1C1917 */
+    --background: 40 33% 98%;
+    /* #FAFAF7 */
+    --foreground: 20 14% 10%;
+    /* #1C1917 */
     --radius: 14px;
   }
 
@@ -40,7 +42,10 @@
     background-color: var(--bg-card) !important;
   }
 
-  h1, h2, h3, .font-display {
+  h1,
+  h2,
+  h3,
+  .font-display {
     font-family: var(--font-instrument), Georgia, serif;
   }
 }
@@ -55,6 +60,7 @@
       opacity: 0;
       transform: translateY(8px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -67,11 +73,12 @@
 }
 
 @media print {
+
   /* 1. Hide UI elements */
-  nav, 
-  aside, 
-  button, 
-  .print-hidden, 
+  nav,
+  aside,
+  button,
+  .print-hidden,
   [role="status"],
   .feedback-button,
   .bottom-menu {
@@ -79,9 +86,9 @@
   }
 
   /* 2. Reset layout */
-  body, 
-  main, 
-  .flex, 
+  body,
+  main,
+  .flex,
   .grid {
     display: block !important;
     width: 100% !important;
@@ -102,39 +109,45 @@
     -webkit-print-color-adjust: exact;
   }
 
-  .bg-white, 
-  .bg-slate-50, 
-  .bg-[#FAFAF7], 
-  .bg-[#F5F4EF] {
+  .bg-white,
+  .bg-slate-50 {
     background: white !important;
     border-color: #eee !important;
   }
 
   /* 4. Ensure lists don't scroll/cut off */
-  .overflow-y-auto, 
-  .max-h-[400px], 
-  .max-h-[500px] {
+  .overflow-y-auto {
     overflow: visible !important;
     max-height: none !important;
   }
 
   /* 5. Page breaks */
-  section, 
-  .card, 
-  .grid > div {
+  section,
+  .card,
+  .grid>div {
     page-break-inside: avoid;
     break-inside: avoid;
     margin-bottom: 20px !important;
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     page-break-after: avoid;
   }
 
   /* 6. Typography */
-  h1 { font-size: 24pt !important; }
-  h2 { font-size: 18pt !important; }
-  p, span { font-size: 11pt !important; }
+  h1 {
+    font-size: 24pt !important;
+  }
+
+  h2 {
+    font-size: 18pt !important;
+  }
+
+  p,
+  span {
+    font-size: 11pt !important;
+  }
 
   /* 7. Show actual URLs next to links (optional but clinical) */
   a[href]:after {
@@ -142,7 +155,7 @@
     font-size: 9pt;
     color: #666;
   }
-  
+
   /* 8. Fix charts for print */
   .recharts-responsive-container {
     width: 100% !important;
