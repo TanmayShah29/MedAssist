@@ -4,7 +4,20 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ClipboardList, AlertCircle, CheckCircle, Activity, FileText, ChevronRight } from 'lucide-react'
+import { 
+    ClipboardList, 
+    AlertCircle, 
+    CheckCircle, 
+    Activity, 
+    FileText, 
+    Upload, 
+    PlayCircle, 
+    Printer, 
+    ChevronRight, 
+    Info, 
+    WifiOff,
+    Brain 
+} from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
@@ -22,7 +35,6 @@ const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr
 import { UploadModal } from '@/components/upload-modal'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { DebugTraceView } from '@/components/dashboard/DebugTraceView'
-import { Download, Share2, Upload, Beaker, PlayCircle, PlusCircle, WifiOff, Shield, Printer, Trash2, ChevronRight, Info } from 'lucide-react'
 import { deleteLabResult } from '@/app/actions/user-data'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
@@ -30,6 +42,7 @@ import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
 import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
+import { Biomarker, Profile } from '@/types/medical'
 
 // ── Chart Components ──
 

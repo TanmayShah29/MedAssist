@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, Sparkles, ChevronRight, Activity, Calendar, Layout } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, Activity, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/animated-tabs";
 
 // Types
 type Message = {
@@ -50,6 +49,7 @@ export default function AssistantPage() {
     ]);
     const [inputValue, setInputValue] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
+    const [activeTab, setActiveTab] = useState<"chat" | "context">("chat");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Fetch Data
@@ -325,23 +325,39 @@ export default function AssistantPage() {
 
                     {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
                     <div className="lg:hidden w-full mb-4">
-                        <Tabs defaultValue="chat" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 bg-[#F5F4EF] border border-[#E8E6DF]">
-                                <TabsTrigger value="chat">Chat</TabsTrigger>
-                                <TabsTrigger value="context">Health Data</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="chat" className="mt-4">
-                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
-                                    {renderChatPanel()}
-                                </div>
-                            </TabsContent>
-                            <TabsContent value="context" className="mt-4 space-y-4">
+                        <div className="flex p-1 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] mb-4">
+                            <button
+                                onClick={() => setActiveTab("chat")}
+                                className={cn(
+                                    "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                    activeTab === "chat" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
+                                )}
+                            >
+                                Chat
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("context")}
+                                className={cn(
+                                    "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                    activeTab === "context" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
+                                )}
+                            >
+                                Health Data
+                            </button>
+                        </div>
+
+                        {activeTab === "chat" ? (
+                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
+                                {renderChatPanel()}
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
                                 <AssistantSidebar biomarkers={biomarkers} />
                                 <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
                                     <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
                                 </div>
-                            </TabsContent>
-                        </Tabs>
+                            </div>
+                        )}
                     </div>
 
                     {/* LEFT: CONVERSATION PANEL (Desktop) */}
