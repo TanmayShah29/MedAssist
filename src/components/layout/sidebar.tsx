@@ -32,39 +32,47 @@ export function Sidebar({ className }: { className?: string }) {
     // const supabase = createClientComponentClient();
 
     useEffect(() => {
-        // Get from onboarding store first (most up to date)
-        const stored = localStorage.getItem("medassist-onboarding");
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                const firstName = parsed?.state?.basicInfo?.firstName;
-                const lastName = parsed?.state?.basicInfo?.lastName;
-                if (firstName) {
-                    setUserName(`${firstName} ${lastName || ""}`.trim());
-                    setUserInitials(
-                        `${firstName[0]}${lastName?.[0] || ""}`.toUpperCase()
-                    );
-                    return;
-                }
-            } catch { }
-        }
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
 
-        /*
-        // Fallback: get from Supabase session
-        const getUser = async () => {
+        const fetchUser = async () => {
+            // 1. Try local storage first (fastest)
+            const stored = localStorage.getItem("medassist-onboarding");
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    const firstName = parsed?.state?.basicInfo?.firstName;
+                    const lastName = parsed?.state?.basicInfo?.lastName;
+                    if (firstName) {
+                        setUserName(`${firstName} ${lastName || ""}`.trim());
+                        setUserInitials(`${firstName[0]}${lastName?.[0] || ""}`.toUpperCase());
+                        return;
+                    }
+                } catch { }
+            }
+
+            // 2. Fallback: Supabase Profile
             const { data: { user } } = await supabase.auth.getUser();
-            if (user?.email) {
-                const emailName = user.email.split("@")[0];
-                setUserName(emailName);
-                setUserInitials(emailName[0].toUpperCase());
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile?.first_name) {
+                    setUserName(`${profile.first_name} ${profile.last_name || ""}`.trim());
+                    setUserInitials(`${profile.first_name[0]}${profile.last_name?.[0] || ""}`.toUpperCase());
+                } else {
+                    setUserName(user.email?.split('@')[0] || "Patient");
+                    setUserInitials(user.email?.[0].toUpperCase() || "P");
+                }
             }
         };
-        getUser();
-        */
 
-        // Mock fallback
-        setUserName("John Doe");
-        setUserInitials("JD");
+        fetchUser();
     }, []);
 
     const handleSignOut = async () => {

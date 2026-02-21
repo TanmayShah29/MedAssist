@@ -205,12 +205,21 @@ export function LabResultCard(props: LabResultCardProps) {
                                 <div>
                                     <p className="font-medium text-foreground mb-1">Interpretation</p>
                                     <p className="text-xs leading-relaxed">
-                                        {result.status === 'optimal' ? 'Your levels are within the optimal range. Keep up the good work!' :
-                                            result.status === 'warning' ? 'Levels are slightly outside the reference range. Monitor closely.' :
-                                                'Requires attention. Please consult with your healthcare provider.'}
+                                        {result.ai_interpretation || (
+                                            result.status === 'optimal' ? 'Your levels are within the optimal range. Keep up the good work!' :
+                                                result.status === 'warning' ? 'Levels are slightly outside the reference range. Monitor closely.' :
+                                                    'Requires attention. Please consult with your healthcare provider.'
+                                        )}
                                     </p>
                                 </div>
                             </div>
+                            {result.confidence !== undefined && (
+                                <div className="mt-2 flex justify-end">
+                                    <span className="text-[10px] text-muted-foreground uppercase font-semibold">
+                                        AI Confidence: {Math.round(result.confidence * 100)}%
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 )}

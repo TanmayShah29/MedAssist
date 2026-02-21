@@ -19,9 +19,7 @@ import { deleteLabResult } from '@/app/actions/user-data'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
 import { toast } from 'sonner'
-import { Profile, Biomarker, Symptom } from '@/types/medical'
-import { ProfileSwitcher } from '@/components/dashboard/ProfileSwitcher'
-import { DEMO_HISTORY, DEMO_LAB_RESULT, MOCK_FAMILY_PROFILES } from '@/lib/demo-data'
+import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 
 // ── Chart Components ──
 
@@ -234,8 +232,6 @@ export default function DashboardClient({
     const [debugMode, setDebugMode] = useState(false);
     const [isOffline, setIsOffline] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
-    const [activeProfile, setActiveProfile] = useState<Profile | null>(initialProfile);
-    const [showAddProfileModal, setShowAddProfileModal] = useState(false);
 
     // Derived Data taking Demo Mode into account
     const displayLabResults = demoMode
@@ -362,13 +358,6 @@ export default function DashboardClient({
                         <PlayCircle size={14} />
                         {demoMode ? 'DEMO ACTIVE' : 'DEMO MODE'}
                     </button>
-
-                    <ProfileSwitcher
-                        currentProfile={activeProfile}
-                        profiles={MOCK_FAMILY_PROFILES}
-                        onProfileSelect={(p) => setActiveProfile(p)}
-                        onAddProfile={() => setShowAddProfileModal(true)}
-                    />
 
                     <button
                         onClick={handlePrint}

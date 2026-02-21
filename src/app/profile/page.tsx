@@ -53,6 +53,9 @@ export default function ProfilePage() {
             const res = await updateUserProfile(user.id, {
                 first_name: profile?.first_name,
                 last_name: profile?.last_name,
+                age: profile?.age,
+                sex: profile?.sex,
+                blood_type: profile?.blood_type,
                 symptoms: symptoms
             });
 

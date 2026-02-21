@@ -76,21 +76,33 @@ export async function deleteLabResult(labResultId: number) {
     }
 }
 
-export async function updateUserProfile(userId: string, data: { first_name?: string, last_name?: string, symptoms?: string[] }) {
+export async function updateUserProfile(userId: string, data: { 
+    first_name?: string, 
+    last_name?: string, 
+    age?: number,
+    sex?: string,
+    blood_type?: string,
+    symptoms?: string[] 
+}) {
     if (!supabaseAdmin) return { success: false, error: "Database connection unavailable" };
 
     try {
-        const { first_name, last_name, symptoms } = data;
+        const { first_name, last_name, age, sex, blood_type, symptoms } = data;
 
         // 1. Update profile
-        if (first_name || last_name) {
-            const { error: profileError } = await supabaseAdmin
-                .from("profiles")
-                .update({ first_name, last_name, updated_at: new Date().toISOString() })
-                .eq("id", userId);
+        const profileUpdates: any = { updated_at: new Date().toISOString() };
+        if (first_name !== undefined) profileUpdates.first_name = first_name;
+        if (last_name !== undefined) profileUpdates.last_name = last_name;
+        if (age !== undefined) profileUpdates.age = age;
+        if (sex !== undefined) profileUpdates.sex = sex;
+        if (blood_type !== undefined) profileUpdates.blood_type = blood_type;
 
-            if (profileError) throw profileError;
-        }
+        const { error: profileError } = await supabaseAdmin
+            .from("profiles")
+            .update(profileUpdates)
+            .eq("id", userId);
+
+        if (profileError) throw profileError;
 
         // 2. Update symptoms if provided
         if (symptoms) {

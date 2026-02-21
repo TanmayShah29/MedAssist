@@ -181,6 +181,93 @@ export default function AssistantPage() {
         // Optional: auto-send
     };
 
+    const renderChatPanel = () => (
+        <>
+            {/* Welcome Banner (No Results) */}
+            {biomarkers.length === 0 && (
+                <div style={{
+                    background: '#F5F4EF',
+                    borderBottom: '1px solid #E8E6DF',
+                    padding: 24,
+                }}>
+                    <p style={{ fontSize: 15, color: '#1C1917', fontWeight: 600, margin: '0 0 8px 0' }}>
+                        Welcome to your AI health assistant
+                    </p>
+                    <p style={{ fontSize: 14, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
+                        I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.
+                    </p>
+                </div>
+            )}
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                {messages.map((msg) => (
+                    <div key={msg.id} className={cn(
+                        "flex w-full",
+                        msg.role === "user" ? "justify-end" : "justify-start"
+                    )}>
+                        {/* MESSAGE BUBBLES */}
+                        {msg.role === "user" ? (
+                            <div className="bg-sky-500 text-white text-sm px-5 py-3.5 rounded-[14px] rounded-tr-sm max-w-[80%] shadow-md shadow-sky-500/10">
+                                {msg.content}
+                            </div>
+                        ) : msg.role === "system_reasoning" ? (
+                            <div className="bg-[#0F172A] rounded-[12px] p-4 max-w-[90%] border border-slate-800 shadow-xl">
+                                <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-1.5">
+                                    <Sparkles className="w-3 h-3" />
+                                    Clinical Pattern Analysis
+                                </p>
+                                <p className="text-slate-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+                                    {msg.content}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                                {msg.content}
+                            </div>
+                        )}
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10">
+                <div className="flex items-center gap-3">
+                    <input
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        onKeyDown={(e: any) => e.key === "Enter" && !isProcessing && handleSendMessage()}
+                        disabled={isProcessing}
+                        className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
+                    />
+                    <button
+                        onClick={handleSendMessage}
+                        disabled={!inputValue.trim() || isProcessing}
+                        style={{
+                            background: isProcessing || !inputValue.trim() ? '#94A3B8' : '#0EA5E9',
+                            cursor: isProcessing || !inputValue.trim() ? 'not-allowed' : 'pointer',
+                            opacity: isProcessing || !inputValue.trim() ? 0.7 : 1,
+                            transition: 'all 0.15s ease'
+                        }}
+                        className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px]"
+                    >
+                        {isProcessing ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Send className="w-4 h-4" />
+                        )}
+                    </button>
+                </div>
+                <p className="text-[11px] text-[#A8A29E] text-center mt-3">
+                    AI-generated insights for educational purposes only. Always consult your physician.
+                </p>
+            </div>
+        </>
+    );
+
     return (
         <div className="min-h-screen bg-[#FAFAF7] font-sans selection:bg-sky-100">
             <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
@@ -236,94 +323,33 @@ export default function AssistantPage() {
                 {/* MAIN GRID Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100vh-300px)] min-h-[600px]">
 
-                    {/* LEFT: CONVERSATION PANEL */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm relative">
-
-                        {/* Welcome Banner (No Results) */}
-                        {biomarkers.length === 0 && (
-                            <div style={{
-                                background: '#F5F4EF',
-                                borderBottom: '1px solid #E8E6DF',
-                                padding: 24,
-                            }}>
-                                <p style={{ fontSize: 15, color: '#1C1917', fontWeight: 600, margin: '0 0 8px 0' }}>
-                                    Welcome to your AI health assistant
-                                </p>
-                                <p style={{ fontSize: 14, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
-                                    I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-5 space-y-6">
-                            {messages.map((msg) => (
-                                <div key={msg.id} className={cn(
-                                    "flex w-full",
-                                    msg.role === "user" ? "justify-end" : "justify-start"
-                                )}>
-                                    {/* MESSAGE BUBBLES */}
-                                    {msg.role === "user" ? (
-                                        <div className="bg-sky-500 text-white text-sm px-5 py-3.5 rounded-[14px] rounded-tr-sm max-w-[80%] shadow-md shadow-sky-500/10">
-                                            {msg.content}
-                                        </div>
-                                    ) : msg.role === "system_reasoning" ? (
-                                        <div className="bg-[#0F172A] rounded-[12px] p-4 max-w-[90%] border border-slate-800 shadow-xl">
-                                            <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-1.5">
-                                                <Sparkles className="w-3 h-3" />
-                                                Clinical Pattern Analysis
-                                            </p>
-                                            <p className="text-slate-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
-                                                {msg.content}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
-                                            {msg.content}
-                                        </div>
-                                    )}
+                    {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
+                    <div className="lg:hidden w-full mb-4">
+                        <Tabs defaultValue="chat" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 bg-[#F5F4EF] border border-[#E8E6DF]">
+                                <TabsTrigger value="chat">Chat</TabsTrigger>
+                                <TabsTrigger value="context">Health Data</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="chat" className="mt-4">
+                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
+                                    {renderChatPanel()}
                                 </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* Input Area */}
-                        <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10">
-                            <div className="flex items-center gap-3">
-                                <input
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onKeyDown={(e: any) => e.key === "Enter" && !isProcessing && handleSendMessage()}
-                                    disabled={isProcessing}
-                                    className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
-                                />
-                                <button
-                                    onClick={handleSendMessage}
-                                    disabled={!inputValue.trim() || isProcessing}
-                                    style={{
-                                        background: isProcessing || !inputValue.trim() ? '#94A3B8' : '#0EA5E9',
-                                        cursor: isProcessing || !inputValue.trim() ? 'not-allowed' : 'pointer',
-                                        opacity: isProcessing || !inputValue.trim() ? 0.7 : 1,
-                                        transition: 'all 0.15s ease'
-                                    }}
-                                    className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px]"
-                                >
-                                    {isProcessing ? (
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    ) : (
-                                        <Send className="w-4 h-4" />
-                                    )}
-                                </button>
-                            </div>
-                            <p className="text-[11px] text-[#A8A29E] text-center mt-3">
-                                AI-generated insights for educational purposes only. Always consult your physician.
-                            </p>
-                        </div>
+                            </TabsContent>
+                            <TabsContent value="context" className="mt-4 space-y-4">
+                                <AssistantSidebar biomarkers={biomarkers} />
+                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
+                                    <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
+                                </div>
+                            </TabsContent>
+                        </Tabs>
                     </div>
 
-                    {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL */}
+                    {/* LEFT: CONVERSATION PANEL (Desktop) */}
+                    <div className="hidden lg:flex bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex-col overflow-hidden shadow-sm relative">
+                        {renderChatPanel()}
+                    </div>
+
+                    {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL (Desktop) */}
                     <div className="hidden lg:block space-y-5 overflow-y-auto">
                         <AssistantSidebar biomarkers={biomarkers} />
                         <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">

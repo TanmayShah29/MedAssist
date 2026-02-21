@@ -20,6 +20,8 @@ export interface LabResult {
     status: 'critical' | 'warning' | 'optimal' | 'monitor';
     date: Date;
     trend?: 'up' | 'down' | 'stable';
+    ai_interpretation?: string;
+    confidence?: number;
 }
 
 export interface WellnessTrendDataPoint {
