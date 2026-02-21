@@ -354,7 +354,10 @@ export default function DashboardClient({
                             </div>
                         )}
                     </div>
-                    <p className="text-[15px] text-[#57534E]">Welcome back, {profile?.first_name || 'there'}</p>
+                    <p className="text-[15px] text-[#57534E]">
+                        {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
+                        {profile?.first_name || 'Patient'}
+                    </p>
                 </div>
                 <div className="flex items-center gap-4">
                     <button
