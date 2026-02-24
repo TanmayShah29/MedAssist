@@ -87,7 +87,7 @@ export function MobileSidebar() {
                   If Sidebar is rigid, I should modify Sidebar to be flexible.
                   Let's assume I can pass `className="flex w-full h-full static ..."` to Sidebar.
               */}
-                            <div className="flex-1 overflow-y-auto h-full w-full relative">
+                            <div className="grow shrink basis-0 overflow-y-auto h-full w-full relative">
                                 {/* 
                     If Sidebar has hardcoded `hidden lg:flex`, we need to strip it.
                     Let's update Sidebar to allow overriding classes.

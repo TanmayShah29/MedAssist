@@ -148,7 +148,7 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-[#0F172A] text-white overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-16 lg:gap-24">
-            <div className="flex-1">
+            <div className="grow shrink basis-0">
               <div className="inline-flex items-center gap-2 px-3 py-1 
                              bg-indigo-500/10 border border-indigo-500/20 
                              rounded-full text-[10px] font-bold text-indigo-400 
@@ -197,7 +197,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex-1 w-full min-w-0 relative">
+            <div className="grow shrink basis-0 w-full min-w-0 relative">
               {/* Visual representation of a timeline/correlation */}
               <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/20 rounded-[48px] border border-white/5 p-8 lg:p-12 relative overflow-hidden group">
                 <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-xl group-hover:opacity-30 transition-opacity">
@@ -211,7 +211,7 @@ export default function LandingPage() {
                   <motion.div
                     initial={{ x: 20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
-                    className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
+                    className="bg-slate-800/80 backdrop-blur-xl transform-gpu border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
                   >
                     <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest mb-3">CORRELATION DETECTED</p>
                     <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
@@ -220,7 +220,7 @@ export default function LandingPage() {
                     initial={{ x: -20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform rotate-1 ml-12"
+                    className="bg-slate-800/80 backdrop-blur-xl transform-gpu border border-white/10 p-6 rounded-3xl shadow-2xl transform rotate-1 ml-12"
                   >
                     <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mb-3">TIMELINE EVENT</p>
                     <p className="text-sm font-medium text-slate-200 leading-relaxed">Symptom &quot;Fatigue&quot; disappeared 4 days after Hemoglobin returned to optimal.</p>
@@ -351,7 +351,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pt-2" style={{ marginLeft: 32 }}>
+                  <div className="grow shrink basis-0 pt-2" style={{ marginLeft: 32 }}>
                     <h3 className="text-2xl font-bold text-text-primary mb-3">
                       {item.title}
                     </h3>
@@ -405,7 +405,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             {/* Left: Interactive-looking Dashboard Mockup */}
-            <div className="flex-1 relative w-full lg:max-w-xl">
+            <div className="grow shrink basis-0 relative w-full lg:max-w-xl">
               <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -442,7 +442,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Trust Statements */}
-            <div className="flex-1">
+            <div className="grow shrink basis-0">
               <h2 className="text-4xl font-bold text-text-primary mb-8">
                 Your health data is <br />
                 <span className="text-sky-500">private and secure.</span>
@@ -540,7 +540,7 @@ export default function LandingPage() {
             ].map((item, index) => (
               <div
                 key={item.step}
-                className={`p-6 bg-white/50 backdrop-blur-sm ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-border-light' : ''}`}
+                className={`p-6 bg-white/50 backdrop-blur-sm transform-gpu ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-border-light' : ''}`}
               >
                 <div className={`text-xs font-bold ${item.color} mb-3 tracking-widest`}>
                   {item.step}

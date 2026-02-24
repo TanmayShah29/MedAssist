@@ -81,7 +81,7 @@ export function HighlightedMessage({ content, role, entities = [], citations = [
                 </div>
             )}
 
-            <div className="flex-1">
+            <div className="grow shrink basis-0">
                 <div className={cn("text-sm", role === 'user' ? "text-white" : "text-slate-700")}>
                     {role === 'user' ? content : renderContent()}
                 </div>

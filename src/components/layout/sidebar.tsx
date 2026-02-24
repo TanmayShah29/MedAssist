@@ -136,7 +136,7 @@ export function Sidebar({ className }: { className?: string }) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 py-4 space-y-0.5">
+            <nav className="grow shrink basis-0 px-3 py-4 space-y-0.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
                       text-[#A8A29E] px-3 mb-2">
                     Navigation
@@ -198,7 +198,7 @@ export function Sidebar({ className }: { className?: string }) {
                         {userInitials}
                     </span>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="grow shrink basis-0 min-w-0">
                     <p className="text-sm font-medium text-[#1C1917] truncate">
                         {userName || (
                             <span className="text-[#A8A29E]">Loading...</span>

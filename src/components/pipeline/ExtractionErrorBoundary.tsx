@@ -43,7 +43,7 @@ export class ExtractionErrorBoundary extends Component<Props, State> {
             const isExtractionError = this.state.error?.name === "AIExtractionError";
 
             return (
-                <div className="flex flex-col items-center justify-center p-8 text-center space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-red-100 shadow-xl max-w-md mx-auto my-12">
+                <div className="flex flex-col items-center justify-center p-8 text-center space-y-6 bg-white/50 backdrop-blur-sm transform-gpu rounded-2xl border border-red-100 shadow-xl max-w-md mx-auto my-12">
                     <div className="p-4 bg-red-50 rounded-full">
                         <AlertCircle className="w-12 h-12 text-red-500" />
                     </div>

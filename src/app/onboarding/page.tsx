@@ -48,7 +48,7 @@ export default function OnboardingPage() {
                             const isLast = idx === STEP_LABELS.length - 1;
 
                             return (
-                                <div key={label} className="flex items-center flex-1 last:flex-none">
+                                <div key={label} className="flex items-center grow shrink basis-0 last:flex-none">
                                     <div className="flex flex-col items-center">
                                         {/* Step circle */}
                                         <motion.div
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
                                             animate={{
                                                 backgroundColor: isComplete ? "#10B981" : "#E8E6DF",
                                             }}
-                                            className="flex-1 h-0.5 mb-4 mx-1"
+                                            className="grow shrink basis-0 h-0.5 mb-4 mx-1"
                                         />
                                     )}
                                 </div>
@@ -96,7 +96,7 @@ export default function OnboardingPage() {
             </div>
 
             {/* Step content */}
-            <div className="flex-1 flex flex-col">
+            <div className="grow shrink basis-0 flex flex-col">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentStep}
@@ -104,7 +104,7 @@ export default function OnboardingPage() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.2 }}
-                        className="flex-1 flex flex-col"
+                        className="grow shrink basis-0 flex flex-col"
                     >
                         {currentStep === 1 && <StepBasicInfo />}
                         {currentStep === 2 && <StepSymptoms />}

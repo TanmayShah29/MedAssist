@@ -372,7 +372,7 @@ export default function ResultsPage() {
                                             b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
                                             }`} />
 
-                                        <div className="flex-1 min-w-0">
+                                        <div className="grow shrink basis-0 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="text-[15px] font-semibold text-[#1C1917] truncate">{b.name}</span>
                                                 <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] truncate">
@@ -414,7 +414,7 @@ export default function ResultsPage() {
 
                     {/* Right column: Detail */}
                     <div className="lg:col-span-2">
-                        <div className="sticky top-6">
+                        <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
                                 <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center">
                                     <p className="text-[15px] text-[#A8A29E]">Select a result to see AI interpretation</p>

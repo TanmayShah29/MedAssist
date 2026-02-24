@@ -117,7 +117,7 @@ export function ClientLayout({
             </aside>
             <MobileSidebar />
             <main className="
-                flex-1
+                grow shrink basis-0
                 lg:ml-60
                 min-h-[100dvh]
                 overflow-y-auto

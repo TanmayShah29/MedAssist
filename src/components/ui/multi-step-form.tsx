@@ -59,7 +59,7 @@ function StepProgress({ current }: { current: number }) {
                         </div>
                         {idx < STEPS.length - 1 && (
                             <motion.div
-                                className="flex-1 h-0.5 mb-4 rounded-full"
+                                className="grow shrink basis-0 h-0.5 mb-4 rounded-full"
                                 animate={{ backgroundColor: current > step.id ? "#10B981" : "#E2E8F0" }}
                                 transition={{ duration: 0.3 }}
                             />

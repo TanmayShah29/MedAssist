@@ -19,7 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </MobileDrawer>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+            <main className="grow shrink basis-0 flex flex-col h-full overflow-hidden relative">
                 {/* Mobile Header Trigger */}
                 <div className="md:hidden h-14 border-b border-slate-200 flex items-center px-4 bg-white flex-shrink-0 z-40">
                     <button
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-auto">
+                <div className="grow shrink basis-0 overflow-auto">
                     {children}
                 </div>
             </main>

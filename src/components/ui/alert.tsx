@@ -125,7 +125,7 @@ export function Alert({
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="grow shrink basis-0 min-w-0">
                         <p className={cn(
                             "font-semibold leading-tight",
                             compact ? "text-xs" : "text-sm",
@@ -215,7 +215,7 @@ export function ClinicalAlert({
                 {urgent ? <XCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
             </div>
 
-            <div className="flex-1 min-w-0">
+            <div className="grow shrink basis-0 min-w-0">
                 <p className={cn(
                     "text-sm font-semibold",
                     urgent ? "text-red-900" : "text-amber-900"
@@ -296,7 +296,7 @@ export function ToastNotification({
                     <span className={cn("flex-shrink-0", cfg.iconColor)}>
                         {cfg.icon}
                     </span>
-                    <p className={cn("text-sm font-medium flex-1", cfg.titleColor)}>
+                    <p className={cn("text-sm font-medium grow shrink basis-0", cfg.titleColor)}>
                         {message}
                     </p>
                     <button

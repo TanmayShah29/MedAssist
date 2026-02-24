@@ -64,7 +64,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 gpu-accelerate"
+                        className="fixed inset-0 bg-black/20 backdrop-blur-sm transform-gpu z-50 gpu-accelerate"
                     />
 
                     {/* Sheet */}
@@ -239,7 +239,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             <div className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                             </div>
-                                            <p className="text-sm text-[#57534E] leading-relaxed flex-1">{tip}</p>
+                                            <p className="text-sm text-[#57534E] leading-relaxed grow shrink basis-0">{tip}</p>
                                         </div>
                                     ))}
                                 </div>

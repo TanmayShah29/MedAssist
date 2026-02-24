@@ -29,7 +29,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
             <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -mr-16 -mt-16 opacity-50 z-0" />
 
             <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-center">
-                <div className="flex-1">
+                <div className="grow shrink basis-0">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0 border border-red-100">
                             <AlertCircle className="w-5 h-5 text-red-500" />

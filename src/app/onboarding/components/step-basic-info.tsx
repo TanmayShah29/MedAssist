@@ -119,7 +119,7 @@ export function StepBasicInfo() {
                                     key={s}
                                     onClick={() => setBasicInfo({ sex: s as "male" | "female" | "other" })}
                                     className={cn(
-                                        "flex-1 py-3 rounded-[10px] text-sm font-medium",
+                                        "grow shrink basis-0 py-3 rounded-[10px] text-sm font-medium",
                                         "border transition-all capitalize",
                                         basicInfo.sex === s
                                             ? "bg-sky-500 text-white border-sky-500"

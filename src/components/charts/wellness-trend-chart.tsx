@@ -52,7 +52,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
             transition={{ duration: 0.15 }}
             // Glassmorphism style - Light Mode
-            className="rounded-lg border bg-white/90 backdrop-blur-md p-4 shadow-xl ring-1 ring-slate-200/50 z-50"
+            className="rounded-lg border bg-white/90 backdrop-blur-md transform-gpu p-4 shadow-xl ring-1 ring-slate-200/50 z-50"
         >
             <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">{label}</p>
             <div className="flex flex-col gap-3">

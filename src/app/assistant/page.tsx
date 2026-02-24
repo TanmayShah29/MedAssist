@@ -191,7 +191,7 @@ export default function AssistantPage() {
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            <div className="grow shrink basis-0 overflow-y-auto p-5 space-y-6">
                 {messages.map((msg) => (
                     <div key={msg.id} className={cn(
                         "flex w-full",
@@ -223,7 +223,7 @@ export default function AssistantPage() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10">
+            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky transform-gpu bottom-0 z-10">
                 <div className="flex items-center gap-3">
                     <input
                         value={inputValue}
@@ -231,7 +231,7 @@ export default function AssistantPage() {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onKeyDown={(e: any) => e.key === "Enter" && !isProcessing && handleSendMessage()}
                         disabled={isProcessing}
-                        className="flex-1 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="grow shrink basis-0 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
                     />
                     <button
@@ -321,7 +321,7 @@ export default function AssistantPage() {
                                 <button
                                     onClick={() => setActiveTab("chat")}
                                     className={cn(
-                                        "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                        "grow shrink basis-0 py-2 text-sm font-bold rounded-[8px] transition-all",
                                         activeTab === "chat" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
                                     )}
                                 >
@@ -330,7 +330,7 @@ export default function AssistantPage() {
                                 <button
                                     onClick={() => setActiveTab("context")}
                                     className={cn(
-                                        "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                        "grow shrink basis-0 py-2 text-sm font-bold rounded-[8px] transition-all",
                                         activeTab === "context" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
                                     )}
                                 >

@@ -218,7 +218,7 @@ export function Calendar({
                                     "w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0",
                                     EVENT_COLORS[event.type].dot
                                 )} />
-                                <div className="flex-1 min-w-0">
+                                <div className="grow shrink basis-0 min-w-0">
                                     <p className="text-xs font-semibold text-slate-900">{event.title}</p>
                                     {event.time && (
                                         <p className="flex items-center gap-1 text-[10px] text-slate-500 mt-0.5">

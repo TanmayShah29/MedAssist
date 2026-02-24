@@ -198,7 +198,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={!isProcessing ? onClose : undefined}
-                        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm transform-gpu"
                     />
 
                     <motion.div
@@ -228,7 +228,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                     type="button"
                                     onClick={() => { setTab('upload'); setError(null); setErrorCode(null); }}
                                     className={cn(
-                                        'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
+                                        'grow shrink basis-0 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
                                         tab === 'upload'
                                             ? 'text-sky-600 border-b-2 border-sky-500 bg-sky-50/50'
                                             : 'text-[#57534E] hover:bg-[#F5F4EF]'
@@ -241,7 +241,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                     type="button"
                                     onClick={() => { setTab('manual'); setError(null); setErrorCode(null); }}
                                     className={cn(
-                                        'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
+                                        'grow shrink basis-0 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
                                         tab === 'manual'
                                             ? 'text-sky-600 border-b-2 border-sky-500 bg-sky-50/50'
                                             : 'text-[#57534E] hover:bg-[#F5F4EF]'
@@ -361,7 +361,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                         placeholder="Name (e.g. Glucose)"
                                                         value={row.name}
                                                         onChange={(e) => updateManualRow(row.id, 'name', e.target.value)}
-                                                        className="flex-1 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                        className="grow shrink basis-0 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                                                     />
                                                     <input
                                                         type="text"

@@ -194,7 +194,7 @@ export function StepProcessing() {
                         <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                             <AlertCircle className="w-5 h-5 text-[#991B1B]" />
                         </div>
-                        <div className="flex-1">
+                        <div className="grow shrink basis-0">
                             <h3 className="font-display text-lg font-bold text-[#991B1B] mb-1">
                                 {errorData.title}
                             </h3>

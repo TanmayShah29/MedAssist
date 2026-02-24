@@ -201,7 +201,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Report List */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col flex-1">
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Uploaded Reports
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                                     <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-500 transition-colors">
                                         <FileText className="w-4 h-4 text-sky-500 group-hover:text-white transition-colors" />
                                     </div>
-                                    <div className="flex-1 min-w-0">
+                                    <div className="grow shrink basis-0 min-w-0">
                                         <p className="text-sm font-medium text-[#1C1917] truncate">
                                             Blood Panel Report
                                         </p>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                 {/* Right Column */}
                 <div className="flex flex-col gap-5">
                     {/* Health Summary - Only showing real symptoms */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col flex-1">
+                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
                         <div className="flex justify-between items-center mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Health Context

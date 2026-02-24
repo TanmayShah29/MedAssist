@@ -86,7 +86,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                             className="group bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/30"
                         >
                             <div className="flex justify-between items-start gap-4 mb-2">
-                                <p className="text-[15px] font-bold text-[#1C1917] leading-tight flex-1">
+                                <p className="text-[15px] font-bold text-[#1C1917] leading-tight grow shrink basis-0">
                                     {item.question}
                                 </p>
                                 <button

@@ -179,7 +179,7 @@ export function StepUpload() {
                                 placeholder="Name (e.g. Glucose)"
                                 value={row.name}
                                 onChange={(e) => updateManualRow(row.id, "name", e.target.value)}
-                                className="flex-1 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                className="grow shrink basis-0 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                             />
                             <input
                                 type="text"
@@ -409,7 +409,7 @@ export function StepUpload() {
                           flex items-center justify-center flex-shrink-0">
                         <FileText className="w-6 h-6 text-emerald-500" />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="grow shrink basis-0 min-w-0">
                         <p className="text-sm font-semibold text-[#1C1917] truncate">
                             {uploadedFile.name}
                         </p>

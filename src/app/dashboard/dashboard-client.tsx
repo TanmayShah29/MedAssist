@@ -256,7 +256,7 @@ export default function DashboardClient({
                 <div className="flex flex-col md:flex-row gap-4 mb-8">
                     {/* Risk Summary Banner - Only show if there are flags */}
                     {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="flex-1 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
@@ -289,7 +289,7 @@ export default function DashboardClient({
 
                     {/* Upload Reminder Nudge - Only if they have a history (not first time) */}
                     {latestLabResult && initialLabResults.length > 0 && (
-                        <div className="flex-1 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
@@ -597,7 +597,7 @@ export default function DashboardClient({
                                 <div key={cat} className="space-y-4">
                                     <div className="flex items-center gap-2">
                                         <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
-                                        <div className="h-[1px] flex-1 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
+                                        <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {catBiomarkers.map((b) => {
@@ -620,7 +620,7 @@ export default function DashboardClient({
                                                 >
                                                     {/* Plain English Tooltip - Safari prefix added via utility class for safety */}
                                                     <div
-                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm gpu-accelerate"
+                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm transform-gpu gpu-accelerate"
                                                         style={{
                                                             WebkitTransition: "all 0.2s ease-out"
                                                         }}
@@ -657,7 +657,7 @@ export default function DashboardClient({
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex-1">
+                                                    <div className="grow shrink basis-0">
                                                         <span className="text-[15px] font-bold text-[#1C1917] block mb-1">{b.name}</span>
                                                         <p className="text-[11px] text-[#A8A29E] line-clamp-1 leading-relaxed italic">
                                                             {b.ai_interpretation || 'Clinical data point extracted from report.'}
@@ -705,7 +705,7 @@ export default function DashboardClient({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setShowScoreModal(false)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 gpu-accelerate"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm transform-gpu z-[100] flex items-center justify-center p-4 gpu-accelerate"
                     >
                         <motion.div
                             initial={{ scale: 0.95, y: 20 }}

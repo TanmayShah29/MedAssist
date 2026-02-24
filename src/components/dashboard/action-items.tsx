@@ -23,7 +23,7 @@ export function ActionItems({ biomarkers }: ActionItemsProps) {
                                 <div className="mt-0.5 bg-white p-1.5 rounded-full shadow-sm">
                                     <Activity className={`w-4 h-4 ${item.status === 'critical' ? 'text-red-500' : 'text-amber-500'}`} />
                                 </div>
-                                <div className="flex-1 min-w-0">
+                                <div className="grow shrink basis-0 min-w-0">
                                     <p className={`text-sm font-medium ${item.status === 'critical' ? 'text-red-900' : 'text-amber-900'}`}>{item.name}</p>
                                     <p className={`text-xs truncate ${item.status === 'critical' ? 'text-red-700/80' : 'text-amber-700/80'}`}>{item.value} {item.unit} (Outside range)</p>
                                     <span className="text-[10px] font-bold uppercase mt-1 block flex items-center gap-1">
