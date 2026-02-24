@@ -52,8 +52,9 @@ export async function saveLabResult(args: SaveLabResultArgs) {
         return { success: true, labResultId };
 
     } catch (error: unknown) {
-        logger.error("Failed to save lab result:", (error as Error).message);
-        return { success: false, error: "Failed to save lab result." };
+        const msg = (error as Error).message;
+        logger.error("Failed to save lab result:", msg);
+        return { success: false, error: `Database Error: ${msg}` };
     }
 }
 
@@ -76,13 +77,13 @@ export async function deleteLabResult(labResultId: number) {
     }
 }
 
-export async function updateUserProfile(userId: string, data: { 
-    first_name?: string, 
-    last_name?: string, 
+export async function updateUserProfile(userId: string, data: {
+    first_name?: string,
+    last_name?: string,
     age?: number,
     sex?: string,
     blood_type?: string,
-    symptoms?: string[] 
+    symptoms?: string[]
 }) {
     if (!supabaseAdmin) return { success: false, error: "Database connection unavailable" };
 

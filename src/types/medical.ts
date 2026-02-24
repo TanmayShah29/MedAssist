@@ -7,14 +7,18 @@ export interface Profile {
 }
 
 export interface Biomarker {
-    id: number;
+    id: string | number;
     name: string;
     value: number;
     unit: string;
     status: 'optimal' | 'warning' | 'critical';
     category: string;
+    reference_range_min?: number;
+    reference_range_max?: number;
     ai_interpretation?: string;
+    confidence?: number;
     lab_result_id?: number;
+    lab_results?: { created_at: string };
     created_at: string;
 }
 

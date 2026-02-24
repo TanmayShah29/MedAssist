@@ -277,6 +277,7 @@ export default function DashboardClient({
     const router = useRouter()
     const searchParams = useSearchParams()
     const [loading, setLoading] = useState(false)
+    const [mounted, setMounted] = useState(false)
     const [showUploadModal, setShowUploadModal] = useState(false)
     const profile = initialProfile;
     const biomarkers = initialBiomarkers;
@@ -292,6 +293,7 @@ export default function DashboardClient({
     const [supplements, setSupplements] = useState<any[]>([]);
 
     useEffect(() => {
+        setMounted(true)
         const fetchSupps = async () => {
             try {
                 const res = await fetch('/api/supplements');
@@ -429,7 +431,7 @@ export default function DashboardClient({
                     <p className="text-sm font-medium mt-1">Summary of Clinical Biomarkers & Wellness Trends</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-sm font-bold" suppressHydrationWarning>DATE: {new Date().toLocaleDateString('en-US')}</p>
+                    <p className="text-sm font-bold">DATE: {mounted ? new Date().toLocaleDateString('en-US') : ''}</p>
                     <p className="text-xs">Patient: {profile?.first_name} {profile?.last_name}</p>
                 </div>
             </div>

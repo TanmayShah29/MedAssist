@@ -7,14 +7,24 @@ export const supabaseAdmin = (() => {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!url || !key) {
-        console.warn('Missing SUPABASE_SERVICE_ROLE_KEY')
+        console.warn('Supabase Admin: Missing environment variables.')
         return null
     }
 
-    return createClient(url, key, {
-        auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-        }
-    })
+    // Security & Functionality Check: If the key starts with 'sb_publishable_', it's an anon key, not a service role key.
+    if (key.startsWith('sb_publishable_')) {
+        console.warn('Supabase Admin: SUPABASE_SERVICE_ROLE_KEY is a publishable key. Admin-only operations (bypassing RLS) will fail, but SECURITY DEFINER RPCs may still work.')
+    }
+
+    try {
+        return createClient(url, key, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+            }
+        })
+    } catch (err) {
+        console.error('Supabase Admin: Failed to initialize client:', err)
+        return null
+    }
 })()

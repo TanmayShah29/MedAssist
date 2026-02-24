@@ -43,7 +43,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [loading, setLoading] = useState(false);
 
   // Determine if current page needs the app shell

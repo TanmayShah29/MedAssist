@@ -7,18 +7,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, ReferenceLine
 } from "recharts";
-
-interface Biomarker {
-    id: number;
-    name: string;
-    value: number;
-    unit: string;
-    status: 'optimal' | 'warning' | 'critical';
-    category: string;
-    ai_interpretation?: string;
-    created_at: string;
-    lab_result_id?: number;
-}
+import { Biomarker } from "@/types/medical";
 
 interface Props {
     isOpen: boolean;

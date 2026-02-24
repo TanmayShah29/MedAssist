@@ -7,28 +7,12 @@ import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, Messag
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { TrustLayer } from '@/components/trust-layer'
+import { Biomarker } from '@/types/medical'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
     { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" /> }
 )
-
-// Define types
-interface Biomarker {
-    id: number
-    name: string
-    value: number
-    unit: string
-    status: 'optimal' | 'warning' | 'critical'
-    category: string
-    reference_range_min?: number
-    reference_range_max?: number
-    ai_interpretation?: string
-    confidence?: number
-    created_at: string
-    lab_result_id?: number
-    lab_results?: { created_at: string }
-}
 
 const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
 
@@ -65,66 +49,66 @@ function RangeBar({ value, min, max, status }: {
                 <span>High</span>
             </div>
             <div style={{ position: 'relative', height: 24, width: '100%' }}>
-            {/* Background track */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: 0,
-                right: 0,
-                height: 4,
-                background: '#E8E6DF',
-                borderRadius: 2,
-                transform: 'translateY(-50%)'
-            }} />
+                {/* Background track */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    right: 0,
+                    height: 4,
+                    background: '#E8E6DF',
+                    borderRadius: 2,
+                    transform: 'translateY(-50%)'
+                }} />
 
-            {/* Reference range highlight */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: `${refMinPosition}%`,
-                width: `${Math.max(0, refMaxPosition - refMinPosition)}%`,
-                height: 4,
-                background: '#D1FAE5',
-                borderRadius: 2,
-                transform: 'translateY(-50%)'
-            }} />
+                {/* Reference range highlight */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${refMinPosition}%`,
+                    width: `${Math.max(0, refMaxPosition - refMinPosition)}%`,
+                    height: 4,
+                    background: '#D1FAE5',
+                    borderRadius: 2,
+                    transform: 'translateY(-50%)'
+                }} />
 
-            {/* Value dot */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: `${valuePosition}%`,
-                width: 12,
-                height: 12,
-                background: dotColor,
-                borderRadius: '50%',
-                transform: 'translate(-50%, -50%)',
-                border: '2px solid white',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                zIndex: 1
-            }} />
+                {/* Value dot */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${valuePosition}%`,
+                    width: 12,
+                    height: 12,
+                    background: dotColor,
+                    borderRadius: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    border: '2px solid white',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                    zIndex: 1
+                }} />
 
-            {/* Min/Max labels */}
-            <div style={{
-                position: 'absolute',
-                bottom: -16,
-                left: `${refMinPosition}%`,
-                fontSize: 10,
-                color: '#A8A29E',
-                transform: 'translateX(-50%)'
-            }}>
-                {min}
-            </div>
-            <div style={{
-                position: 'absolute',
-                bottom: -16,
-                left: `${refMaxPosition}%`,
-                fontSize: 10,
-                color: '#A8A29E',
-                transform: 'translateX(-50%)'
-            }}>
-                {max}
-            </div>
+                {/* Min/Max labels */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: -16,
+                    left: `${refMinPosition}%`,
+                    fontSize: 10,
+                    color: '#A8A29E',
+                    transform: 'translateX(-50%)'
+                }}>
+                    {min}
+                </div>
+                <div style={{
+                    position: 'absolute',
+                    bottom: -16,
+                    left: `${refMaxPosition}%`,
+                    fontSize: 10,
+                    color: '#A8A29E',
+                    transform: 'translateX(-50%)'
+                }}>
+                    {max}
+                </div>
             </div>
         </div>
     )
@@ -141,11 +125,13 @@ export default function ResultsPage() {
     const [loadingTrends, setLoadingTrends] = useState(false)
     const [isDebugMode, setIsDebugMode] = useState(false)
     const [supplements, setSupplements] = useState<any[]>([])
+    const [mounted, setMounted] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
 
     useEffect(() => {
+        setMounted(true)
         setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true")
-        
+
         const fetchSupps = async () => {
             try {
                 const res = await fetch('/api/supplements');
@@ -215,7 +201,7 @@ export default function ResultsPage() {
     }, [selectedCategory, router, refreshKey])
 
     // Derived counts for status summary
-    const filteredBiomarkers = biomarkers.filter(b => 
+    const filteredBiomarkers = biomarkers.filter(b =>
         b.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
     const optimalCount = filteredBiomarkers.filter(b => b.status === 'optimal').length
@@ -232,7 +218,7 @@ export default function ResultsPage() {
                     <p className="text-sm font-medium mt-1">Patient Lab Data Interpretation · Clinical Context Intelligence</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-sm font-bold">DATE: {new Date().toLocaleDateString()}</p>
+                    <p className="text-sm font-bold">DATE: {mounted ? new Date().toLocaleDateString() : ''}</p>
                     <p className="text-xs">Generated by Groq AI (Llama 3.3)</p>
                 </div>
             </div>
@@ -243,7 +229,7 @@ export default function ResultsPage() {
                     <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
                     <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
                     <p className="text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
-                <TrustLayer variant="compact" className="mt-3" />
+                    <TrustLayer variant="compact" className="mt-3" />
                 </div>
                 <div className="flex gap-3">
                     <button
@@ -372,16 +358,12 @@ export default function ResultsPage() {
                                     key={b.id}
                                     onClick={() => setSelectedBiomarker(b)}
                                     className={`flex items-center p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
-                                        } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${
-                                        b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
-                                        b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
+                                        } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
+                                            b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
                                         }`}
                                 >
                                     <div className={`w-2.5 h-2.5 rounded-full shrink-0 mr-3 ${b.status === 'optimal' ? 'bg-emerald-500' :
-                                        b.status === 'warning' ? 'amber-500' : 'bg-red-500' // Corrected amber-500 to bg-amber-500 implicitly via 'warning' check in next update if needed, but user spec said #F59E0B which is amber-500. 
-                                        // Wait, user spec said: "Status dot (10px circle: #10B981 / #F59E0B / #EF4444)"
-                                        // I will use explicit classes:
-                                        } ${b.status === 'warning' ? 'bg-amber-500' : ''
+                                        b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
                                         }`} />
 
                                     <div className="flex-1 min-w-0">
@@ -401,7 +383,7 @@ export default function ResultsPage() {
                                         </div>
                                         {b.lab_results?.created_at && (
                                             <p className="text-[11px] text-[#A8A29E] mt-0.5">
-                                                From report {new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                From report {mounted ? new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                             </p>
                                         )}
                                         <RangeBar
@@ -480,10 +462,10 @@ export default function ResultsPage() {
                                         </div>
                                     ) : biomarkerTrends.length > 1 ? (
                                         <div className="h-full w-full scale-95 origin-top">
-                                            <WellnessTrendChart 
-                                                data={biomarkerTrends} 
+                                            <WellnessTrendChart
+                                                data={biomarkerTrends}
                                                 supplements={supplements}
-                                                className="col-span-1" 
+                                                className="col-span-1"
                                             />
                                         </div>
                                     ) : (
