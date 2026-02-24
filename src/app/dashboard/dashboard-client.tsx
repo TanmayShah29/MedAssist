@@ -49,6 +49,32 @@ import { toast } from 'sonner'
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
 import { Biomarker, Profile } from '@/types/medical'
 
+// ── Plain English Definitions ──
+const BIOMARKER_DEFINITIONS: Record<string, string> = {
+    'Glucose': 'Main sugar found in your blood; primary energy source.',
+    'Hemoglobin A1c': 'Your average blood sugar levels over the past 3 months.',
+    'LDL Cholesterol': '"Bad" cholesterol that can build up in your arteries.',
+    'HDL Cholesterol': '"Good" cholesterol that helps remove other forms of cholesterol from your bloodstream.',
+    'Triglycerides': 'A type of fat found in your blood; high levels can increase heart disease risk.',
+    'Vitamin D': 'Essential for bone health and immune system function.',
+    'C-Reactive Protein (CRP)': 'A marker of inflammation in the body.',
+    'Iron': 'Used to make hemoglobin, which carries oxygen in your blood.',
+    'Ferritin': 'A protein that stores iron in your cells.',
+    'TSH': 'Thyroid Stimulating Hormone; regulates your metabolism.',
+    'B12': 'Vital for nerve tissue health, brain function, and red blood cells.',
+    'Magnesium': 'Involved in over 300 biochemical reactions in the body.',
+    'ALT': 'Liver enzyme that can indicate liver health.',
+    'AST': 'Another liver enzyme used to evaluate liver function.',
+    'Creatinine': 'Waste product filtered by kidneys; used to measure kidney function.',
+}
+
+function getDelta(current: number, previous: number | null) {
+    if (previous === null) return null;
+    const diff = current - previous;
+    const percent = Math.round((diff / previous) * 100);
+    return { diff, percent };
+}
+
 // ── Chart Components ──
 
 
@@ -173,7 +199,8 @@ function TrendChart({ labResults, biomarkers, supplements = [] }: { labResults: 
                         fontSize: 11,
                         padding: '2px 8px',
                         color: '#57534E',
-                        outline: 'none'
+                        outline: 'none',
+                        WebkitAppearance: 'none'
                     }}
                 >
                     <option value="Health Score">Overall Health Score</option>
@@ -443,7 +470,7 @@ export default function DashboardClient({
             </div>
 
             {/* ── Header row ── */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-6">
                 <div>
                     <div className="flex items-center gap-3">
                         <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Clinical Overview</h1>
@@ -458,13 +485,13 @@ export default function DashboardClient({
                         {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
                         {profile?.first_name || 'Patient'}
                     </p>
-                    <TrustLayer variant="compact" className="mt-2" />
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handlePrint}
                         className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden"
                         title="Print Report"
+                        style={{ WebkitAppearance: 'none' }}
                     >
                         <Printer className="w-5 h-5" />
                     </button>
@@ -472,12 +499,75 @@ export default function DashboardClient({
                     <button
                         onClick={() => setShowUploadModal(true)}
                         className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#0284C7] transition-all shadow-md shadow-sky-500/20"
+                        style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload className="w-4 h-4" />
                         Upload
                     </button>
                 </div>
             </div>
+
+            {/* ── Informational Banners: Risk Summary & Upload Nudge ── */}
+            {totalCount > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    {/* Risk Summary Banner */}
+                    <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : warningCount > 0 ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                <Activity size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
+                                <p className="text-xs text-[#57534E]">
+                                    {criticalCount > 0 
+                                        ? `${criticalCount} urgent markers need attention` 
+                                        : warningCount > 0 
+                                            ? `${warningCount} markers to monitor closely` 
+                                            : 'All systems performing optimally'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <span className="block text-xs font-bold text-emerald-700">{optimalCount}</span>
+                                <span className="text-[10px] text-emerald-600 uppercase font-semibold">Opt</span>
+                            </div>
+                            <div className="text-center px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
+                                <span className="block text-xs font-bold text-amber-700">{warningCount}</span>
+                                <span className="text-[10px] text-amber-600 uppercase font-semibold">Mon</span>
+                            </div>
+                            <div className="text-center px-3 py-1 bg-red-50 rounded-lg border border-red-100">
+                                <span className="block text-xs font-bold text-red-700">{criticalCount}</span>
+                                <span className="text-[10px] text-red-600 uppercase font-semibold">Act</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Upload Reminder Nudge */}
+                    {latestLabResult && (
+                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
+                                    <ClipboardList size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
+                                    <p className="text-xs text-[#57534E]">
+                                        Last test was {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24))} days ago
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24)) > 90 ? (
+                                    <span className="inline-block px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold">DUE FOR NEW TEST</span>
+                                ) : (
+                                    <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold">UP TO DATE</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* ── Demo mode banner: avoid mistaking sample data for real data ── */}
             {demoMode && (
@@ -488,6 +578,7 @@ export default function DashboardClient({
                     <button
                         onClick={() => setDemoMode(false)}
                         className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                        style={{ WebkitAppearance: 'none' }}
                     >
                         Show my data
                     </button>
@@ -518,11 +609,6 @@ export default function DashboardClient({
                     />
                 </div>
             </div>
-
-            {/* ── Debug Mode: Technical Trace ── */}
-            {debugMode && latestLabResult && (
-                <DebugTraceView labResult={latestLabResult} />
-            )}
 
             {/* ── Health Score Hero Card OR Empty State ── */}
             {totalCount === 0 ? (
@@ -569,7 +655,8 @@ export default function DashboardClient({
                                 padding: '12px 24px',
                                 fontSize: 15,
                                 fontWeight: 600,
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                WebkitAppearance: 'none'
                             }}
                         >
                             Upload my first report
@@ -577,6 +664,7 @@ export default function DashboardClient({
                         <button
                             onClick={() => setDemoMode(true)}
                             className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors"
+                            style={{ WebkitAppearance: 'none' }}
                         >
                             <PlayCircle size={18} />
                             Try with sample lab report
@@ -594,6 +682,7 @@ export default function DashboardClient({
                             <button
                                 onClick={() => setShowScoreModal(true)}
                                 className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2 hover:text-white transition-colors w-fit"
+                                style={{ WebkitAppearance: 'none' }}
                             >
                                 HEALTH SCORE
                                 <Info size={12} />
@@ -703,7 +792,55 @@ export default function DashboardClient({
                 </div>
             )}
 
-            {/* ── Longitudinal Insights ── */}
+            {/* ── Personalized "What to do next" Card ── */}
+            {totalCount > 0 && (
+                <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <Sparkles size={120} />
+                    </div>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+                                <ArrowRight className="w-5 h-5 text-sky-400" />
+                            </div>
+                            <h3 className="text-xl font-bold font-display">Personalized Care Plan</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[...latestBiomarkers]
+                                .filter(b => b.status !== 'optimal')
+                                .sort((a, b) => (a.status === 'critical' ? -1 : 1))
+                                .slice(0, 3)
+                                .map((b, idx) => {
+                                    const recommendations: Record<string, string> = {
+                                        'Vitamin D': 'Consider 15m daily sunlight or discuss D3 supplementation with your doctor.',
+                                        'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
+                                        'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
+                                        'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
+                                        'CRP': 'Focus on anti-inflammatory foods and prioritize 7-8 hours of quality sleep.',
+                                        'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
+                                    };
+                                    const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
+                                    
+                                    return (
+                                        <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.status === 'critical' ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-amber-500/20 border-amber-500/30 text-amber-400'}`}>
+                                                    {b.status.toUpperCase()}
+                                                </div>
+                                                <span className="text-[10px] text-white/40 font-mono">PRIORITY {idx + 1}</span>
+                                            </div>
+                                            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">{b.name}</h4>
+                                            <p className="text-sm text-slate-400 leading-relaxed">
+                                                {recommendations[b.name] || fallback}
+                                            </p>
+                                        </div>
+                                    )
+                                })}
+                        </div>
+                    </div>
+                </div>
+            )}
             {longitudinalInsights.length > 0 && (
                 <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
@@ -761,17 +898,23 @@ export default function DashboardClient({
                 </div>
             )}
 
-            {/* ── Charts Grid (Trend & Radar) ── */}
+            {/* ── Charts Grid (Trend) ── */}
             {totalCount > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="mb-6">
                     <TrendChart labResults={labResults} biomarkers={biomarkers} supplements={supplements} />
-                    <CategoryRadar biomarkers={biomarkers} />
                 </div>
             )}
 
-            {/* ── "Today's Priorities" section ── */}
+            {/* ── Grouped Biomarkers (Core Data) ── */}
             <div className="mb-6">
-                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">TODAY&apos;S PRIORITIES</h3>
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
+                    <div className="flex gap-4 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter">
+                        <span>Optimal: {optimalCount}</span>
+                        <span>Monitor: {warningCount}</span>
+                        <span>Action: {criticalCount}</span>
+                    </div>
+                </div>
 
                 {biomarkers.length === 0 ? (
                     <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
@@ -780,7 +923,7 @@ export default function DashboardClient({
                         </div>
                         <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
                         <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
-                            Upload your first lab report to see your health overview and priorities.
+                            Upload your first lab report to see your health overview.
                         </p>
                         <button
                             onClick={() => setShowUploadModal(true)}
@@ -790,95 +933,74 @@ export default function DashboardClient({
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {priorities.map((b) => (
-                            <div
-                                key={b.id}
-                                className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-colors hover:bg-[#EFEDE6] cursor-pointer group shadow-sm"
-                                onClick={() => handleBiomarkerClick(b)}
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.status === 'optimal' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                        b.status === 'warning' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                            'bg-red-50 text-red-700 border-red-100'
-                                        }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'optimal' ? 'bg-emerald-500' :
-                                            b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
-                                            }`} />
-                                        {b.status.toUpperCase()}
-                                    </div>
-                                    <span className="text-[13px] font-bold text-[#1C1917]">{b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span></span>
-                                </div>
+                    <div className="space-y-8">
+                        {['hematology', 'metabolic', 'inflammation', 'vitamins', 'other'].map(cat => {
+                            const catBiomarkers = latestBiomarkers.filter(b => b.category === cat);
+                            if (catBiomarkers.length === 0) return null;
 
-                                <div className="flex-1">
-                                    <span className="text-[15px] font-bold text-[#1C1917] group-hover:text-sky-600 transition-colors block mb-1">{b.name}</span>
-                                    {b.ai_interpretation && (
-                                        <p className="text-[12px] text-[#A8A29E] line-clamp-2 leading-relaxed italic">
-                                            {b.ai_interpretation}
-                                        </p>
-                                    )}
+                            return (
+                                <div key={cat} className="space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
+                                        <div className="h-[1px] flex-1 bg-[#E8E6DF]" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {catBiomarkers.map((b) => {
+                                            const prev = displayBiomarkers.find(pb => 
+                                                pb.name === b.name && 
+                                                pb.lab_result_id !== latestLabResult?.id
+                                            );
+                                            const delta = getDelta(b.value, prev?.value || null);
+
+                                            return (
+                                                <div
+                                                    key={b.id}
+                                                    className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden"
+                                                    onClick={() => handleBiomarkerClick(b)}
+                                                >
+                                                    {/* Plain English Tooltip on Hover */}
+                                                    <div className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4 text-center z-20 pointer-events-none">
+                                                        <p className="text-white text-[11px] font-medium leading-relaxed">
+                                                            {BIOMARKER_DEFINITIONS[b.name] || 'Clinical biomarker used to assess specific metabolic or systemic health functions.'}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-start">
+                                                        <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.status === 'optimal' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                            b.status === 'warning' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                                'bg-red-50 text-red-700 border-red-100'
+                                                            }`}>
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'optimal' ? 'bg-emerald-500' :
+                                                                b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                                                                }`} />
+                                                            {b.status.toUpperCase()}
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-[15px] font-bold text-[#1C1917]">{b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span></div>
+                                                            {delta && (
+                                                                <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${delta.diff > 0 ? (b.status === 'optimal' ? 'text-emerald-600' : 'text-red-600') : (b.status === 'optimal' ? 'text-red-600' : 'text-emerald-600')}`}>
+                                                                    {delta.diff > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                                                                    {Math.abs(delta.percent)}%
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex-1">
+                                                        <span className="text-[15px] font-bold text-[#1C1917] block mb-1">{b.name}</span>
+                                                        <p className="text-[11px] text-[#A8A29E] line-clamp-1 leading-relaxed italic">
+                                                            {b.ai_interpretation || 'Clinical data point extracted from report.'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
-            </div>
-
-            {/* ── Secondary row: Activity & Distribution ── */}
-            {totalCount > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <RecentActivity labResults={displayLabResults} />
-                    <StatusDistributionChart
-                        optimal={optimalCount}
-                        warning={warningCount}
-                        critical={criticalCount}
-                    />
-                </div>
-            )}
-
-            {/* ── Quick Actions ── */}
-            <div className="mb-6">
-                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">QUICK ACTIONS</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Link
-                        href="/results"
-                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-sky-100 rounded-lg text-sky-600">
-                                <Activity size={18} />
-                            </div>
-                            <span className="text-[15px] font-bold text-[#1C1917]">View Full Results</span>
-                        </div>
-                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                    </Link>
-
-                    <Link
-                        href="/assistant"
-                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-violet-100 rounded-lg text-violet-600">
-                                <Brain size={18} />
-                            </div>
-                            <span className="text-[15px] font-bold text-[#1C1917]">Consult Assistant</span>
-                        </div>
-                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                    </Link>
-
-                    <Link
-                        href="/profile"
-                        className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex items-center justify-between hover:bg-[#EFEDE6] transition-colors group shadow-sm"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
-                                <CheckCircle size={18} />
-                            </div>
-                            <span className="text-[15px] font-bold text-[#1C1917]">Update Health Profile</span>
-                        </div>
-                        <ChevronRight size={16} className="text-[#A8A29E] group-hover:text-[#1C1917] transition-colors" />
-                    </Link>
-                </div>
             </div>
 
             {/* ── Doctor Questions ── */}
@@ -891,79 +1013,6 @@ export default function DashboardClient({
                     </div>
                 </div>
             )}
-
-            {/* ── Two column grid ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left column: All Biomarkers */}
-                <div className="bg-white border border-[#E8E6DF] rounded-[14px] p-6 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                        <h2 className="text-[18px] font-bold text-[#1C1917]">Latest Biomarkers</h2>
-                        <span className="bg-sky-100 text-sky-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                            {totalCount} Total
-                        </span>
-                    </div>
-
-                    <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-                        {latestBiomarkers.length > 0 ? (
-                            latestBiomarkers.map((b, i) => (
-                                <div
-                                    key={b.id || i}
-                                    className={`flex items-center py-3 cursor-pointer hover:bg-slate-50 px-2 -mx-2 rounded-lg transition-colors group ${i !== latestBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]/50' : ''}`}
-                                    onClick={() => handleBiomarkerClick(b)}
-                                >
-                                    <div className={`w-2 h-2 rounded-full shrink-0 ${b.status === 'optimal' ? 'bg-emerald-500' :
-                                        b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
-                                        }`} />
-
-                                    <div className="flex-1 ml-3 mr-4 min-w-0">
-                                        <p className="text-sm font-bold text-[#1C1917] truncate group-hover:text-sky-600 transition-colors">{b.name}</p>
-                                        <p className="text-[10px] text-[#A8A29E] font-bold uppercase tracking-wider mt-0.5">{b.category}</p>
-                                    </div>
-
-                                    <div className="text-sm text-[#1C1917] font-bold whitespace-nowrap">
-                                        {b.value} <span className="text-xs text-[#A8A29E] font-medium">{b.unit}</span>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-12">
-                                <FileText className="w-8 h-8 text-[#D6D3C9] mx-auto mb-2 opacity-30" />
-                                <p className="text-sm text-[#A8A29E]">No biomarkers found</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right column: Symptoms Reported */}
-                <div className="bg-white border border-[#E8E6DF] rounded-[14px] p-6 shadow-sm h-fit">
-                    <h2 className="text-[18px] font-bold text-[#1C1917] mb-4">Current Symptoms</h2>
-
-                    {symptoms.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {symptoms.map((s, i) => (
-                                <span
-                                    key={i}
-                                    className="bg-slate-50 text-[#57534E] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#E8E6DF] uppercase tracking-wider"
-                                >
-                                    {s}
-                                </span>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#E8E6DF]">
-                            <p className="text-xs text-[#A8A29E] font-medium italic">
-                                No symptoms reported.
-                            </p>
-                        </div>
-                    )}
-
-                    <Link href="/profile" className="mt-6 block">
-                        <button className="w-full py-2.5 text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 rounded-[10px] border border-sky-100 transition-colors">
-                            Update Symptoms Context
-                        </button>
-                    </Link>
-                </div>
-            </div>
 
             <UploadModal
                 isOpen={showUploadModal}
@@ -1026,6 +1075,7 @@ export default function DashboardClient({
                             <button
                                 onClick={() => setShowScoreModal(false)}
                                 className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black transition-all"
+                                style={{ WebkitAppearance: 'none' }}
                             >
                                 Understood
                             </button>
