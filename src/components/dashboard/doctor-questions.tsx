@@ -76,20 +76,20 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
 
             <div className="space-y-4">
                 {loading && questions.length === 0 ? (
-                    [1, 2, 3].map((i) => (
+                    Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="h-24 bg-slate-50 animate-pulse rounded-xl border border-slate-100" />
                     ))
                 ) : questions.length > 0 ? (
                     questions.map((item, idx) => (
-                        <div 
-                            key={idx} 
+                        <div
+                            key={idx}
                             className="group bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/30"
                         >
                             <div className="flex justify-between items-start gap-4 mb-2">
                                 <p className="text-[15px] font-bold text-[#1C1917] leading-tight flex-1">
                                     {item.question}
                                 </p>
-                                <button 
+                                <button
                                     onClick={() => copyToClipboard(item.question, idx)}
                                     className="p-1.5 rounded-md hover:bg-white transition-colors text-[#A8A29E] hover:text-indigo-600"
                                     title="Copy to clipboard"

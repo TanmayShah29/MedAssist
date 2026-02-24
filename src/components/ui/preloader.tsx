@@ -252,7 +252,7 @@ export function Preloader({
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950"
+                    className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950 min-h-[100dvh]"
                 >
                     {variant === "clinical" && (
                         <ClinicalPreloader onComplete={onComplete} />

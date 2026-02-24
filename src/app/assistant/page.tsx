@@ -323,7 +323,7 @@ export default function AssistantPage() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100vh-300px)] min-h-[600px]">
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100dvh-300px)] min-h-[600px]">
 
                         {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
                         <div className="lg:hidden w-full mb-4">

@@ -138,7 +138,23 @@ export const useStore = create<AppState>()(
         }),
         {
             name: 'medassist-storage',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => {
+                try {
+                    // Test if localStorage is actually accessible (throws quota error in Safari private mode)
+                    const testKey = '__test__';
+                    window.localStorage.setItem(testKey, testKey);
+                    window.localStorage.removeItem(testKey);
+                    return window.localStorage;
+                } catch (e) {
+                    // Fallback to in-memory storage if unavailable
+                    const fallbackStorage = new Map<string, string>();
+                    return {
+                        getItem: (name: string) => fallbackStorage.get(name) || null,
+                        setItem: (name: string, value: string) => fallbackStorage.set(name, value),
+                        removeItem: (name: string) => fallbackStorage.delete(name),
+                    };
+                }
+            }),
         }
     )
 );

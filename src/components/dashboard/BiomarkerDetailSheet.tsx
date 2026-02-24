@@ -64,7 +64,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 gpu-accelerate"
                     />
 
                     {/* Sheet */}
@@ -74,6 +74,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed right-0 top-0 h-full w-full max-w-md bg-[#FAFAF7] shadow-2xl z-50 overflow-y-auto"
+                        style={{ WebkitOverflowScrolling: 'touch', height: '-webkit-fill-available' }}
                     >
                         <div className="p-6">
                             {/* Header */}
@@ -93,6 +94,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 <button
                                     onClick={onClose}
                                     className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    style={{ WebkitAppearance: 'none' }}
                                 >
                                     <X className="w-6 h-6 text-[#57534E]" />
                                 </button>

@@ -39,10 +39,13 @@ export function Sidebar({ className }: { className?: string }) {
 
         const fetchUser = async () => {
             // 1. Try local storage first (fastest)
-            const stored = localStorage.getItem("medassist-onboarding");
-            if (stored) {
-                try {
+            try {
+                const stored = localStorage.getItem("medassist-onboarding");
+                if (stored) {
                     const parsed = JSON.parse(stored);
+                    if (parsed.name) {
+                        setUserName(parsed.name);
+                    }
                     const firstName = parsed?.state?.basicInfo?.firstName;
                     const lastName = parsed?.state?.basicInfo?.lastName;
                     if (firstName) {
@@ -50,8 +53,8 @@ export function Sidebar({ className }: { className?: string }) {
                         setUserInitials(`${firstName[0]}${lastName?.[0] || ""}`.toUpperCase());
                         return;
                     }
-                } catch { }
-            }
+                }
+            } catch (e) { }
 
             // 2. Fallback: Supabase Profile
             const { data: { user } } = await supabase.auth.getUser();
@@ -70,7 +73,7 @@ export function Sidebar({ className }: { className?: string }) {
                     setUserInitials(user.email?.[0].toUpperCase() || "P");
                 }
             }
-        };
+        }; // End of fetchUser declaration
 
         fetchUser();
 
@@ -91,16 +94,18 @@ export function Sidebar({ className }: { className?: string }) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
         await supabase.auth.signOut();
-        
+
         // Clear all persistent states
-        localStorage.removeItem("medassist-onboarding");
-        localStorage.removeItem("medassist_debug_mode");
-        localStorage.removeItem("medassist_cached_lab_results");
-        localStorage.removeItem("medassist_cached_biomarkers");
-        localStorage.removeItem("medassist_cached_demo_lab_results");
-        localStorage.removeItem("medassist_cached_demo_biomarkers");
+        try {
+            localStorage.removeItem("medassist-onboarding");
+            localStorage.removeItem("medassist_debug_mode");
+            localStorage.removeItem("medassist_cached_lab_results");
+            localStorage.removeItem("medassist_cached_biomarkers");
+            localStorage.removeItem("medassist_cached_demo_lab_results");
+            localStorage.removeItem("medassist_cached_demo_biomarkers");
+        } catch (e) { }
         sessionStorage.removeItem("medassist_loaded");
-        
+
         document.cookie = 'onboarding_complete=; max-age=0; path=/';
         router.push('/');
     };
@@ -186,10 +191,9 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
             </div>
 
-            {/* User */}
             <div className="p-4 border-t border-[#E8E6DF] flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-sky-100 border border-sky-200
-                        flex items-center justify-center flex-shrink-0">
+                            flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-semibold text-sky-700">
                         {userInitials}
                     </span>
@@ -206,11 +210,11 @@ export function Sidebar({ className }: { className?: string }) {
                     onClick={handleSignOut}
                     className="text-[#A8A29E] hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
                     title="Sign Out"
+                    style={{ WebkitAppearance: 'none' }}
                 >
                     <LogOut className="w-4 h-4" />
                 </button>
             </div>
         </aside>
     );
-
 }

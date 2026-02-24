@@ -55,7 +55,8 @@ export function BottomMenu({
                 // Only visible on mobile — hidden on lg+ where sidebar takes over
                 "fixed bottom-0 left-0 right-0 z-50 lg:hidden",
                 "bg-white/80 backdrop-blur-xl border-t border-slate-200",
-                "px-2 pb-safe-area-inset-bottom",
+                "px-2 pb-[env(safe-area-inset-bottom)]",
+                "gpu-accelerate",
                 className
             )}
         >

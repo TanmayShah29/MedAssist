@@ -1,52 +1,59 @@
 @import "tailwindcss";
 
+@theme {
+  --color-page: #FAFAF7;
+  --color-card: #F5F4EF;
+  --color-card-hover: #EFEDE6;
+  --color-border-light: #E8E6DF;
+  --color-border-medium: #D9D6CD;
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #57534E;
+  --color-text-muted: #A8A29E;
+  --color-brand-primary: #0EA5E9;
+  --color-brand-primary-hover: #0284C7;
+  --color-status-optimal: #10B981;
+  --color-status-warning: #F59E0B;
+  --color-status-critical: #EF4444;
+
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+}
+
 @layer base {
-  :root {
-    /* Design Tokens — Warm Cream Theme */
-    --bg-page: #FAFAF7;
-    --bg-card: #F5F4EF;
-    --bg-card-hover: #EFEDE6;
-
-    --border-light: #E8E6DF;
-    --border-medium: #D9D6CD;
-
-    --text-primary: #1C1917;
-    --text-secondary: #57534E;
-    --text-muted: #A8A29E;
-
-    --brand-primary: #0EA5E9;
-    --brand-primary-hover: #0284C7;
-
-    --status-optimal: #10B981;
-    --status-warning: #F59E0B;
-    --status-critical: #EF4444;
-
-    /* Shadcn UI compatibility (optional but good for plugins) */
-    --background: 40 33% 98%;
-    /* #FAFAF7 */
-    --foreground: 20 14% 10%;
-    /* #1C1917 */
-    --radius: 14px;
-  }
-
   body {
-    background-color: var(--bg-page);
-    color: var(--text-primary);
-    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    background-color: var(--color-page);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Safari safe viewport fallback */
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
-  /* Force cream theme on existing white surfaces to prevent "flash of white" */
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    /* Safari font-variant parser fix */
+    font-variant-ligatures: common-ligatures;
+  }
+
+  /* Standardizing backgrounds without !important to allow Tailwind overrides */
   .bg-white {
-    background-color: var(--bg-card) !important;
+    background-color: var(--color-card);
   }
 
-  h1,
-  h2,
-  h3,
-  .font-display {
-    font-family: var(--font-instrument), Georgia, serif;
+  /* Safari form element resets */
+  input, select, textarea {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -55,20 +62,69 @@
     text-wrap: balance;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
+  /* Robust Safari backdrop-filter prefixes */
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
 
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .backdrop-blur-xl {
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+
+  /* Unified Safari utility */
+  .backdrop-blur-safari {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    /* Force GPU acceleration in Safari */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Hardware acceleration helper */
+  .gpu-accelerate {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-perspective: 1000;
+  }
+
+  @-webkit-keyframes fadeIn {
+    from { opacity: 0; -webkit-transform: translateY(8px); transform: translateY(8px); }
+    to { opacity: 1; -webkit-transform: translateY(0); transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .page-enter {
+    -webkit-animation: fadeIn 0.25s ease-out forwards;
     animation: fadeIn 0.25s ease-out forwards;
+  }
+
+  /* Safari scroll container fix */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }
 

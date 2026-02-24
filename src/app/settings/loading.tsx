@@ -5,12 +5,12 @@ export default function SettingsLoading() {
 
             <div className="space-y-4 max-w-2xl">
                 <div className="h-6 w-40 rounded mb-4" style={{ background: '#E8E6DF' }} />
-                {[1, 2, 3].map((i) => (
+                {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="h-20 rounded-[14px] mb-4" style={{ background: '#E8E6DF' }} />
                 ))}
 
                 <div className="h-6 w-40 rounded mb-4 mt-8" style={{ background: '#E8E6DF' }} />
-                {[1, 2].map((i) => (
+                {Array.from({ length: 2 }).map((_, i) => (
                     <div key={i} className="h-20 rounded-[14px] mb-4" style={{ background: '#E8E6DF' }} />
                 ))}
             </div>

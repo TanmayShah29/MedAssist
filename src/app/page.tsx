@@ -45,8 +45,8 @@ export default function LandingPage() {
       <header
         className="fixed top-0 left-0 right-0 z-50 
                    bg-page/80 backdrop-blur-md 
-                   border-b border-border-light"
-        style={{ WebkitBackdropFilter: "blur(12px)" }}
+                   border-b border-border-light
+                   gpu-accelerate"
       >
         <div className="max-w-6xl mx-auto px-6 h-16 
                         flex items-center justify-between">
@@ -214,7 +214,6 @@ export default function LandingPage() {
                     initial={{ x: 20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
-                    style={{ WebkitBackdropFilter: "blur(24px)" }}
                   >
                     <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest mb-3">CORRELATION DETECTED</p>
                     <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
@@ -224,7 +223,6 @@ export default function LandingPage() {
                     whileInView={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform rotate-1 ml-12"
-                    style={{ WebkitBackdropFilter: "blur(24px)" }}
                   >
                     <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mb-3">TIMELINE EVENT</p>
                     <p className="text-sm font-medium text-slate-200 leading-relaxed">Symptom &quot;Fatigue&quot; disappeared 4 days after Hemoglobin returned to optimal.</p>

@@ -47,7 +47,7 @@ function AuthContent() {
 
                 // Clear any leftover onboarding state from previous users before starting
                 if (typeof window !== 'undefined') {
-                    window.localStorage.removeItem('medassist-onboarding');
+                    try { window.localStorage.removeItem('medassist-onboarding'); } catch (e) { }
                 }
 
                 router.push('/onboarding');

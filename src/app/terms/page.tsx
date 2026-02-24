@@ -5,7 +5,7 @@ export default function TermsPage() {
             margin: '0 auto',
             padding: '48px 24px',
             background: '#FAFAF7',
-            minHeight: '100vh'
+            minHeight: '100dvh'
         }}>
             <h1 style={{
                 fontFamily: 'Instrument Serif',

@@ -18,14 +18,15 @@ export default function SettingsPage() {
     const [isDebugMode, setIsDebugMode] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem("medassist_debug_mode") === "true";
+        let saved = false;
+        try { saved = localStorage.getItem("medassist_debug_mode") === "true"; } catch (e) { }
         setIsDebugMode(saved);
     }, []);
 
     const toggleDebugMode = () => {
         const next = !isDebugMode;
         setIsDebugMode(next);
-        localStorage.setItem("medassist_debug_mode", next.toString());
+        try { localStorage.setItem("medassist_debug_mode", next.toString()); } catch (e) { }
         toast.info(next ? "Debug mode enabled" : "Debug mode disabled");
     };
 

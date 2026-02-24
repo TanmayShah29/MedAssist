@@ -49,6 +49,7 @@ export function DebugTraceView({ labResult }: DebugTraceViewProps) {
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-6 py-4 flex items-center justify-between bg-zinc-900 text-white hover:bg-zinc-800 transition-colors"
+                style={{ WebkitAppearance: 'none' }}
             >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center">

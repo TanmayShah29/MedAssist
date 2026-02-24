@@ -22,7 +22,10 @@ export function ClientLayout({
   appShellRoutes,
   standaloneRoutes,
 }: ClientLayoutProps) {
-  const pathname = usePathname() || initialPathname || "";
+  const nextPathname = usePathname();
+  // Safely determine pathname, prioritizing client-side usePathname()
+  const pathname = nextPathname || initialPathname || "";
+
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -31,27 +34,34 @@ export function ClientLayout({
   }, []);
 
   // Determine if current page needs the app shell
-  const needsAppShell = appShellRoutes.some(
+  const needsAppShell = pathname ? appShellRoutes.some(
     route => pathname.startsWith(route)
-  );
+  ) : false;
 
   // Determine if this is a standalone page
-  const isStandalone = standaloneRoutes.some(
+  const isStandalone = pathname ? standaloneRoutes.some(
     route => pathname === route || (route !== "/" && pathname.startsWith(route))
-  );
+  ) : false;
 
   // Preloader — only on first app shell load
   useEffect(() => {
     if (needsAppShell && mounted) {
-      const hasLoaded = sessionStorage.getItem("medassist_loaded");
-      if (!hasLoaded) {
-        setLoading(true);
+      try {
+        const hasLoaded = sessionStorage.getItem("medassist_loaded");
+        if (!hasLoaded) {
+          setLoading(true);
+        }
+      } catch (e) {
+        // Silently fail if sessionStorage is unavailable (e.g. Private Mode)
+        console.warn("sessionStorage unavailable", e);
       }
     }
   }, [needsAppShell, mounted]);
 
   const handlePreloaderComplete = () => {
-    sessionStorage.setItem("medassist_loaded", "true");
+    try {
+      sessionStorage.setItem("medassist_loaded", "true");
+    } catch (e) { }
     setLoading(false);
   };
 
@@ -79,7 +89,7 @@ export function ClientLayout({
     <>
       {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
       {isStandalone && (
-        <div className="min-h-screen min-h-[100dvh]">
+        <div className="min-h-[100dvh]">
           {children}
         </div>
       )}
@@ -94,12 +104,12 @@ export function ClientLayout({
           />
 
           <div
-            className="flex min-h-screen min-h-[100dvh]"
+            className="flex min-h-[100dvh]"
             style={{ visibility: loading ? "hidden" : "visible" }}
           >
             <aside className="
                 hidden lg:flex
-                w-60 min-h-screen min-h-[100dvh]
+                w-60 min-h-[100dvh]
                 fixed left-0 top-0 z-40
                 flex-col
               ">
@@ -109,7 +119,7 @@ export function ClientLayout({
             <main className="
                 flex-1
                 lg:ml-60
-                min-h-screen min-h-[100dvh]
+                min-h-[100dvh]
                 overflow-y-auto
                 pb-[calc(5rem+env(safe-area-inset-bottom))]
                 lg:pb-0

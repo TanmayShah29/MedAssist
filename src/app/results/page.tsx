@@ -132,7 +132,7 @@ export default function ResultsPage() {
 
     useEffect(() => {
         setMounted(true)
-        setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true")
+        try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true") } catch (e) { }
 
         const fetchSupps = async () => {
             try {

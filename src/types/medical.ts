@@ -22,6 +22,15 @@ export interface Biomarker {
     created_at: string;
 }
 
+export interface LabResult {
+    id: number;
+    health_score?: number;
+    created_at: string;
+    uploaded_at?: string;
+    summary?: string;
+    raw_ai_json?: any;
+}
+
 export interface Symptom {
     symptom: string;
 }

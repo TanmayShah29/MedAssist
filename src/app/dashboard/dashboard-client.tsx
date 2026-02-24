@@ -44,8 +44,9 @@ import { DebugTraceView } from '@/components/dashboard/DebugTraceView'
 import { deleteLabResult } from '@/app/actions/user-data'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
-import { RecentActivity } from '@/components/dashboard/recent-activity'
-import { StatusDistributionChart } from '@/components/dashboard/status-distribution-chart'
+import { PriorityAlertCard } from '@/components/dashboard/priority-alert-card'
+import { TrendSnapshot } from '@/components/dashboard/trend-snapshot'
+import { HealthScoreOverview } from '@/components/dashboard/health-score-overview'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { MedicineCabinet } from '@/components/dashboard/medicine-cabinet'
 import { TrustLayer } from '@/components/trust-layer'
@@ -527,8 +528,8 @@ export default function DashboardClient({
                                 <div style={{ marginLeft: 16 }}>
                                     <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
                                     <p className="text-xs text-[#57534E]">
-                                        {criticalCount > 0 
-                                            ? `${criticalCount} urgent markers need attention` 
+                                        {criticalCount > 0
+                                            ? `${criticalCount} urgent markers need attention`
                                             : `${warningCount} markers to monitor closely`}
                                     </p>
                                 </div>
@@ -617,7 +618,7 @@ export default function DashboardClient({
                 </div>
             </div>
 
-            {/* ── Health Score Hero Card OR Empty State ── */}
+            {/* ── Dashboard Content ── */}
             {totalCount === 0 ? (
                 <div style={{
                     background: '#F5F4EF',
@@ -683,119 +684,21 @@ export default function DashboardClient({
                     </p>
                 </div>
             ) : (
-                <div className="bg-sky-500 rounded-[18px] p-8 mb-6 text-white relative overflow-hidden">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
-                        {/* Left: Score Box */}
-                        <div className="flex flex-col">
-                            <button
-                                onClick={() => setShowScoreModal(true)}
-                                className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/70 tracking-wider mb-2 hover:text-white transition-colors w-fit"
-                                style={{ WebkitAppearance: 'none' }}
-                            >
-                                HEALTH SCORE
-                                <Info size={12} />
-                            </button>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                                <div style={{
-                                    fontFamily: 'Instrument Serif',
-                                    fontSize: 64,
-                                    fontWeight: 700,
-                                    color: 'white',
-                                    lineHeight: 1
-                                }}>
-                                    {healthScore}
-                                </div>
-                                <div style={{
-                                    background: 'rgba(255,255,255,0.2)',
-                                    color: 'white',
-                                    borderRadius: 8,
-                                    padding: '4px 10px',
-                                    fontSize: 14,
-                                    fontWeight: 600
-                                }}>
-                                    {scoreLabel.label}
-                                </div>
-                            </div>
+                <div className="flex flex-col gap-6 mb-6">
+                    <PriorityAlertCard biomarkers={latestBiomarkers} />
 
-                            <div style={{ marginTop: 16 }}>
-                                <div style={{
-                                    fontSize: 13,
-                                    color: 'rgba(255,255,255,0.9)',
-                                    marginBottom: 8
-                                }}>
-                                    Score ranges:
-                                </div>
-                                <div style={{
-                                    display: 'flex',
-                                    gap: 12,
-                                    flexWrap: 'wrap',
-                                    fontSize: 12
-                                }}>
-                                    {[
-                                        { range: '85-100', label: 'Excellent', color: '#10B981' },
-                                        { range: '70-84', label: 'Good', color: '#10B981' },
-                                        { range: '55-69', label: 'Fair', color: '#F59E0B' },
-                                        { range: 'Below 55', label: 'Needs attention', color: '#EF4444' }
-                                    ].map(item => (
-                                        <div key={item.range} style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 4
-                                        }}>
-                                            <div style={{
-                                                width: 8,
-                                                height: 8,
-                                                borderRadius: '50%',
-                                                background: item.color
-                                            }} />
-                                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                                                {item.range}: {item.label}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <p style={{
-                                    fontSize: 12,
-                                    color: 'rgba(255,255,255,0.6)',
-                                    marginTop: 8
-                                }}>
-                                    Most healthy adults score between 70–85
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Right: Stats */}
-                        <div className="flex-1 w-full max-w-md mt-6 md:mt-0">
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                                        <span className="text-[15px] font-medium">Optimal</span>
-                                    </div>
-                                    <span className="text-[16px] font-bold">{optimalCount}</span>
-                                </div>
-                                <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                                        <span className="text-[15px] font-medium">Monitor</span>
-                                    </div>
-                                    <span className="text-[16px] font-bold">{warningCount}</span>
-                                </div>
-                                <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-[10px] px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                                        <span className="text-[15px] font-medium">Action Needed</span>
-                                    </div>
-                                    <span className="text-[16px] font-bold">{criticalCount}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-white/20 relative z-10 text-center md:text-left">
-                        <p className="text-[15px] text-white/90">
-                            Based on {totalCount} biomarkers from your latest report
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <HealthScoreOverview
+                            score={healthScore}
+                            optimalCount={optimalCount}
+                            warningCount={warningCount}
+                            criticalCount={criticalCount}
+                        />
+                        <TrendSnapshot
+                            latestBiomarkers={latestBiomarkers}
+                            history={displayBiomarkers}
+                            latestLabResult={latestLabResult}
+                        />
                     </div>
                 </div>
             )}
@@ -830,7 +733,7 @@ export default function DashboardClient({
                                             'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
                                         };
                                         const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
-                                        
+
                                         return (
                                             <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
                                                 <div className="flex items-center justify-between mb-3">
@@ -910,12 +813,7 @@ export default function DashboardClient({
                 </div>
             )}
 
-            {/* ── Charts Grid (Trend) ── */}
-            {totalCount > 0 && (
-                <div className="mb-6">
-                    <TrendChart labResults={labResults} biomarkers={biomarkers} supplements={supplements} />
-                </div>
-            )}
+
 
             {/* ── Grouped Biomarkers (Core Data) ── */}
             <div className="mb-6">
@@ -956,7 +854,7 @@ export default function DashboardClient({
                                 }
                                 return bCat === cat;
                             });
-                            
+
                             if (catBiomarkers.length === 0) return null;
 
                             return (
@@ -967,8 +865,8 @@ export default function DashboardClient({
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {catBiomarkers.map((b) => {
-                                            const prev = displayBiomarkers.find(pb => 
-                                                pb.name === b.name && 
+                                            const prev = displayBiomarkers.find(pb =>
+                                                pb.name === b.name &&
                                                 pb.lab_result_id !== latestLabResult?.id
                                             );
                                             const delta = getDelta(b.value, prev?.value);
@@ -984,11 +882,10 @@ export default function DashboardClient({
                                                         setTimeout(() => el.classList.remove('active-tooltip'), 3000);
                                                     }}
                                                 >
-                                                    {/* Plain English Tooltip - Safari prefix added via inline style for safety */}
-                                                    <div 
-                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none"
-                                                        style={{ 
-                                                            WebkitBackdropFilter: "blur(4px)",
+                                                    {/* Plain English Tooltip - Safari prefix added via utility class for safety */}
+                                                    <div
+                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm gpu-accelerate"
+                                                        style={{
                                                             WebkitTransition: "all 0.2s ease-out"
                                                         }}
                                                     >
@@ -1012,9 +909,9 @@ export default function DashboardClient({
                                                             {delta ? (
                                                                 <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${delta.diff > 0 ? (b.status === 'optimal' ? 'text-emerald-600' : 'text-red-600') : (b.status === 'optimal' ? 'text-red-600' : 'text-emerald-600')}`}>
                                                                     {delta.diff > 0 ? (
-                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m18 15-6-6-6 6"/></svg>
+                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m18 15-6-6-6 6" /></svg>
                                                                     ) : (
-                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m6 9 6 6 6-6"/></svg>
+                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m6 9 6 6 6-6" /></svg>
                                                                     )}
                                                                     {Math.abs(delta.percent)}% from last
                                                                 </div>
@@ -1072,7 +969,7 @@ export default function DashboardClient({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setShowScoreModal(false)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 gpu-accelerate"
                     >
                         <motion.div
                             initial={{ scale: 0.95, y: 20 }}
