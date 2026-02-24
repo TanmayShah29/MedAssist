@@ -204,7 +204,7 @@ function StepSymptoms({ selected, onToggle }: {
             </div>
             {selected.length > 0 && (
                 <motion.p
-                    initial={{ opacity: 0 }}
+                    initial={{ opacity: 0.01 }}
                     animate={{ opacity: 1 }}
                     className="mt-3 text-xs text-sky-600 font-medium"
                 >
@@ -252,7 +252,7 @@ function StepUpload({ file, onFile }: {
                     onChange={e => onFile(e.target.files?.[0] || null)}
                 />
                 {file ? (
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                    <motion.div initial={{ opacity: 0.01, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                         <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center mx-auto mb-3">
                             <Check className="w-6 h-6 text-emerald-600" />
                         </div>
@@ -315,7 +315,7 @@ function StepProcessing({ onComplete }: { onComplete: () => void }) {
                 return (
                     <motion.div
                         key={step.label}
-                        initial={{ opacity: 0, x: -8 }}
+                        initial={{ opacity: 0.01, x: -8 }}
                         animate={{ opacity: currentStep >= idx ? 1 : 0.3, x: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         className="flex items-center gap-3"
@@ -380,9 +380,9 @@ export function MultiStepForm({ onComplete, className }: MultiStepFormProps) {
     };
 
     const variants = {
-        enter: (dir: number) => ({ x: dir * 40, opacity: 0 }),
+        enter: (dir: number) => ({ x: dir * 40, opacity: 0.01 }),
         center: { x: 0, opacity: 1 },
-        exit: (dir: number) => ({ x: dir * -40, opacity: 0 }),
+        exit: (dir: number) => ({ x: dir * -40, opacity: 0.01 }),
     };
 
     return (

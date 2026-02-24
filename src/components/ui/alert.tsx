@@ -99,9 +99,9 @@ export function Alert({
         <AnimatePresence>
             {visible && (
                 <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    initial={{ opacity: 0.01, y: -8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.98, height: 0, marginBottom: 0 }}
+                    exit={{ opacity: 0.01, y: -8, scale: 0.98, height: 0, marginBottom: 0 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
                         "relative flex gap-3 rounded-lg border overflow-hidden",
@@ -191,7 +191,7 @@ export function ClinicalAlert({
 }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0.01, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
                 "relative flex gap-3 rounded-lg border p-4 overflow-hidden",
@@ -282,9 +282,9 @@ export function ToastNotification({
         <AnimatePresence>
             {visible && (
                 <motion.div
-                    initial={{ opacity: 0, y: -60, scale: 0.9 }}
+                    initial={{ opacity: 0.01, y: -60, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -60, scale: 0.9 }}
+                    exit={{ opacity: 0.01, y: -60, scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     className={cn(
                         "fixed top-4 left-1/2 -translate-x-1/2 z-[100]",

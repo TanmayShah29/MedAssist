@@ -83,7 +83,7 @@ export function StepSymptoms() {
             {/* Selected count */}
             {selectedSymptoms.length > 0 && (
                 <motion.div
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0.01, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-[#F5F4EF] rounded-[12px] border border-[#E8E6DF] p-4"
                 >

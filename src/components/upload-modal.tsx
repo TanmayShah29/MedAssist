@@ -194,17 +194,17 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             {isOpen && (
                 <>
                     <motion.div
-                        initial={{ opacity: 0 }}
+                        initial={{ opacity: 0.01 }}
                         animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        exit={{ opacity: 0.01 }}
                         onClick={!isProcessing ? onClose : undefined}
                         className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm transform-gpu"
                     />
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        initial={{ opacity: 0.01, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        exit={{ opacity: 0.01, scale: 0.95, y: 20 }}
                         className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50 px-4"
                     >
                         <div className="bg-[#FAFAF7] rounded-[24px] shadow-2xl overflow-hidden border border-[#E8E6DF]">

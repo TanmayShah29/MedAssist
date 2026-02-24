@@ -39,16 +39,16 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                 {isOpen && (
                     <>
                         <motion.div
-                            initial={{ opacity: 0 }}
+                            initial={{ opacity: 0.01 }}
                             animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            exit={{ opacity: 0.01 }}
                             onClick={() => setIsOpen(false)}
                             className="fixed inset-0 z-40"
                         />
                         <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            initial={{ opacity: 0.01, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            exit={{ opacity: 0.01, y: 10, scale: 0.95 }}
                             className="absolute right-0 mt-2 w-64 bg-white border border-[#E8E6DF] rounded-2xl shadow-xl z-50 overflow-hidden"
                         >
                             <div className="p-3 border-b border-[#F1F1EF] bg-[#FAFAF7]">

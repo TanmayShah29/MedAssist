@@ -61,7 +61,7 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
         <div className="flex flex-col items-center justify-center gap-8">
             {/* Logo */}
             <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
+                initial={{ scale: 0.5, opacity: 0.01 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                 className="flex flex-col items-center gap-3"
@@ -90,7 +90,7 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
             <AnimatePresence>
                 {phase === "loading" && (
                     <motion.div
-                        initial={{ opacity: 0, y: 16 }}
+                        initial={{ opacity: 0.01, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="w-72 space-y-4"
                     >
@@ -107,9 +107,9 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
                         <AnimatePresence mode="wait">
                             <motion.p
                                 key={stepIdx}
-                                initial={{ opacity: 0, y: 4 }}
+                                initial={{ opacity: 0.01, y: 4 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -4 }}
+                                exit={{ opacity: 0.01, y: -4 }}
                                 transition={{ duration: 0.2 }}
                                 className="text-center text-sm text-slate-400 font-mono"
                             >
@@ -203,7 +203,7 @@ function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
                     return (
                         <motion.div
                             key={step.label}
-                            initial={{ opacity: 0, x: -8 }}
+                            initial={{ opacity: 0.01, x: -8 }}
                             animate={{ opacity: done >= idx ? 1 : 0.3, x: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             className="flex items-center gap-3"
@@ -250,7 +250,7 @@ export function Preloader({
             {visible && (
                 <motion.div
                     initial={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    exit={{ opacity: 0.01 }}
                     transition={{ duration: 0.4 }}
                     className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950 min-h-[100dvh]"
                 >

@@ -109,7 +109,7 @@ export function Calendar({
                 </button>
                 <motion.h3
                     key={`${viewMonth}-${viewYear}`}
-                    initial={{ opacity: 0 }}
+                    initial={{ opacity: 0.01 }}
                     animate={{ opacity: 1 }}
                     className="text-sm font-semibold text-slate-900"
                 >
@@ -139,9 +139,9 @@ export function Calendar({
                     <motion.div
                         key={`${viewMonth}-${viewYear}`}
                         custom={direction}
-                        initial={{ opacity: 0, x: direction * 20 }}
+                        initial={{ opacity: 0.01, x: direction * 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: direction * -20 }}
+                        exit={{ opacity: 0.01, x: direction * -20 }}
                         transition={{ duration: 0.2 }}
                         className="grid grid-cols-7 gap-y-1"
                     >
@@ -210,7 +210,7 @@ export function Calendar({
                         {selectedEvents.map(event => (
                             <motion.div
                                 key={event.id}
-                                initial={{ opacity: 0, y: 4 }}
+                                initial={{ opacity: 0.01, y: 4 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100"
                             >

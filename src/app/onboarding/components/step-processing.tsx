@@ -186,7 +186,7 @@ export function StepProcessing() {
         return (
             <div className="max-w-lg mx-auto w-full px-6 py-20 flex flex-col items-center">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0.01, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="w-full p-6 rounded-[16px] border-l-4 border-[#EF4444] bg-[#FFF1F2] shadow-sm"
                 >
@@ -261,7 +261,7 @@ export function StepProcessing() {
 
         return (
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0.01, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 style={{ textAlign: 'center', padding: '48px 24px', maxWidth: 600, margin: '0 auto' }}
             >

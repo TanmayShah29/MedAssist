@@ -400,7 +400,7 @@ export function StepUpload() {
                 </div>
             ) : (
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0.01, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-white border border-[#E8E6DF] rounded-[16px] p-4 
                      flex items-center gap-4 relative shadow-sm"

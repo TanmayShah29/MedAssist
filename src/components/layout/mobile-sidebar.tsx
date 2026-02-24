@@ -31,9 +31,9 @@ export function MobileSidebar() {
                     <>
                         {/* Backdrop */}
                         <motion.div
-                            initial={{ opacity: 0 }}
+                            initial={{ opacity: 0.01 }}
                             animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            exit={{ opacity: 0.01 }}
                             onClick={() => setOpen(false)}
                             className="
                 lg:hidden fixed inset-0 z-40

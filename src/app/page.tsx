@@ -95,7 +95,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center">
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0.01, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
@@ -212,7 +212,7 @@ export default function LandingPage() {
                   </div>
                   <div className="relative z-10 flex flex-col justify-center h-full gap-6">
                     <motion.div
-                      initial={{ x: 20, opacity: 0 }}
+                      initial={{ x: 20, opacity: 0.01 }}
                       whileInView={{ x: 0, opacity: 1 }}
                       className="bg-slate-800/80 backdrop-blur-xl transform-gpu border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
                     >
@@ -220,7 +220,7 @@ export default function LandingPage() {
                       <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
                     </motion.div>
                     <motion.div
-                      initial={{ x: -20, opacity: 0 }}
+                      initial={{ x: -20, opacity: 0.01 }}
                       whileInView={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.2 }}
                       className="bg-slate-800/80 backdrop-blur-xl transform-gpu border border-white/10 p-6 rounded-3xl shadow-2xl transform rotate-1 ml-12"
@@ -239,7 +239,7 @@ export default function LandingPage() {
         <section className="py-24 px-6 bg-card border-y border-border-light">
           <div className="max-w-3xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0.01, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
@@ -259,7 +259,7 @@ export default function LandingPage() {
                 ].map((problem, idx) => (
                   <motion.div
                     key={problem}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0.01, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
@@ -330,7 +330,7 @@ export default function LandingPage() {
                 ].map((item, idx) => (
                   <motion.div
                     key={item.step}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0.01, y: 30 }}
                     animate={isPipelineInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ delay: idx * 0.2, duration: 0.5 }}
                     className="relative flex items-start"
@@ -372,7 +372,7 @@ export default function LandingPage() {
 
             {/* What you get */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0.01, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.6 }}
@@ -410,7 +410,7 @@ export default function LandingPage() {
               {/* Left: Interactive-looking Dashboard Mockup */}
               <div className="grow shrink basis-auto relative w-full lg:max-w-xl">
                 <motion.div
-                  initial={{ opacity: 0, x: -40 }}
+                  initial={{ opacity: 0.01, x: -40 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   className="bg-card rounded-3xl border border-border-light shadow-2xl p-6 relative z-10 overflow-hidden"
                 >
@@ -583,7 +583,7 @@ export default function LandingPage() {
         <section className="py-24 px-6 bg-page">
           <div className="max-w-4xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0.01, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
@@ -621,7 +621,7 @@ export default function LandingPage() {
                 ].map((stage, idx) => (
                   <motion.div
                     key={stage.timeline}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0.01, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
@@ -687,7 +687,7 @@ export default function LandingPage() {
         <section className="py-24 px-6">
           <div className="max-w-3xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0.01, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >

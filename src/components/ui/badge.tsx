@@ -151,9 +151,9 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         if (animate) {
             return (
                 <motion.span
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0.01, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
+                    exit={{ opacity: 0.01, scale: 0.8 }}
                     transition={{ duration: 0.15, ease: "easeOut" }}
                     style={{ display: "inline-flex" }}
                 >

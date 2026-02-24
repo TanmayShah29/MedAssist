@@ -60,9 +60,9 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                 <>
                     {/* Backdrop */}
                     <motion.div
-                        initial={{ opacity: 0 }}
+                        initial={{ opacity: 0.01 }}
                         animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        exit={{ opacity: 0.01 }}
                         onClick={onClose}
                         className="fixed inset-0 bg-black/20 backdrop-blur-sm transform-gpu z-50 gpu-accelerate"
                     />

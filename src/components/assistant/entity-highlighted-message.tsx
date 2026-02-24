@@ -68,7 +68,7 @@ export function HighlightedMessage({ content, role, entities = [], citations = [
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0.01, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
                 "flex gap-4 p-4 rounded-lg max-w-[90%] mb-6 relative group transition-colors",

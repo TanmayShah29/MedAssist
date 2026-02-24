@@ -9,9 +9,9 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function AnimatedPage({ children }: { children: React.ReactNode }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0.01, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0.01, y: -10 }}
             transition={{ duration: 0.6, ease: EASE }}
         >
             {children}
@@ -56,7 +56,7 @@ export function StaggerItem({
         <motion.div
             className={className}
             variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0.01, y: 20 },
                 visible: {
                     opacity: 1,
                     y: 0,
@@ -133,7 +133,7 @@ export function FadeIn({
     return (
         <motion.div
             className={className}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0.01, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration, delay, ease: EASE }}
         >

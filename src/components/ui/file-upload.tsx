@@ -107,7 +107,7 @@ export const FileUpload = ({
 
                     {!files.length && isDragActive && (
                         <motion.div
-                            initial={{ opacity: 0 }}
+                            initial={{ opacity: 0.01 }}
                             animate={{ opacity: 1 }}
                             className="text-sky-500 text-sm font-medium"
                         >

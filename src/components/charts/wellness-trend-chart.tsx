@@ -47,9 +47,9 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.9 }}
+            initial={{ opacity: 0.01, y: -10, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.9 }}
+            exit={{ opacity: 0.01, y: -10, scale: 0.9 }}
             transition={{ duration: 0.15 }}
             // Glassmorphism style - Light Mode
             className="rounded-lg border bg-white/90 backdrop-blur-md transform-gpu p-4 shadow-xl ring-1 ring-slate-200/50 z-50"
@@ -111,7 +111,7 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0.01, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className={cn("col-span-4", className)}

@@ -42,9 +42,9 @@ export function FeedbackButton() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        initial={{ opacity: 0.01, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        exit={{ opacity: 0.01, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
                         className="bg-white border border-[#E8E6DF] shadow-xl rounded-[16px] p-4 w-72 mb-4 origin-bottom-right"
                     >

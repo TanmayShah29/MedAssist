@@ -109,9 +109,9 @@ export function MedicineCabinet() {
             <AnimatePresence>
                 {showAddForm && (
                     <motion.form
-                        initial={{ opacity: 0, height: 0 }}
+                        initial={{ opacity: 0.01, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
+                        exit={{ opacity: 0.01, height: 0 }}
                         onSubmit={handleAddSupplement}
                         className="mb-6 space-y-4 overflow-hidden"
                     >
