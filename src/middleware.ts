@@ -5,9 +5,13 @@ import type { NextRequest } from 'next/server'
 export default async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
+    // Always set x-pathname so layout can render correctly (fixes blank page)
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-pathname', pathname)
+
     // Landing page — NEVER redirect, always show
     if (pathname === '/') {
-        return NextResponse.next()
+        return NextResponse.next({ request: { headers: requestHeaders } })
     }
 
     // Legacy /login → show sign-in form
@@ -29,12 +33,8 @@ export default async function middleware(request: NextRequest) {
         pathname === '/privacy' ||
         pathname.includes('.')
     ) {
-        return NextResponse.next()
+        return NextResponse.next({ request: { headers: requestHeaders } })
     }
-
-    // Prepare headers for server components
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-pathname', pathname);
 
     // Initial response with headers
     let response = NextResponse.next({
