@@ -43,8 +43,8 @@ export default function LandingPage() {
       {/* ── HEADER ───────────────────────────────────── */}
       <header
         className="fixed top-0 left-0 right-0 z-50 
-                   bg-[#FAFAF7]/80 backdrop-blur-md 
-                   border-b border-[#E8E6DF]"
+                   bg-page/80 backdrop-blur-md 
+                   border-b border-border-light"
         style={{ WebkitBackdropFilter: "blur(12px)" }}
       >
         <div className="max-w-6xl mx-auto px-6 h-16 
@@ -56,13 +56,21 @@ export default function LandingPage() {
                             shadow-sm shadow-sky-500/20">
               <Shield className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display text-xl text-[#1C1917]">
+            <span className="font-display text-xl text-text-primary">
               MedAssist
             </span>
           </Link>
 
           {/* Nav CTAs */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
+            {!isSignedIn && (
+              <Link 
+                href="/auth?mode=login" 
+                className="text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors px-4 py-2"
+              >
+                Sign in
+              </Link>
+            )}
             <button
               onClick={() => {
                 if (isSignedIn) {
@@ -71,19 +79,8 @@ export default function LandingPage() {
                   router.push('/auth?mode=signup');
                 }
               }}
-              style={{
-                background: '#0EA5E9',
-                color: 'white',
-                border: 'none',
-                borderRadius: 10,
-                padding: '8px 20px',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = '#0284C7'}
-              onMouseLeave={e => e.currentTarget.style.background = '#0EA5E9'}
+              className="bg-sky-500 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-sky-600 transition-all active:scale-95 shadow-md shadow-sky-500/20"
+              style={{ WebkitAppearance: 'none', marginLeft: 8 }}
             >
               {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
             </button>
@@ -100,14 +97,6 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 
-                           bg-sky-50 border border-sky-200 rounded-full 
-                           text-xs font-medium text-sky-700 mb-6">
-              <Sparkles className="w-3 h-3" />
-              AI-powered health insights you can actually understand
-            </div>
-
             {/* Headline */}
             <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl 
                            text-[#1C1917] leading-[1.05] mb-6">
@@ -117,6 +106,13 @@ export default function LandingPage() {
             </h1>
 
             {/* Subheadline */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 
+                           bg-sky-50 border border-sky-200 rounded-full 
+                           text-xs font-medium text-sky-700 mb-8">
+              <Sparkles className="w-3 h-3" />
+              AI-powered health insights you can actually understand
+            </div>
+
             <p className="text-lg sm:text-xl text-[#57534E] 
                           max-w-2xl mx-auto leading-relaxed mb-10">
               Upload your blood work. Get plain-language explanations
@@ -125,7 +121,7 @@ export default function LandingPage() {
             </p>
 
             {/* Primary CTA */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}>
+            <div className="flex flex-col items-center mt-8">
               <button
                 onClick={() => {
                   if (isSignedIn) {
@@ -136,23 +132,12 @@ export default function LandingPage() {
                     router.push('/auth?mode=signup');
                   }
                 }}
-                style={{
-                  background: '#0EA5E9',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 10,
-                  padding: '14px 32px',
-                  fontSize: 16,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#0284C7'}
-                onMouseLeave={e => e.currentTarget.style.background = '#0EA5E9'}
+                className="bg-sky-500 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-sky-600 transition-all shadow-lg shadow-sky-500/25 active:scale-95"
+                style={{ WebkitAppearance: 'none' }}
               >
                 {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
               </button>
-              <p style={{ fontSize: 13, color: '#A8A29E', margin: 0 }}>
+              <p className="text-xs text-text-muted mt-3">
                 Free to start · No credit card required · Takes 3 minutes
               </p>
             </div>
@@ -160,82 +145,89 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── COMING SOON: ADVANCED INTELLIGENCE ────────── */}
-      <section className="py-20 px-6 bg-[#0F172A] text-white overflow-hidden">
+      {/* ── ADVANCED INTELLIGENCE ────────── */}
+      <section className="py-24 px-6 bg-[#0F172A] text-white overflow-hidden">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center gap-12">
+          <div className="flex flex-col md:flex-row items-center gap-16 lg:gap-24">
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 
                              bg-indigo-500/10 border border-indigo-500/20 
                              rounded-full text-[10px] font-bold text-indigo-400 
-                             uppercase tracking-widest mb-6">
+                             uppercase tracking-widest mb-8">
                 Next Generation Health Intelligence
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl leading-tight mb-6">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-8">
                 Beyond just <span className="text-indigo-400">results.</span>
                 <br />
                 Real-world <span className="text-indigo-400">correlations.</span>
               </h2>
-              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                MedAssist is the first clinical intelligence platform that understands the "why" behind your numbers by connecting your actions to your outcomes.
+              <p className="text-slate-400 text-lg mb-12 leading-relaxed">
+                MedAssist is the first clinical intelligence platform that understands 
+                the &quot;why&quot; behind your numbers by connecting your actions to your outcomes.
               </p>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {[
                   {
                     title: "Supplement Correlation",
                     desc: "Log your intake and see exactly how it affects your biomarkers with automated chart markers.",
                     status: "LIVE"
-                  },
-                  {
-                    title: "Health Timeline",
-                    desc: "A medical diary that connects symptoms, lab reports, and AI insights.",
-                    status: "COMING SOON"
                   }
                 ].map((item, idx) => (
-                  <div key={idx} className="flex gap-4">
+                  <div key={idx} className="flex">
                     <div className={cn(
-                        "w-1 h-auto rounded-full",
+                        "w-1 h-auto rounded-full shrink-0",
                         item.status === "LIVE" ? "bg-emerald-500" : "bg-indigo-500/30"
                     )} />
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="font-bold text-slate-200">{item.title}</h4>
+                    <div style={{ marginLeft: 24 }}>
+                      <div className="flex items-center mb-2">
+                        <h4 className="font-bold text-slate-200 text-lg">{item.title}</h4>
                         <span className={cn(
-                            "text-[9px] font-bold px-1.5 py-0.5 rounded border",
+                            "text-[10px] font-black px-2 py-0.5 rounded border tracking-tighter",
                             item.status === "LIVE" 
                                 ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" 
                                 : "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"
-                        )}>
+                        )} style={{ marginLeft: 12 }}>
                             {item.status}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-500">{item.desc}</p>
+                      <p className="text-base text-slate-500 leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="flex-1 relative">
+            <div className="flex-1 w-full relative">
               {/* Visual representation of a timeline/correlation */}
-              <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/10 rounded-[32px] border border-white/5 p-8 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-full space-y-4 opacity-50 blur-[1px]">
-                     <div className="h-2 bg-indigo-500/20 rounded-full w-3/4 mx-auto" />
-                     <div className="h-2 bg-sky-500/20 rounded-full w-1/2 mx-auto" />
-                     <div className="h-2 bg-emerald-500/20 rounded-full w-2/3 mx-auto" />
+              <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/20 rounded-[48px] border border-white/5 p-8 lg:p-12 relative overflow-hidden group">
+                <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-xl group-hover:opacity-30 transition-opacity">
+                  <div className="w-full space-y-8">
+                     <div className="h-3 bg-indigo-500 rounded-full w-3/4 mx-auto" />
+                     <div className="h-3 bg-sky-500 rounded-full w-1/2 mx-auto" />
+                     <div className="h-3 bg-emerald-500 rounded-full w-2/3 mx-auto" />
                   </div>
                 </div>
-                <div className="relative z-10 flex flex-col justify-center h-full">
-                  <div className="bg-[#1E293B] border border-white/10 p-5 rounded-2xl shadow-2xl transform -rotate-3 mb-4">
-                    <p className="text-[10px] text-indigo-400 font-bold uppercase mb-2">CORRELATION DETECTED</p>
-                    <p className="text-sm font-medium">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
-                  </div>
-                  <div className="bg-[#1E293B] border border-white/10 p-5 rounded-2xl shadow-2xl transform rotate-2 ml-8">
-                    <p className="text-[10px] text-emerald-400 font-bold uppercase mb-2">TIMELINE EVENT</p>
-                    <p className="text-sm font-medium">Symptom "Fatigue" disappeared 4 days after Hemoglobin returned to optimal.</p>
-                  </div>
+                <div className="relative z-10 flex flex-col justify-center h-full gap-6">
+                  <motion.div 
+                    initial={{ x: 20, opacity: 0 }}
+                    whileInView={{ x: 0, opacity: 1 }}
+                    className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
+                    style={{ WebkitBackdropFilter: "blur(24px)" }}
+                  >
+                    <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest mb-3">CORRELATION DETECTED</p>
+                    <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ x: -20, opacity: 0 }}
+                    whileInView={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform rotate-1 ml-12"
+                    style={{ WebkitBackdropFilter: "blur(24px)" }}
+                  >
+                    <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mb-3">TIMELINE EVENT</p>
+                    <p className="text-sm font-medium text-slate-200 leading-relaxed">Symptom &quot;Fatigue&quot; disappeared 4 days after Hemoglobin returned to optimal.</p>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -244,7 +236,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── THE PROBLEM ───────────────────────────────── */}
-      <section className="py-16 px-6 bg-[#F5F4EF] border-y border-[#E8E6DF]">
+      <section className="py-24 px-6 bg-card border-y border-border-light">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -252,20 +244,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 style={{
-              fontFamily: 'Instrument Serif',
-              fontSize: 32,
-              fontWeight: 700,
-              color: '#1C1917',
-              textAlign: 'center',
-              marginBottom: 32
-            }}>
+            <h2 className="text-4xl font-bold text-text-primary text-center mb-12">
               You get your lab results back.
               <br />
               Now what?
             </h2>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
               {[
                 "Numbers on a page that mean nothing to you",
                 "Google searches that make you worry more",
@@ -278,43 +263,19 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 12,
-                    padding: 16,
-                    background: '#FAFAF7',
-                    borderRadius: 12,
-                    border: '1px solid #E8E6DF'
-                  }}
+                  className="flex items-start p-5 bg-white rounded-2xl border border-border-light shadow-sm"
                 >
-                  <div style={{
-                    width: 24,
-                    height: 24,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    marginTop: 2
-                  }}>
-                    <X className="w-4 h-4 text-red-500" />
+                  <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
+                    <X className="w-5 h-5 text-red-500" />
                   </div>
-                  <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', lineHeight: 1.6, margin: 0 }}>
+                  <p className="text-lg text-text-secondary leading-relaxed" style={{ marginLeft: 16 }}>
                     {problem}
                   </p>
                 </motion.div>
               ))}
             </div>
 
-            <p style={{
-              fontFamily: 'DM Sans',
-              fontSize: 15,
-              color: '#57534E',
-              textAlign: 'center',
-              maxWidth: 480,
-              margin: '24px auto 0 auto',
-              lineHeight: 1.6
-            }}>
+            <p className="text-text-secondary text-center max-w-lg mx-auto mt-10 leading-relaxed italic">
               MedAssist is free to use. No credit card, no subscription, no catch.
               Just upload your lab report and get instant plain-English explanations.
             </p>
@@ -323,19 +284,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS (SIMPLE PIPELINE) ─────────────── */}
-      <section className="py-20 px-6" ref={pipelineRef}>
+      <section className="py-24 px-6" ref={pipelineRef}>
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 style={{
-              fontFamily: 'Instrument Serif',
-              fontSize: 32,
-              fontWeight: 700,
-              color: '#1C1917',
-              marginBottom: 12
-            }}>
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
               How MedAssist works
             </h2>
-            <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
               From lab report to health insights in 3 simple steps
             </p>
           </div>
@@ -343,34 +298,34 @@ export default function LandingPage() {
           {/* Pipeline steps */}
           <div className="relative">
             {/* Connecting line */}
-            <div className="absolute left-8 top-8 bottom-8 w-0.5 
-                            bg-[#E8E6DF] hidden md:block" />
+            <div className="absolute left-10 top-10 bottom-10 w-0.5 
+                            bg-border-light hidden md:block" />
 
-            <div className="space-y-8">
+            <div className="space-y-12">
               {[
                 {
                   step: "1",
-                  icon: <Upload className="w-5 h-5 text-white" />,
+                  icon: <Upload className="w-6 h-6 text-white" />,
                   title: "Upload your lab report",
                   description: "Works with digital PDF lab reports from any lab.",
                   detail: "Takes 5 seconds",
-                  color: "sky",
+                  color: "bg-sky-500",
                 },
                 {
                   step: "2",
-                  icon: <Brain className="w-5 h-5 text-white" />,
+                  icon: <Brain className="w-6 h-6 text-white" />,
                   title: "AI reads every value",
                   description: "Groq AI extracts every biomarker — Hemoglobin, CRP, Vitamin D, Glucose — and compares them to clinical reference ranges.",
                   detail: "Takes 20–40 seconds",
-                  color: "sky",
+                  color: "bg-sky-500",
                 },
                 {
                   step: "3",
-                  icon: <LineChart className="w-5 h-5 text-white" />,
+                  icon: <LineChart className="w-6 h-6 text-white" />,
                   title: "See what it all means",
-                  description: "Your dashboard shows: What's optimal. What needs attention. What trends you should track. All in plain language you can actually understand — and with professional print styling for your next doctor's visit.",
+                  description: "Your dashboard shows: What's optimal. What needs attention. What trends you should track. All in plain language you can actually understand.",
                   detail: "Updated every time you upload",
-                  color: "emerald",
+                  color: "bg-emerald-500",
                 },
               ].map((item, idx) => (
                 <motion.div
@@ -378,37 +333,35 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={isPipelineInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: idx * 0.2, duration: 0.5 }}
-                  className="relative flex gap-5 md:gap-6"
+                  className="relative flex items-start"
                 >
                   {/* Step number circle */}
                   <div className={`
                     relative z-10 flex-shrink-0
-                    w-16 h-16 rounded-2xl
+                    w-20 h-20 rounded-3xl
                     flex items-center justify-center
-                    shadow-sm
-                    ${item.color === "emerald"
-                      ? "bg-emerald-500"
-                      : "bg-sky-500"}
+                    shadow-xl shadow-sky-500/10
+                    ${item.color}
                   `}>
                     {item.icon}
-                    <span className="absolute -top-1 -right-1 w-6 h-6 
-                                     rounded-full bg-white border-2 
-                                     border-[#FAFAF7] flex items-center 
-                                     justify-center text-xs font-bold 
-                                     text-[#1C1917]">
+                    <div className="absolute -top-2 -right-2 w-8 h-8 
+                                     rounded-full bg-white border-4 
+                                     border-page flex items-center 
+                                     justify-center text-xs font-black 
+                                     text-text-primary shadow-sm">
                       {item.step}
-                    </span>
+                    </div>
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pt-1">
-                    <h3 style={{ fontFamily: 'Instrument Serif', fontSize: 20, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>
+                  <div className="flex-1 pt-2" style={{ marginLeft: 32 }}>
+                    <h3 className="text-2xl font-bold text-text-primary mb-3">
                       {item.title}
                     </h3>
-                    <p style={{ fontFamily: 'DM Sans', fontSize: 15, color: '#57534E', lineHeight: 1.6, marginBottom: 8 }}>
+                    <p className="text-lg text-text-secondary leading-relaxed mb-3">
                       {item.description}
                     </p>
-                    <p style={{ fontSize: 12, fontWeight: 500, color: '#A8A29E' }}>
+                    <p className="text-xs font-bold text-text-muted uppercase tracking-wider">
                       {item.detail}
                     </p>
                   </div>
@@ -423,18 +376,12 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6 }}
-            style={{
-              padding: 24,
-              background: '#F0F9FF',
-              borderRadius: 16,
-              border: '1px solid #BAE6FD',
-              marginTop: 56
-            }}
+            className="p-10 bg-sky-50 border border-sky-100 rounded-[32px] mt-20 shadow-sm"
           >
-            <p className="text-sm font-semibold text-sky-800 mb-3">
-              What you get in your dashboard:
+            <p className="text-sm font-bold text-sky-800 uppercase tracking-widest mb-6">
+              Included in your clinical dashboard:
             </p>
-            <div className="grid sm:grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
               {[
                 "Health score (0-100) based on all your values",
                 "Which results need attention today",
@@ -446,8 +393,8 @@ export default function LandingPage() {
                 "What to ask your doctor at your next visit",
               ].map(feature => (
                 <div key={feature}
-                  className="flex items-start gap-2 text-sm text-sky-700">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  className="flex items-start text-sm font-medium text-sky-700">
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-sky-500" style={{ marginRight: 12 }} />
                   {feature}
                 </div>
               ))}
@@ -456,270 +403,219 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── TRUST & SOCIAL PROOF SECTION ───────────────── */}
+      <section className="py-24 px-6 bg-white overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            {/* Left: Interactive-looking Dashboard Mockup */}
+            <div className="flex-1 relative w-full lg:max-w-xl">
+              <motion.div 
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                className="bg-card rounded-3xl border border-border-light shadow-2xl p-6 relative z-10 overflow-hidden"
+              >
+                {/* Mock Header */}
+                <div className="flex justify-between items-center mb-8">
+                  <div className="h-4 w-32 bg-border-light rounded-full" />
+                  <div className="h-8 w-8 bg-sky-500 rounded-lg" />
+                </div>
+                {/* Mock Hero Card */}
+                <div className="bg-sky-500 rounded-2xl p-6 text-white mb-6">
+                  <div className="h-3 w-20 bg-white/20 rounded-full mb-4" />
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-4xl font-black">82</div>
+                    <div className="text-sm font-bold bg-white/20 px-2 py-0.5 rounded">Good</div>
+                  </div>
+                </div>
+                {/* Mock Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white border border-border-light rounded-xl p-4">
+                    <div className="h-2 w-12 bg-emerald-100 rounded-full mb-2" />
+                    <div className="h-4 w-20 bg-text-primary rounded-full" />
+                  </div>
+                  <div className="bg-white border border-border-light rounded-xl p-4">
+                    <div className="h-2 w-12 bg-amber-100 rounded-full mb-2" />
+                    <div className="h-4 w-20 bg-text-primary rounded-full" />
+                  </div>
+                </div>
+              </motion.div>
+              {/* Decorative elements */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-sky-500/5 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl" />
+            </div>
+
+            {/* Right: Trust Statements */}
+            <div className="flex-1">
+              <h2 className="text-4xl font-bold text-text-primary mb-8">
+                Your health data is <br />
+                <span className="text-sky-500">private and secure.</span>
+              </h2>
+              <div className="space-y-8">
+                {[
+                  {
+                    title: "Your data is never sold",
+                    desc: "We don't share your medical information with third parties or advertisers. Ever.",
+                    icon: <Shield className="w-6 h-6 text-emerald-500" />
+                  },
+                  {
+                    title: "Row-level encryption",
+                    desc: "Built on Supabase with enterprise-grade security. Only you can access your uploads.",
+                    icon: <Sparkles className="w-6 h-6 text-sky-500" />
+                  },
+                  {
+                    title: "Delete anytime",
+                    desc: "You have full control. One click to permanently wipe your entire history from our servers.",
+                    icon: <X className="w-6 h-6 text-red-500" />
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex">
+                    <div className="w-12 h-12 rounded-xl bg-page border border-border-light flex items-center justify-center shrink-0">
+                      {item.icon}
+                    </div>
+                    <div style={{ marginLeft: 20 }}>
+                      <h4 className="text-lg font-bold text-text-primary mb-1">{item.title}</h4>
+                      <p className="text-text-secondary leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── TECHNICAL PIPELINE SECTION ───────────────── */}
-      <section style={{
-        padding: '80px 24px',
-        background: '#FAFAF7', // Page background
-      }}>
-        <div style={{
-          maxWidth: 900,
-          margin: '0 auto',
-          background: '#F5F4EF',
-          border: '1px solid #E8E6DF',
-          borderRadius: 18,
-          padding: '64px 24px'
-        }}>
+      <section className="py-24 px-6 bg-page">
+        <div className="max-w-5xl mx-auto bg-card border border-border-light rounded-[32px] p-12 lg:p-20 shadow-sm">
 
           {/* Section label */}
-          <p style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: '#A8A29E',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            textAlign: 'center',
-            margin: '0 0 12px 0'
-          }}>
-            TECHNICAL PIPELINE
+          <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] text-center mb-4">
+            TECHNICAL ARCHITECTURE
           </p>
 
-          <h2 style={{
-            fontFamily: 'Instrument Serif',
-            fontSize: 32,
-            fontWeight: 700,
-            color: '#1C1917',
-            textAlign: 'center',
-            margin: '0 0 8px 0'
-          }}>
-            How the AI actually works
+          <h2 className="text-4xl lg:text-5xl font-bold text-text-primary text-center mb-6">
+            Clinical-grade AI pipeline
           </h2>
 
-          <p style={{
-            fontFamily: 'DM Sans',
-            fontSize: 15,
-            color: '#57534E',
-            textAlign: 'center',
-            margin: '0 auto 56px auto',
-            maxWidth: 520,
-            lineHeight: 1.6
-          }}>
-            MedAssist uses a multi-stage AI pipeline to extract, interpret,
-            and structure your lab data with high accuracy.
+          <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+            MedAssist uses a multi-stage clinical intelligence pipeline to extract, 
+            interpret, and structure your lab data with high accuracy.
           </p>
 
           {/* Pipeline steps */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: 0,
-            position: 'relative'
-          }}>
-
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-0 border border-border-light rounded-2xl overflow-hidden">
             {[
               {
                 step: '01',
                 title: 'PDF Upload',
                 tech: 'Next.js 16',
-                description: 'User uploads a digital lab report PDF through a secure file handler. File is read as binary and passed to the extraction layer.',
-                color: '#0EA5E9'
+                description: 'Secure file handler processing digital lab reports as binary data.',
+                color: 'text-sky-500'
               },
               {
                 step: '02',
                 title: 'OCR Extraction',
-                tech: 'OCR.space API',
-                description: 'Optical Character Recognition reads every value, unit, and reference range from the PDF — including complex lab table layouts.',
-                color: '#8B5CF6'
+                tech: 'OCR.space',
+                description: 'Extracting raw values, units, and clinical reference ranges.',
+                color: 'text-violet-500'
               },
               {
                 step: '03',
-                title: 'AI Interpretation',
-                tech: 'Groq · Llama 3.3 70B',
-                description: 'Extracted text is structured into a JSON schema by a large language model. Each biomarker is classified, scored, and given a plain-English explanation.',
-                color: '#10B981'
+                title: 'AI Analysis',
+                tech: 'Llama 3.3',
+                description: 'Structuring data into clinical schemas with plain-English insights.',
+                color: 'text-emerald-500'
               },
               {
                 step: '04',
-                title: 'Data Persistence',
-                tech: 'Supabase · PostgreSQL',
-                description: 'Biomarkers, health score, and AI interpretations are stored with row-level security. Each user can only access their own data.',
-                color: '#F59E0B'
+                title: 'Persistence',
+                tech: 'PostgreSQL',
+                description: 'Encrypted storage with row-level security for total privacy.',
+                color: 'text-amber-500'
               },
               {
                 step: '05',
-                title: 'Visualisation',
-                tech: 'Recharts · React',
-                description: 'Results are rendered as interactive charts — range bars, trend lines, and radar charts — so patterns are immediately visible.',
-                color: '#EF4444'
+                title: 'Insights',
+                tech: 'Recharts',
+                description: 'Rendering longitudinal trends and clinical system balance charts.',
+                color: 'text-red-500'
               }
-            ].map((item, index, arr) => (
-              <div key={item.step} style={{ position: 'relative' }}>
-
-                {/* Connector line between steps */}
-                {index < arr.length - 1 && (
-                  <div className="hidden md:block" style={{
-                    position: 'absolute',
-                    top: 28,
-                    right: -1,
-                    width: 2,
-                    height: 20,
-                    background: '#E8E6DF',
-                    zIndex: 1,
-                  }} />
-                )}
-
-                <div style={{
-                  padding: '24px 20px',
-                  borderLeft: index === 0 ? 'none' : '1px solid #E8E6DF',
-                }}
-                  className={index > 0 ? "border-l border-[#E8E6DF] md:border-l" : ""}
-                >
-                  {/* Step number */}
-                  <div style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: item.color,
-                    letterSpacing: '0.05em',
-                    marginBottom: 12
-                  }}>
-                    {item.step}
-                  </div>
-
-                  {/* Title */}
-                  <h3 style={{
-                    fontFamily: 'Instrument Serif',
-                    fontSize: 18,
-                    fontWeight: 600,
-                    color: '#1C1917',
-                    margin: '0 0 6px 0'
-                  }}>
-                    {item.title}
-                  </h3>
-
-                  {/* Tech badge */}
-                  <div style={{
-                    display: 'inline-block',
-                    background: '#E8E6DF',
-                    color: '#57534E',
-                    fontSize: 11,
-                    padding: '2px 8px',
-                    borderRadius: 4,
-                    marginBottom: 12,
-                    fontFamily: 'monospace'
-                  }}>
-                    {item.tech}
-                  </div>
-
-                  {/* Description */}
-                  <p style={{
-                    fontFamily: 'DM Sans',
-                    fontSize: 13,
-                    color: '#57534E',
-                    margin: 0,
-                    lineHeight: 1.6
-                  }}>
-                    {item.description}
-                  </p>
+            ].map((item, index) => (
+              <div 
+                key={item.step} 
+                className={`p-6 bg-white/50 backdrop-blur-sm ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-border-light' : ''}`}
+              >
+                <div className={`text-xs font-bold ${item.color} mb-3 tracking-widest`}>
+                  {item.step}
                 </div>
+                <h3 className="text-lg font-bold text-text-primary mb-2">
+                  {item.title}
+                </h3>
+                <div className="inline-block bg-white border border-border-light text-text-secondary text-[10px] px-2 py-0.5 rounded-md font-mono mb-4">
+                  {item.tech}
+                </div>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {item.description}
+                </p>
               </div>
             ))}
           </div>
 
           {/* Tech stack row at bottom */}
-          <div style={{
-            marginTop: 48,
-            paddingTop: 32,
-            borderTop: '1px solid #E8E6DF',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 12,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <span style={{ fontFamily: 'DM Sans', fontSize: 13, color: '#57534E', marginRight: 8 }}>
-              Built with:
+          <div className="mt-16 pt-10 border-t border-border-light flex flex-wrap justify-center">
+            <span className="text-sm font-medium text-text-secondary self-center" style={{ marginRight: 12 }}>
+              Powered by Groq AI & Llama 3.3
             </span>
-            {[
-              'Next.js 16',
-              'TypeScript',
-              'Supabase',
-              'PostgreSQL',
-              'Groq AI',
-              'Llama 3.3 70B',
-              'OCR.space',
-              'Recharts',
-              'Vercel',
-              'Zustand'
-            ].map(tech => (
-              <span key={tech} style={{
-                background: '#E8E6DF',
-                color: '#57534E', // darkened from #A8A29E
-                fontSize: 12,
-                padding: '4px 10px',
-                borderRadius: 6,
-                fontFamily: 'monospace'
-              }}>
-                {tech}
-              </span>
-            ))}
+            <div className="flex flex-wrap gap-3 justify-center">
+              {[
+                'Supabase', 'Next.js 16', 'TypeScript', 'Tailwind 4'
+              ].map(tech => (
+                <span key={tech} className="bg-white border border-border-light text-text-muted text-[11px] px-3 py-1 rounded-full font-mono">
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
-
         </div>
       </section>
 
       {/* ── WHY CONSISTENCY MATTERS ───────────────────── */}
-      <section className="py-20 px-6 bg-[#FaFaF7]">
+      <section className="py-24 px-6 bg-page">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 style={{
-              fontFamily: 'Instrument Serif',
-              fontSize: 32,
-              fontWeight: 700,
-              color: '#1C1917',
-              textAlign: 'center',
-              marginBottom: 12
-            }}>
-              Health tracking works when
-              <br />
-              you actually stick with it
+            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary text-center mb-8">
+              Consistency builds clarity
             </h2>
-            <p style={{
-              fontFamily: 'DM Sans',
-              fontSize: 15,
-              color: '#57534E',
-              textAlign: 'center',
-              maxWidth: 600,
-              margin: '0 auto 48px auto',
-              lineHeight: 1.6
-            }}>
-              One lab report tells you where you are.
+            <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+              One lab report tells you where you are. 
               <br />
-              <span className="font-semibold text-[#1C1917]">
-                Multiple reports show you where you&apos;re going.
+              <span className="font-black text-text-primary">
+                A timeline tells you where you&apos;re going.
               </span>
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {[
                 {
                   timeline: "Upload #1",
-                  title: "See your baseline",
-                  description: "Know what's optimal and what needs work",
+                  title: "Clinical Baseline",
+                  description: "Establish your starting point and identify immediate priorities.",
                   icon: "1",
                 },
                 {
                   timeline: "Upload #2",
-                  title: "Track your progress",
-                  description: "Did that vitamin D supplement help? Is hemoglobin improving?",
+                  title: "Trend Correlation",
+                  description: "See if supplements or lifestyle changes are moving your markers.",
                   icon: "2",
                 },
                 {
                   timeline: "Upload #3+",
-                  title: "Understand your body",
-                  description: "Patterns emerge. You know what works for YOU.",
+                  title: "True Health IQ",
+                  description: "Understand your body&apos;s patterns and predict future outcomes.",
                   icon: "3",
                 },
               ].map((stage, idx) => (
@@ -729,74 +625,95 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  style={{
-                    background: '#F5F4EF',
-                    borderRadius: 14,
-                    border: '1px solid #E8E6DF',
-                    padding: 24,
-                    textAlign: 'center'
-                  }}
+                  className="bg-card rounded-3xl border border-border-light p-8 text-center shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="text-2xl font-bold bg-sky-100 text-sky-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="text-2xl font-black bg-sky-100 text-sky-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6">
                     {stage.icon}
                   </div>
-                  <p className="text-[10px] font-semibold uppercase 
-                                tracking-[0.12em] text-sky-500 mb-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-500 mb-3">
                     {stage.timeline}
                   </p>
-                  <h3 style={{ fontFamily: 'Instrument Serif', fontSize: 18, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>
+                  <h3 className="text-xl font-bold text-text-primary mb-3">
                     {stage.title}
                   </h3>
-                  <p style={{ fontFamily: 'DM Sans', fontSize: 14, color: '#57534E', lineHeight: 1.6 }}>
+                  <p className="text-sm text-text-secondary leading-relaxed">
                     {stage.description}
                   </p>
                 </motion.div>
               ))}
             </div>
-
-            <div className="mt-10 text-center">
-              <p className="text-sm font-medium text-[#1C1917] mb-1">
-                The more you use MedAssist, the smarter it gets.
-              </p>
-              <p className="text-sm text-[#57534E]">
-                Trends become clear. Patterns reveal themselves.
-                Your health story unfolds.
-              </p>
-            </div>
           </motion.div>
         </div>
       </section>
 
+      {/* ── ROADMAP SECTION ───────────────────── */}
+      <section className="py-24 px-6 bg-page border-t border-border-light">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-[32px] border border-border-light p-10 shadow-sm overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Activity size={120} />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-500 mb-4">ROADMAP</h3>
+              <h2 className="text-3xl font-bold text-text-primary mb-8">What&apos;s coming next</h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="flex items-start">
+                  <div className="w-1 h-auto bg-sky-500/30 rounded-full shrink-0" />
+                  <div style={{ marginLeft: 16 }}>
+                    <div className="flex items-center mb-1">
+                      <h4 className="font-bold text-text-primary">Health Timeline</h4>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border border-sky-500/30 text-sky-600 bg-sky-50 ml-2">Q2 2026</span>
+                    </div>
+                    <p className="text-sm text-text-secondary">A unified medical diary connecting symptoms, lifestyle actions, and lab results.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-1 h-auto bg-sky-500/30 rounded-full shrink-0" />
+                  <div style={{ marginLeft: 16 }}>
+                    <div className="flex items-center mb-1">
+                      <h4 className="font-bold text-text-primary">Wearable Sync</h4>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border border-sky-500/30 text-sky-600 bg-sky-50 ml-2">Q3 2026</span>
+                    </div>
+                    <p className="text-sm text-text-secondary">Connect Apple Health or Oura to see how sleep and activity correlate with your blood work.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── WHAT IT'S NOT ─────────────────────────────── */}
-      <section className="py-16 px-6">
+      <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h3 className="font-display text-2xl text-[#1C1917] 
-                           text-center mb-8">
-              What MedAssist is <span className="italic">not</span>
+            <h3 className="text-3xl font-bold text-text-primary text-center mb-10">
+              Medical Disclaimers
             </h3>
 
-            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] 
-                            p-6 space-y-3">
+            <div className="bg-card rounded-[32px] border border-border-light p-10 space-y-6 shadow-sm">
               {[
-                "Not a doctor — this is education, not diagnosis",
-                "Not a replacement for medical care",
-                "Powered by Groq AI",
-                "Not complex — you don't need a medical degree to use it",
-              ].map(clarification => (
-                <div key={clarification}
-                  className="flex items-start gap-2.5 text-sm text-[#57534E]">
-                  <span className="text-[#1C1917] flex-shrink-0">•</span>
-                  {clarification}
+                { title: "Not a doctor", desc: "MedAssist is a clinical education tool, not a diagnostic platform." },
+                { title: "No medical advice", desc: "We do not provide treatment plans, prescriptions, or medical guidance." },
+                { title: "Professional care", desc: "Always consult a qualified healthcare provider before making medical decisions." }
+              ].map((item, idx) => (
+                <div key={idx} className="flex">
+                  <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center shrink-0 mt-1">
+                    <X className="w-3 h-3 text-red-500" />
+                  </div>
+                  <div style={{ marginLeft: 16 }}>
+                    <h4 className="text-base font-bold text-text-primary mb-1">{item.title}</h4>
+                    <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <p className="text-xs text-[#A8A29E] text-center mt-6 italic">
+            <p className="text-xs text-text-muted text-center mt-8 italic max-w-sm mx-auto">
               MedAssist helps you understand your results so you can
               have better conversations with your doctor.
             </p>
@@ -805,96 +722,63 @@ export default function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ─────────────────────────────────── */}
-      <div style={{ textAlign: 'center', padding: '64px 24px', background: '#F5F4EF', borderTop: '1px solid #E8E6DF' }}>
-        <h2 style={{
-          fontFamily: 'Instrument Serif',
-          fontSize: 32,
-          fontWeight: 700,
-          color: '#1C1917',
-          margin: '0 0 12px 0'
-        }}>
-          Ready to understand your health?
-        </h2>
-        <p style={{
-          fontFamily: 'DM Sans',
-          fontSize: 15,
-          color: '#57534E',
-          margin: '0 0 32px 0',
-          maxWidth: 400,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          lineHeight: 1.6
-        }}>
-          Upload your first lab report and get your health score, plain-English explanations, and personalized insights in under a minute.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => router.push('/auth?mode=signup')}
-            style={{
-              background: '#0EA5E9',
-              color: 'white',
-              border: 'none',
-              borderRadius: 10,
-              padding: '12px 28px',
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
-          >
-            Create free account
-          </button>
-          <button
-            onClick={() => router.push('/auth?mode=login')}
-            style={{
-              background: 'transparent',
-              color: '#57534E',
-              border: '1px solid #D9D6CD',
-              borderRadius: 10,
-              padding: '12px 28px',
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
-          >
-            Sign in
-          </button>
+      <section className="text-center py-24 px-6 bg-card border-t border-border-light">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
+            Ready to understand your health?
+          </h2>
+          <p className="text-lg text-text-secondary mb-12 leading-relaxed">
+            Upload your first lab report and get your health score, 
+            plain-English explanations, and personalized insights in under a minute.
+          </p>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => router.push('/auth?mode=signup')}
+              className="bg-sky-500 text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-sky-600 transition-all shadow-lg shadow-sky-500/25 active:scale-95"
+              style={{ WebkitAppearance: 'none' }}
+            >
+              Create free account
+            </button>
+            {!isSignedIn && (
+              <Link 
+                href="/auth?mode=login" 
+                className="text-sm font-bold text-text-secondary hover:text-text-primary transition-colors mt-6"
+              >
+                Already have an account? Sign in
+              </Link>
+            )}
+          </div>
         </div>
-        <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 16 }}>
-          Already have an account? Click Sign in above.
-        </p>
-      </div>
+      </section>
 
       {/* ── FOOTER ────────────────────────────────────── */}
-      <footer className="py-8 px-6 border-t border-[#E8E6DF] bg-[#FAFAF7]">
+      <footer className="py-12 px-6 border-t border-border-light bg-page">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center 
-                          justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-sky-500 
-                              flex items-center justify-center">
-                <Shield className="w-3 h-3 text-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-white" />
               </div>
-              <span className="font-display text-[#1C1917]">MedAssist</span>
+              <span className="font-display text-xl text-text-primary">MedAssist</span>
             </div>
 
             {/* Disclaimer */}
-            <p className="text-xs text-[#A8A29E] text-center max-w-md">
-              AI-generated insights for educational purposes only.
-              MedAssist does not provide medical diagnosis.
-              Always consult a qualified physician.
+            <p className="text-[13px] text-text-muted text-center max-w-lg leading-relaxed">
+              AI-generated health insights. For educational purposes only.
+              Always consult a qualified physician. Powered by Groq AI & Llama 3.3.
             </p>
 
-            <div className="flex gap-6 text-xs text-[#A8A29E]">
-              <Link href="/terms" className="hover:text-[#57534E] transition-colors">Terms of Service</Link>
-              <Link href="/privacy" className="hover:text-[#57534E] transition-colors">Privacy Policy</Link>
+            <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-text-muted">
+              <Link href="/terms" className="hover:text-text-primary transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-text-primary transition-colors">Privacy</Link>
             </div>
 
             {/* Credits */}
-            <div className="flex items-center gap-4 text-xs text-[#A8A29E]">
+            <div className="flex items-center text-[11px] text-text-muted">
               <span>© 2026 MedAssist</span>
-              <span className="w-1 h-1 rounded-full bg-[#D9D6CD]" />
-              <span>Made by Tanmay Shah</span>
+              <span className="mx-3 text-border-medium">|</span>
+              <span>Tanmay Shah</span>
             </div>
           </div>
         </div>
