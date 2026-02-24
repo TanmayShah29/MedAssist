@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Brain, Link as LinkIcon, Activity, Thermometer } from "lucide-react"
+import { Brain, Activity } from "lucide-react"
 
 interface ClinicalEntity {
     name: string
@@ -10,7 +10,7 @@ interface ClinicalEntity {
 }
 
 interface AnalysisPanelProps {
-    biomarkers: any[]
+    biomarkers: import('@/types/medical').Biomarker[]
     symptoms: string[]
 }
 

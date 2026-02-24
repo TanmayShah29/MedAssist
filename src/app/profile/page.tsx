@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FileText, ChevronRight, Trash2, Plus, X } from "lucide-react";
+import { FileText, ChevronRight, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
@@ -67,7 +67,7 @@ export default function ProfilePage() {
             } else {
                 toast.error(res.error || "Failed to update profile");
             }
-        } catch (err) {
+        } catch (_err) {
             toast.error("An error occurred while saving");
         } finally {
             setIsSaving(false);
@@ -85,7 +85,7 @@ export default function ProfilePage() {
             } else {
                 toast.error(res.error || "Failed to delete report");
             }
-        } catch (err) {
+        } catch (_err) {
             toast.error("An error occurred while deleting");
         }
     };

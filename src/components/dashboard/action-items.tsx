@@ -1,8 +1,8 @@
-import { AlertTriangle, ArrowRight, Pill, ClipboardCheck, Activity } from "lucide-react"
+import { AlertTriangle, ArrowRight, Activity } from "lucide-react"
 import Link from "next/link"
 
 interface ActionItemsProps {
-    biomarkers: any[]
+    biomarkers: import('@/types/medical').Biomarker[]
 }
 
 export function ActionItems({ biomarkers }: ActionItemsProps) {

@@ -1,8 +1,9 @@
 import { Biomarker } from "@/types/medical";
 
 export interface DemoLabResult {
-    id: string;
+    id: number | string;
     created_at: string;
+    summary?: string;
     raw_ai_json: {
         healthScore: number;
         riskLevel: string;

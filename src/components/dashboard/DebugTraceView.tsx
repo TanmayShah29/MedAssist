@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Terminal, Code, Cpu, Database, ChevronDown, ChevronUp } from "lucide-react";
 
 interface DebugTraceViewProps {
-    labResult: any;
+    labResult: import('@/types/medical').LabResult;
 }
 
 export function DebugTraceView({ labResult }: DebugTraceViewProps) {

@@ -4,44 +4,27 @@ import { useState, useEffect } from 'react'
 import { logger } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+
 import {
     ClipboardList,
     AlertCircle,
-    CheckCircle,
     Activity,
     FileText,
     Upload,
     PlayCircle,
     Printer,
-    ChevronRight,
-    Info,
     WifiOff,
-    Brain,
-    Pill,
+
     Sparkles,
-    TrendingUp,
-    TrendingDown,
     ArrowRight
 } from 'lucide-react'
-import dynamic from 'next/dynamic'
 
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
-const RadarChart = dynamic(() => import('recharts').then(mod => mod.RadarChart), { ssr: false });
-const Radar = dynamic(() => import('recharts').then(mod => mod.Radar), { ssr: false });
-const PolarGrid = dynamic(() => import('recharts').then(mod => mod.PolarGrid), { ssr: false });
-const PolarAngleAxis = dynamic(() => import('recharts').then(mod => mod.PolarAngleAxis), { ssr: false });
-const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
-const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+
+
 
 import { UploadModal } from '@/components/upload-modal'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
-import { DebugTraceView } from '@/components/dashboard/DebugTraceView'
-import { deleteLabResult } from '@/app/actions/user-data'
+
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
 import { ActionItems } from '@/components/dashboard/action-items'
 import { PriorityAlertCard } from '@/components/dashboard/priority-alert-card'
@@ -49,10 +32,9 @@ import { TrendSnapshot } from '@/components/dashboard/trend-snapshot'
 import { HealthScoreOverview } from '@/components/dashboard/health-score-overview'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { MedicineCabinet } from '@/components/dashboard/medicine-cabinet'
-import { TrustLayer } from '@/components/trust-layer'
-import { toast } from 'sonner'
+
 import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
-import { Biomarker, Profile } from '@/types/medical'
+import { Biomarker, Profile, LabResult } from '@/types/medical'
 
 // ── Plain English Definitions ──
 const BIOMARKER_DEFINITIONS: Record<string, string> = {
@@ -85,219 +67,7 @@ function getDelta(current: number, previous: number | null | undefined) {
 
 // ── Chart Components ──
 
-
-function CategoryRadar({ biomarkers }: { biomarkers: Biomarker[] }) {
-    const categories = ['hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
-
-    const data = categories.map(cat => {
-        const catBiomarkers = biomarkers.filter(b => b.category === cat)
-        if (catBiomarkers.length === 0) return { category: cat, score: 0, fullMark: 100 }
-
-        const optimal = catBiomarkers.filter(b => b.status === 'optimal').length
-        const warning = catBiomarkers.filter(b => b.status === 'warning').length
-        const critical = catBiomarkers.filter(b => b.status === 'critical').length
-        const total = catBiomarkers.length
-
-        const score = Math.round(((optimal * 100) + (warning * 75) + (critical * 40)) / total)
-
-        return {
-            category: cat.charAt(0).toUpperCase() + cat.slice(1),
-            score,
-            fullMark: 100
-        }
-    }).filter(d => d.score > 0) // Only show categories with data
-
-    if (data.length < 3) return null // Need at least 3 points for radar
-
-    return (
-        <div style={{
-            background: '#F5F4EF',
-            border: '1px solid #E8E6DF',
-            borderRadius: 14,
-            padding: 24,
-            height: '100%'
-        }}>
-            <p style={{ fontSize: 10, fontWeight: 600, color: '#A8A29E', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 16px 0' }}>
-                SYSTEM BALANCE
-            </p>
-            <ResponsiveContainer width="100%" height={220}>
-                <RadarChart data={data}>
-                    <PolarGrid stroke="#E8E6DF" />
-                    <PolarAngleAxis
-                        dataKey="category"
-                        tick={{ fontSize: 12, fill: '#57534E' }}
-                    />
-                    <Radar
-                        name="Score"
-                        dataKey="score"
-                        stroke="#0EA5E9"
-                        fill="#0EA5E9"
-                        fillOpacity={0.15}
-                        strokeWidth={2}
-                    />
-                </RadarChart>
-            </ResponsiveContainer>
-        </div>
-    )
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TrendChart({ labResults, biomarkers, supplements = [] }: { labResults: any[], biomarkers: Biomarker[], supplements?: any[] }) {
-    const [selectedBiomarker, setSelectedBiomarker] = useState<string>('Health Score');
-
-    if (labResults.length < 1) return null;
-
-    // Get unique biomarker names that appear in at least 2 reports for trending
-    const biomarkerNames = Array.from(new Set(biomarkers.map(b => b.name)));
-    const trendableBiomarkers = biomarkerNames.filter(name =>
-        biomarkers.filter(b => b.name === name).length >= 2
-    );
-
-    const chartData = labResults.map(report => {
-        const reportDate = new Date(report.uploaded_at || report.created_at);
-        const date = reportDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-        });
-
-        const dataPoint: any = { date, originalDate: reportDate };
-
-        if (selectedBiomarker === 'Health Score') {
-            dataPoint.value = report.health_score || 0;
-        } else {
-            const b = biomarkers.find(bm => bm.lab_result_id === report.id && bm.name === selectedBiomarker);
-            dataPoint.value = b ? b.value : null;
-            dataPoint.unit = b?.unit;
-        }
-
-        // Add supplement info if started on this date
-        const supp = supplements.find(s => {
-            const sDate = new Date(s.start_date);
-            return sDate.toLocaleDateString() === reportDate.toLocaleDateString();
-        });
-        if (supp) dataPoint.supplement = supp.name;
-
-        return dataPoint;
-    });
-
-    const displayUnit = selectedBiomarker === 'Health Score' ? '/ 100' :
-        biomarkers.find(b => b.name === selectedBiomarker)?.unit || '';
-
-    return (
-        <div style={{
-            background: '#F5F4EF',
-            border: '1px solid #E8E6DF',
-            borderRadius: 14,
-            padding: 24,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-        }}>
-            <div className="flex justify-between items-center mb-6">
-                <p style={{ fontSize: 10, fontWeight: 600, color: '#A8A29E', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
-                    WELLNESS TRENDS
-                </p>
-                <select
-                    value={selectedBiomarker}
-                    onChange={(e) => setSelectedBiomarker(e.target.value)}
-                    style={{
-                        background: 'white',
-                        border: '1px solid #E8E6DF',
-                        borderRadius: 6,
-                        fontSize: 11,
-                        padding: '2px 8px',
-                        color: '#57534E',
-                        outline: 'none',
-                        WebkitAppearance: 'none'
-                    }}
-                >
-                    <option value="Health Score">Overall Health Score</option>
-                    {trendableBiomarkers.map(name => (
-                        <option key={name} value={name}>{name}</option>
-                    ))}
-                </select>
-            </div>
-
-            {chartData.length < 2 && selectedBiomarker === 'Health Score' ? (
-                <div className="flex-1 flex flex-col justify-center items-center text-center opacity-60">
-                    <Activity className="w-8 h-8 text-[#A8A29E] mb-3" />
-                    <p style={{ fontSize: 13, color: '#A8A29E' }}>
-                        Upload more reports to see your progress over time
-                    </p>
-                </div>
-            ) : (
-                <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#E8E6DF" vertical={false} />
-                        <XAxis
-                            dataKey="date"
-                            tick={{ fontSize: 11, fill: '#A8A29E' }}
-                            axisLine={false}
-                            tickLine={false}
-                            dy={10}
-                        />
-                        <YAxis
-                            tick={{ fontSize: 11, fill: '#A8A29E' }}
-                            axisLine={false}
-                            tickLine={false}
-                            dx={-10}
-                        />
-                        <Tooltip
-                            content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                    const supp = payload[0].payload.supplement;
-                                    return (
-                                        <div style={{
-                                            background: '#FAFAF7',
-                                            border: '1px solid #E8E6DF',
-                                            borderRadius: 8,
-                                            padding: '8px 12px',
-                                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                                        }}>
-                                            <p style={{ fontSize: 10, color: '#A8A29E', margin: '0 0 4px 0' }}>{payload[0].payload.date}</p>
-                                            <div className="flex flex-col gap-1">
-                                                <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', margin: 0 }}>
-                                                    {payload[0].value} <span style={{ fontSize: 11, fontWeight: 400, color: '#57534E' }}>{displayUnit}</span>
-                                                </p>
-                                                {supp && (
-                                                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                                                        <Pill size={10} className="text-rose-500" />
-                                                        <span className="text-[10px] font-bold text-rose-600 uppercase">Started: {supp}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            }}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#0EA5E9"
-                            strokeWidth={3}
-                            dot={(props: any) => {
-                                const { cx, cy, payload } = props;
-                                if (payload.supplement) {
-                                    return (
-                                        <g key={props.key}>
-                                            <circle cx={cx} cy={cy} r={6} fill="#F43F5E" stroke="white" strokeWidth={2} />
-                                            <path d={`M${cx} ${cy - 15} L${cx} ${cy}`} stroke="#F43F5E" strokeWidth={1} strokeDasharray="2 2" />
-                                        </g>
-                                    );
-                                }
-                                return <circle key={props.key} cx={cx} cy={cy} r={4} fill="#0EA5E9" stroke="white" strokeWidth={2} />;
-                            }}
-                            activeDot={{ r: 6, strokeWidth: 0 }}
-                            connectNulls
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            )}
-        </div>
-    );
-}
+// ── Chart Components ──
 
 export default function DashboardClient({
     initialProfile,
@@ -308,16 +78,16 @@ export default function DashboardClient({
     initialProfile: Profile | null,
     initialBiomarkers: Biomarker[],
     initialSymptoms: string[],
-    initialLabResults: any[]
+    initialLabResults: LabResult[]
 }) {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const [loading, setLoading] = useState(false)
+
     const [mounted, setMounted] = useState(false)
     const [showUploadModal, setShowUploadModal] = useState(false)
     const profile = initialProfile;
     const biomarkers = initialBiomarkers;
-    const symptoms = initialSymptoms;
+    const _symptoms = initialSymptoms || [];
     const labResults = initialLabResults;
 
     const [selectedBiomarkerData, setSelectedBiomarkerData] = useState<Biomarker | null>(null);
@@ -326,7 +96,7 @@ export default function DashboardClient({
     const [isOffline, setIsOffline] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
     const [showScoreModal, setShowScoreModal] = useState(false);
-    const [supplements, setSupplements] = useState<any[]>([]);
+    const [_supplements, setSupplements] = useState<Record<string, unknown>[]>([]);
 
     useEffect(() => {
         setMounted(true)
@@ -371,7 +141,7 @@ export default function DashboardClient({
     );
 
     const latestLabResult = displayLabResults[0];
-    const longitudinalInsights: string[] = latestLabResult?.raw_ai_json?.longitudinalInsights || [];
+    const longitudinalInsights: string[] = (latestLabResult?.raw_ai_json?.longitudinalInsights as string[]) || [];
 
     // Offline Resilience: Save to LocalStorage (never mix demo with real data)
     useEffect(() => {
@@ -409,24 +179,6 @@ export default function DashboardClient({
         window.print();
     };
 
-    const handleDeleteReport = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this report? This will also remove its biomarkers from your trends.")) return;
-
-        setLoading(true);
-        try {
-            const res = await deleteLabResult(id);
-            if (res.success) {
-                toast.success("Report deleted successfully");
-                router.refresh();
-            } else {
-                toast.error(res.error || "Failed to delete report");
-            }
-        } catch (err) {
-            toast.error("An error occurred while deleting");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Derived values - use latestBiomarkers for current state summary
     const optimalCount = latestBiomarkers.filter(b => b.status === 'optimal').length
@@ -443,22 +195,6 @@ export default function DashboardClient({
         healthScore = Math.round(Math.max(floor, rawScore))
     }
 
-    const getScoreLabel = (score: number) => {
-        if (score >= 85) return { label: 'Excellent', color: '#10B981' }
-        if (score >= 70) return { label: 'Good', color: '#10B981' }
-        if (score >= 55) return { label: 'Fair', color: '#F59E0B' }
-        return { label: 'Needs Attention', color: '#EF4444' }
-    }
-
-    const scoreLabel = getScoreLabel(healthScore)
-
-    const priorities = [...latestBiomarkers]
-        .sort((a, b) => {
-            const order = { critical: 0, warning: 1, optimal: 2 }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return (order[a.status as keyof typeof order] ?? 1) - (order[b.status as keyof typeof order] ?? 1)
-        })
-        .slice(0, 3)
 
     // Removed loading skeleton since data is passed directly from server
 
@@ -721,7 +457,7 @@ export default function DashboardClient({
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {[...latestBiomarkers]
                                     .filter(b => b.status !== 'optimal')
-                                    .sort((a, b) => (a.status === 'critical' ? -1 : 1))
+                                    .sort((a, _b) => (a.status === 'critical' ? -1 : 1))
                                     .slice(0, 3)
                                     .map((b, idx) => {
                                         const recommendations: Record<string, string> = {

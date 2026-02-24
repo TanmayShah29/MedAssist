@@ -57,12 +57,18 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    interface TrendRow {
+        value: number;
+        unit: string;
+        lab_results: { created_at: string } | { created_at: string }[] | null;
+    }
+
     // Transform for Recharts (lab_results may be null if join fails)
-    const trends = (data || [])
-        .filter((b: any) => Array.isArray(b.lab_results) ? b.lab_results[0]?.created_at : b.lab_results?.created_at)
-        .map((b: any) => {
+    const trends = ((data as TrendRow[]) || [])
+        .filter((b) => Array.isArray(b.lab_results) ? b.lab_results[0]?.created_at : (!Array.isArray(b.lab_results) && b.lab_results?.created_at))
+        .map((b) => {
             const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            const d = new Date(lr.created_at);
+            const d = new Date(lr!.created_at);
             const month = d.toLocaleString('en-US', { month: 'short' });
             const day = d.getDate();
             return {

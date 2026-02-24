@@ -35,7 +35,7 @@ export interface ExtractionResult {
 export async function extractTextFromPdf(
     fileBuffer: Buffer,
     mimeType: string = 'application/pdf',
-    fileName?: string
+    _fileName?: string
 ): Promise<ExtractionResult> {
     if (fileBuffer.length > MAX_FILE_SIZE_BYTES) {
         throw new ExtractionValidationError(`File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.`);

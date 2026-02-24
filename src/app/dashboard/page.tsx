@@ -7,7 +7,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 
 export const dynamic = 'force-dynamic';
 
-async function DashboardContent({ user }: { user: any }) {
+async function DashboardContent({ user }: { user: { id: string } }) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,7 +33,7 @@ async function DashboardContent({ user }: { user: any }) {
     ])
 
     const profile = profileResponse.data
-    const biomarkers = (biomarkerResponse.data || []) as any[]
+    const biomarkers = (biomarkerResponse.data || []) as import('@/types/medical').Biomarker[]
     const symptoms = (symptomResponse.data || []).map((s: { symptom: string }) => s.symptom)
     const labResults = labResponse.data || []
 

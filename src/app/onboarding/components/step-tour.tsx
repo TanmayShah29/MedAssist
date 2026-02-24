@@ -1,10 +1,7 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion } from "framer-motion";
-import { ArrowRight, Activity, AlertTriangle, CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { saveLabResult, completeOnboarding } from "@/app/actions/user-data";
 import { createClient } from "@/lib/supabase/client";
@@ -12,10 +9,7 @@ import { toast } from "sonner";
 import { logger } from "@/lib/logger";
 
 export function StepTour() {
-    const {
-        analysisResult,
-    } = useOnboardingStore();
-    const router = useRouter();
+    const { analysisResult } = useOnboardingStore();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleFinish = async () => {

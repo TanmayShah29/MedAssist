@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { logger } from "@/lib/logger";
-import { MessageSquare, Info, ChevronRight, ClipboardCopy, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Info, ClipboardCopy, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ interface Question {
 }
 
 interface DoctorQuestionsProps {
-    biomarkers: any[];
+    biomarkers: import('@/types/medical').Biomarker[];
     className?: string;
 }
 

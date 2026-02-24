@@ -3,12 +3,11 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import type { ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Upload, X, FileText, Shield, Calendar, Lock, PenLine, Plus, Trash2, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Upload, X, FileText, Lock, PenLine, Plus, Trash2, Loader2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+
 import { logger } from "@/lib/logger";
 
 function nextId() {
@@ -33,7 +32,7 @@ export function StepUpload() {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const router = useRouter();
+
 
     // Handle drag events
     const handleDragOver = (e: React.DragEvent) => {
@@ -83,8 +82,6 @@ export function StepUpload() {
     if (uploadedFile && showOptions && !showManualEntry) {
         setShowOptions(false);
     }
-
-    const [isSkipping, setIsSkipping] = useState(false);
 
     const addManualRow = () => setManualRows((p) => [...p, { id: nextId(), name: "", value: "", unit: "mg/dL" }]);
     const updateManualRow = (id: string, field: keyof ManualRow, value: string) =>
@@ -144,7 +141,6 @@ export function StepUpload() {
 
     const onSkip = async () => {
         try {
-            setIsSkipping(true);
             setUploadedFile(null);
             completeStep(3);
 

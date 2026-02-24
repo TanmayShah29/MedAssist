@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { logger } from "@/lib/logger";
-import { Pill, Plus, Trash2, Calendar, Activity, CheckCircle2, X } from "lucide-react";
+import { Pill, Plus, Trash2, Activity, CheckCircle2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+
 import { toast } from "sonner";
 
 interface Supplement {
@@ -67,7 +67,7 @@ export function MedicineCabinet() {
                 });
                 toast.success("Supplement added to your cabinet");
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error("Failed to add supplement");
         }
     };
@@ -81,7 +81,7 @@ export function MedicineCabinet() {
                 setSupplements(supplements.filter(s => s.id !== id));
                 toast.success("Supplement removed");
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error("Failed to remove supplement");
         }
     };
@@ -187,7 +187,7 @@ export function MedicineCabinet() {
                     </div>
                 )}
             </div>
-            
+
             <div className="mt-6 pt-4 border-t border-[#E8E6DF]">
                 <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-rose-400 mt-0.5" />

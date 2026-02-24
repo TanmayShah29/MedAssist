@@ -54,7 +54,7 @@ export function Sidebar({ className }: { className?: string }) {
                         return;
                     }
                 }
-            } catch (e) { }
+            } catch (_e) { }
 
             // 2. Fallback: Supabase Profile
             const { data: { user } } = await supabase.auth.getUser();
@@ -103,7 +103,7 @@ export function Sidebar({ className }: { className?: string }) {
             localStorage.removeItem("medassist_cached_biomarkers");
             localStorage.removeItem("medassist_cached_demo_lab_results");
             localStorage.removeItem("medassist_cached_demo_biomarkers");
-        } catch (e) { }
+        } catch (_e) { }
         sessionStorage.removeItem("medassist_loaded");
 
         document.cookie = 'onboarding_complete=; max-age=0; path=/';

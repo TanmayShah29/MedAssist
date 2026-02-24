@@ -12,7 +12,7 @@ interface SaveLabResultArgs {
     labValues: ExtractedLabValue[];
     fileName?: string;
     rawOcrText?: string;
-    rawAiJson?: any;
+    rawAiJson?: unknown;
 }
 
 export async function saveLabResult(args: SaveLabResultArgs) {
@@ -76,9 +76,10 @@ export async function deleteLabResult(labResultId: number | string) {
 
         if (error) throw error;
         return { success: true };
-    } catch (error: any) {
-        logger.error("Delete failed:", error.message);
-        return { success: false, error: error.message };
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        logger.error("Delete failed:", msg);
+        return { success: false, error: msg };
     }
 }
 
@@ -96,7 +97,7 @@ export async function updateUserProfile(userId: string, data: {
         const { first_name, last_name, age, sex, blood_type, symptoms } = data;
 
         // 1. Update profile
-        const profileUpdates: any = { updated_at: new Date().toISOString() };
+        const profileUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
         if (first_name !== undefined) profileUpdates.first_name = first_name;
         if (last_name !== undefined) profileUpdates.last_name = last_name;
         if (age !== undefined) profileUpdates.age = age;
@@ -126,9 +127,10 @@ export async function updateUserProfile(userId: string, data: {
         }
 
         return { success: true };
-    } catch (error: any) {
-        logger.error("Update profile failed:", error.message);
-        return { success: false, error: error.message };
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        logger.error("Update profile failed:", msg);
+        return { success: false, error: msg };
     }
 }
 

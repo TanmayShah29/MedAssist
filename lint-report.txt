@@ -1,0 +1,198 @@
+
+> medassist-temp@0.1.0 lint
+> npx eslint .
+
+
+/Users/tanmay/MedAssist_2/src/app/actions/user-data.ts
+   15:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/api/account/delete/route.ts
+   5:30  error  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  56:21  error  Unexpected any. Specify a different type                                   @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/api/analyze-report/route.ts
+  104:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/api/biomarker-trends/route.ts
+  62:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/api/generate-questions/route.ts
+   44:44  error  'reportError' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   59:58  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+   74:23  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+   74:31  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+   75:22  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+   87:56  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+   98:30  error  Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+  151:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u        @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/api/supplements/route.ts
+   5:27  error  'request' is defined but never used. Allowed unused args must match /^_/u         @typescript-eslint/no-unused-vars
+  83:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/assistant/page.tsx
+    5:47  error  'Calendar' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   74:52  error  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+   82:58  error  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+   83:48  error  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+  167:18  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u                    @typescript-eslint/no-unused-vars
+  180:11  error  'handleSuggestedQuestion' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/auth/page.tsx
+  50:92  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  75:25  error  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/dashboard/dashboard-client.tsx
+    7:8   error  'Link' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+   11:5   error  'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+   17:5   error  'ChevronRight' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+   18:5   error  'Info' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+   20:5   error  'Brain' is defined but never used. Allowed unused vars must match /^_/u                        @typescript-eslint/no-unused-vars
+   23:5   error  'TrendingUp' is defined but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+   24:5   error  'TrendingDown' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+   43:10  error  'DebugTraceView' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+   52:10  error  'TrustLayer' is defined but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+   89:10  error  'CategoryRadar' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  145:10  error  'TrendChart' is defined but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  163:26  error  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  280:42  error  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  311:24  error  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  315:12  error  'loading' is assigned a value but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  320:11  error  'symptoms' is assigned a value but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+  329:12  error  'supplements' is assigned a value but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  329:52  error  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  412:11  error  'handleDeleteReport' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  424:18  error  'err' is defined but never used. Allowed unused caught errors must match /^_/u                 @typescript-eslint/no-unused-vars
+  453:11  error  'scoreLabel' is assigned a value but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  455:11  error  'priorities' is assigned a value but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  724:47  error  'b' is defined but never used. Allowed unused args must match /^_/u                            @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/dashboard/page.tsx
+  10:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/global-error.tsx
+  3:10  error  'useEffect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/onboarding/components/step-processing.tsx
+    5:18   error  'AnimatePresence' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+    7:17   error  'Search' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+    7:25   error  'Brain' is defined but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+    7:32   error  'Activity' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+    7:89   error  'FileText' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+    7:99   error  'BarChart' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+    7:109  error  'Sparkles' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+    7:119  error  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   49:15   error  'processStage' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  269:67   error  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  270:67   error  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  271:68   error  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/onboarding/components/step-tour.tsx
+   4:10  error  'motion' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   5:22  error  'Activity' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+   5:32  error  'AlertTriangle' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+   7:10  error  'cn' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  18:11  error  'router' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/onboarding/components/step-upload.tsx
+   6:58  error  'Shield' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  11:10  error  'createClient' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  36:11  error  'router' is assigned a value but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+  87:12  error  'isSkipping' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/page.tsx
+  14:3  error  'ArrowRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  18:3  error  'Printer' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/profile/page.tsx
+   4:42  error  'Plus' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  70:18  error  'err' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  88:18  error  'err' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/app/results/page.tsx
+    7:75   error  'MessageSquare' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    7:90   error  'ClipboardCopy' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    7:105  error  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  129:52   error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  135:96   error  'e' is defined but never used. Allowed unused caught errors must match /^_/u     @typescript-eslint/no-unused-vars
+  161:64   error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/app/settings/page.tsx
+    6:10  error  'Shield' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   12:11  error  'router' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   22:89  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u       @typescript-eslint/no-unused-vars
+   29:87  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u       @typescript-eslint/no-unused-vars
+   90:25  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  112:25  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/assistant/analysis-panel.tsx
+   4:25  error  'LinkIcon' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   4:45  error  'Thermometer' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  13:17  error  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/assistant/sidebar.tsx
+  1:10  error  'MessageSquare' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  1:47  error  'ArrowRight' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  2:10  error  'Button' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  5:17  error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/BiomarkerDetailSheet.tsx
+  5:25  error  'TrendingDown' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  8:26  error  'ReferenceLine' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/DebugTraceView.tsx
+  8:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/ProfileSwitcher.tsx
+  5:46  error  'Shield' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/action-items.tsx
+  1:37  error  'Pill' is defined but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+  1:43  error  'ClipboardCheck' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  5:17  error  Unexpected any. Specify a different type                                          @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/ai-insights-feed.tsx
+  1:10  error  'Lightbulb' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  1:40  error  'Info' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/doctor-questions.tsx
+   5:31  error  'ChevronRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  15:17  error  Unexpected any. Specify a different type                                        @typescript-eslint/no-explicit-any
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/medicine-cabinet.tsx
+   5:30  error  'Calendar' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+   7:10  error  'cn' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  70:18  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  84:18  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/dashboard/trend-snapshot.tsx
+  38:19  error  'isImprovement' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/layout/ClientLayout.tsx
+  64:14  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/components/layout/sidebar.tsx
+   57:22  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  106:18  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/lib/supabase/server.ts
+  18:30  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  27:30  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/services/extractionService.ts
+  38:5  error  'fileName' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/store/useStore.ts
+  148:26  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/tanmay/MedAssist_2/src/types/medical.ts
+  31:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 123 problems (123 errors, 0 warnings)
+

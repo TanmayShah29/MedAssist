@@ -51,9 +51,9 @@ export function ClientLayout({
         if (!hasLoaded) {
           setLoading(true);
         }
-      } catch (e) {
+      } catch (_e) {
         // Silently fail if sessionStorage is unavailable (e.g. Private Mode)
-        console.warn("sessionStorage unavailable", e);
+        console.warn("sessionStorage unavailable", _e);
       }
     }
   }, [needsAppShell, mounted]);
@@ -61,7 +61,7 @@ export function ClientLayout({
   const handlePreloaderComplete = () => {
     try {
       sessionStorage.setItem("medassist_loaded", "true");
-    } catch (e) { }
+    } catch (_e) { }
     setLoading(false);
   };
 

@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, Sparkles, Activity, Calendar } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { Biomarker } from "@/types/medical";
 
 // Types
 type Message = {
@@ -25,13 +26,7 @@ type ContextData = {
     relatedMarkers?: { name: string; status: string }[];
 };
 
-type Biomarker = {
-    name: string;
-    value: number;
-    unit: string;
-    status: "optimal" | "warning" | "critical";
-    category: string;
-};
+
 
 export default function AssistantPage() {
     const router = useRouter();
@@ -71,7 +66,7 @@ export default function AssistantPage() {
             }
 
             if (cResponse.data && cResponse.data.length > 0) {
-                setMessages(cResponse.data.map((m: any) => ({
+                setMessages(cResponse.data.map((m: { id: string, role: string, content: string, created_at: string }) => ({
                     id: m.id,
                     role: m.role as "user" | "assistant",
                     content: m.content,
@@ -79,8 +74,8 @@ export default function AssistantPage() {
                 })));
             } else if (bResponse.data && bResponse.data.length > 0) {
                 // Find most critical biomarker
-                const critical = bResponse.data.find((b: any) => b.status === "critical")
-                    || bResponse.data.find((b: any) => b.status === "warning")
+                const critical = bResponse.data.find((b: Biomarker) => b.status === "critical")
+                    || bResponse.data.find((b: Biomarker) => b.status === "warning")
                     || bResponse.data[0];
 
                 setMessages([
@@ -164,7 +159,7 @@ export default function AssistantPage() {
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, newAiMsg]);
-        } catch (error) {
+        } catch (_error) {
             const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 role: "assistant",
@@ -175,11 +170,6 @@ export default function AssistantPage() {
         } finally {
             setIsProcessing(false);
         }
-    };
-
-    const handleSuggestedQuestion = (question: string) => {
-        setInputValue(question);
-        // Optional: auto-send
     };
 
     const renderChatPanel = () => (

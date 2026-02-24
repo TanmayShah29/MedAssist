@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { logger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, MessageSquare, ClipboardCopy, CheckCircle2, RefreshCw } from 'lucide-react'
+import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, RefreshCw } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { TrustLayer } from '@/components/trust-layer'
@@ -126,13 +126,13 @@ export default function ResultsPage() {
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
     const [loadingTrends, setLoadingTrends] = useState(false)
     const [isDebugMode, setIsDebugMode] = useState(false)
-    const [supplements, setSupplements] = useState<any[]>([])
+    const [supplements, setSupplements] = useState<{ id: number, name: string, start_date: string }[]>([])
     const [mounted, setMounted] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
 
     useEffect(() => {
         setMounted(true)
-        try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true") } catch (e) { }
+        try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true") } catch (_e) { }
 
         const fetchSupps = async () => {
             try {
@@ -158,7 +158,7 @@ export default function ResultsPage() {
                     const res = await fetch(`/api/biomarker-trends?name=${encodeURIComponent(selectedBiomarker.name)}`)
                     const data = await res.json()
                     if (data.trends) {
-                        setBiomarkerTrends(data.trends.map((t: any) => ({
+                        setBiomarkerTrends(data.trends.map((t: { date: string, value: number }) => ({
                             date: t.date,
                             score: t.value
                         })))

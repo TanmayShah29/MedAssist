@@ -145,7 +145,7 @@ export const useStore = create<AppState>()(
                     window.localStorage.setItem(testKey, testKey);
                     window.localStorage.removeItem(testKey);
                     return window.localStorage;
-                } catch (e) {
+                } catch (_e) {
                     // Fallback to in-memory storage if unavailable
                     const fallbackStorage = new Map<string, string>();
                     return {

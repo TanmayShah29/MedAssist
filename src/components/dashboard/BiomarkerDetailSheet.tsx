@@ -2,10 +2,10 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, TrendingUp, TrendingDown, Info, Lightbulb, ChevronRight, Activity, AlertCircle } from "lucide-react";
+import { X, TrendingUp, Info, Lightbulb, ChevronRight, Activity, AlertCircle } from "lucide-react";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, ReferenceLine
+    ResponsiveContainer
 } from "recharts";
 import { Biomarker } from "@/types/medical";
 

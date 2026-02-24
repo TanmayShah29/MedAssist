@@ -47,7 +47,7 @@ function AuthContent() {
 
                 // Clear any leftover onboarding state from previous users before starting
                 if (typeof window !== 'undefined') {
-                    try { window.localStorage.removeItem('medassist-onboarding'); } catch (e) { }
+                    try { window.localStorage.removeItem('medassist-onboarding'); } catch (_e) { }
                 }
 
                 router.push('/onboarding');
@@ -72,8 +72,8 @@ function AuthContent() {
                     }
                 }
             }
-        } catch (error: any) {
-            toast.error(error.message || "Authentication failed");
+        } catch (error: unknown) {
+            toast.error((error as Error).message || "Authentication failed");
         } finally {
             setIsLoading(false);
         }

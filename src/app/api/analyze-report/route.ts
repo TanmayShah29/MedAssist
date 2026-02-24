@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateEnv } from '@/lib/env';
 import { extractTextFromPdf, ImageBasedPdfError } from '@/services/extractionService';
 import { analyzeLabText } from '@/services/aiAnalysisService';
-import { getUserBiomarkerHistory } from '@/app/actions/user-data';
+import { getUserBiomarkerHistory, saveLabResult } from '@/app/actions/user-data';
+import { ExtractedLabValue } from '@/lib/onboarding-store';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { saveLabResult } from '@/app/actions/user-data';
 
 /** Client can use this to show clean image-based PDF message and manual entry option. */
 export const IMAGE_BASED_PDF_ERROR_CODE = 'IMAGE_BASED_PDF';
@@ -80,10 +80,10 @@ export async function POST(req: NextRequest) {
         }
 
         if (!extractedText || extractedText.trim().length < 50) {
-            return NextResponse.json({ 
-                success: false, 
+            return NextResponse.json({
+                success: false,
                 error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
-                code: IMAGE_BASED_PDF_ERROR_CODE 
+                code: IMAGE_BASED_PDF_ERROR_CODE
             }, { status: 400 });
         }
         logger.info("Text extracted successfully.");
@@ -97,15 +97,15 @@ export async function POST(req: NextRequest) {
 
         // 6. Data Persistence
         const saveResult = await saveLabResult({
-                userId: authUser.id,
-                healthScore: analysisResult.healthScore,
-                riskLevel: analysisResult.riskLevel,
-                summary: analysisResult.summary,
-                labValues: analysisResult.biomarkers as any,
-                fileName: file.name,
-                rawOcrText: extractedText,
-                rawAiJson: analysisResult
-            });
+            userId: authUser.id,
+            healthScore: analysisResult.healthScore,
+            riskLevel: analysisResult.riskLevel,
+            summary: analysisResult.summary,
+            labValues: analysisResult.biomarkers as unknown as ExtractedLabValue[],
+            fileName: file.name,
+            rawOcrText: extractedText,
+            rawAiJson: analysisResult
+        });
 
         if (!saveResult.success) {
             logger.error("Failed to save via action:", saveResult.error);
@@ -206,7 +206,7 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
         healthScore: analysisResult.healthScore,
         riskLevel: analysisResult.riskLevel,
         summary: analysisResult.summary,
-        labValues: analysisResult.biomarkers as any,
+        labValues: analysisResult.biomarkers as unknown as ExtractedLabValue[],
         fileName: 'Manual entry',
         rawOcrText: undefined,
         rawAiJson: analysisResult

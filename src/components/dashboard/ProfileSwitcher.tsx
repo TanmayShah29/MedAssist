@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, User, UserPlus, Check, Shield } from "lucide-react";
+import { ChevronDown, User, UserPlus, Check } from "lucide-react";
 import { Profile } from "@/types/medical";
 
 interface Props {

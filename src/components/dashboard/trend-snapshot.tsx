@@ -35,7 +35,7 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
 
             // Determine if increase/decrease is good or bad simply by looking at status change or just directional
             // A simple approach: 
-            const isImprovement = (current.status === 'optimal' && previous.status !== 'optimal') ||
+            const _isImprovement = (current.status === 'optimal' && previous.status !== 'optimal') ||
                 (diff > 0 && current.status === 'optimal'); // This is a simplification. 
             // Truly knowing if improved is hard without knowing the specific marker.
             // Let's just state Increased/Decreased/Stable objectively, but style it.

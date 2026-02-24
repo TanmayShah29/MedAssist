@@ -23,12 +23,14 @@ export interface Biomarker {
 }
 
 export interface LabResult {
-    id: number;
+    id: number | string;
     health_score?: number;
     created_at: string;
     uploaded_at?: string;
     summary?: string;
-    raw_ai_json?: any;
+    raw_ai_json?: Record<string, unknown>;
+    raw_ocr_text?: string;
+    processing_time_ms?: number;
 }
 
 export interface Symptom {

@@ -3,13 +3,11 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Shield, Download, Trash2, KeyRound, Terminal } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Download, Trash2, KeyRound, Terminal } from "lucide-react";
 import { useEffect } from "react";
 
 export default function SettingsPage() {
     const supabase = createClient();
-    const router = useRouter();
 
     const [newPassword, setNewPassword] = useState("");
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -19,14 +17,14 @@ export default function SettingsPage() {
 
     useEffect(() => {
         let saved = false;
-        try { saved = localStorage.getItem("medassist_debug_mode") === "true"; } catch (e) { }
+        try { saved = localStorage.getItem("medassist_debug_mode") === "true"; } catch (_e) { }
         setIsDebugMode(saved);
     }, []);
 
     const toggleDebugMode = () => {
         const next = !isDebugMode;
         setIsDebugMode(next);
-        try { localStorage.setItem("medassist_debug_mode", next.toString()); } catch (e) { }
+        try { localStorage.setItem("medassist_debug_mode", next.toString()); } catch (_e) { }
         toast.info(next ? "Debug mode enabled" : "Debug mode disabled");
     };
 
@@ -87,8 +85,8 @@ export default function SettingsPage() {
             document.body.removeChild(link);
 
             toast.success("Health data exported successfully.");
-        } catch (error: any) {
-            toast.error(error.message || "Failed to export data");
+        } catch (error: unknown) {
+            toast.error((error as Error).message || "Failed to export data");
         } finally {
             setIsExporting(false);
         }
@@ -109,8 +107,8 @@ export default function SettingsPage() {
             await supabase.auth.signOut();
             toast.success("Account deleted successfully.");
             window.location.href = "/";
-        } catch (error: any) {
-            toast.error(error.message || "Failed to delete account");
+        } catch (error: unknown) {
+            toast.error((error as Error).message || "Failed to delete account");
         } finally {
             setIsDeleting(false);
         }

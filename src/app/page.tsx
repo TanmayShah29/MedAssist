@@ -11,11 +11,9 @@ import {
   Upload,
   Brain,
   LineChart,
-  ArrowRight,
   CheckCircle2,
   Sparkles,
   X,
-  Printer,
   Activity
 } from "lucide-react";
 
@@ -65,8 +63,8 @@ export default function LandingPage() {
           {/* Nav CTAs */}
           <div className="flex items-center">
             {!isSignedIn && (
-              <Link 
-                href="/auth?mode=login" 
+              <Link
+                href="/auth?mode=login"
                 className="text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors px-4 py-3 min-h-[44px] flex items-center"
               >
                 Sign in
@@ -163,10 +161,10 @@ export default function LandingPage() {
                 Real-world <span className="text-indigo-400">correlations.</span>
               </h2>
               <p className="text-slate-400 text-lg mb-12 leading-relaxed">
-                MedAssist is the first clinical intelligence platform that understands 
+                MedAssist is the first clinical intelligence platform that understands
                 the &quot;why&quot; behind your numbers by connecting your actions to your outcomes.
               </p>
-              
+
               <div className="space-y-8">
                 {[
                   {
@@ -177,19 +175,19 @@ export default function LandingPage() {
                 ].map((item, idx) => (
                   <div key={idx} className="flex">
                     <div className={cn(
-                        "w-1 h-auto rounded-full shrink-0",
-                        item.status === "LIVE" ? "bg-emerald-500" : "bg-indigo-500/30"
+                      "w-1 h-auto rounded-full shrink-0",
+                      item.status === "LIVE" ? "bg-emerald-500" : "bg-indigo-500/30"
                     )} />
                     <div style={{ marginLeft: 24 }}>
                       <div className="flex items-center mb-2">
                         <h4 className="font-bold text-slate-200 text-lg">{item.title}</h4>
                         <span className={cn(
-                            "text-[10px] font-black px-2 py-0.5 rounded border tracking-tighter",
-                            item.status === "LIVE" 
-                                ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" 
-                                : "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"
+                          "text-[10px] font-black px-2 py-0.5 rounded border tracking-tighter",
+                          item.status === "LIVE"
+                            ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
+                            : "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"
                         )} style={{ marginLeft: 12 }}>
-                            {item.status}
+                          {item.status}
                         </span>
                       </div>
                       <p className="text-base text-slate-500 leading-relaxed">{item.desc}</p>
@@ -198,19 +196,19 @@ export default function LandingPage() {
                 ))}
               </div>
             </div>
-            
+
             <div className="flex-1 w-full relative">
               {/* Visual representation of a timeline/correlation */}
               <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/20 rounded-[48px] border border-white/5 p-8 lg:p-12 relative overflow-hidden group">
                 <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-xl group-hover:opacity-30 transition-opacity">
                   <div className="w-full space-y-8">
-                     <div className="h-3 bg-indigo-500 rounded-full w-3/4 mx-auto" />
-                     <div className="h-3 bg-sky-500 rounded-full w-1/2 mx-auto" />
-                     <div className="h-3 bg-emerald-500 rounded-full w-2/3 mx-auto" />
+                    <div className="h-3 bg-indigo-500 rounded-full w-3/4 mx-auto" />
+                    <div className="h-3 bg-sky-500 rounded-full w-1/2 mx-auto" />
+                    <div className="h-3 bg-emerald-500 rounded-full w-2/3 mx-auto" />
                   </div>
                 </div>
                 <div className="relative z-10 flex flex-col justify-center h-full gap-6">
-                  <motion.div 
+                  <motion.div
                     initial={{ x: 20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     className="bg-slate-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transform -rotate-2"
@@ -218,7 +216,7 @@ export default function LandingPage() {
                     <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest mb-3">CORRELATION DETECTED</p>
                     <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D levels increased by 42% after starting D3 Supplement on Feb 12.</p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     initial={{ x: -20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -408,7 +406,7 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center gap-16">
             {/* Left: Interactive-looking Dashboard Mockup */}
             <div className="flex-1 relative w-full lg:max-w-xl">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 className="bg-card rounded-3xl border border-border-light shadow-2xl p-6 relative z-10 overflow-hidden"
@@ -497,7 +495,7 @@ export default function LandingPage() {
           </h2>
 
           <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
-            MedAssist uses a multi-stage clinical intelligence pipeline to extract, 
+            MedAssist uses a multi-stage clinical intelligence pipeline to extract,
             interpret, and structure your lab data with high accuracy.
           </p>
 
@@ -540,8 +538,8 @@ export default function LandingPage() {
                 color: 'text-red-500'
               }
             ].map((item, index) => (
-              <div 
-                key={item.step} 
+              <div
+                key={item.step}
                 className={`p-6 bg-white/50 backdrop-blur-sm ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-border-light' : ''}`}
               >
                 <div className={`text-xs font-bold ${item.color} mb-3 tracking-widest`}>
@@ -590,7 +588,7 @@ export default function LandingPage() {
               Consistency builds clarity
             </h2>
             <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
-              One lab report tells you where you are. 
+              One lab report tells you where you are.
               <br />
               <span className="font-black text-text-primary">
                 A timeline tells you where you&apos;re going.
@@ -727,7 +725,7 @@ export default function LandingPage() {
             Ready to understand your health?
           </h2>
           <p className="text-lg text-text-secondary mb-12 leading-relaxed">
-            Upload your first lab report and get your health score, 
+            Upload your first lab report and get your health score,
             plain-English explanations, and personalized insights in under a minute.
           </p>
           <div className="flex flex-col items-center">
@@ -739,8 +737,8 @@ export default function LandingPage() {
               Create free account
             </button>
             {!isSignedIn && (
-              <Link 
-                href="/auth?mode=login" 
+              <Link
+                href="/auth?mode=login"
                 className="text-sm font-bold text-text-secondary hover:text-text-primary transition-colors mt-6"
               >
                 Already have an account? Sign in

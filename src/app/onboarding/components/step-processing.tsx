@@ -2,9 +2,9 @@
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import type { ExtractedLabValue } from "@/lib/onboarding-store";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, FileText, BarChart, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Real processing stages related to API lifecycle
@@ -46,17 +46,6 @@ export function StepProcessing() {
 
         let timer: NodeJS.Timeout;
 
-        const processStage = (index: number) => {
-            if (index >= stages.length) return;
-
-            setCurrentStageIndex(index);
-
-            timer = setTimeout(() => {
-                if (index < stages.length - 1) {
-                    processStage(index + 1);
-                }
-            }, stages[index].duration);
-        };
 
         // Only start the internal timer loop if we are in a processing state
         if (state === 'uploading' || state === 'analyzing' || state === 'finalizing') {
@@ -266,9 +255,9 @@ export function StepProcessing() {
     if (state === "complete" && analysisResult) {
         const biomarkerCount = analysisResult.biomarkers.length;
         const healthScore = analysisResult.healthScore;
-        const optimalCount = analysisResult.biomarkers.filter((b: any) => b.status === "optimal").length;
-        const warningCount = analysisResult.biomarkers.filter((b: any) => b.status === "warning").length;
-        const criticalCount = analysisResult.biomarkers.filter((b: any) => b.status === "critical").length;
+        const optimalCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "optimal").length;
+        const warningCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "warning").length;
+        const criticalCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "critical").length;
 
         return (
             <motion.div

@@ -1,8 +1,7 @@
-import { MessageSquare, FileText, HelpCircle, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { FileText, HelpCircle } from "lucide-react"
 
 interface AssistantSidebarProps {
-    biomarkers: any[]
+    biomarkers: import('@/types/medical').Biomarker[]
 }
 
 export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {

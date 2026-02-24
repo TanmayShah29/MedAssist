@@ -37,7 +37,7 @@ export default async function middleware(request: NextRequest) {
     }
 
     // Initial response with headers
-    let response = NextResponse.next({
+    const response = NextResponse.next({
         request: {
             headers: requestHeaders,
         },

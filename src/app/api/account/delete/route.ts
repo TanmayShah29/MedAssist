@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(_request: NextRequest) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest) {
         }
 
         return NextResponse.json({ success: true })
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message || 'Failed to delete account' }, { status: 500 })
+    } catch (error: unknown) {
+        return NextResponse.json({ error: (error as Error).message || 'Failed to delete account' }, { status: 500 })
     }
 }
