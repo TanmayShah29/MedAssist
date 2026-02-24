@@ -1,6 +1,6 @@
 export default function ResultsLoading() {
     return (
-        <div className="min-h-screen p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
+        <div className="min-h-[100dvh] p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
             <div className="h-8 w-36 rounded-lg mb-2" style={{ background: '#E8E6DF' }} />
             <div className="h-4 w-48 rounded-lg mb-8" style={{ background: '#E8E6DF' }} />
             <div className="grid grid-cols-3 gap-4 mb-6">

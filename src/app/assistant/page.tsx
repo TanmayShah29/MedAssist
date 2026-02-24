@@ -261,7 +261,7 @@ export default function AssistantPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-screen bg-[#FAFAF7] font-sans selection:bg-sky-100">
+            <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100">
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
 
                     {/* HEADER */}

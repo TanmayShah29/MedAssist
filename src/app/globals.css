@@ -30,7 +30,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Safari safe viewport fallback */
-    min-height: 100vh;
+    min-height: 100dvh;
     min-height: 100dvh;
   }
 

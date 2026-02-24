@@ -113,7 +113,7 @@ export function Sidebar({ className }: { className?: string }) {
     return (
         <aside className={cn(`
             hidden lg:flex
-            w-60 min-h-screen fixed left-0 top-0 z-40
+            w-60 min-h-[100dvh] fixed left-0 top-0 z-40
             bg-[#F0EFE9] border-r border-[#E8E6DF]
             flex-col
         `, className)}>

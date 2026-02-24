@@ -10,6 +10,12 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all",
+    "safari >= 14"
+  ],
   "dependencies": {
     "@number-flow/react": "^0.5.12",
     "@radix-ui/react-icons": "^1.3.2",

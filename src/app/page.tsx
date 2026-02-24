@@ -37,7 +37,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7]">
+    <div className="min-h-[100dvh] bg-[#FAFAF7]">
 
       {/* ── HEADER ───────────────────────────────────── */}
       <header
@@ -197,7 +197,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex-1 w-full relative">
+            <div className="flex-1 w-full min-w-0 relative">
               {/* Visual representation of a timeline/correlation */}
               <div className="aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/20 rounded-[48px] border border-white/5 p-8 lg:p-12 relative overflow-hidden group">
                 <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-xl group-hover:opacity-30 transition-opacity">

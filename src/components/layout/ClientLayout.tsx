@@ -137,7 +137,7 @@ export function ClientLayout({
 
       {/* ── FALLBACK ── */}
       {!isStandalone && !needsAppShell && (
-        <div className="min-h-screen">
+        <div className="min-h-[100dvh]">
           {children}
         </div>
       )}

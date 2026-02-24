@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     return (
-        <div className="flex h-screen bg-slate-50 overflow-hidden">
+        <div className="flex h-[100dvh] bg-slate-50 overflow-hidden">
             {/* Desktop Sidebar (hidden on mobile) */}
             <Sidebar className="hidden md:flex" />
 

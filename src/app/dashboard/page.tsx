@@ -69,7 +69,7 @@ export default async function DashboardPage() {
 
     return (
         <ErrorBoundary>
-            <Suspense fallback={<div className="min-h-screen bg-[#FAFAF7] flex items-center justify-center"><div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" /></div>}>
+            <Suspense fallback={<div className="min-h-[100dvh] bg-[#FAFAF7] flex items-center justify-center"><div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" /></div>}>
                 <DashboardContent user={user} />
             </Suspense>
         </ErrorBoundary>

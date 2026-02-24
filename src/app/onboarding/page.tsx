@@ -22,7 +22,7 @@ export default function OnboardingPage() {
     const { currentStep } = useOnboardingStore();
 
     return (
-        <div className="min-h-screen bg-[#FAFAF7] flex flex-col">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">
 
             {/* Header */}
             <div className="border-b border-[#E8E6DF] bg-[#F5F4EF]">

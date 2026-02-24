@@ -195,7 +195,7 @@ function AuthContent() {
 
 export default function AuthPage() {
     return (
-        <div className="min-h-screen bg-[#F0EFE9] flex flex-col justify-center items-center p-4">
+        <div className="min-h-[100dvh] bg-[#F0EFE9] flex flex-col justify-center items-center p-4">
             <Link href="/" className="absolute top-8 left-8 flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
                     <Shield className="w-4 h-4 text-white" />

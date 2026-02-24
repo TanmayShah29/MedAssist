@@ -199,7 +199,7 @@ export default function DashboardClient({
     // Removed loading skeleton since data is passed directly from server
 
     return (
-        <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans" id="dashboard-content">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] p-6 text-[#1C1917] font-sans" id="dashboard-content">
 
             {/* ── Print-only Header ── */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">

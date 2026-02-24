@@ -1,6 +1,6 @@
 export default function SettingsLoading() {
     return (
-        <div className="min-h-screen p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
+        <div className="min-h-[100dvh] p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
             <div className="h-8 w-32 rounded-lg mb-8" style={{ background: '#E8E6DF' }} />
 
             <div className="space-y-4 max-w-2xl">

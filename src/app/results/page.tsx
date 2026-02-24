@@ -212,7 +212,7 @@ export default function ResultsPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-screen bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
+            <div className="min-h-[100dvh] bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
 
                 {/* ── Print-only Header ── */}
                 <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
