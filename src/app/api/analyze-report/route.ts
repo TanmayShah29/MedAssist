@@ -78,6 +78,14 @@ export async function POST(req: NextRequest) {
             }
             throw extractErr;
         }
+
+        if (!extractedText || extractedText.trim().length < 50) {
+            return NextResponse.json({ 
+                success: false, 
+                error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
+                code: IMAGE_BASED_PDF_ERROR_CODE 
+            }, { status: 400 });
+        }
         logger.info("Text extracted successfully.");
 
         let history: Awaited<ReturnType<typeof getUserBiomarkerHistory>> = [];

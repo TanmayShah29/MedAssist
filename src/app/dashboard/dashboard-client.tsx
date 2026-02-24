@@ -18,7 +18,11 @@ import {
     Info,
     WifiOff,
     Brain,
-    Pill
+    Pill,
+    Sparkles,
+    TrendingUp,
+    TrendingDown,
+    ArrowRight
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -492,7 +496,7 @@ export default function DashboardClient({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handlePrint}
-                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden"
+                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Print Report"
                         style={{ WebkitAppearance: 'none' }}
                     >
@@ -501,7 +505,7 @@ export default function DashboardClient({
 
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#0284C7] transition-all shadow-md shadow-sky-500/20"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#0284C7] transition-all shadow-md shadow-sky-500/20 min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload className="w-4 h-4" />
@@ -659,14 +663,15 @@ export default function DashboardClient({
                                 fontSize: 15,
                                 fontWeight: 600,
                                 cursor: 'pointer',
-                                WebkitAppearance: 'none'
+                                WebkitAppearance: 'none',
+                                minHeight: '44px'
                             }}
                         >
                             Upload my first report
                         </button>
                         <button
                             onClick={() => setDemoMode(true)}
-                            className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors"
+                            className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors min-h-[44px]"
                             style={{ WebkitAppearance: 'none' }}
                         >
                             <PlayCircle size={18} />
@@ -960,7 +965,7 @@ export default function DashboardClient({
                                         <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
                                         <div className="h-[1px] flex-1 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {catBiomarkers.map((b) => {
                                             const prev = displayBiomarkers.find(pb => 
                                                 pb.name === b.name && 
@@ -971,7 +976,7 @@ export default function DashboardClient({
                                             return (
                                                 <div
                                                     key={b.id}
-                                                    className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden"
+                                                    className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
                                                     onClick={() => handleBiomarkerClick(b)}
                                                     onTouchStart={(e) => {
                                                         const el = e.currentTarget;

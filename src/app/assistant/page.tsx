@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 // Types
 type Message = {
@@ -269,112 +270,114 @@ export default function AssistantPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[#FAFAF7] font-sans selection:bg-sky-100">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
+        <ErrorBoundary>
+            <div className="min-h-screen bg-[#FAFAF7] font-sans selection:bg-sky-100">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
 
-                {/* HEADER */}
-                <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h1 className="font-display text-3xl text-[#1C1917]">
-                            AI Health Assistant
-                        </h1>
-                        <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-sky-500" />
-                            Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "Updated"} · Updated 2 min ago
-                        </p>
-                    </div>
+                    {/* HEADER */}
+                    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h1 className="font-display text-3xl text-[#1C1917]">
+                                AI Health Assistant
+                            </h1>
+                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-sky-500" />
+                                Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "Updated"} · Updated 2 min ago
+                            </p>
+                        </div>
 
-                    <button
-                        onClick={() => router.back()}
-                        className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center gap-2"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back
-                    </button>
-                </header>
+                        <button
+                            onClick={() => router.back()}
+                            className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center gap-2"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back
+                        </button>
+                    </header>
 
-                {/* CONTEXT SUMMARY CARD */}
-                {contextData && (
-                    <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
-                            <Activity className="w-3 h-3" />
-                            Current Context
-                        </p>
+                    {/* CONTEXT SUMMARY CARD */}
+                    {contextData && (
+                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
+                                <Activity className="w-3 h-3" />
+                                Current Context
+                            </p>
 
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <p className="font-display text-xl text-sky-800">
-                                    {contextData.title} {contextData.value && `— ${contextData.value}`}
-                                </p>
-                                <p className="text-sm text-sky-700 mt-1">
-                                    {contextData.trend} {contextData.status === "critical" && "· Below optimal range"}
-                                </p>
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <p className="font-display text-xl text-sky-800">
+                                        {contextData.title} {contextData.value && `— ${contextData.value}`}
+                                    </p>
+                                    <p className="text-sm text-sky-700 mt-1">
+                                        {contextData.trend} {contextData.status === "critical" && "· Below optimal range"}
+                                    </p>
+                                </div>
+
+                                {contextData.status === "critical" && (
+                                    <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200">
+                                        Action Required
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MAIN GRID Layout */}
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100vh-300px)] min-h-[600px]">
+
+                        {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
+                        <div className="lg:hidden w-full mb-4">
+                            <div className="flex p-1 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] mb-4">
+                                <button
+                                    onClick={() => setActiveTab("chat")}
+                                    className={cn(
+                                        "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                        activeTab === "chat" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
+                                    )}
+                                >
+                                    Chat
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("context")}
+                                    className={cn(
+                                        "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
+                                        activeTab === "context" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
+                                    )}
+                                >
+                                    Health Data
+                                </button>
                             </div>
 
-                            {contextData.status === "critical" && (
-                                <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200">
-                                    Action Required
-                                </span>
+                            {activeTab === "chat" ? (
+                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
+                                    {renderChatPanel()}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <AssistantSidebar biomarkers={biomarkers} />
+                                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
+                                        <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
+                                    </div>
+                                </div>
                             )}
                         </div>
-                    </div>
-                )}
 
-                {/* MAIN GRID Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100vh-300px)] min-h-[600px]">
-
-                    {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
-                    <div className="lg:hidden w-full mb-4">
-                        <div className="flex p-1 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] mb-4">
-                            <button
-                                onClick={() => setActiveTab("chat")}
-                                className={cn(
-                                    "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
-                                    activeTab === "chat" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
-                                )}
-                            >
-                                Chat
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("context")}
-                                className={cn(
-                                    "flex-1 py-2 text-sm font-bold rounded-[8px] transition-all",
-                                    activeTab === "context" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
-                                )}
-                            >
-                                Health Data
-                            </button>
+                        {/* LEFT: CONVERSATION PANEL (Desktop) */}
+                        <div className="hidden lg:flex bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex-col overflow-hidden shadow-sm relative">
+                            {renderChatPanel()}
                         </div>
 
-                        {activeTab === "chat" ? (
-                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
-                                {renderChatPanel()}
+                        {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL (Desktop) */}
+                        <div className="hidden lg:block space-y-5 overflow-y-auto">
+                            <AssistantSidebar biomarkers={biomarkers} />
+                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
+                                <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
                             </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <AssistantSidebar biomarkers={biomarkers} />
-                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
-                                    <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* LEFT: CONVERSATION PANEL (Desktop) */}
-                    <div className="hidden lg:flex bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex-col overflow-hidden shadow-sm relative">
-                        {renderChatPanel()}
-                    </div>
-
-                    {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL (Desktop) */}
-                    <div className="hidden lg:block space-y-5 overflow-y-auto">
-                        <AssistantSidebar biomarkers={biomarkers} />
-                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
-                            <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
                         </div>
                     </div>
+
                 </div>
-
             </div>
-        </div>
+        </ErrorBoundary>
     );
 }

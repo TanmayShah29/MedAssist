@@ -1,135 +1,65 @@
-# MedAssist
+# MedAssist — Understand Your Lab Results
 
-**MedAssist** is an intelligent, AI-powered medical assistant designed to help users understand their health data, analyze lab reports, and manage their wellness journey. Built with **Next.js 16**, **Supabase**, and advanced LLMs (**Groq/Llama 3.3**), it provides a secure and meaningful way to interpret complex medical information.
+MedAssist is an intelligent health platform that transforms confusing blood work PDFs into plain-English insights. By connecting raw clinical data with advanced AI, MedAssist helps you track your longitudinal health trends and prepare for your next doctor's visit with confidence.
 
-> **Disclaimer**: MedAssist is an educational tool and does not provide medical diagnosis or treatment. Always consult a physician for professional medical advice.
-
----
+![Landing Page Mockup](https://raw.githubusercontent.com/tanmayshah/medassist/main/public/screenshot-landing.png)
+*Note: Please replace with actual screenshot paths after deployment.*
 
 ## Key Features
+- **AI Lab Report Analysis**: Automated extraction of biomarkers from PDF reports using OCR.space and Groq (Llama 3.3).
+- **Personalized Care Plans**: Data-driven diet and lifestyle recommendations based on your out-of-range values.
+- **Longitudinal Tracking**: Visualize how your health markers change over time with interactive trend charts.
+- **Doctor Preparation**: Auto-generated questions tailored to your specific clinical flags.
+- **Privacy First**: Enterprise-grade security with Supabase row-level encryption. Your data is never sold.
 
-- **AI Lab Report Analysis**: Upload a PDF of your lab report. MedAssist uses **OCR.space** for precise text extraction and **Groq (Llama 3.3 70B)** to extract biomarkers, interpret results (Optimal, Warning, Critical), and provide a plain-English summary.
-- **Optimistic Health Scoring**: A proprietary, forgiving health score algorithm that rewards "Optimal" values while providing context for areas needing attention. Includes **Algorithmic Transparency** with a methodology modal explaining the calculation logic.
-- **Professional Clinical Printing**: Optimized `@media print` styling that transforms the dashboard into a professional, clean medical report suitable for sharing with healthcare providers.
-- **PWA & Offline Resilience**: Full Progressive Web App support with `manifest.json` and `apple-touch-icon`. Implements local caching for lab results to ensure your health data is accessible even without an internet connection.
-- **Interactive Health Q&A**: Chat with an AI assistant that understands your specific symptoms and extracted biomarkers to answer your health questions contextually.
-- **Smart Doctor Preparation**: Automatically generates structured, context-aware questions for your next medical appointment based on flagged biomarkers, complete with "Why ask this" clinical rationale.
-- **Supplement & Medication Correlation**: A dedicated "Medicine Cabinet" to log intake, which automatically overlays correlation markers on biomarker trend charts to visualize the impact of your actions.
-- **Smart Dashboard**: A visualized clinical overview showing your critical biomarkers, trends, and categorized health insights (Metabolic, Hematology, etc.).
-- **Secure Platform**: Integrated with Supabase Auth for secure user management and Row Level Security (RLS) for data privacy.
-- **Engaging Onboarding**: A verified, step-by-step processing flow that keeps you informed while the AI analyzes your data.
-
-## Technology Stack
-
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions)
-- **Language**: TypeScript
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/), [Framer Motion](https://www.framer.com/motion/)
-- **Backend & Database**: [Supabase](https://supabase.com/) (PostgreSQL, Auth, Storage)
-- **AI & OCR**: 
-  - [OCR.space](https://ocr.space/) (PDF Text Extraction)
-  - [Groq SDK](https://groq.com/) (Llama 3.3 70B for medical reasoning)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
-
-## Future Roadmap
-
-MedAssist is evolving from a lab analyzer into a comprehensive health intelligence platform. Upcoming features include:
-
-- **Integrated Health Timeline**: A chronological medical diary interweaving lab results, symptom logs, and AI milestones to visualize your complete health story.
-- **Biomarker Simulation**: "What-if" scenarios to understand how specific lifestyle or dietary changes might influence your clinical results.
-
-## How it Works
-
-MedAssist operates on a sophisticated pipeline designed to transform raw medical data into actionable health insights.
-
-### 1. The User Journey
-1.  **Onboarding & Profile**: New users complete a secure onboarding flow, providing basic demographics and symptoms to create a personalized context.
-2.  **Smart Upload**: Users upload lab reports. The app validates the file and initiates a binary upload stream.
-3.  **Real-time Processing**: 
-    - **Step 1 (OCR)**: The file is sent to OCR.space to extract raw text from validity-verified PDFs.
-    - **Step 2 (Analysis)**: The extracted text is processed by Llama 3.3 (via Groq) to identify biomarkers and detailed interpretations.
-4.  **Interactive Dashboard**: Users land on a dashboard showing a "Health Score", categorized results, and priority actions.
-
-### 2. Technical Architecture
-1.  **Direct Binary Upload**: Files are streamed directly to the OCR provider to ensure data integrity and bypass encoding issues.
-2.  **Data Normalization**: 
-    - Raw AI output is validated against a strict JSON schema.
-    - Biomarkers are normalized to standard units and statuses (Optimal, Warning, Critical).
-3.  **RAG-Powered Q&A**: 
-    - User questions trigger a Retrieval-Augmented Generation flow, pulling the user's *actual* recent biomarkers to provide personalized answers.
+## Tech Stack
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- **Database & Auth**: [Supabase](https://supabase.com/)
+- **AI Engine**: [Groq SDK](https://groq.com/) (Llama 3.3 70B)
+- **OCR Engine**: [OCR.space API](https://ocr.space/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Charts**: [Recharts](https://recharts.org/)
 
 ## Getting Started
 
-Follow these steps to set up the project locally.
-
 ### Prerequisites
+- Node.js 20+ 
+- A Supabase account
+- A Groq API key
+- An OCR.space API key
 
-- Node.js 18+ installed
-- A [Supabase](https://supabase.com/) account
-- A [Groq](https://groq.com/) API Key
-- An [OCR.space](https://ocr.space/) API Key (Free)
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/medassist.git
+   cd medassist
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables (see `.env.example`):
+   ```bash
+   cp .env.example .env.local
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-### 1. Clone the repository
+## Environment Variables
+The following keys are required in your `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY`: Service role key for admin operations (server-only)
+- `GROQ_API_KEY`: API key from Groq Console
+- `OCR_SPACE_API_KEY`: API key from OCR.space
 
-```bash
-git clone https://github.com/your-username/medassist.git
-cd medassist
-```
+## Deployment
+Deploy to Vercel in one click:
 
-### 2. Install dependencies
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftanmayshah%2Fmedassist)
 
-```bash
-npm install
-```
-
-### 3. Environment Variables
-
-Create a `.env.local` file in the root directory and add the following keys:
-
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-
-# AI & OCR Configuration
-GROQ_API_KEY=your_groq_api_key
-OCR_SPACE_API_KEY=your_ocr_space_api_key
-```
-
-### 4. Database Setup
-
-Run the SQL migration in your Supabase SQL Editor to set up the tables (`rate_limits`, `lab_results`, `biomarkers`, etc.) and Row Level Security policies.
-
-### 5. Run the development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Project Structure
-
-```
-src/
-├── app/                  # Next.js App Router
-│   ├── (auth)/           # Login/Signup
-│   ├── api/              # API Routes (analyze-report, ask-ai)
-│   ├── dashboard/        # Main Dashboard
-│   ├── onboarding/       # Upload & Processing Flow
-│   └── results/          # Detailed Results
-├── components/           # UI Components
-├── lib/                  # Utilities
-│   ├── extractPdfText.ts # OCR.space integration
-│   ├── groq-medical.ts   # Groq AI logic
-│   └── supabase.ts       # Supabase client
-└── store/                # Zustand stores
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
+---
+© 2026 MedAssist. Built by Tanmay Shah.

@@ -32,8 +32,32 @@ const STANDALONE_ROUTES = [
 ];
 
 export const metadata = {
-  title: "MedAssist - Your Lab Results, Explained.",
-  description: "AI-powered health insights for your lab reports.",
+  title: "MedAssist — Understand Your Lab Results",
+  description: "Transform your confusing blood work PDFs into plain-English insights with AI-powered lab report analysis.",
+  openGraph: {
+    title: "MedAssist — Understand Your Lab Results",
+    description: "AI-powered clinical intelligence for your lab reports.",
+    url: "https://medassist.vercel.app",
+    siteName: "MedAssist",
+    images: [
+      {
+        url: "https://medassist.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MedAssist — Understand Your Lab Results",
+    description: "AI-powered clinical intelligence for your lab reports.",
+    images: ["https://medassist.vercel.app/og-image.png"],
+  },
+  alternates: {
+    canonical: "https://medassist.vercel.app",
+  },
 };
 
 export default async function RootLayout({

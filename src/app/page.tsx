@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   Sparkles,
   X,
-  Printer
+  Printer,
+  Activity
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -66,7 +67,7 @@ export default function LandingPage() {
             {!isSignedIn && (
               <Link 
                 href="/auth?mode=login" 
-                className="text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors px-4 py-2"
+                className="text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors px-4 py-3 min-h-[44px] flex items-center"
               >
                 Sign in
               </Link>
@@ -79,7 +80,7 @@ export default function LandingPage() {
                   router.push('/auth?mode=signup');
                 }
               }}
-              className="bg-sky-500 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-sky-600 transition-all active:scale-95 shadow-md shadow-sky-500/20"
+              className="bg-sky-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-sky-600 transition-all active:scale-95 shadow-md shadow-sky-500/20 min-h-[44px]"
               style={{ WebkitAppearance: 'none', marginLeft: 8 }}
             >
               {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
@@ -105,7 +106,7 @@ export default function LandingPage() {
               <span className="text-sky-500">finally explained.</span>
             </h1>
 
-            {/* Subheadline */}
+            {/* Subheadline badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 
                            bg-sky-50 border border-sky-200 rounded-full 
                            text-xs font-medium text-sky-700 mb-8">
@@ -777,8 +778,8 @@ export default function LandingPage() {
             {/* Credits */}
             <div className="flex items-center text-[11px] text-text-muted">
               <span>© 2026 MedAssist</span>
-              <span className="mx-3 text-border-medium">|</span>
-              <span>Tanmay Shah</span>
+              <span className="mx-3 text-border-medium" aria-hidden="true">|</span>
+              <span>Built by Tanmay Shah</span>
             </div>
           </div>
         </div>
