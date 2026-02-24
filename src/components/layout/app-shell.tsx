@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     return (
-        <div className="flex h-[100dvh] bg-slate-50 overflow-hidden">
+        <div className="flex h-[100dvh] bg-slate-50 relative">
             {/* Desktop Sidebar (hidden on mobile) */}
             <Sidebar className="hidden md:flex" />
 
@@ -19,7 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </MobileDrawer>
 
             {/* Main Content */}
-            <main className="grow shrink basis-0 flex flex-col h-full overflow-hidden relative">
+            <main className="grow shrink basis-0 flex flex-col h-full relative">
                 {/* Mobile Header Trigger */}
                 <div className="md:hidden h-14 border-b border-slate-200 flex items-center px-4 bg-white flex-shrink-0 z-40">
                     <button

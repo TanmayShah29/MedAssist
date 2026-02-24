@@ -29,10 +29,10 @@ interface HighlightedMessageProps {
 
 export function HighlightedMessage({ content, role, entities = [], citations = [] }: HighlightedMessageProps) {
     const renderContent = () => {
-        if (!entities.length) return <p className="leading-relaxed whitespace-pre-wrap">{content}</p>
+        if (!entities.length) return <p className="leading-normal whitespace-pre-wrap">{content}</p>
 
         return (
-            <p className="leading-relaxed whitespace-pre-wrap relative z-10">
+            <p className="leading-normal whitespace-pre-wrap relative z-10">
                 {content.split(' ').map((word, i) => {
                     const cleanWord = word.replace(/[^a-zA-Z0-9-]/g, '')
                     const entity = entities.find(e => e.text.toLowerCase().includes(cleanWord.toLowerCase()) && cleanWord.length > 3)
