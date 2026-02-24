@@ -32,9 +32,17 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.next()
     }
 
+    // Prepare headers for server components
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', pathname);
 
-    // Check auth session
-    let response = NextResponse.next({ request })
+    // Initial response with headers
+    let response = NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    });
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

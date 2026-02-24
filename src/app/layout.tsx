@@ -1,14 +1,7 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { Preloader } from "@/components/ui/preloader";
-import { Sidebar } from "@/components/layout/sidebar";
-import { MobileSidebar } from "@/components/layout/mobile-sidebar";
-import { BottomMenu } from "@/components/ui/bottom-menu";
-import { FeedbackButton } from "@/components/feedback-button";
-import { Toaster } from "sonner";
+import React from "react";
+import { headers } from "next/headers";
 import { Instrument_Serif, DM_Sans } from "next/font/google";
+import { ClientLayout } from "@/components/layout/ClientLayout";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -38,58 +31,18 @@ const STANDALONE_ROUTES = [
   "/onboarding",
 ];
 
-export default function RootLayout({
+export const metadata = {
+  title: "MedAssist - Your Lab Results, Explained.",
+  description: "AI-powered health insights for your lab reports.",
+};
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname() || "";
-  const [loading, setLoading] = useState(false);
-
-  // Determine if current page needs the app shell
-  const needsAppShell = APP_SHELL_ROUTES.some(
-    route => pathname.startsWith(route)
-  );
-
-  // Determine if this is a standalone page
-  const isStandalone = STANDALONE_ROUTES.some(
-    route => pathname === route || (route !== "/" && pathname.startsWith(route))
-  );
-
-  // Preloader — only on first app shell load
-  useEffect(() => {
-    if (needsAppShell) {
-      const hasLoaded = sessionStorage.getItem("medassist_loaded");
-      if (!hasLoaded) {
-        setLoading(true);
-      }
-    }
-  }, [needsAppShell]);
-
-  const handlePreloaderComplete = () => {
-    sessionStorage.setItem("medassist_loaded", "true");
-    setLoading(false);
-  };
-
-  // Active nav item for bottom menu
-  const activeId = pathname.includes("assistant") ? "assistant"
-    : pathname.includes("results") ? "results"
-      : pathname.includes("profile") ? "profile"
-        : pathname.includes("settings") ? "settings"
-          : "dashboard";
-
-  // Service Worker Registration
-  useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(() => {
-          // SW registered
-        }).catch(() => {
-          // SW registration failed (non-critical)
-        });
-      });
-    }
-  }, []);
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname");
 
   return (
     <html lang="en" suppressHydrationWarning className={`${instrumentSerif.variable} ${dmSans.variable}`}>
@@ -103,76 +56,14 @@ export default function RootLayout({
         <meta name="theme-color" content="#0EA5E9" />
         <link rel="apple-touch-icon" href="/window.svg" />
       </head>
-      <body
-        className="bg-[#FAFAF7] font-sans overflow-x-hidden"
-      >
-
-        {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
-        {/* No sidebar. No bottom nav. No preloader. Just the page. */}
-        {isStandalone && (
-          <div className="min-h-screen min-h-[100dvh]">
-            {children}
-          </div>
-        )}
-
-        {/* ── APP PAGES (dashboard, results, assistant, etc.) ── */}
-        {needsAppShell && (
-          <>
-            {/* Preloader — first visit only */}
-            <Preloader
-              visible={loading}
-              onComplete={handlePreloaderComplete}
-              variant="pipeline"
-            />
-
-            <div
-              className="flex min-h-screen min-h-[100dvh]"
-              style={{ visibility: loading ? "hidden" : "visible" }}
-            >
-              {/* Desktop sidebar — hidden on standalone pages */}
-              <aside className="
-                hidden lg:flex
-                w-60 min-h-screen min-h-[100dvh]
-                fixed left-0 top-0 z-40
-                flex-col
-              ">
-                <Sidebar />
-              </aside>
-
-              {/* Mobile sidebar drawer */}
-              <MobileSidebar />
-
-              {/* Main content */}
-              <main className="
-                flex-1
-                lg:ml-60
-                min-h-screen min-h-[100dvh]
-                overflow-y-auto
-                pb-[calc(5rem+env(safe-area-inset-bottom))]
-                lg:pb-0
-                page-enter
-              ">
-                {children}
-              </main>
-            </div>
-
-            {/* Bottom nav — mobile only, app pages only */}
-            <div className="lg:hidden">
-              <BottomMenu activeId={activeId} />
-            </div>
-          </>
-        )}
-
-        {/* ── FALLBACK: any other route ── */}
-        {!isStandalone && !needsAppShell && (
-          <div className="min-h-screen">
-            {children}
-          </div>
-        )}
-
-        {/* Global UI Elements */}
-        <FeedbackButton />
-        <Toaster position="bottom-center" />
+      <body className="bg-[#FAFAF7] font-sans overflow-x-hidden">
+        <ClientLayout 
+          initialPathname={pathname}
+          appShellRoutes={APP_SHELL_ROUTES}
+          standaloneRoutes={STANDALONE_ROUTES}
+        >
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
