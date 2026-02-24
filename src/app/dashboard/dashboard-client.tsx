@@ -54,8 +54,8 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'Glucose': 'Main sugar found in your blood; primary energy source.',
     'Hemoglobin A1c': 'Your average blood sugar levels over the past 3 months.',
     'LDL Cholesterol': '"Bad" cholesterol that can build up in your arteries.',
-    'HDL Cholesterol': '"Good" cholesterol that helps remove other forms of cholesterol from your bloodstream.',
-    'Triglycerides': 'A type of fat found in your blood; high levels can increase heart disease risk.',
+    'HDL Cholesterol': '"Good" cholesterol that helps remove other forms of cholesterol.',
+    'Triglycerides': 'A type of fat found in your blood; indicates heart health.',
     'Vitamin D': 'Essential for bone health and immune system function.',
     'C-Reactive Protein (CRP)': 'A marker of inflammation in the body.',
     'Iron': 'Used to make hemoglobin, which carries oxygen in your blood.',
@@ -66,10 +66,13 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'ALT': 'Liver enzyme that can indicate liver health.',
     'AST': 'Another liver enzyme used to evaluate liver function.',
     'Creatinine': 'Waste product filtered by kidneys; used to measure kidney function.',
+    'Hemoglobin': 'Protein in red blood cells that carries oxygen.',
+    'WBC': 'White blood cells; the core of your immune system defense.',
+    'RBC': 'Red blood cells; responsible for delivering oxygen to tissues.',
 }
 
-function getDelta(current: number, previous: number | null) {
-    if (previous === null) return null;
+function getDelta(current: number, previous: number | null | undefined) {
+    if (previous === null || previous === undefined || isNaN(previous)) return null;
     const diff = current - previous;
     const percent = Math.round((diff / previous) * 100);
     return { diff, percent };
@@ -509,55 +512,55 @@ export default function DashboardClient({
 
             {/* ── Informational Banners: Risk Summary & Upload Nudge ── */}
             {totalCount > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    {/* Risk Summary Banner */}
-                    <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
-                        <div className="flex items-center gap-4">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : warningCount > 0 ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                                <Activity size={24} />
+                <div className="flex flex-col md:flex-row gap-4 mb-8">
+                    {/* Risk Summary Banner - Only show if there are flags */}
+                    {(criticalCount > 0 || warningCount > 0) && (
+                        <div className="flex-1 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
+                                    <Activity size={24} />
+                                </div>
+                                <div style={{ marginLeft: 16 }}>
+                                    <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
+                                    <p className="text-xs text-[#57534E]">
+                                        {criticalCount > 0 
+                                            ? `${criticalCount} urgent markers need attention` 
+                                            : `${warningCount} markers to monitor closely`}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
-                                <p className="text-xs text-[#57534E]">
-                                    {criticalCount > 0 
-                                        ? `${criticalCount} urgent markers need attention` 
-                                        : warningCount > 0 
-                                            ? `${warningCount} markers to monitor closely` 
-                                            : 'All systems performing optimally'}
-                                </p>
+                            <div className="flex gap-2" style={{ marginLeft: 'auto' }}>
+                                <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                                    <span className="block text-xs font-bold text-emerald-700">{optimalCount}</span>
+                                    <span className="text-[10px] text-emerald-600 uppercase font-semibold">Opt</span>
+                                </div>
+                                <div className="text-center px-3 py-1 bg-amber-50 rounded-lg border border-amber-100" style={{ marginLeft: 8 }}>
+                                    <span className="block text-xs font-bold text-amber-700">{warningCount}</span>
+                                    <span className="text-[10px] text-amber-600 uppercase font-semibold">Mon</span>
+                                </div>
+                                <div className="text-center px-3 py-1 bg-red-50 rounded-lg border border-red-100" style={{ marginLeft: 8 }}>
+                                    <span className="block text-xs font-bold text-red-700">{criticalCount}</span>
+                                    <span className="text-[10px] text-red-600 uppercase font-semibold">Act</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex gap-2">
-                            <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
-                                <span className="block text-xs font-bold text-emerald-700">{optimalCount}</span>
-                                <span className="text-[10px] text-emerald-600 uppercase font-semibold">Opt</span>
-                            </div>
-                            <div className="text-center px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
-                                <span className="block text-xs font-bold text-amber-700">{warningCount}</span>
-                                <span className="text-[10px] text-amber-600 uppercase font-semibold">Mon</span>
-                            </div>
-                            <div className="text-center px-3 py-1 bg-red-50 rounded-lg border border-red-100">
-                                <span className="block text-xs font-bold text-red-700">{criticalCount}</span>
-                                <span className="text-[10px] text-red-600 uppercase font-semibold">Act</span>
-                            </div>
-                        </div>
-                    </div>
+                    )}
 
-                    {/* Upload Reminder Nudge */}
-                    {latestLabResult && (
-                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                    {/* Upload Reminder Nudge - Only if they have a history (not first time) */}
+                    {latestLabResult && initialLabResults.length > 0 && (
+                        <div className="flex-1 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
                                 </div>
-                                <div>
+                                <div style={{ marginLeft: 16 }}>
                                     <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
                                     <p className="text-xs text-[#57534E]">
                                         Last test was {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24))} days ago
                                     </p>
                                 </div>
                             </div>
-                            <div className="text-right">
+                            <div className="text-right" style={{ marginLeft: 'auto' }}>
                                 {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24)) > 90 ? (
                                     <span className="inline-block px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold">DUE FOR NEW TEST</span>
                                 ) : (
@@ -794,52 +797,56 @@ export default function DashboardClient({
 
             {/* ── Personalized "What to do next" Card ── */}
             {totalCount > 0 && (
-                <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                        <Sparkles size={120} />
-                    </div>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
-                                <ArrowRight className="w-5 h-5 text-sky-400" />
+                <>
+                    <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-10">
+                            <Sparkles size={120} />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+                                    <ArrowRight className="w-5 h-5 text-sky-400" />
+                                </div>
+                                <h3 className="text-xl font-bold font-display" style={{ marginLeft: 12 }}>Personalized Care Plan</h3>
                             </div>
-                            <h3 className="text-xl font-bold font-display">Personalized Care Plan</h3>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[...latestBiomarkers]
-                                .filter(b => b.status !== 'optimal')
-                                .sort((a, b) => (a.status === 'critical' ? -1 : 1))
-                                .slice(0, 3)
-                                .map((b, idx) => {
-                                    const recommendations: Record<string, string> = {
-                                        'Vitamin D': 'Consider 15m daily sunlight or discuss D3 supplementation with your doctor.',
-                                        'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
-                                        'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
-                                        'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
-                                        'CRP': 'Focus on anti-inflammatory foods and prioritize 7-8 hours of quality sleep.',
-                                        'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
-                                    };
-                                    const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
-                                    
-                                    return (
-                                        <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.status === 'critical' ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-amber-500/20 border-amber-500/30 text-amber-400'}`}>
-                                                    {b.status.toUpperCase()}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {[...latestBiomarkers]
+                                    .filter(b => b.status !== 'optimal')
+                                    .sort((a, b) => (a.status === 'critical' ? -1 : 1))
+                                    .slice(0, 3)
+                                    .map((b, idx) => {
+                                        const recommendations: Record<string, string> = {
+                                            'Vitamin D': 'Consider 15m daily sunlight or discuss D3 supplementation with your doctor.',
+                                            'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
+                                            'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
+                                            'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
+                                            'CRP': 'Focus on anti-inflammatory foods and prioritize 7-8 hours of quality sleep.',
+                                            'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
+                                        };
+                                        const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
+                                        
+                                        return (
+                                            <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.status === 'critical' ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-amber-500/20 border-amber-500/30 text-amber-400'}`}>
+                                                        {b.status.toUpperCase()}
+                                                    </span>
+                                                    <span className="text-[10px] text-white/40 font-mono">PRIORITY {idx + 1}</span>
                                                 </div>
-                                                <span className="text-[10px] text-white/40 font-mono">PRIORITY {idx + 1}</span>
+                                                <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">{b.name}</h4>
+                                                <p className="text-sm text-slate-400 leading-relaxed">
+                                                    {recommendations[b.name] || fallback}
+                                                </p>
                                             </div>
-                                            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">{b.name}</h4>
-                                            <p className="text-sm text-slate-400 leading-relaxed">
-                                                {recommendations[b.name] || fallback}
-                                            </p>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    })}
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <DoctorQuestions biomarkers={latestBiomarkers} className="mb-8" />
+                </>
             )}
             {longitudinalInsights.length > 0 && (
                 <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm">
@@ -909,9 +916,9 @@ export default function DashboardClient({
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
-                    <div className="flex gap-4 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter">
-                        <span>Optimal: {optimalCount}</span>
-                        <span>Monitor: {warningCount}</span>
+                    <div className="flex gap-4 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter" style={{ marginLeft: 'auto' }}>
+                        <span style={{ marginRight: 12 }}>Optimal: {optimalCount}</span>
+                        <span style={{ marginRight: 12 }}>Monitor: {warningCount}</span>
                         <span>Action: {criticalCount}</span>
                     </div>
                 </div>
@@ -928,6 +935,7 @@ export default function DashboardClient({
                         <button
                             onClick={() => setShowUploadModal(true)}
                             className="text-white rounded-[10px] px-6 py-3 font-medium bg-sky-500 hover:bg-sky-600 transition-colors"
+                            style={{ WebkitAppearance: 'none' }}
                         >
                             Upload your first report
                         </button>
@@ -935,14 +943,22 @@ export default function DashboardClient({
                 ) : (
                     <div className="space-y-8">
                         {['hematology', 'metabolic', 'inflammation', 'vitamins', 'other'].map(cat => {
-                            const catBiomarkers = latestBiomarkers.filter(b => b.category === cat);
+                            // Category fallback logic: anything not in the first 4 goes to 'other'
+                            const catBiomarkers = latestBiomarkers.filter(b => {
+                                const bCat = b.category?.toLowerCase() || 'other';
+                                if (cat === 'other') {
+                                    return !['hematology', 'metabolic', 'inflammation', 'vitamins'].includes(bCat);
+                                }
+                                return bCat === cat;
+                            });
+                            
                             if (catBiomarkers.length === 0) return null;
 
                             return (
                                 <div key={cat} className="space-y-4">
                                     <div className="flex items-center gap-2">
                                         <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
-                                        <div className="h-[1px] flex-1 bg-[#E8E6DF]" />
+                                        <div className="h-[1px] flex-1 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {catBiomarkers.map((b) => {
@@ -950,16 +966,27 @@ export default function DashboardClient({
                                                 pb.name === b.name && 
                                                 pb.lab_result_id !== latestLabResult?.id
                                             );
-                                            const delta = getDelta(b.value, prev?.value || null);
+                                            const delta = getDelta(b.value, prev?.value);
 
                                             return (
                                                 <div
                                                     key={b.id}
                                                     className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden"
                                                     onClick={() => handleBiomarkerClick(b)}
+                                                    onTouchStart={(e) => {
+                                                        const el = e.currentTarget;
+                                                        el.classList.add('active-tooltip');
+                                                        setTimeout(() => el.classList.remove('active-tooltip'), 3000);
+                                                    }}
                                                 >
-                                                    {/* Plain English Tooltip on Hover */}
-                                                    <div className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4 text-center z-20 pointer-events-none">
+                                                    {/* Plain English Tooltip - Safari prefix added via inline style for safety */}
+                                                    <div 
+                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none"
+                                                        style={{ 
+                                                            WebkitBackdropFilter: "blur(4px)",
+                                                            WebkitTransition: "all 0.2s ease-out"
+                                                        }}
+                                                    >
                                                         <p className="text-white text-[11px] font-medium leading-relaxed">
                                                             {BIOMARKER_DEFINITIONS[b.name] || 'Clinical biomarker used to assess specific metabolic or systemic health functions.'}
                                                         </p>
@@ -975,13 +1002,19 @@ export default function DashboardClient({
                                                                 }`} />
                                                             {b.status.toUpperCase()}
                                                         </div>
-                                                        <div className="text-right">
+                                                        <div className="text-right" style={{ marginLeft: 'auto' }}>
                                                             <div className="text-[15px] font-bold text-[#1C1917]">{b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span></div>
-                                                            {delta && (
+                                                            {delta ? (
                                                                 <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${delta.diff > 0 ? (b.status === 'optimal' ? 'text-emerald-600' : 'text-red-600') : (b.status === 'optimal' ? 'text-red-600' : 'text-emerald-600')}`}>
-                                                                    {delta.diff > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                                                                    {Math.abs(delta.percent)}%
+                                                                    {delta.diff > 0 ? (
+                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m18 15-6-6-6 6"/></svg>
+                                                                    ) : (
+                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m6 9 6 6 6-6"/></svg>
+                                                                    )}
+                                                                    {Math.abs(delta.percent)}% from last
                                                                 </div>
+                                                            ) : (
+                                                                <div className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-tighter">No previous data</div>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1003,12 +1036,11 @@ export default function DashboardClient({
                 )}
             </div>
 
-            {/* ── Doctor Questions ── */}
+            {/* ── Medicine Cabinet (Supplementary Care) ── */}
             {totalCount > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PREPARATION & CARE</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <DoctorQuestions biomarkers={displayBiomarkers} />
+                <div className="mb-12">
+                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
+                    <div className="max-w-xl">
                         <MedicineCabinet />
                     </div>
                 </div>
