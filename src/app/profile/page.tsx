@@ -78,7 +78,7 @@ export default function ProfilePage() {
         if (!confirm("Are you sure you want to delete this report? This will remove all associated biomarkers.")) return;
 
         try {
-            const res = await deleteLabResult(parseInt(id));
+            const res = await deleteLabResult(id);
             if (res.success) {
                 setReports(prev => prev.filter(r => r.id !== id));
                 toast.success("Report deleted successfully");

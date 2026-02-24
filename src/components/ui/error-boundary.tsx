@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { logger } from "@/lib/logger"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
 
@@ -24,7 +25,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        console.error("ErrorBoundary caught an error:", error, errorInfo)
+        logger.error("ErrorBoundary caught an error", { error, errorInfo })
     }
 
     render() {

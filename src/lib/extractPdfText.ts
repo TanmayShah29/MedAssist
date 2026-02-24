@@ -2,6 +2,8 @@
 export const IMAGE_BASED_PDF_MESSAGE =
     'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
 
+const OCR_TIMEOUT_MS = 45_000; // 45s to avoid hung requests
+
 export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
     const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
 
@@ -13,13 +15,28 @@ export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'app
     formData.append('isTable', 'true')
     formData.append('OCREngine', '2')
 
-    const response = await fetch('https://api.ocr.space/parse/image', {
-        method: 'POST',
-        headers: {
-            'apikey': process.env.OCR_SPACE_API_KEY!
-        },
-        body: formData
-    })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), OCR_TIMEOUT_MS)
+
+    let response: Response
+    try {
+        response = await fetch('https://api.ocr.space/parse/image', {
+            method: 'POST',
+            headers: {
+                'apikey': process.env.OCR_SPACE_API_KEY!
+            },
+            body: formData,
+            signal: controller.signal
+        })
+    } catch (err) {
+        clearTimeout(timeoutId)
+        if (err instanceof Error && err.name === 'AbortError') {
+            throw new Error('OCR timed out. Please try again or enter values manually.')
+        }
+        throw err
+    } finally {
+        clearTimeout(timeoutId)
+    }
 
     const data = await response.json()
 

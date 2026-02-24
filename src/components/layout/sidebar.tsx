@@ -97,6 +97,8 @@ export function Sidebar({ className }: { className?: string }) {
         localStorage.removeItem("medassist_debug_mode");
         localStorage.removeItem("medassist_cached_lab_results");
         localStorage.removeItem("medassist_cached_biomarkers");
+        localStorage.removeItem("medassist_cached_demo_lab_results");
+        localStorage.removeItem("medassist_cached_demo_biomarkers");
         sessionStorage.removeItem("medassist_loaded");
         
         document.cookie = 'onboarding_complete=; max-age=0; path=/';

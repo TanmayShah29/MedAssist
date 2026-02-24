@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -300,7 +301,7 @@ export default function DashboardClient({
                 const data = await res.json();
                 if (data.supplements) setSupplements(data.supplements);
             } catch (err) {
-                console.error("Failed to fetch supplements", err);
+                logger.error("Failed to fetch supplements", err);
             }
         };
         fetchSupps();
@@ -337,12 +338,17 @@ export default function DashboardClient({
     const latestLabResult = displayLabResults[0];
     const longitudinalInsights: string[] = latestLabResult?.raw_ai_json?.longitudinalInsights || [];
 
-    // Offline Resilience: Save to LocalStorage
+    // Offline Resilience: Save to LocalStorage (never mix demo with real data)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             if (displayLabResults.length > 0) {
-                localStorage.setItem('medassist_cached_lab_results', JSON.stringify(displayLabResults));
-                localStorage.setItem('medassist_cached_biomarkers', JSON.stringify(displayBiomarkers));
+                if (demoMode) {
+                    localStorage.setItem('medassist_cached_demo_lab_results', JSON.stringify(displayLabResults));
+                    localStorage.setItem('medassist_cached_demo_biomarkers', JSON.stringify(displayBiomarkers));
+                } else {
+                    localStorage.setItem('medassist_cached_lab_results', JSON.stringify(displayLabResults));
+                    localStorage.setItem('medassist_cached_biomarkers', JSON.stringify(displayBiomarkers));
+                }
             }
 
             const handleOnline = () => setIsOffline(false);
@@ -357,7 +363,7 @@ export default function DashboardClient({
                 window.removeEventListener('offline', handleOffline);
             };
         }
-    }, [displayLabResults, displayBiomarkers]);
+    }, [displayLabResults, displayBiomarkers, demoMode]);
 
     const handleBiomarkerClick = (b: Biomarker) => {
         setSelectedBiomarkerData(b);

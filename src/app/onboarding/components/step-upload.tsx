@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { logger } from "@/lib/logger";
 
 function nextId() {
     return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -153,13 +154,13 @@ export function StepUpload() {
             const result = await completeOnboarding();
 
             if (!result.success) {
-                console.error("Failed to complete onboarding:", result.error);
+                logger.error("Failed to complete onboarding:", result.error);
                 // Still navigate — don't block the user
             }
 
             window.location.href = "/dashboard";
         } catch (err) {
-            console.error("Non-fatal error skipping onboarding:", err);
+            logger.error("Non-fatal error skipping onboarding:", err);
             window.location.href = "/dashboard";
         }
     };

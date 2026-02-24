@@ -187,6 +187,16 @@ CREATE TABLE IF NOT EXISTS global_ai_cache (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, now()) NOT NULL
 );
 
+-- RLS: deny direct access; only service role bypasses
+ALTER TABLE global_ai_cache ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    DROP POLICY IF EXISTS "Deny all direct access" ON global_ai_cache;
+END $$;
+
+CREATE POLICY "Deny all direct access" ON global_ai_cache FOR ALL USING (false) WITH CHECK (false);
+
 -- Updated Save Function with raw data support
 CREATE OR REPLACE FUNCTION save_complete_report(
   p_user_id UUID,

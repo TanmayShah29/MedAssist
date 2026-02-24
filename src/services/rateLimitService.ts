@@ -46,9 +46,9 @@ async function getClientIp(): Promise<string> {
  * Calls Supabase RPC `check_rate_limit`.
  */
 export async function checkRateLimit(): Promise<RateLimitResult> {
-    // Bypass for local development
-    if ((process.env.NODE_ENV as string) === 'development') { // Removed 'as string'
-        logger.info('[RateLimit] Bypassing for development environment');
+    // Bypass only when explicitly disabled (e.g. local dev without Supabase)
+    if (process.env.DISABLE_RATE_LIMIT === 'true') {
+        logger.info('[RateLimit] Bypassed via DISABLE_RATE_LIMIT=true');
         return { success: true };
     }
 
@@ -110,14 +110,13 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
     } catch (error) {
         logger.error("Rate Limit Infrastructure Error:", error);
 
-        // In development, fail open so broken Supabase config doesn't 
-        // block local testing
-        if ((process.env.NODE_ENV as string) === 'development') { // Removed 'as string'
-            logger.info('[RateLimit] Dev mode: failing open despite error');
+        // Fail open only when explicitly disabled (local dev)
+        if (process.env.DISABLE_RATE_LIMIT === 'true') {
+            logger.info('[RateLimit] DISABLE_RATE_LIMIT: failing open despite error');
             return { success: true };
         }
 
-        // Fail Closed - PRD 4.2
+        // Fail closed in production
         return {
             success: false,
             message: "Service temporarily unavailable (RLS).",

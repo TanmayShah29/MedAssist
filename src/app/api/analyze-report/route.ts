@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { validateEnv } from '@/lib/env';
 import { extractTextFromPdf, ImageBasedPdfError } from '@/services/extractionService';
 import { analyzeLabText } from '@/services/aiAnalysisService';
 import { getUserBiomarkerHistory } from '@/app/actions/user-data';
@@ -17,12 +18,28 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
     try {
+        validateEnv();
         const rateLimitResult = await checkRateLimit();
         if (!rateLimitResult.success) {
             logger.warn(`Rate limit exceeded: ${rateLimitResult.message}`);
             return NextResponse.json(
                 { success: false, error: rateLimitResult.message },
                 { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+            );
+        }
+
+        // Require auth to prevent quota abuse
+        const cookieStore = await cookies();
+        const supabaseAuth = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+        );
+        const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
+        if (!authUser) {
+            return NextResponse.json(
+                { success: false, error: 'Sign in to analyze reports.' },
+                { status: 401 }
             );
         }
 
@@ -63,43 +80,16 @@ export async function POST(req: NextRequest) {
         }
         logger.info("Text extracted successfully.");
 
-        // 4. Authenticate & Fetch History
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() {
-                        return cookieStore.getAll()
-                    },
-                    setAll(cookiesToSet) {
-                        try {
-                            cookiesToSet.forEach(({ name, value, options }) =>
-                                cookieStore.set(name, value, options)
-                            )
-                        } catch {
-                            // Ignored in route handlers
-                        }
-                    }
-                },
-            }
-        );
-
-        const { data: { user } } = await supabase.auth.getUser();
         let history: Awaited<ReturnType<typeof getUserBiomarkerHistory>> = [];
-        if (user) {
-            history = await getUserBiomarkerHistory(user.id);
-            logger.info(`Fetched ${history.length} historical biomarkers for user ${user.id}`);
-        }
+        history = await getUserBiomarkerHistory(authUser.id);
+        logger.info(`Fetched ${history.length} historical biomarkers for user ${authUser.id}`);
 
         logger.info("Starting AI analysis...");
         const analysisResult = await analyzeLabText(extractedText, { symptoms: [], history });
 
         // 6. Data Persistence
-        if (user) {
-            const saveResult = await saveLabResult({
-                userId: user.id,
+        const saveResult = await saveLabResult({
+                userId: authUser.id,
                 healthScore: analysisResult.healthScore,
                 riskLevel: analysisResult.riskLevel,
                 summary: analysisResult.summary,
@@ -109,9 +99,12 @@ export async function POST(req: NextRequest) {
                 rawAiJson: analysisResult
             });
 
-            if (!saveResult.success) {
-                logger.error("Failed to save via action:", saveResult.error);
-            }
+        if (!saveResult.success) {
+            logger.error("Failed to save via action:", saveResult.error);
+            return NextResponse.json(
+                { success: false, error: saveResult.error || 'Failed to save results. Please try again.' },
+                { status: 500 }
+            );
         }
 
         return NextResponse.json({

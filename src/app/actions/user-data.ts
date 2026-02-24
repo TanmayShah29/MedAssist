@@ -58,16 +58,21 @@ export async function saveLabResult(args: SaveLabResultArgs) {
     }
 }
 
-export async function deleteLabResult(labResultId: number) {
+export async function deleteLabResult(labResultId: number | string) {
     if (!supabaseAdmin) {
         return { success: false, error: "Database connection unavailable" };
+    }
+
+    const id = typeof labResultId === 'string' ? parseInt(labResultId, 10) : labResultId;
+    if (Number.isNaN(id) || id < 1) {
+        return { success: false, error: "Invalid report ID" };
     }
 
     try {
         const { error } = await supabaseAdmin
             .from("lab_results")
             .delete()
-            .eq("id", labResultId);
+            .eq("id", id);
 
         if (error) throw error;
         return { success: true };

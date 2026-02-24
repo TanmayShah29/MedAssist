@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
+import { logger } from "@/lib/logger";
 import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +26,7 @@ export class ExtractionErrorBoundary extends Component<Props, State> {
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error("Extraction Error caught:", error, errorInfo);
+        logger.error("Extraction Error caught", { error, errorInfo });
     }
 
     private handleRetry = () => {

@@ -3,8 +3,8 @@ import { z } from "zod";
 export const BiomarkerStatusSchema = z.enum(["optimal", "warning", "critical"]);
 export const BiomarkerCategorySchema = z.string().transform(val => {
     const valid = ["hematology", "inflammation", "metabolic", "vitamins", "other"] as const;
-    const lowered = val.toLowerCase();
-    return (valid.includes(lowered as any) ? lowered : "other") as typeof valid[number];
+    const lowered = val.toLowerCase().trim();
+    return (valid as readonly string[]).includes(lowered) ? (lowered as typeof valid[number]) : "other";
 });
 
 export const BiomarkerSchema = z.object({

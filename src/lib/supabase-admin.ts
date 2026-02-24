@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 export const supabaseAdmin = (() => {
     if (typeof window !== 'undefined') return null
@@ -7,13 +8,13 @@ export const supabaseAdmin = (() => {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!url || !key) {
-        console.warn('Supabase Admin: Missing environment variables.')
+        logger.warn('Supabase Admin: Missing environment variables.')
         return null
     }
 
     // Security & Functionality Check: If the key starts with 'sb_publishable_', it's an anon key, not a service role key.
     if (key.startsWith('sb_publishable_')) {
-        console.warn('Supabase Admin: SUPABASE_SERVICE_ROLE_KEY is a publishable key. Admin-only operations (bypassing RLS) will fail, but SECURITY DEFINER RPCs may still work.')
+        logger.warn('Supabase Admin: SUPABASE_SERVICE_ROLE_KEY is a publishable key. Admin-only operations (bypassing RLS) will fail, but SECURITY DEFINER RPCs may still work.')
     }
 
     try {
@@ -24,7 +25,7 @@ export const supabaseAdmin = (() => {
             }
         })
     } catch (err) {
-        console.error('Supabase Admin: Failed to initialize client:', err)
+        logger.error('Supabase Admin: Failed to initialize client:', err)
         return null
     }
 })()

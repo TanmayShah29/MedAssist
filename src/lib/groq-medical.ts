@@ -1,11 +1,13 @@
 import Groq from "groq-sdk";
 import { ExtractionResultSchema } from "./validations/analysis";
+import { logger } from "@/lib/logger";
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
 const MODEL = "llama-3.3-70b-versatile";
+const GROQ_TIMEOUT_MS = 45_000; // 45s to avoid hung requests
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -57,8 +59,11 @@ export async function extractAndInterpretBiomarkers(
         ? `\n\nUser's Historical Lab Data:\n${history.map(b => `- ${b.name}: ${b.value} ${b.unit} (${b.status})`).join("\n")}`
         : "";
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
     try {
-        const completion = await groq.chat.completions.create({
+        const completion = await groq.chat.completions.create(
+            {
             messages: [
                 {
                     role: "system",
@@ -131,7 +136,9 @@ Rules:
             temperature: 0.1,
             max_tokens: 4000,
             response_format: { type: "json_object" },
-        });
+        },
+            { signal: controller.signal }
+        );
 
         const raw = completion.choices[0].message.content || "";
 
@@ -145,7 +152,7 @@ Rules:
         try {
             parsedJson = JSON.parse(cleaned);
         } catch (err) {
-            console.error("AI JSON Parse Error:", err);
+            logger.error("AI JSON Parse Error:", err);
             throw new AIExtractionError("AI returned malformed JSON data. Please try again.");
         }
 
@@ -153,12 +160,15 @@ Rules:
             // Validate with Zod
             return ExtractionResultSchema.parse(parsedJson);
         } catch (err) {
-            console.error("AI Validation Error:", err);
+            logger.error("AI Validation Error:", err);
             throw new AIExtractionError("AI returned data that failed health-safety validation. Please try again.");
         }
     } catch (error: unknown) {
         if (error instanceof AIExtractionError) {
             throw error;
+        }
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error('AI analysis timed out. Please try again.');
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
@@ -167,6 +177,8 @@ Rules:
             );
         }
         throw new Error(`AI analysis failed: ${(error as Error).message || "Unknown error"}`);
+    } finally {
+        clearTimeout(timeoutId);
     }
 }
 
@@ -321,7 +333,7 @@ Return ONLY valid JSON with keys: summary, checklist (string array), questions (
             questions: result.questions || ["What do my findings indicate?", "What are the next steps?"]
         };
     } catch (err: unknown) {
-        console.error("Groq appointment prep failed", (err as Error).message);
+        logger.error("Groq appointment prep failed", (err as Error).message);
         // Fallback
         return {
             summary: "Please bring your recent lab results and a list of questions.",
@@ -416,7 +428,7 @@ export async function generateClinicalInsight(prompt: string, contextType: 'symp
         const data = JSON.parse(text);
         return { success: true, data };
     } catch (err: unknown) {
-        console.error("AI Generation Failed", (err as Error).message);
+        logger.error("AI Generation Failed", (err as Error).message);
         return { success: false, error: "AI Generation Failed", status: 500 };
     }
 }

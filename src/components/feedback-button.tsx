@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { HelpCircle, X, Send } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,7 +9,6 @@ export function FeedbackButton() {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const supabase = createClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,20 +16,22 @@ export function FeedbackButton() {
 
         setIsSubmitting(true);
         try {
-            const { error } = await supabase.from('feedback').insert([
-                {
-                    message: message.trim(),
-                    url: window.location.href
-                }
-            ]);
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message.trim(), url: window.location.href }),
+            });
+            const data = await res.json();
 
-            if (error) throw error;
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to send feedback');
+            }
 
             toast.success("Feedback sent! Thank you.");
             setIsOpen(false);
             setMessage("");
-        } catch (error: any) {
-            toast.error(error.message || "Failed to send feedback");
+        } catch (error: unknown) {
+            toast.error((error as Error).message || "Failed to send feedback");
         } finally {
             setIsSubmitting(false);
         }

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { saveLabResult, completeOnboarding } from "@/app/actions/user-data";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 export function StepTour() {
     const {
@@ -41,7 +42,7 @@ export function StepTour() {
                 });
 
                 if (!result.success) {
-                    console.error("Failed to save results:", result.error);
+                    logger.error("Failed to save results:", result.error);
                 }
             }
 
@@ -49,13 +50,16 @@ export function StepTour() {
             const result = await completeOnboarding();
 
             if (!result.success) {
-                console.error("Failed to complete onboarding:", result.error);
-                // Still navigate — don't block the user
+                logger.error("Failed to complete onboarding:", result.error);
+                toast.error("Could not finalize onboarding. Please try again.");
+                setIsLoading(false);
+                return;
             }
 
+            toast.success("Welcome! Your health dashboard is ready.");
             window.location.href = "/dashboard";
         } catch (err) {
-            console.error("Non-fatal error completing onboarding:", err);
+            logger.error("Non-fatal error completing onboarding:", err);
             window.location.href = "/dashboard";
         }
     };

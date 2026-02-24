@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { logger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, MessageSquare, ClipboardCopy, CheckCircle2, RefreshCw } from 'lucide-react'
@@ -138,7 +139,7 @@ export default function ResultsPage() {
                 const data = await res.json();
                 if (data.supplements) setSupplements(data.supplements);
             } catch (err) {
-                console.error("Failed to fetch supplements", err);
+                logger.error("Failed to fetch supplements", err);
             }
         };
         fetchSupps();
@@ -162,7 +163,7 @@ export default function ResultsPage() {
                         })))
                     }
                 } catch (err) {
-                    console.error("Failed to fetch trends", err)
+                    logger.error("Failed to fetch trends", err)
                 } finally {
                     setLoadingTrends(false)
                 }

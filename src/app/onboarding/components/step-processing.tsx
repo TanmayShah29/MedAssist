@@ -1,6 +1,7 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
+import type { ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { Check, Search, Brain, Activity, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, FileText, BarChart, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
@@ -128,17 +129,49 @@ export function StepProcessing() {
 
             setState("finalizing");
 
-            const analysisData = JSON.parse(data.analysis);
+            let analysisData: { biomarkers?: unknown[]; healthScore?: number; riskLevel?: string; summary?: string };
+            try {
+                if (!data.analysis || typeof data.analysis !== 'string') {
+                    throw new Error('Invalid response from server');
+                }
+                analysisData = JSON.parse(data.analysis) as typeof analysisData;
+            } catch {
+                setErrorData({ title: 'Server Error', detail: 'Invalid response. Please try again.', canRetry: true });
+                setState("error");
+                return;
+            }
 
-            // Save to store
+            // Map API BiomarkerResult[] to ExtractedLabValue[] (add rangePosition, trend if missing)
+            const rawBiomarkers = (analysisData.biomarkers || []) as Record<string, unknown>[];
+            const labValues: ExtractedLabValue[] = rawBiomarkers.map((b) => ({
+                name: (b.name as string) || "",
+                value: (b.value as number) ?? 0,
+                unit: (b.unit as string) || "",
+                status: (b.status as ExtractedLabValue["status"]) || "optimal",
+                referenceMin: (b.referenceMin as number | null) ?? null,
+                referenceMax: (b.referenceMax as number | null) ?? null,
+                rangePosition: (b.rangePosition as number) ?? 50,
+                confidence: (b.confidence as number) ?? 0.8,
+                aiInterpretation: (b.aiInterpretation as string) || "See your doctor for interpretation.",
+                trend: (b.trend as string) ?? "",
+                category: ["hematology", "inflammation", "metabolic", "vitamins"].includes((b.category as string) || "")
+                    ? (b.category as ExtractedLabValue["category"])
+                    : "metabolic",
+            }));
+
             useOnboardingStore.getState().setExtractedData({
-                labValues: analysisData.biomarkers || [],
+                labValues,
                 entities: [],
                 healthScore: analysisData.healthScore || 0,
-                riskLevel: analysisData.riskLevel || "low",
+                riskLevel: (analysisData.riskLevel as "low" | "moderate" | "high") || "low",
             });
 
-            setAnalysisResult(analysisData);
+            setAnalysisResult({
+                biomarkers: labValues,
+                healthScore: analysisData.healthScore || 0,
+                riskLevel: analysisData.riskLevel || "low",
+                summary: analysisData.summary || "",
+            });
 
             setState("complete");
 

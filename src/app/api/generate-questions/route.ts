@@ -139,7 +139,8 @@ Do not include any preamble or postamble.`
                 }, { onConflict: 'cache_key' });
             }
         } catch (e) {
-            console.error("Failed to parse AI response as JSON", e);
+            const { logger } = await import("@/lib/logger");
+            logger.error("Failed to parse AI response as JSON", e);
             questions = [{ 
                 question: "Could not generate structured questions. Please ask your doctor about your flagged biomarkers.",
                 context: "There was an error processing the detailed questions."

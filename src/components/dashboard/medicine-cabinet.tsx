@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { logger } from "@/lib/logger";
 import { Pill, Plus, Trash2, Calendar, Activity, CheckCircle2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -34,7 +35,7 @@ export function MedicineCabinet() {
                 setSupplements(data.supplements);
             }
         } catch (error) {
-            console.error("Failed to fetch supplements", error);
+            logger.error("Failed to fetch supplements", error);
         } finally {
             setLoading(false);
         }

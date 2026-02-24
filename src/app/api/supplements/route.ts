@@ -64,10 +64,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Name and start date are required' }, { status: 400 })
         }
 
+        const parsedDate = new Date(start_date)
+        if (isNaN(parsedDate.getTime())) {
+            return NextResponse.json({ error: 'Invalid start_date. Use YYYY-MM-DD.' }, { status: 400 })
+        }
+        const startDateIso = parsedDate.toISOString().split('T')[0]
+
         const { data, error } = await supabase
             .from('supplements')
             .insert([
-                { user_id: user.id, name, dosage, frequency, start_date }
+                { user_id: user.id, name, dosage, frequency, start_date: startDateIso }
             ])
             .select()
             .single()

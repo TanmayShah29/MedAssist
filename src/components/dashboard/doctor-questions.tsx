@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logger } from "@/lib/logger";
 import { MessageSquare, Info, ChevronRight, ClipboardCopy, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,7 +36,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                         setQuestions(data.questions);
                     }
                 } catch (error) {
-                    console.error("Failed to fetch doctor questions", error);
+                    logger.error("Failed to fetch doctor questions", error);
                 } finally {
                     setLoading(false);
                 }

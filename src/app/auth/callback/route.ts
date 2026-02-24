@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
             // Set cookie for middleware optimization
             cookieStore.set('onboarding_complete', String(onboardingComplete), {
                 httpOnly: false,
-                maxAge: 60 * 60 * 24 * 7 // 7 days
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                path: '/'
             });
 
             if (onboardingComplete) {
