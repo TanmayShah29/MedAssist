@@ -41,7 +41,9 @@ function AuthContent() {
                 if (error) throw error;
 
                 if (data.user && !data.session) {
-                    toast.success("Check your email to confirm your account, then sign in.");
+                    toast.success("Check your email to confirm your account, then sign in.", { duration: 10000 });
+                    // Also use a standard alert just in case the toast is missed by the user
+                    alert("Account created successfully! Please check your email to confirm your account before logging in.");
                     return;
                 }
 
@@ -73,7 +75,13 @@ function AuthContent() {
                 }
             }
         } catch (error: unknown) {
-            toast.error((error as Error).message || "Authentication failed");
+            console.error("Auth error:", error);
+            const msg = (error as Error).message || "Authentication failed";
+            toast.error(msg, { duration: 5000 });
+            // If the user gets stuck, standard alert is visceral
+            if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("password") || msg.toLowerCase().includes("already registered")) {
+                alert(msg);
+            }
         } finally {
             setIsLoading(false);
         }
