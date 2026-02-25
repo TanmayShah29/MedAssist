@@ -160,9 +160,10 @@ function AuthContent() {
                 <button
                     type="submit"
                     disabled={isLoading || (mode === 'signup' && !agreedToTerms)}
+                    title={mode === 'signup' && !agreedToTerms ? "You must agree to the Terms of Service to continue" : undefined}
                     className="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white rounded-[12px] 
                              font-semibold shadow-lg shadow-sky-500/20 transition-all 
-                             hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0
+                             hover:-translate-y-0.5 disabled:opacity-50 disabled:bg-stone-300 disabled:shadow-none disabled:hover:translate-y-0 disabled:cursor-not-allowed
                              flex items-center justify-center gap-2 mt-2 min-h-[44px]"
                     style={{ WebkitAppearance: 'none' }}
                 >
@@ -170,7 +171,7 @@ function AuthContent() {
                         <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                         <>
-                            {mode === 'login' ? 'Sign In' : 'Get Started'}
+                            {mode === 'login' ? 'Sign In' : (agreedToTerms || mode !== 'signup' ? 'Get Started' : 'Accept Terms to Continue')}
                             <ArrowRight className="w-4 h-4" />
                         </>
                     )}
