@@ -1,8 +1,7 @@
 /** User-facing message when PDF is image-based (scanned) and text extraction fails. */
 export const IMAGE_BASED_PDF_MESSAGE =
     'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
-
-const OCR_TIMEOUT_MS = 55_000; // 55s to avoid hung requests, max limit for Vercel 60s limit
+const OCR_TIMEOUT_MS = 58_000; // 58s to avoid hung requests, max limit for Vercel Hobby is 60s
 
 export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
     const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
