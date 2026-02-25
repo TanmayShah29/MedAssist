@@ -186,9 +186,19 @@ export default function DashboardClient({
     const criticalCount = latestBiomarkers.filter(b => b.status === 'critical').length
     const totalCount = latestBiomarkers.length
 
-    // Optimistic scoring calculation
-    let healthScore = 0
-    if (totalCount > 0) {
+    // Extract real Health Score from AI DB records
+    let healthScore = 0;
+    if (displayLabResults && displayLabResults.length > 0) {
+        const latestResult = displayLabResults[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawJson: any = latestResult.raw_ai_json;
+        if (rawJson && typeof rawJson.healthScore === 'number') {
+            healthScore = rawJson.healthScore;
+        }
+    }
+
+    // Fallback recalculation if no score exists but markers do
+    if (healthScore === 0 && totalCount > 0) {
         const rawScore = ((optimalCount * 100) + (warningCount * 75) + (criticalCount * 40)) / totalCount
         // Apply a floor — no one with any optimal values scores below 50
         const floor = optimalCount > 0 ? 50 : 30
