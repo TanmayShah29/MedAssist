@@ -32,9 +32,9 @@ export function StepSymptoms() {
             </div>
 
             {/* Data flow explanation */}
-            <div className="bg-[#E0F2FE] rounded-[12px] border border-[#BAE6FD] p-4 flex gap-3">
+            <div className="bg-[#E0F2FE] rounded-[12px] border border-[#BAE6FD] p-4 flex gap-3 shrink-0 relative">
                 <div className="w-5 h-5 rounded-full bg-sky-100 flex items-center 
-                        justify-center flex-shrink-0 mt-0.5">
+                        justify-center shrink-0 mt-0.5">
                     <span className="text-sky-600 text-[10px] font-bold">i</span>
                 </div>
                 <div>

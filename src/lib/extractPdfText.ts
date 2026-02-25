@@ -2,7 +2,7 @@
 export const IMAGE_BASED_PDF_MESSAGE =
     'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
 
-const OCR_TIMEOUT_MS = 45_000; // 45s to avoid hung requests
+const OCR_TIMEOUT_MS = 55_000; // 55s to avoid hung requests, max limit for Vercel 60s limit
 
 export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
     const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })

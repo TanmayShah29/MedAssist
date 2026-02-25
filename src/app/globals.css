@@ -33,10 +33,9 @@
     overflow-x: hidden;
   }
 
-  /* Force Safari to calculate nested heights correctly */
+  /* Force Safari to calculate nested flex widths correctly, but avoid min-height collapse on grids */
   * {
     min-width: 0;
-    min-height: 0;
   }
 
   body {
