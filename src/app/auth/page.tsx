@@ -142,7 +142,7 @@ function AuthContent() {
                             checked={agreedToTerms}
                             onChange={e => setAgreedToTerms(e.target.checked)}
                             className="w-4 h-4 min-w-[16px] min-h-[16px] rounded border-[#E8E6DF] text-sky-500 focus:ring-sky-500 cursor-pointer"
-                            style={{ marginTop: 2, accentColor: '#0EA5E9' }}
+                            style={{ marginTop: 2, accentColor: '#0EA5E9', appearance: 'auto', WebkitAppearance: 'checkbox' }}
                         />
                         <label htmlFor="terms" style={{ fontSize: 13, color: '#57534E', lineHeight: 1.5 }}>
                             I agree to the{' '}
