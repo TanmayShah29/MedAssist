@@ -64,12 +64,14 @@ export async function extractAndInterpretBiomarkers(
     try {
         const completion = await groq.chat.completions.create(
             {
-            messages: [
-                {
-                    role: "system",
-                    content: `You are a medical data extraction assistant. You are an educational tool — you NEVER diagnose, prescribe, or provide treatment plans.
+                messages: [
+                    {
+                        role: "system",
+                        content: `You are a medical data extraction assistant. You are an educational tool — you NEVER diagnose, prescribe, or provide treatment plans.
 
 Extract ALL biomarker values from the provided lab report text. Return ONLY valid JSON — no markdown, no backticks, no explanation outside the JSON.
+
+CRITICAL INSTRUCTION: NEVER guess, impute, or hallucinate values. If a specific biomarker (e.g., Vitamin D, Iron) is NOT explicitly listed in the text with a corresponding value, DO NOT include it in the JSON output at all. Only extract what is visibly present.
 
 MANDATORY: Every interpretation or summary MUST end with "Always consult your doctor before making health decisions."
 
@@ -121,22 +123,23 @@ Return the score as an integer in the "healthScore" field.
 MANDATORY: AI summary MUST end with "Always consult your doctor before making health decisions."
 
 Rules:
+- STRICT RULE: Extract ONLY the biomarkers physically present in the text. Do NOT populate fields with random, default, or assumed values. If the report doesn't mention Magnesium, do not include Magnesium.
 - Extract every biomarker present in the text
 - status: "optimal" if within range, "warning" if slightly outside, "critical" if far outside
 - aiInterpretation: plain English a non-medical person can understand. NEVER say "you have", "diagnosed with", or "you are suffering from"
 - summary: 2-3 sentence plain English overview. Educational tone only.
 - Return ONLY the JSON object. No other text.`,
-                },
-                {
-                    role: "user",
-                    content: `Extract all biomarkers from this lab report:\n\n${pdfText}`,
-                },
-            ],
-            model: MODEL,
-            temperature: 0.1,
-            max_tokens: 4000,
-            response_format: { type: "json_object" },
-        },
+                    },
+                    {
+                        role: "user",
+                        content: `Extract all biomarkers from this lab report:\n\n${pdfText}`,
+                    },
+                ],
+                model: MODEL,
+                temperature: 0.1,
+                max_tokens: 4000,
+                response_format: { type: "json_object" },
+            },
             { signal: controller.signal }
         );
 
