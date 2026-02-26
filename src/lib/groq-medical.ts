@@ -158,12 +158,14 @@ Rules:
             { signal: controller.signal }
         );
 
-        const raw = completion.choices[0].message.content || "";
+        // Scenario A: empty content from Groq
+        const raw = completion.choices[0]?.message?.content;
+        if (!raw || raw.trim().length === 0) {
+            throw new AIExtractionError("AI analysis returned no content. Please try again.");
+        }
 
         // FOR AUDIT - Log exact Groq response
-        console.log("\n================ GROQ RAW JSON RESPONSE ================\n");
-        console.log(raw);
-        console.log("\n========================================================\n");
+        logger.info("\n================ GROQ RAW JSON RESPONSE ================\n" + raw + "\n========================================================\n");
 
         // Strip accidental markdown code fences before parsing
         const cleaned = raw
@@ -171,6 +173,7 @@ Rules:
             .replace(/\s*```$/i, "")
             .trim();
 
+        // Scenario B: malformed JSON
         let parsedJson;
         try {
             parsedJson = JSON.parse(cleaned);
@@ -179,13 +182,37 @@ Rules:
             throw new AIExtractionError("AI returned malformed JSON data. Please try again.");
         }
 
-        try {
-            // Validate with Zod
-            return ExtractionResultSchema.parse(parsedJson);
-        } catch (err) {
-            logger.error("AI Validation Error:", err);
-            throw new AIExtractionError("AI returned data that failed health-safety validation. Please try again.");
+        // Zod validation with safeParse for better error logging
+        const validationResult = ExtractionResultSchema.safeParse(parsedJson);
+        if (!validationResult.success) {
+            logger.error("AI Validation Error (Zod issues):", JSON.stringify(validationResult.error.issues, null, 2));
+            // Scenario A variant: try to salvage biomarkers if the rest of the schema failed
+            const salvaged = (parsedJson.biomarkers || []).filter(
+                (b: Record<string, unknown>) => b.name && b.value !== undefined && b.status
+            );
+            if (salvaged.length === 0) {
+                throw new AIExtractionError("AI returned data that failed validation and no valid biomarkers could be extracted. Please try again.");
+            }
+            logger.warn(`Salvaged ${salvaged.length} biomarkers after Zod validation failure — proceeding with partial data.`);
+            // Return a minimal valid structure with salvaged biomarkers
+            return {
+                biomarkers: salvaged,
+                healthScore: typeof parsedJson.healthScore === 'number' ? parsedJson.healthScore : 50,
+                riskLevel: ['low', 'moderate', 'high'].includes(parsedJson.riskLevel) ? parsedJson.riskLevel : 'moderate',
+                summary: typeof parsedJson.summary === 'string' && parsedJson.summary.length > 5
+                    ? parsedJson.summary
+                    : 'Lab report processed. Please consult your doctor for interpretation.',
+            };
         }
+
+        // Scenario C: empty biomarkers array — Groq couldn't find any values
+        if (validationResult.data.biomarkers.length === 0) {
+            throw new AIExtractionError(
+                "No biomarkers were found in this PDF. Make sure you are uploading a digital lab report with numeric test results, not a prescription or doctor note."
+            );
+        }
+
+        return validationResult.data;
     } catch (error: unknown) {
         if (error instanceof AIExtractionError) {
             throw error;

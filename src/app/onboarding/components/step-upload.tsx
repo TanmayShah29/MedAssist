@@ -28,6 +28,8 @@ export function StepUpload() {
         setStep,
         completeStep,
         setAnalysisResult,
+        basicInfo,
+        selectedSymptoms,
     } = useOnboardingStore();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,8 +146,18 @@ export function StepUpload() {
             setUploadedFile(null);
             completeStep(3);
 
-            // Import Server Action inline or fetch dynamically
-            const { completeOnboarding } = await import("@/app/actions/user-data");
+            // Dynamically import to avoid circular deps in a client component
+            const { saveProfileFromSession, completeOnboarding } = await import("@/app/actions/user-data");
+
+            // Save profile and symptoms now (was never done on skip path before)
+            await saveProfileFromSession({
+                first_name: basicInfo.firstName || undefined,
+                last_name: basicInfo.lastName || undefined,
+                age: basicInfo.age ? Number(basicInfo.age) : undefined,
+                sex: basicInfo.sex || undefined,
+                blood_type: basicInfo.bloodType || undefined,
+                symptoms: selectedSymptoms,
+            });
 
             const result = await completeOnboarding();
 

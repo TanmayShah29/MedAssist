@@ -168,7 +168,7 @@ export function StepProcessing() {
 
             setState("complete");
 
-            // Bug 5 fix: Save profile info to Supabase (was only in Zustand store before)
+            // Bug 5 fix: Save profile info + symptoms to Supabase (was only in Zustand store before)
             try {
                 await saveProfileFromSession({
                     first_name: basicInfo.firstName || undefined,
@@ -176,6 +176,7 @@ export function StepProcessing() {
                     age: basicInfo.age ? Number(basicInfo.age) : undefined,
                     sex: basicInfo.sex || undefined,
                     blood_type: basicInfo.bloodType || undefined,
+                    symptoms: symptoms, // Save to DB — was never persisted before
                 });
             } catch (_profileErr) {
                 // Non-blocking — profile save failure shouldn't block onboarding

@@ -206,6 +206,7 @@ export async function saveProfileFromSession(data: {
     age?: number;
     sex?: string;
     blood_type?: string;
+    symptoms?: string[];
 }) {
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -229,5 +230,49 @@ export async function saveProfileFromSession(data: {
         return { success: false, error: 'No user session' };
     }
 
-    return updateUserProfile(user.id, data);
+    try {
+        const { first_name, last_name, age, sex, blood_type, symptoms } = data;
+
+        // Build profile update payload (skip undefined keys so we don't null-out existing data)
+        const profileUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+        if (first_name !== undefined && first_name !== '') profileUpdates.first_name = first_name;
+        if (last_name !== undefined) profileUpdates.last_name = last_name;
+        if (age !== undefined) profileUpdates.age = age;
+        if (sex !== undefined) profileUpdates.sex = sex;
+        if (blood_type !== undefined) profileUpdates.blood_type = blood_type;
+
+        // Use user's own session (RLS-compliant) rather than supabaseAdmin
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update(profileUpdates)
+            .eq('id', user.id);
+
+        if (profileError) {
+            logger.error('saveProfileFromSession — profile update failed', profileError);
+            throw profileError;
+        }
+
+        // Save symptoms during onboarding (was never saved before this fix)
+        if (symptoms !== undefined) {
+            // Delete previous symptoms
+            await supabase.from('symptoms').delete().eq('user_id', user.id);
+
+            if (symptoms.length > 0) {
+                const { error: sympError } = await supabase
+                    .from('symptoms')
+                    .insert(symptoms.map(s => ({ user_id: user.id, symptom: s })));
+
+                if (sympError) {
+                    logger.error('saveProfileFromSession — symptoms insert failed', sympError);
+                    // Non-fatal: profile saved successfully even if symptoms fail
+                }
+            }
+        }
+
+        return { success: true };
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('saveProfileFromSession failed:', msg);
+        return { success: false, error: msg };
+    }
 }
