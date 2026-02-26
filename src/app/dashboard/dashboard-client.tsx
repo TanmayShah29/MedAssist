@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { logger } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 import {
     ClipboardList,
@@ -84,7 +84,6 @@ export default function DashboardClient({
     initialLabResults: LabResult[]
 }) {
     const router = useRouter()
-    const searchParams = useSearchParams()
 
     const [mounted, setMounted] = useState(false)
     const [showUploadModal, setShowUploadModal] = useState(false)
@@ -117,11 +116,12 @@ export default function DashboardClient({
 
     // Open upload modal when arriving with ?openUpload=1 (e.g. from Results "Upload New Report")
     useEffect(() => {
-        if (searchParams.get('openUpload') === '1') {
+        if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('openUpload') === '1') {
             setShowUploadModal(true);
             router.replace('/dashboard', { scroll: false });
         }
-    }, [searchParams, router]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Derived Data taking Demo Mode into account
     const displayLabResults = demoMode
