@@ -9,7 +9,7 @@ export interface Profile {
 export interface Biomarker {
     id: string | number;
     name: string;
-    value: number;
+    value: number | string; // Bug 4: DB stores as TEXT; use parseFloat() for arithmetic
     unit: string;
     status: 'optimal' | 'warning' | 'critical';
     category: string;
@@ -18,15 +18,15 @@ export interface Biomarker {
     ai_interpretation?: string;
     confidence?: number;
     lab_result_id?: number;
-    lab_results?: { created_at: string };
+    lab_results?: { created_at: string; uploaded_at?: string };
     created_at: string;
 }
 
 export interface LabResult {
     id: number | string;
     health_score?: number;
-    created_at: string;
-    uploaded_at?: string;
+    created_at?: string;       // legacy alias; prefer uploaded_at
+    uploaded_at?: string;      // actual DB column name
     summary?: string;
     raw_ai_json?: Record<string, unknown>;
     raw_ocr_text?: string;

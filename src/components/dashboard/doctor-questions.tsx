@@ -23,6 +23,21 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
 
     useEffect(() => {
         if (biomarkers.length > 0) {
+            const cacheKey = `medassist_doctor_questions_${biomarkers.length}_${biomarkers[0]?.id}`;
+            const cached = localStorage.getItem(cacheKey);
+
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && Array.isArray(parsed)) {
+                        setQuestions(parsed);
+                        return; // Found in cache, exit early
+                    }
+                } catch (e) {
+                    // Ignore parsing errors and fetch
+                }
+            }
+
             const fetchQuestions = async () => {
                 setLoading(true);
                 try {
@@ -34,6 +49,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                     const data = await response.json();
                     if (data.questions && Array.isArray(data.questions)) {
                         setQuestions(data.questions);
+                        localStorage.setItem(cacheKey, JSON.stringify(data.questions));
                     }
                 } catch (error) {
                     logger.error("Failed to fetch doctor questions", error);

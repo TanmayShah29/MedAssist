@@ -120,7 +120,7 @@ export async function updateUserProfile(userId: string, data: {
             if (symptoms.length > 0) {
                 const { error: sympError } = await supabaseAdmin
                     .from("symptoms")
-                    .insert(symptoms.map(s => ({ user_id: userId, symptom_text: s })));
+                    .insert(symptoms.map(s => ({ user_id: userId, symptom: s })));
 
                 if (sympError) throw sympError;
             }
@@ -200,3 +200,34 @@ export async function completeOnboarding() {
     return { success: true }
 }
 
+export async function saveProfileFromSession(data: {
+    first_name?: string;
+    last_name?: string;
+    age?: number;
+    sex?: string;
+    blood_type?: string;
+}) {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() { return cookieStore.getAll() },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        cookieStore.set(name, value, options)
+                    )
+                }
+            }
+        }
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        logger.error('saveProfileFromSession — no user found', userError);
+        return { success: false, error: 'No user session' };
+    }
+
+    return updateUserProfile(user.id, data);
+}

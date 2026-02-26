@@ -43,7 +43,7 @@ export default function LandingPage() {
       <header
         className="fixed top-0 left-0 right-0 z-50 
                    bg-page/80 backdrop-blur-md 
-                   border-b border-border-light
+                   border-b border-[#E8E6DF]
                    gpu-accelerate"
       >
         <div className="max-w-6xl mx-auto px-6 h-16 
@@ -55,7 +55,7 @@ export default function LandingPage() {
                             shadow-sm shadow-sky-500/20">
               <Shield className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display text-xl text-text-primary">
+            <span className="font-display text-xl text-[#1C1917]">
               MedAssist
             </span>
           </Link>
@@ -65,7 +65,7 @@ export default function LandingPage() {
             {!isSignedIn && (
               <Link
                 href="/auth?mode=login"
-                className="text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors px-4 py-3 min-h-[44px] flex items-center"
+                className="text-sm font-semibold text-[#57534E] hover:text-[#1C1917] transition-colors px-4 py-3 min-h-[44px] flex items-center"
               >
                 Sign in
               </Link>
@@ -139,7 +139,7 @@ export default function LandingPage() {
                 >
                   {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
                 </button>
-                <p className="text-xs text-text-muted mt-3">
+                <p className="text-xs text-[#A8A29E] mt-3">
                   Free to start · No credit card required · Takes 3 minutes
                 </p>
               </div>
@@ -236,7 +236,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── THE PROBLEM ───────────────────────────────── */}
-        <section className="py-24 px-6 bg-card border-y border-border-light">
+        <section className="py-24 px-6 bg-white border-y border-[#E8E6DF]">
           <div className="max-w-3xl mx-auto">
             <motion.div
               initial={{ opacity: 0.01, y: 20 }}
@@ -244,7 +244,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-4xl font-bold text-text-primary text-center mb-12">
+              <h2 className="text-4xl font-bold text-[#1C1917] text-center mb-12">
                 You get your lab results back.
                 <br />
                 Now what?
@@ -263,19 +263,19 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className="flex items-start p-5 bg-white rounded-2xl border border-border-light shadow-sm"
+                    className="flex items-start p-5 bg-white rounded-2xl border border-[#E8E6DF] shadow-sm"
                   >
                     <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
                       <X className="w-5 h-5 text-red-500" />
                     </div>
-                    <p className="text-lg text-text-secondary leading-relaxed" style={{ marginLeft: 16 }}>
+                    <p className="text-lg text-[#57534E] leading-relaxed" style={{ marginLeft: 16 }}>
                       {problem}
                     </p>
                   </motion.div>
                 ))}
               </div>
 
-              <p className="text-text-secondary text-center max-w-lg mx-auto mt-10 leading-relaxed italic">
+              <p className="text-[#57534E] text-center max-w-lg mx-auto mt-10 leading-relaxed italic">
                 MedAssist is free to use. No credit card, no subscription, no catch.
                 Just upload your lab report and get instant plain-English explanations.
               </p>
@@ -287,10 +287,10 @@ export default function LandingPage() {
         <section className="py-24 px-6" ref={pipelineRef}>
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-20">
-              <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
+              <h2 className="text-4xl lg:text-5xl font-bold text-[#1C1917] mb-6">
                 How MedAssist works
               </h2>
-              <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
+              <p className="text-lg text-[#57534E] max-w-2xl mx-auto leading-relaxed">
                 From lab report to health insights in 3 simple steps
               </p>
             </div>
@@ -348,20 +348,20 @@ export default function LandingPage() {
                                      rounded-full bg-white border-4 
                                      border-page flex items-center 
                                      justify-center text-xs font-black 
-                                     text-text-primary shadow-sm">
+                                     text-[#1C1917] shadow-sm">
                         {item.step}
                       </div>
                     </div>
 
                     {/* Content */}
                     <div className="grow shrink basis-auto w-full pt-2" style={{ marginLeft: 32 }}>
-                      <h3 className="text-2xl font-bold text-text-primary mb-3">
+                      <h3 className="text-2xl font-bold text-[#1C1917] mb-3">
                         {item.title}
                       </h3>
-                      <p className="text-lg text-text-secondary leading-relaxed mb-3">
+                      <p className="text-lg text-[#57534E] leading-relaxed mb-3">
                         {item.description}
                       </p>
-                      <p className="text-xs font-bold text-text-muted uppercase tracking-wider">
+                      <p className="text-xs font-bold text-[#A8A29E] uppercase tracking-wider">
                         {item.detail}
                       </p>
                     </div>
@@ -412,7 +412,7 @@ export default function LandingPage() {
                 <motion.div
                   initial={{ opacity: 0.01, x: -40 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  className="bg-card rounded-3xl border border-border-light shadow-2xl p-6 relative z-10 overflow-hidden"
+                  className="bg-white rounded-3xl border border-[#E8E6DF] shadow-2xl p-6 relative z-10 overflow-hidden"
                 >
                   {/* Mock Header */}
                   <div className="flex justify-between items-center mb-8">
@@ -429,11 +429,11 @@ export default function LandingPage() {
                   </div>
                   {/* Mock Grid */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white border border-border-light rounded-xl p-4">
+                    <div className="bg-white border border-[#E8E6DF] rounded-xl p-4">
                       <div className="h-2 w-12 bg-emerald-100 rounded-full mb-2" />
                       <div className="h-4 w-20 bg-text-primary rounded-full" />
                     </div>
-                    <div className="bg-white border border-border-light rounded-xl p-4">
+                    <div className="bg-white border border-[#E8E6DF] rounded-xl p-4">
                       <div className="h-2 w-12 bg-amber-100 rounded-full mb-2" />
                       <div className="h-4 w-20 bg-text-primary rounded-full" />
                     </div>
@@ -446,35 +446,35 @@ export default function LandingPage() {
 
               {/* Right: Trust Statements */}
               <div className="grow shrink basis-auto w-full">
-                <h2 className="text-4xl font-bold text-text-primary mb-8">
+                <h2 className="text-4xl font-bold text-[#1C1917] mb-8">
                   Your health data is <br />
                   <span className="text-sky-500">private and secure.</span>
                 </h2>
                 <div className="space-y-8">
                   {[
                     {
-                      title: "Your data is never sold",
-                      desc: "We don't share your medical information with third parties or advertisers. Ever.",
+                      title: "Zero-retention AI analysis",
+                      desc: "Your lab reports are processed in memory and immediately discarded. Models are never trained on your medical history.",
                       icon: <Shield className="w-6 h-6 text-emerald-500" />
                     },
                     {
-                      title: "Row-level encryption",
-                      desc: "Built on Supabase with enterprise-grade security. Only you can access your uploads.",
+                      title: "AES-256 Database Encryption",
+                      desc: "Built on Supabase with enterprise-grade security and HIPAA-aligned data practices. Only you hold the keys to your uploads.",
                       icon: <Sparkles className="w-6 h-6 text-sky-500" />
                     },
                     {
-                      title: "Delete anytime",
-                      desc: "You have full control. One click to permanently wipe your entire history from our servers.",
+                      title: "Delete permanently anytime",
+                      desc: "You have full control. One click to permanently wipe your entire history from our active servers and backups.",
                       icon: <X className="w-6 h-6 text-red-500" />
                     }
                   ].map((item, idx) => (
                     <div key={idx} className="flex">
-                      <div className="w-12 h-12 rounded-xl bg-page border border-border-light flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-page border border-[#E8E6DF] flex items-center justify-center shrink-0">
                         {item.icon}
                       </div>
                       <div style={{ marginLeft: 20 }}>
-                        <h4 className="text-lg font-bold text-text-primary mb-1">{item.title}</h4>
-                        <p className="text-text-secondary leading-relaxed">{item.desc}</p>
+                        <h4 className="text-lg font-bold text-[#1C1917] mb-1">{item.title}</h4>
+                        <p className="text-[#57534E] leading-relaxed">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -486,24 +486,24 @@ export default function LandingPage() {
 
         {/* ── TECHNICAL PIPELINE SECTION ───────────────── */}
         <section className="py-24 px-6 bg-page">
-          <div className="max-w-5xl mx-auto bg-card border border-border-light rounded-[32px] p-12 lg:p-20 shadow-sm">
+          <div className="max-w-5xl mx-auto bg-white border border-[#E8E6DF] rounded-[32px] p-12 lg:p-20 shadow-sm">
 
             {/* Section label */}
-            <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] text-center mb-4">
+            <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.2em] text-center mb-4">
               TECHNICAL ARCHITECTURE
             </p>
 
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary text-center mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-[#1C1917] text-center mb-6">
               Clinical-grade AI pipeline
             </h2>
 
-            <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+            <p className="text-lg text-[#57534E] text-center max-w-2xl mx-auto mb-16 leading-relaxed">
               MedAssist uses a multi-stage clinical intelligence pipeline to extract,
               interpret, and structure your lab data with high accuracy.
             </p>
 
             {/* Pipeline steps */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-0 border border-border-light rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-0 border border-[#E8E6DF] rounded-2xl overflow-hidden">
               {[
                 {
                   step: '01',
@@ -543,18 +543,18 @@ export default function LandingPage() {
               ].map((item, index) => (
                 <div
                   key={item.step}
-                  className={`p-6 bg-white/50 backdrop-blur-sm transform-gpu ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-border-light' : ''}`}
+                  className={`p-6 bg-white/50 backdrop-blur-sm transform-gpu ${index !== 4 ? 'border-b md:border-b-0 md:border-r border-[#E8E6DF]' : ''}`}
                 >
                   <div className={`text-xs font-bold ${item.color} mb-3 tracking-widest`}>
                     {item.step}
                   </div>
-                  <h3 className="text-lg font-bold text-text-primary mb-2">
+                  <h3 className="text-lg font-bold text-[#1C1917] mb-2">
                     {item.title}
                   </h3>
-                  <div className="inline-block bg-white border border-border-light text-text-secondary text-[10px] px-2 py-0.5 rounded-md font-mono mb-4">
+                  <div className="inline-block bg-white border border-[#E8E6DF] text-[#57534E] text-[10px] px-2 py-0.5 rounded-md font-mono mb-4">
                     {item.tech}
                   </div>
-                  <p className="text-sm text-text-secondary leading-relaxed">
+                  <p className="text-sm text-[#57534E] leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -562,15 +562,15 @@ export default function LandingPage() {
             </div>
 
             {/* Tech stack row at bottom */}
-            <div className="mt-16 pt-10 border-t border-border-light flex flex-wrap justify-center">
-              <span className="text-sm font-medium text-text-secondary self-center" style={{ marginRight: 12 }}>
+            <div className="mt-16 pt-10 border-t border-[#E8E6DF] flex flex-wrap justify-center">
+              <span className="text-sm font-medium text-[#57534E] self-center" style={{ marginRight: 12 }}>
                 Powered by Groq AI & Llama 3.3
               </span>
               <div className="flex flex-wrap gap-3 justify-center">
                 {[
                   'Supabase', 'Next.js 16', 'TypeScript', 'Tailwind 4'
                 ].map(tech => (
-                  <span key={tech} className="bg-white border border-border-light text-text-muted text-[11px] px-3 py-1 rounded-full font-mono">
+                  <span key={tech} className="bg-white border border-[#E8E6DF] text-[#A8A29E] text-[11px] px-3 py-1 rounded-full font-mono">
                     {tech}
                   </span>
                 ))}
@@ -587,13 +587,13 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl lg:text-5xl font-bold text-text-primary text-center mb-8">
+              <h2 className="text-4xl lg:text-5xl font-bold text-[#1C1917] text-center mb-8">
                 Consistency builds clarity
               </h2>
-              <p className="text-lg text-text-secondary text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+              <p className="text-lg text-[#57534E] text-center max-w-2xl mx-auto mb-16 leading-relaxed">
                 One lab report tells you where you are.
                 <br />
-                <span className="font-black text-text-primary">
+                <span className="font-black text-[#1C1917]">
                   A timeline tells you where you&apos;re going.
                 </span>
               </p>
@@ -625,7 +625,7 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-card rounded-3xl border border-border-light p-8 text-center shadow-sm hover:shadow-md transition-shadow"
+                    className="bg-white rounded-3xl border border-[#E8E6DF] p-8 text-center shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="text-2xl font-black bg-sky-100 text-sky-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6">
                       {stage.icon}
@@ -633,10 +633,10 @@ export default function LandingPage() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-500 mb-3">
                       {stage.timeline}
                     </p>
-                    <h3 className="text-xl font-bold text-text-primary mb-3">
+                    <h3 className="text-xl font-bold text-[#1C1917] mb-3">
                       {stage.title}
                     </h3>
-                    <p className="text-sm text-text-secondary leading-relaxed">
+                    <p className="text-sm text-[#57534E] leading-relaxed">
                       {stage.description}
                     </p>
                   </motion.div>
@@ -647,34 +647,34 @@ export default function LandingPage() {
         </section>
 
         {/* ── ROADMAP SECTION ───────────────────── */}
-        <section className="py-24 px-6 bg-page border-t border-border-light">
+        <section className="py-24 px-6 bg-page border-t border-[#E8E6DF]">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-[32px] border border-border-light p-10 shadow-sm overflow-hidden relative">
+            <div className="bg-white rounded-[32px] border border-[#E8E6DF] p-10 shadow-sm overflow-hidden relative">
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Activity size={120} />
               </div>
               <div className="relative z-10">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-500 mb-4">ROADMAP</h3>
-                <h2 className="text-3xl font-bold text-text-primary mb-8">What&apos;s coming next</h2>
+                <h2 className="text-3xl font-bold text-[#1C1917] mb-8">What&apos;s coming next</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="flex items-start">
                     <div className="w-1 h-auto bg-sky-500/30 rounded-full shrink-0" />
                     <div style={{ marginLeft: 16 }}>
                       <div className="flex items-center mb-1">
-                        <h4 className="font-bold text-text-primary">Health Timeline</h4>
+                        <h4 className="font-bold text-[#1C1917]">Health Timeline</h4>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border border-sky-500/30 text-sky-600 bg-sky-50 ml-2">Q2 2026</span>
                       </div>
-                      <p className="text-sm text-text-secondary">A unified medical diary connecting symptoms, lifestyle actions, and lab results.</p>
+                      <p className="text-sm text-[#57534E]">A unified medical diary connecting symptoms, lifestyle actions, and lab results.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <div className="w-1 h-auto bg-sky-500/30 rounded-full shrink-0" />
                     <div style={{ marginLeft: 16 }}>
                       <div className="flex items-center mb-1">
-                        <h4 className="font-bold text-text-primary">Wearable Sync</h4>
+                        <h4 className="font-bold text-[#1C1917]">Wearable Sync</h4>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border border-sky-500/30 text-sky-600 bg-sky-50 ml-2">Q3 2026</span>
                       </div>
-                      <p className="text-sm text-text-secondary">Connect Apple Health or Oura to see how sleep and activity correlate with your blood work.</p>
+                      <p className="text-sm text-[#57534E]">Connect Apple Health or Oura to see how sleep and activity correlate with your blood work.</p>
                     </div>
                   </div>
                 </div>
@@ -691,11 +691,11 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-3xl font-bold text-text-primary text-center mb-10">
+              <h3 className="text-3xl font-bold text-[#1C1917] text-center mb-10">
                 Medical Disclaimers
               </h3>
 
-              <div className="bg-card rounded-[32px] border border-border-light p-10 space-y-6 shadow-sm">
+              <div className="bg-white rounded-[32px] border border-[#E8E6DF] p-10 space-y-6 shadow-sm">
                 {[
                   { title: "Not a doctor", desc: "MedAssist is a clinical education tool, not a diagnostic platform." },
                   { title: "No medical advice", desc: "We do not provide treatment plans, prescriptions, or medical guidance." },
@@ -706,14 +706,14 @@ export default function LandingPage() {
                       <X className="w-3 h-3 text-red-500" />
                     </div>
                     <div style={{ marginLeft: 16 }}>
-                      <h4 className="text-base font-bold text-text-primary mb-1">{item.title}</h4>
-                      <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+                      <h4 className="text-base font-bold text-[#1C1917] mb-1">{item.title}</h4>
+                      <p className="text-sm text-[#57534E] leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <p className="text-xs text-text-muted text-center mt-8 italic max-w-sm mx-auto">
+              <p className="text-xs text-[#A8A29E] text-center mt-8 italic max-w-sm mx-auto">
                 MedAssist helps you understand your results so you can
                 have better conversations with your doctor.
               </p>
@@ -722,12 +722,12 @@ export default function LandingPage() {
         </section>
 
         {/* ── FINAL CTA ─────────────────────────────────── */}
-        <section className="text-center py-24 px-6 bg-card border-t border-border-light">
+        <section className="text-center py-24 px-6 bg-white border-t border-[#E8E6DF]">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-[#1C1917] mb-6">
               Ready to understand your health?
             </h2>
-            <p className="text-lg text-text-secondary mb-12 leading-relaxed">
+            <p className="text-lg text-[#57534E] mb-12 leading-relaxed">
               Upload your first lab report and get your health score,
               plain-English explanations, and personalized insights in under a minute.
             </p>
@@ -742,7 +742,7 @@ export default function LandingPage() {
               {!isSignedIn && (
                 <Link
                   href="/auth?mode=login"
-                  className="text-sm font-bold text-text-secondary hover:text-text-primary transition-colors mt-6"
+                  className="text-sm font-bold text-[#57534E] hover:text-[#1C1917] transition-colors mt-6"
                 >
                   Already have an account? Sign in
                 </Link>
@@ -752,7 +752,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── FOOTER ────────────────────────────────────── */}
-        <footer className="py-12 px-6 border-t border-border-light bg-page">
+        <footer className="py-12 px-6 border-t border-[#E8E6DF] bg-page">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               {/* Logo */}
@@ -760,22 +760,22 @@ export default function LandingPage() {
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-display text-xl text-text-primary">MedAssist</span>
+                <span className="font-display text-xl text-[#1C1917]">MedAssist</span>
               </div>
 
               {/* Disclaimer */}
-              <p className="text-[13px] text-text-muted text-center max-w-lg leading-relaxed">
+              <p className="text-[13px] text-[#A8A29E] text-center max-w-lg leading-relaxed">
                 AI-generated health insights. For educational purposes only.
                 Always consult a qualified physician. Powered by Groq AI & Llama 3.3.
               </p>
 
-              <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-text-muted">
-                <Link href="/terms" className="hover:text-text-primary transition-colors">Terms</Link>
-                <Link href="/privacy" className="hover:text-text-primary transition-colors">Privacy</Link>
+              <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-[#A8A29E]">
+                <Link href="/terms" className="hover:text-[#1C1917] transition-colors">Terms</Link>
+                <Link href="/privacy" className="hover:text-[#1C1917] transition-colors">Privacy</Link>
               </div>
 
               {/* Credits */}
-              <div className="flex items-center text-[11px] text-text-muted">
+              <div className="flex items-center text-[11px] text-[#A8A29E]">
                 <span>© 2026 MedAssist</span>
                 <span className="mx-3 text-border-medium" aria-hidden="true">|</span>
                 <span>Built by Tanmay Shah</span>

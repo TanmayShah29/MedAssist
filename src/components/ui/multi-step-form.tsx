@@ -46,7 +46,7 @@ function StepProgress({ current }: { current: number }) {
                                 }}
                                 transition={{ duration: 0.2 }}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
-                                style={{ color: isComplete || isActive ? "white" : "#94A3B8" }}
+                                style={{ color: isComplete || isActive ? "white" : "#475569" }}
                             >
                                 {isComplete ? <Check className="w-4 h-4" /> : step.icon}
                             </motion.div>

@@ -1,3 +1,8 @@
+export const metadata = {
+    title: 'Terms of Service | MedAssist',
+    description: 'MedAssist terms of service and user agreements.'
+};
+
 export default function TermsPage() {
     return (
         <div style={{

@@ -36,12 +36,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch biomarkers server-side for integrity
-    const { data: biomarkers } = await supabase
+    const { data: rawBiomarkers } = await supabase
         .from('biomarkers')
         .select('name, value, unit, status, reference_range_min, reference_range_max, ai_interpretation')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50)
+
+    // Bug 8 fix: Deduplicate by name — keep most recent per biomarker
+    type BiomarkerRow = { name: string; value: string | number; unit: string; status: string; reference_range_min: number | null; reference_range_max: number | null; ai_interpretation: string };
+    const biomarkers = Array.from(
+        (rawBiomarkers || []).reduce((acc, b) => {
+            if (!acc.has(b.name)) acc.set(b.name, b as BiomarkerRow);
+            return acc;
+        }, new Map<string, BiomarkerRow>()).values()
+    );
 
     const { data: previousMessages } = await supabase
         .from('conversations')
@@ -50,8 +59,14 @@ export async function POST(request: NextRequest) {
         .order('created_at', { ascending: true })
         .limit(20)
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, age, sex, blood_type')
+        .eq('id', user.id)
+        .single()
+
     try {
-        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [], previousMessages || [])
+        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [], previousMessages || [], profile)
 
         // Save history
         await supabase.from('conversations').insert([

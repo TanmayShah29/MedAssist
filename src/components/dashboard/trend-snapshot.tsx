@@ -30,7 +30,8 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
             const previous = history.find(b => b.name === current.name && b.lab_result_id !== latestLabResult?.id);
             if (!previous) return null;
 
-            const diff = current.value - previous.value;
+            const diff = parseFloat(String(current.value)) - parseFloat(String(previous.value));
+            if (isNaN(diff)) return null;
             if (diff === 0) return { name: current.name, status: 'stable', label: 'Stable', icon: Minus, color: 'text-amber-500' };
 
             // Determine if increase/decrease is good or bad simply by looking at status change or just directional

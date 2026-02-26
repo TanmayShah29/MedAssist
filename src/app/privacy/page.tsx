@@ -1,3 +1,8 @@
+export const metadata = {
+    title: 'Privacy Policy | MedAssist',
+    description: 'MedAssist privacy policy and data handling practices.'
+};
+
 export default function PrivacyPage() {
     return (
         <div style={{

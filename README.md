@@ -11,6 +11,9 @@ MedAssist is an intelligent health platform that transforms confusing blood work
 - **Longitudinal Tracking**: Visualize how your health markers change over time with interactive trend charts.
 - **Doctor Preparation**: Auto-generated questions tailored to your specific clinical flags.
 - **Privacy First**: Enterprise-grade security with Supabase row-level encryption. Your data is never sold.
+- **Global Demo Mode**: Seamlessly explore all app features with sample data without creating an account.
+- **Data Portability & Control**: Export functionality and complete account deletion options for full control over your health data.
+- **Continuous Feedback**: Built-in feedback system to continually improve the user experience.
 
 ## Tech Stack
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
@@ -32,7 +35,7 @@ MedAssist is an intelligent health platform that transforms confusing blood work
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/medassist.git
+   git clone https://github.com/tanmayshah/medassist.git
    cd medassist
    ```
 2. Install dependencies:

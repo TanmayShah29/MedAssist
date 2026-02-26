@@ -143,6 +143,13 @@ export default function SettingsPage() {
                 </form>
             </section>
 
+            <section className="bg-emerald-50 border border-emerald-100 rounded-[16px] p-6 mb-6 shadow-sm">
+                <h2 className="text-lg font-bold text-emerald-900 mb-2">Data Protection & Portability</h2>
+                <p className="text-sm text-emerald-800 leading-relaxed font-medium">
+                    Your data belongs to you. You can export or permanently delete your entire health record at any time. We do not hold your data hostage.
+                </p>
+            </section>
+
             <section className="bg-white border border-[#E8E6DF] rounded-[16px] p-6 mb-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-2">
                     <Download className="w-5 h-5 text-[#10B981]" />

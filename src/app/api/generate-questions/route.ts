@@ -69,11 +69,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ questions: defaultMsg });
         }
 
-        // 3. Global Caching: Create a key based on sorted biomarker statuses
-        // This allows different users with identical patterns to share the same cached AI response
+        // Bug 6 fix: Cache key includes actual value so users with same status pattern but
+        // different numeric values get specific (not cross-user-shared) questions
         const cacheKey = `questions_${criticalBiomarkers
             .sort((a: BiomarkerInput, b: BiomarkerInput) => a.name.localeCompare(b.name))
-            .map((b: BiomarkerInput) => `${b.name.toLowerCase()}:${b.status}`)
+            .map((b: BiomarkerInput) => `${b.name.toLowerCase()}:${b.status}:${parseFloat(String(b.value)).toFixed(1)}`)
             .join('|')}`;
 
         const { data: globalCache } = await supabase
@@ -95,16 +95,20 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const questionsPrompt = `Based on these lab results that need attention:
-${criticalBiomarkers.map((b: BiomarkerInput) => `${b.name}: ${b.value} ${b.unit} (${b.status})`).join('\n')}
+        // Bug 6 fix: Include actual values and reference ranges so questions are specific
+        const questionsPrompt = `Based on these specific lab results that need attention:
+${criticalBiomarkers.map((b: BiomarkerInput & { reference_range_min?: number | null; reference_range_max?: number | null }) =>
+            `${b.name}: ${b.value} ${b.unit} (status: ${b.status}${b.reference_range_min != null && b.reference_range_max != null ? `, normal range: ${b.reference_range_min}–${b.reference_range_max} ${b.unit}` : ''})`
+        ).join('\n')}
 
-Generate 3-5 specific questions this person should ask their doctor at their next appointment. 
-For each question, provide a brief "Why ask this" context.
+Generate 3-5 specific questions this person should ask their doctor at their next appointment.
+For each question, reference the actual numeric value in the question text. Provide a brief "Why ask this" context.
+Example format: "My [biomarker] is [value] [unit], which is [above/below] the normal range of [range]. What could be causing this?"
 
-Return the response EXCLUSIVELY as a JSON array of objects with the following structure:
+Return the response EXCLUSIVELY as a JSON array of objects:
 [
   {
-    "question": "The actual question for the doctor",
+    "question": "The actual question with the specific value mentioned",
     "context": "Why this question is important based on the specific results"
   }
 ]

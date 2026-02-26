@@ -19,13 +19,15 @@ const WellnessTrendChart = dynamic(
 const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
 
 // ── Helper Component ──
-function RangeBar({ value, min, max, status }: {
-    value: number
+function RangeBar({ value: rawValue, min, max, status }: {
+    value: number | string
     min: number | null
     max: number | null
     status: string
 }) {
     if (!min || !max) return null
+    const value = parseFloat(String(rawValue))
+    if (Number.isNaN(value)) return null
 
     // Calculate position as percentage
     const range = max - min
@@ -120,6 +122,9 @@ export default function ResultsPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [labResults, setLabResults] = useState<any[]>([])
+    const [selectedReportId, setSelectedReportId] = useState<string>('all')
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
     const [searchQuery, setSearchValue] = useState('')
@@ -187,7 +192,7 @@ export default function ResultsPage() {
 
             let query = supabase
                 .from('biomarkers')
-                .select('*, lab_results!inner(user_id, created_at)')
+                .select('*, lab_results!inner(user_id, uploaded_at)')
                 .eq('lab_results.user_id', user.id)
                 .order('created_at', { ascending: false })
 
@@ -197,18 +202,38 @@ export default function ResultsPage() {
 
             const { data } = await query
             setBiomarkers((data as Biomarker[]) || [])
+
+            const { data: lrData } = await supabase
+                .from('lab_results')
+                .select('id, file_name, created_at, raw_ai_json')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+            setLabResults(lrData || [])
             setLoading(false)
         }
         fetchBiomarkers()
     }, [selectedCategory, router, refreshKey])
 
     // Derived counts for status summary
-    const filteredBiomarkers = biomarkers.filter(b =>
-        b.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    const optimalCount = filteredBiomarkers.filter(b => b.status === 'optimal').length
-    const warningCount = filteredBiomarkers.filter(b => b.status === 'warning').length
-    const criticalCount = filteredBiomarkers.filter(b => b.status === 'critical').length
+    const filteredBiomarkers = (selectedReportId === 'all'
+        ? biomarkers
+        : biomarkers.filter(b => b.lab_result_id?.toString() === selectedReportId)
+    ).filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    // Bug 7 fix: Deduplicate for status counts only (show most recent per biomarker name)
+    // The full list (filteredBiomarkers) is still shown in the UI for historical context
+    const deduplicatedForCounts = Array.from(
+        filteredBiomarkers.reduce((acc, biomarker) => {
+            const existing = acc.get(biomarker.name);
+            if (!existing || new Date(biomarker.created_at || 0) > new Date(existing.created_at || 0)) {
+                acc.set(biomarker.name, biomarker);
+            }
+            return acc;
+        }, new Map<string, Biomarker>()).values()
+    );
+    const optimalCount = deduplicatedForCounts.filter(b => b.status === 'optimal').length
+    const warningCount = deduplicatedForCounts.filter(b => b.status === 'warning').length
+    const criticalCount = deduplicatedForCounts.filter(b => b.status === 'critical').length
 
     return (
         <ErrorBoundary>
@@ -261,6 +286,49 @@ export default function ResultsPage() {
                             Upload New Report
                         </button>
                     </div>
+                </div>
+
+                {/* ── Report Selector ── */}
+                <div style={{ marginBottom: 24 }} className="print:hidden">
+                    <label style={{
+                        fontSize: 11,
+                        color: '#A8A29E',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        display: 'block',
+                        marginBottom: 6
+                    }}>
+                        VIEWING REPORT
+                    </label>
+                    <select
+                        value={selectedReportId}
+                        onChange={e => setSelectedReportId(e.target.value)}
+                        style={{
+                            background: '#F5F4EF',
+                            border: '1px solid #E8E6DF',
+                            borderRadius: 8,
+                            padding: '8px 12px',
+                            fontSize: 14,
+                            color: '#1C1917',
+                            cursor: 'pointer',
+                            minWidth: 280
+                        }}
+                    >
+                        <option value="all">All reports</option>
+                        {labResults?.map(r => {
+                            const score = r.raw_ai_json?.healthScore;
+                            return (
+                                <option key={r.id} value={r.id.toString()}>
+                                    {new Date(r.created_at).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    })} — Score: {score || 'N/A'}
+                                </option>
+                            );
+                        })}
+                    </select>
                 </div>
 
                 {/* ── Status summary row ── */}
@@ -389,7 +457,7 @@ export default function ResultsPage() {
                                             </div>
                                             {b.lab_results?.created_at && (
                                                 <p className="text-[11px] text-[#A8A29E] mt-0.5">
-                                                    From report {mounted ? new Date(b.lab_results.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                                                    From report {mounted ? new Date(b.lab_results?.uploaded_at || b.lab_results?.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                                 </p>
                                             )}
                                             <RangeBar
@@ -554,7 +622,7 @@ export default function ResultsPage() {
                         <ArrowRight size={16} />
                     </button>
                 </div>
-            </div>
-        </ErrorBoundary>
+            </div >
+        </ErrorBoundary >
     )
 }

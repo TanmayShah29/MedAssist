@@ -7,6 +7,11 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+    title: 'Dashboard | MedAssist',
+    description: 'Your health overview and clinical insights.'
+};
+
 async function DashboardContent({ user }: { user: { id: string } }) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -23,12 +28,12 @@ async function DashboardContent({ user }: { user: { id: string } }) {
 
     const [profileResponse, biomarkerResponse, symptomResponse, labResponse] = await Promise.all([
         supabase.from('profiles').select('id, first_name, last_name, onboarding_complete').eq('id', user.id).single(),
-        supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+        supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(200), // Bug 9: increased from 50
         supabase.from('symptoms').select('symptom').eq('user_id', user.id),
         supabase.from('lab_results')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
+            .order('uploaded_at', { ascending: false }) // Bug 2: was created_at (doesn't exist)
             .limit(10)
     ])
 

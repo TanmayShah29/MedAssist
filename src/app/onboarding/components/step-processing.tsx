@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { saveProfileFromSession } from "@/app/actions/user-data";
 
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
@@ -90,6 +91,9 @@ export function StepProcessing() {
                 return;
             }
 
+            // Get basic info from onboarding store
+            const basicInfo = useOnboardingStore.getState().basicInfo;
+
             // Create FormData for upload
             const formData = new FormData();
             formData.append("file", file);
@@ -163,6 +167,19 @@ export function StepProcessing() {
             });
 
             setState("complete");
+
+            // Bug 5 fix: Save profile info to Supabase (was only in Zustand store before)
+            try {
+                await saveProfileFromSession({
+                    first_name: basicInfo.firstName || undefined,
+                    last_name: basicInfo.lastName || undefined,
+                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
+                    sex: basicInfo.sex || undefined,
+                    blood_type: basicInfo.bloodType || undefined,
+                });
+            } catch (_profileErr) {
+                // Non-blocking — profile save failure shouldn't block onboarding
+            }
 
         } catch (err: unknown) {
             setErrorData(getErrorMessage((err as Error).message || "Network error"));

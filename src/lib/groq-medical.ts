@@ -33,11 +33,11 @@ export interface ExtractionResult {
 
 export interface BiomarkerContext {
     name: string;
-    value: number;
+    value: number | string; // DB stores as TEXT; use parseFloat() for arithmetic
     unit: string;
     status: string;
-    reference_range_min?: number;
-    reference_range_max?: number;
+    reference_range_min?: number | null;
+    reference_range_max?: number | null;
     ai_interpretation?: string;
 }
 
@@ -93,7 +93,13 @@ Return only a JSON object with this structure:
       "referenceMin": number | null,
       "referenceMax": number | null,
       "status": "optimal" | "warning" | "critical",
-      "category": "hematology" | "inflammation" | "metabolic" | "vitamins" | "other",
+      "category": must be EXACTLY one of: "hematology" | "inflammation" | "metabolic" | "vitamins" | "other"
+             Use these definitions:
+             - hematology: CBC values like Hemoglobin, RBC, WBC, Platelets, Hematocrit, PCV, MCV, MCH, MCHC, Neutrophils, Lymphocytes, Eosinophils, Basophils, Monocytes, Reticulocytes
+             - inflammation: CRP, ESR, Ferritin, Procalcitonin, IL-6, Fibrinogen, D-Dimer
+             - metabolic: Glucose, HbA1c, Insulin, Cholesterol (Total/LDL/HDL/VLDL), Triglycerides, Creatinine, BUN, eGFR, Uric Acid, ALT, AST, ALP, GGT, Bilirubin, Albumin, Total Protein, Sodium, Potassium, Chloride, Bicarbonate, Calcium, Magnesium, Phosphorus, Iron, TIBC, TSH, T3, T4
+             - vitamins: Vitamin B12, Vitamin D, Vitamin C, Vitamin E, Vitamin K, Folate, Folic Acid, Zinc, Selenium, Biotin, Thiamine, Riboflavin
+             - other: anything that doesn't fit the above categories
       "confidence": number (0-1),
       "aiInterpretation": string (1-2 sentences, plain English, never diagnostic)
     }
@@ -145,6 +151,11 @@ Rules:
 
         const raw = completion.choices[0].message.content || "";
 
+        // FOR AUDIT - Log exact Groq response
+        console.log("\n================ GROQ RAW JSON RESPONSE ================\n");
+        console.log(raw);
+        console.log("\n========================================================\n");
+
         // Strip accidental markdown code fences before parsing
         const cleaned = raw
             .replace(/^```(?:json)?\s*/i, "")
@@ -191,7 +202,8 @@ export async function answerHealthQuestion(
     question: string,
     biomarkers: BiomarkerContext[],
     symptoms: string[],
-    previousMessages: { role: 'user' | 'assistant', content: string }[] = []
+    previousMessages: { role: 'user' | 'assistant', content: string }[] = [],
+    profile?: { first_name?: string; age?: number; sex?: string; blood_type?: string } | null
 ): Promise<string> {
     const biomarkerContextStr = biomarkers?.length > 0
         ? `The user has the following biomarkers from their lab report:\n${biomarkers.map(b =>
@@ -200,6 +212,12 @@ export async function answerHealthQuestion(
         : 'The user has not uploaded a lab report yet.'
 
     const systemPrompt = `You are a personal health assistant for MedAssist. You help users understand their lab results in plain English.
+
+User Profile:
+- Name: ${profile?.first_name || 'Not provided'}
+- Age: ${profile?.age || 'Not provided'}
+- Sex: ${profile?.sex || 'Not provided'}
+- Blood Type: ${profile?.blood_type || 'Not provided'}
 
 ${biomarkerContextStr}
 ${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` : ""}
@@ -212,6 +230,11 @@ Rules:
 - Do not use any emojis in your response`
 
     try {
+        // FOR AUDIT - Log system prompt
+        console.log("\n================ GROQ ASSISTANT SYSTEM PROMPT ================\n");
+        console.log(systemPrompt);
+        console.log("\n==============================================================\n");
+
         const completion = await groq.chat.completions.create({
             messages: [
                 {

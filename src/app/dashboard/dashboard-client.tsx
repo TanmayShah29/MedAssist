@@ -58,10 +58,13 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'RBC': 'Red blood cells; responsible for delivering oxygen to tissues.',
 }
 
-function getDelta(current: number, previous: number | null | undefined) {
-    if (previous === null || previous === undefined || isNaN(previous)) return null;
-    const diff = current - previous;
-    const percent = Math.round((diff / previous) * 100);
+function getDelta(current: number | string, previous: number | string | null | undefined) {
+    if (previous === null || previous === undefined) return null;
+    const curr = parseFloat(String(current));
+    const prev = parseFloat(String(previous));
+    if (isNaN(curr) || isNaN(prev) || prev === 0) return null;
+    const diff = curr - prev;
+    const percent = Math.round((diff / prev) * 100);
     return { diff, percent };
 }
 
@@ -208,6 +211,15 @@ export default function DashboardClient({
 
     // Removed loading skeleton since data is passed directly from server
 
+    // 3b: Show last report date on dashboard
+    const lastUpdated = displayLabResults?.[0]?.uploaded_at
+        ? new Date(displayLabResults[0].uploaded_at).toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        })
+        : null
+
     return (
         <div className="min-h-[100dvh] bg-[#FAFAF7] p-6 text-[#1C1917] font-sans" id="dashboard-content">
 
@@ -224,10 +236,22 @@ export default function DashboardClient({
             </div>
 
             {/* ── Header row ── */}
-            <div className="flex justify-between items-center mb-6">
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 24
+            }}>
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Clinical Overview</h1>
+                        <h1 style={{
+                            fontFamily: 'Instrument Serif',
+                            fontSize: 32,
+                            color: '#1C1917',
+                            margin: 0
+                        }}>
+                            Clinical Overview
+                        </h1>
                         {isOffline && (
                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse">
                                 <WifiOff size={12} />
@@ -235,10 +259,16 @@ export default function DashboardClient({
                             </div>
                         )}
                     </div>
-                    <p className="text-[15px] text-[#57534E]">
-                        {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
-                        {profile?.first_name || 'Patient'}
-                    </p>
+                    {lastUpdated ? (
+                        <p style={{ fontSize: 13, color: '#A8A29E', margin: '4px 0 0 0' }}>
+                            Last report: {lastUpdated}
+                        </p>
+                    ) : (
+                        <p className="text-[15px] text-[#57534E] mt-1">
+                            {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
+                            {profile?.first_name || 'Patient'}
+                        </p>
+                    )}
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -252,92 +282,108 @@ export default function DashboardClient({
 
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0EA5E9] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#0284C7] transition-all shadow-md shadow-sky-500/20 min-h-[44px]"
-                        style={{ WebkitAppearance: 'none' }}
+                        style={{
+                            background: '#0EA5E9',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 10,
+                            padding: '10px 20px',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            minHeight: 44
+                        }}
                     >
-                        <Upload className="w-4 h-4" />
-                        Upload
+                        <Upload size={16} />
+                        Upload Report
                     </button>
                 </div>
             </div>
 
             {/* ── Informational Banners: Risk Summary & Upload Nudge ── */}
-            {totalCount > 0 && (
-                <div className="flex flex-col md:flex-row gap-4 mb-8">
-                    {/* Risk Summary Banner - Only show if there are flags */}
-                    {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
-                                    <Activity size={24} />
+            {
+                totalCount > 0 && (
+                    <div className="flex flex-col md:flex-row gap-4 mb-8">
+                        {/* Risk Summary Banner - Only show if there are flags */}
+                        {(criticalCount > 0 || warningCount > 0) && (
+                            <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
+                                        <Activity size={24} />
+                                    </div>
+                                    <div style={{ marginLeft: 16 }}>
+                                        <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
+                                        <p className="text-xs text-[#57534E]">
+                                            {criticalCount > 0
+                                                ? `${criticalCount} urgent markers need attention`
+                                                : `${warningCount} markers to monitor closely`}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div style={{ marginLeft: 16 }}>
-                                    <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
-                                    <p className="text-xs text-[#57534E]">
-                                        {criticalCount > 0
-                                            ? `${criticalCount} urgent markers need attention`
-                                            : `${warningCount} markers to monitor closely`}
-                                    </p>
+                                <div className="flex gap-2" style={{ marginLeft: 'auto' }}>
+                                    <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
+                                        <span className="block text-xs font-bold text-emerald-700">{optimalCount}</span>
+                                        <span className="text-[10px] text-emerald-600 uppercase font-semibold">Opt</span>
+                                    </div>
+                                    <div className="text-center px-3 py-1 bg-amber-50 rounded-lg border border-amber-100" style={{ marginLeft: 8 }}>
+                                        <span className="block text-xs font-bold text-amber-700">{warningCount}</span>
+                                        <span className="text-[10px] text-amber-600 uppercase font-semibold">Mon</span>
+                                    </div>
+                                    <div className="text-center px-3 py-1 bg-red-50 rounded-lg border border-red-100" style={{ marginLeft: 8 }}>
+                                        <span className="block text-xs font-bold text-red-700">{criticalCount}</span>
+                                        <span className="text-[10px] text-red-600 uppercase font-semibold">Act</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex gap-2" style={{ marginLeft: 'auto' }}>
-                                <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-100">
-                                    <span className="block text-xs font-bold text-emerald-700">{optimalCount}</span>
-                                    <span className="text-[10px] text-emerald-600 uppercase font-semibold">Opt</span>
-                                </div>
-                                <div className="text-center px-3 py-1 bg-amber-50 rounded-lg border border-amber-100" style={{ marginLeft: 8 }}>
-                                    <span className="block text-xs font-bold text-amber-700">{warningCount}</span>
-                                    <span className="text-[10px] text-amber-600 uppercase font-semibold">Mon</span>
-                                </div>
-                                <div className="text-center px-3 py-1 bg-red-50 rounded-lg border border-red-100" style={{ marginLeft: 8 }}>
-                                    <span className="block text-xs font-bold text-red-700">{criticalCount}</span>
-                                    <span className="text-[10px] text-red-600 uppercase font-semibold">Act</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Upload Reminder Nudge - Only if they have a history (not first time) */}
-                    {latestLabResult && initialLabResults.length > 0 && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
-                                    <ClipboardList size={24} />
+                        {/* Upload Reminder Nudge - Only if they have a history (not first time) */}
+                        {latestLabResult && initialLabResults.length > 0 && (
+                            <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
+                                        <ClipboardList size={24} />
+                                    </div>
+                                    <div style={{ marginLeft: 16 }}>
+                                        <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
+                                        <p className="text-xs text-[#57534E]">
+                                            Last test was {Math.floor((new Date().getTime() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) / (1000 * 3600 * 24))} days ago
+                                        </p>
+                                    </div>
                                 </div>
-                                <div style={{ marginLeft: 16 }}>
-                                    <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
-                                    <p className="text-xs text-[#57534E]">
-                                        Last test was {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24))} days ago
-                                    </p>
+                                <div className="text-right" style={{ marginLeft: 'auto' }}>
+                                    {Math.floor((new Date().getTime() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) / (1000 * 3600 * 24)) > 90 ? (
+                                        <span className="inline-block px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold">DUE FOR NEW TEST</span>
+                                    ) : (
+                                        <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold">UP TO DATE</span>
+                                    )}
                                 </div>
                             </div>
-                            <div className="text-right" style={{ marginLeft: 'auto' }}>
-                                {Math.floor((new Date().getTime() - new Date(latestLabResult.created_at).getTime()) / (1000 * 3600 * 24)) > 90 ? (
-                                    <span className="inline-block px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold">DUE FOR NEW TEST</span>
-                                ) : (
-                                    <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold">UP TO DATE</span>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>
+                )
+            }
 
             {/* ── Demo mode banner: avoid mistaking sample data for real data ── */}
-            {demoMode && (
-                <div className="mb-6 flex items-center justify-between gap-4 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 print:hidden">
-                    <p className="text-sm font-semibold text-amber-900">
-                        You&apos;re viewing <strong>sample data</strong> — not your personal results. Health score and biomarkers below are for demo only.
-                    </p>
-                    <button
-                        onClick={() => setDemoMode(false)}
-                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
-                        style={{ WebkitAppearance: 'none' }}
-                    >
-                        Show my data
-                    </button>
-                </div>
-            )}
+            {
+                demoMode && (
+                    <div className="mb-6 flex items-center justify-between gap-4 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 print:hidden">
+                        <p className="text-sm font-semibold text-amber-900">
+                            You&apos;re viewing <strong>sample data</strong> — not your personal results. Health score and biomarkers below are for demo only.
+                        </p>
+                        <button
+                            onClick={() => setDemoMode(false)}
+                            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                            style={{ WebkitAppearance: 'none' }}
+                        >
+                            Show my data
+                        </button>
+                    </div>
+                )
+            }
 
             {/* ── Developer Tools Overlay (Subtle) ── */}
             <div className="fixed bottom-24 right-6 z-[45] flex flex-col gap-2 print:hidden">
@@ -365,199 +411,209 @@ export default function DashboardClient({
             </div>
 
             {/* ── Dashboard Content ── */}
-            {totalCount === 0 ? (
-                <div style={{
-                    background: '#F5F4EF',
-                    border: '1px solid #E8E6DF',
-                    borderRadius: 18,
-                    padding: '48px 32px',
-                    textAlign: 'center',
-                    marginBottom: 24
-                }}>
+            {
+                totalCount === 0 ? (
                     <div style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: '50%',
-                        background: '#E0F2FE',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 16px auto'
+                        background: '#F5F4EF',
+                        border: '1px solid #E8E6DF',
+                        borderRadius: 18,
+                        padding: '48px 32px',
+                        textAlign: 'center',
+                        marginBottom: 24
                     }}>
-                        <FileText size={24} color="#0EA5E9" />
+                        <div style={{
+                            width: 56,
+                            height: 56,
+                            borderRadius: '50%',
+                            background: '#E0F2FE',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 16px auto'
+                        }}>
+                            <FileText size={24} color="#0EA5E9" />
+                        </div>
+                        <h2 style={{
+                            fontFamily: 'Instrument Serif',
+                            fontSize: 28,
+                            fontWeight: 700,
+                            color: '#1C1917',
+                            margin: '0 0 12px 0'
+                        }}>
+                            Ready when you are
+                        </h2>
+                        <p style={{ fontSize: 15, color: '#57534E', maxWidth: 400, margin: '0 auto 24px auto', lineHeight: 1.6 }}>
+                            Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                            <button
+                                onClick={() => setShowUploadModal(true)}
+                                style={{
+                                    background: '#0EA5E9',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: 10,
+                                    padding: '12px 24px',
+                                    fontSize: 15,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    WebkitAppearance: 'none',
+                                    minHeight: '44px'
+                                }}
+                            >
+                                Upload my first report
+                            </button>
+                            <button
+                                onClick={() => setDemoMode(true)}
+                                className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors min-h-[44px]"
+                                style={{ WebkitAppearance: 'none' }}
+                            >
+                                <PlayCircle size={18} />
+                                Try with sample lab report
+                            </button>
+                        </div>
+                        <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 12 }}>
+                            Supports digital PDF lab reports · Takes 20–40 seconds
+                        </p>
                     </div>
-                    <h2 style={{
-                        fontFamily: 'Instrument Serif',
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: '#1C1917',
-                        margin: '0 0 12px 0'
-                    }}>
-                        Ready when you are
-                    </h2>
-                    <p style={{ fontSize: 15, color: '#57534E', maxWidth: 400, margin: '0 auto 24px auto', lineHeight: 1.6 }}>
-                        Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                        <button
-                            onClick={() => setShowUploadModal(true)}
-                            style={{
-                                background: '#0EA5E9',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: 10,
-                                padding: '12px 24px',
-                                fontSize: 15,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                WebkitAppearance: 'none',
-                                minHeight: '44px'
-                            }}
-                        >
-                            Upload my first report
-                        </button>
-                        <button
-                            onClick={() => setDemoMode(true)}
-                            className="flex items-center gap-2 px-4 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors min-h-[44px]"
-                            style={{ WebkitAppearance: 'none' }}
-                        >
-                            <PlayCircle size={18} />
-                            Try with sample lab report
-                        </button>
-                    </div>
-                    <p style={{ fontSize: 12, color: '#A8A29E', marginTop: 12 }}>
-                        Supports digital PDF lab reports · Takes 20–40 seconds
-                    </p>
-                </div>
-            ) : (
-                <div className="flex flex-col gap-6 mb-6">
-                    <PriorityAlertCard biomarkers={latestBiomarkers} />
+                ) : (
+                    <div className="flex flex-col gap-6 mb-6">
+                        <PriorityAlertCard biomarkers={latestBiomarkers} />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <HealthScoreOverview
-                            score={healthScore}
-                            optimalCount={optimalCount}
-                            warningCount={warningCount}
-                            criticalCount={criticalCount}
-                        />
-                        <TrendSnapshot
-                            latestBiomarkers={latestBiomarkers}
-                            history={displayBiomarkers}
-                            latestLabResult={latestLabResult}
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <HealthScoreOverview
+                                score={healthScore}
+                                optimalCount={optimalCount}
+                                warningCount={warningCount}
+                                criticalCount={criticalCount}
+                            />
+                            <TrendSnapshot
+                                latestBiomarkers={latestBiomarkers}
+                                history={displayBiomarkers}
+                                latestLabResult={latestLabResult}
+                            />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ── Personalized "What to do next" Card ── */}
-            {totalCount > 0 && (
-                <>
-                    <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-10">
-                            <Sparkles size={120} />
-                        </div>
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
-                                    <ArrowRight className="w-5 h-5 text-sky-400" />
+            {
+                totalCount > 0 && (
+                    <>
+                        <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-10">
+                                <Sparkles size={120} />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+                                        <ArrowRight className="w-5 h-5 text-sky-400" />
+                                    </div>
+                                    <h3 className="text-xl font-bold font-display" style={{ marginLeft: 12 }}>Personalized Care Plan</h3>
                                 </div>
-                                <h3 className="text-xl font-bold font-display" style={{ marginLeft: 12 }}>Personalized Care Plan</h3>
-                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {[...latestBiomarkers]
-                                    .filter(b => b.status !== 'optimal')
-                                    .sort((a, _b) => (a.status === 'critical' ? -1 : 1))
-                                    .slice(0, 3)
-                                    .map((b, idx) => {
-                                        const recommendations: Record<string, string> = {
-                                            'Vitamin D': 'Consider 15m daily sunlight or discuss D3 supplementation with your doctor.',
-                                            'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
-                                            'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
-                                            'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
-                                            'CRP': 'Focus on anti-inflammatory foods and prioritize 7-8 hours of quality sleep.',
-                                            'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
-                                        };
-                                        const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {[...latestBiomarkers]
+                                        .filter(b => b.status !== 'optimal')
+                                        .sort((a, _b) => (a.status === 'critical' ? -1 : 1))
+                                        .slice(0, 3)
+                                        .map((b, idx) => {
+                                            const recommendations: Record<string, string> = {
+                                                'Vitamin D': 'Consider 15m daily sunlight or discuss D3 supplementation with your doctor.',
+                                                'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
+                                                'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
+                                                'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
+                                                'CRP': 'Focus on anti-inflammatory foods and prioritize 7-8 hours of quality sleep.',
+                                                'Iron': 'Incorporate more iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
+                                            };
+                                            const fallback = `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
 
-                                        return (
-                                            <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.status === 'critical' ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-amber-500/20 border-amber-500/30 text-amber-400'}`}>
-                                                        {b.status.toUpperCase()}
-                                                    </span>
-                                                    <span className="text-[10px] text-white/40 font-mono">PRIORITY {idx + 1}</span>
+                                            return (
+                                                <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.status === 'critical' ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-amber-500/20 border-amber-500/30 text-amber-400'}`}>
+                                                            {b.status.toUpperCase()}
+                                                        </span>
+                                                        <span className="text-[10px] text-white/40 font-mono">PRIORITY {idx + 1}</span>
+                                                    </div>
+                                                    <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">{b.name}</h4>
+                                                    <p className="text-sm text-slate-400 leading-relaxed">
+                                                        {recommendations[b.name] || fallback}
+                                                    </p>
                                                 </div>
-                                                <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">{b.name}</h4>
-                                                <p className="text-sm text-slate-400 leading-relaxed">
-                                                    {recommendations[b.name] || fallback}
-                                                </p>
-                                            </div>
-                                        )
-                                    })}
+                                            )
+                                        })}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <DoctorQuestions biomarkers={latestBiomarkers} className="mb-8" />
-                </>
-            )}
-            {longitudinalInsights.length > 0 && (
-                <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Activity className="w-5 h-5 text-indigo-500" />
-                        <h3 className="text-[18px] font-bold text-[#1C1917]">Longitudinal Insights</h3>
-                        <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-auto">Beta</span>
+                        <DoctorQuestions biomarkers={latestBiomarkers} className="mb-8" />
+                    </>
+                )
+            }
+            {
+                longitudinalInsights.length > 0 && (
+                    <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Activity className="w-5 h-5 text-indigo-500" />
+                            <h3 className="text-[18px] font-bold text-[#1C1917]">Longitudinal Insights</h3>
+                            <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-auto">Beta</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {longitudinalInsights.map((insight, idx) => (
+                                <div key={idx} className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF]">
+                                    <div className="mt-1 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                                    <p className="text-[14px] text-[#475569] leading-relaxed">
+                                        {insight}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-4 text-[11px] text-[#94A3B8] italic">
+                            * Insights are generated by comparing your latest results with up to 10 previous reports.
+                        </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {longitudinalInsights.map((insight, idx) => (
-                            <div key={idx} className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF]">
-                                <div className="mt-1 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
-                                <p className="text-[14px] text-[#475569] leading-relaxed">
-                                    {insight}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                    <p className="mt-4 text-[11px] text-[#94A3B8] italic">
-                        * Insights are generated by comparing your latest results with up to 10 previous reports.
-                    </p>
-                </div>
-            )}
+                )
+            }
 
             {/* ── Engagement Nudge (Only if 1 report) ── */}
-            {labResults.length === 1 && (
-                <div style={{
-                    background: '#E0F2FE',
-                    border: '1px solid #BAE6FD',
-                    borderLeft: '4px solid #0EA5E9',
-                    borderRadius: 14,
-                    padding: '16px 20px',
-                    marginBottom: 24,
-                }}>
-                    <div>
-                        <p style={{ color: '#0369A1', fontWeight: 600, fontSize: 15, margin: 0 }}>
-                            Your AI gets smarter with every report
-                        </p>
-                        <p style={{ color: '#0284C7', fontSize: 13, margin: '4px 0 0 0' }}>
-                            You have 1 report uploaded. Upload your next report after your upcoming blood test
-                            and MedAssist will start showing you trends — like whether your hemoglobin is improving
-                            or your vitamin D is responding to supplements.
-                        </p>
+            {
+                labResults.length === 1 && (
+                    <div style={{
+                        background: '#E0F2FE',
+                        border: '1px solid #BAE6FD',
+                        borderLeft: '4px solid #0EA5E9',
+                        borderRadius: 14,
+                        padding: '16px 20px',
+                        marginBottom: 24,
+                    }}>
+                        <div>
+                            <p style={{ color: '#0369A1', fontWeight: 600, fontSize: 15, margin: 0 }}>
+                                Your AI gets smarter with every report
+                            </p>
+                            <p style={{ color: '#0284C7', fontSize: 13, margin: '4px 0 0 0' }}>
+                                You have 1 report uploaded. Upload your next report after your upcoming blood test
+                                and MedAssist will start showing you trends — like whether your hemoglobin is improving
+                                or your vitamin D is responding to supplements.
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ── Real Insights Feed ── */}
-            {totalCount > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider text-center lg:text-left">PERSONALIZED INSIGHTS</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
-                        <AIInsightsFeed analysis={{ summary: latestLabResult?.summary || "" }} />
-                        <ActionItems biomarkers={biomarkers} />
+            {
+                totalCount > 0 && (
+                    <div className="mb-6">
+                        <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider text-center lg:text-left">PERSONALIZED INSIGHTS</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
+                            <AIInsightsFeed analysis={{ summary: latestLabResult?.summary || "" }} />
+                            <ActionItems biomarkers={biomarkers} />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
 
 
@@ -615,7 +671,7 @@ export default function DashboardClient({
                                                 pb.name === b.name &&
                                                 pb.lab_result_id !== latestLabResult?.id
                                             );
-                                            const delta = getDelta(b.value, prev?.value);
+                                            const delta = getDelta(parseFloat(String(b.value)), prev?.value !== undefined ? parseFloat(String(prev.value)) : undefined);
 
                                             return (
                                                 <div
@@ -685,14 +741,16 @@ export default function DashboardClient({
             </div>
 
             {/* ── Medicine Cabinet (Supplementary Care) ── */}
-            {totalCount > 0 && (
-                <div className="mb-12">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
-                    <div className="max-w-xl">
-                        <MedicineCabinet />
+            {
+                totalCount > 0 && (
+                    <div className="mb-12">
+                        <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
+                        <div className="max-w-xl">
+                            <MedicineCabinet />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <UploadModal
                 isOpen={showUploadModal}
@@ -778,6 +836,6 @@ export default function DashboardClient({
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

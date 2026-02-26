@@ -61,7 +61,7 @@ export default function OnboardingPage() {
                                             }}
                                             className="w-7 h-7 rounded-full flex items-center 
                                  justify-center text-xs font-semibold"
-                                            style={{ color: isComplete || isActive ? "white" : "#A8A29E" }}
+                                            style={{ color: isComplete || isActive ? "white" : "#57534E" }}
                                         >
                                             {isComplete ? (
                                                 <Check className="w-3.5 h-3.5" />
@@ -74,7 +74,7 @@ export default function OnboardingPage() {
                       whitespace-nowrap hidden md:block
                       ${isActive ? "text-sky-600"
                                                 : isComplete ? "text-emerald-600"
-                                                    : "text-[#A8A29E]"}`}>
+                                                    : "text-[#57534E]"}`}>
                                             {label}
                                         </span>
                                     </div>

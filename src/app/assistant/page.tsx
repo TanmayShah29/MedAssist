@@ -224,6 +224,28 @@ export default function AssistantPage() {
 
             {/* Input Area */}
             <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky transform-gpu bottom-0 z-10">
+                {/* Suggested Questions */}
+                {messages.filter(m => m.role === 'user').length === 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none mb-1">
+                        {[
+                            "What do my latest results mean?",
+                            "Are there any hidden risks?",
+                            "How can I improve my health score?",
+                            "What should I ask my doctor?"
+                        ].map((q, i) => (
+                            <button
+                                key={i}
+                                onClick={() => {
+                                    setInputValue(q);
+                                }}
+                                className="whitespace-nowrap px-4 py-2 bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 <div className="flex items-center gap-3">
                     <input
                         value={inputValue}

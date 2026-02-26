@@ -3,6 +3,7 @@ import { Biomarker } from "@/types/medical";
 export interface DemoLabResult {
     id: number | string;
     created_at: string;
+    uploaded_at?: string;
     summary?: string;
     raw_ai_json: {
         healthScore: number;
@@ -127,6 +128,7 @@ export const DEMO_HISTORY: Biomarker[] = [
 export const DEMO_LAB_RESULT: DemoLabResult = {
     id: "demo-latest",
     created_at: new Date().toISOString(),
+    uploaded_at: new Date().toISOString(),
     raw_ai_json: {
         healthScore: 82,
         riskLevel: "moderate",
