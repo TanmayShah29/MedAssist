@@ -29,6 +29,21 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Section 1b — Per-user rate limit: max 10 messages per minute
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString()
+    const { count: msgCount } = await supabase
+        .from('conversations')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('role', 'user')
+        .gte('created_at', oneMinuteAgo)
+    if (msgCount !== null && msgCount >= 10) {
+        return NextResponse.json(
+            { error: 'Too many messages. Please wait a moment before sending another.' },
+            { status: 429 }
+        )
+    }
+
     const { question, symptoms } = await request.json()
 
     if (!question || question.trim().length === 0) {

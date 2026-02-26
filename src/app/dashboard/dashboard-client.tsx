@@ -480,6 +480,35 @@ export default function DashboardClient({
                     <div className="flex flex-col gap-6 mb-6">
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
+                        {/* Section 6a — Symptom empty state notice */}
+                        {initialSymptoms.length === 0 && totalCount > 0 && (
+                            <div style={{
+                                background: '#FFFBEB',
+                                border: '1px solid #FDE68A',
+                                borderLeft: '4px solid #F59E0B',
+                                borderRadius: 10,
+                                padding: '12px 16px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 12
+                            }}>
+                                <p style={{ fontSize: 14, color: '#57534E', margin: 0 }}>
+                                    Add your symptoms to get more personalised insights from your lab results.
+                                </p>
+                                <a href="/profile" style={{
+                                    fontSize: 13,
+                                    color: '#0EA5E9',
+                                    fontWeight: 600,
+                                    textDecoration: 'none',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0
+                                }}>
+                                    Add symptoms →
+                                </a>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <HealthScoreOverview
                                 score={healthScore}

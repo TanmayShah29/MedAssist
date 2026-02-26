@@ -43,6 +43,20 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Section 1b — Per-user rate limit: max 5 uploads per hour
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { count: uploadCount } = await supabaseAuth
+            .from('lab_results')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', authUser.id)
+            .gte('uploaded_at', oneHourAgo);
+        if (uploadCount !== null && uploadCount >= 5) {
+            return NextResponse.json(
+                { success: false, error: 'Rate limit exceeded. You can analyze up to 5 reports per hour. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         logger.info('[Analyze] NODE_ENV:', process.env.NODE_ENV);
         const formData = await req.formData();
         const file = formData.get('file') as File | null;
@@ -58,7 +72,17 @@ export async function POST(req: NextRequest) {
         }
 
         if (file.size > 10 * 1024 * 1024) {
-            return NextResponse.json({ success: false, error: 'File size exceeds 10MB limit' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'File size exceeds 10MB limit.' }, { status: 400 });
+        }
+
+        // Section 1d — Server-side file type validation
+        const allowedMimeTypes = ['application/pdf'];
+        const fileName = file.name.toLowerCase();
+        if (!allowedMimeTypes.includes(file.type) || !fileName.endsWith('.pdf')) {
+            return NextResponse.json(
+                { success: false, error: 'Invalid file type. Only PDF files are accepted.' },
+                { status: 400 }
+            );
         }
 
         const arrayBuffer = await file.arrayBuffer();
@@ -89,11 +113,17 @@ export async function POST(req: NextRequest) {
         logger.info("Text extracted successfully.");
 
         let history: Awaited<ReturnType<typeof getUserBiomarkerHistory>> = [];
-        history = await getUserBiomarkerHistory(authUser.id);
+        // Fetch history and user symptoms in parallel
+        const [historyResult, symptomsResult] = await Promise.all([
+            getUserBiomarkerHistory(authUser.id),
+            supabaseAuth.from('symptoms').select('symptom').eq('user_id', authUser.id)
+        ]);
+        history = historyResult;
+        const userSymptoms = (symptomsResult.data || []).map((s: { symptom: string }) => s.symptom);
         logger.info(`Fetched ${history.length} historical biomarkers for user ${authUser.id}`);
 
         logger.info("Starting AI analysis...");
-        const analysisResult = await analyzeLabText(extractedText, { symptoms: [], history });
+        const analysisResult = await analyzeLabText(extractedText, { symptoms: userSymptoms, history });
 
         // 6. Data Persistence
         const saveResult = await saveLabResult({

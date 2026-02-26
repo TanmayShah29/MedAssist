@@ -97,6 +97,8 @@ export function StepBasicInfo() {
                         <input
                             type="number"
                             name="age"
+                            inputMode="numeric"
+                            autoComplete="age"
                             value={basicInfo.age}
                             onChange={e => setBasicInfo({ age: parseInt(e.target.value, 10) || "" })}
                             placeholder="32"

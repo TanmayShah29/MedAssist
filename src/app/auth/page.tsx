@@ -108,6 +108,8 @@ function AuthContent() {
                     <input
                         type="email"
                         name="email"
+                        inputMode="email"
+                        autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -124,6 +126,7 @@ function AuthContent() {
                     <input
                         type="password"
                         name="password"
+                        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required

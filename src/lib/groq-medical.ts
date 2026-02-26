@@ -131,8 +131,17 @@ MANDATORY: AI summary MUST end with "Always consult your doctor before making he
 Rules:
 - STRICT RULE: Extract ONLY the biomarkers physically present in the text. Do NOT populate fields with random, default, or assumed values. If the report doesn't mention Magnesium, do not include Magnesium.
 - Extract every biomarker present in the text
-- status: "optimal" if within range, "warning" if slightly outside, "critical" if far outside
-- aiInterpretation: plain English a non-medical person can understand. NEVER say "you have", "diagnosed with", or "you are suffering from"
+- status: "optimal" if within range, "warning" if slightly outside (≤20% outside range), "critical" if significantly outside (>20% outside range or clinically concerning)
+- aiInterpretation must follow ALL of these rules:
+    1. State what the biomarker measures in simple, plain terms (1 sentence)
+    2. Reference the patient's actual numeric value AND their reference range in the same sentence
+    3. If out of range, explain 2-3 possible causes in plain language (e.g., "This can occur with iron-poor diet, heavy periods, or chronic inflammation.")
+    4. If in range, briefly note why this is good (e.g., "This is within the healthy range, which means your red blood cells are carrying oxygen efficiently.")
+    5. NEVER make it only "consult a doctor" — always give actual educational information first
+    6. NEVER say "you have", "diagnosed with", "you are suffering from", or any diagnostic language
+    7. NEVER use emojis
+    GOOD example: "Hemoglobin measures the oxygen-carrying protein in your red blood cells. Your level of 11.2 g/dL is below the reference range of 12–16 g/dL, which can indicate mild anemia. This may result from low iron intake, vitamin B12 deficiency, or increased red blood cell breakdown — worth discussing with your doctor if you experience fatigue or breathlessness. Always consult your doctor before making health decisions."
+    BAD example: "Hemoglobin is a protein that carries oxygen. Your result is slightly low. Please consult a doctor."
 - summary: 2-3 sentence plain English overview. Educational tone only.
 - Return ONLY the JSON object. No other text.`,
                     },
