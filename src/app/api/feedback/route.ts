@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
     const rateLimitResult = await checkRateLimit();
@@ -15,23 +16,40 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const message = typeof body?.message === 'string' ? body.message.trim() : '';
-        const url = typeof body?.url === 'string' ? body.url : null;
 
-        if (!message || message.length < 3) {
-            return NextResponse.json({ error: 'Message is required (min 3 characters).' }, { status: 400 });
+        const feedbackSchema = z.object({
+            message: z.string().trim().min(3, 'Message is required (min 3 characters).').max(2000, 'Message too long.'),
+            url: z.string().url('Invalid URL').nullable().optional()
+        });
+
+        const parseResult = feedbackSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid input.' }, { status: 400 });
         }
 
-        if (message.length > 2000) {
-            return NextResponse.json({ error: 'Message too long.' }, { status: 400 });
-        }
+        const { message, url } = parseResult.data;
 
         let userId: string | null = null;
         const cookieStore = await cookies();
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            )
+                        } catch {
+                            // Ignored
+                        }
+                    }
+                }
+            }
         );
         const { data: { user } } = await supabase.auth.getUser();
         if (user) userId = user.id;

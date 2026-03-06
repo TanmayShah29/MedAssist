@@ -237,7 +237,7 @@ export default function ResultsPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-[100dvh] bg-[#FAFAF7] p-6 text-[#1C1917] font-sans">
+            <div className="min-h-[100dvh] bg-[#FAFAF7] px-4 py-6 md:p-6 text-[#1C1917] font-sans">
 
                 {/* ── Print-only Header ── */}
                 <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
@@ -252,39 +252,43 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Header ── */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
-                        <p className="text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
-                        <p className="text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
-                        <TrustLayer variant="compact" className="mt-3" />
-                    </div>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => setRefreshKey((k) => k + 1)}
-                            disabled={loading}
-                            className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2.5 font-medium flex items-center gap-2 hover:bg-[#F5F4EF] transition-colors print:hidden disabled:opacity-50 min-h-[44px]"
-                            title="Refresh results"
-                            style={{ WebkitAppearance: 'none' }}
-                        >
-                            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-                            Refresh
-                        </button>
-                        <button
-                            onClick={handlePrint}
-                            className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2.5 font-medium flex items-center gap-2 hover:bg-[#F5F4EF] transition-colors print:hidden min-h-[44px]"
-                            style={{ WebkitAppearance: 'none' }}
-                        >
-                            <Printer size={18} />
-                            Export PDF
-                        </button>
-                        <button
-                            onClick={() => router.push('/dashboard?openUpload=1')}
-                            className="text-white rounded-[10px] px-4 py-2.5 font-medium print:hidden bg-sky-500 hover:bg-sky-600 transition-colors min-h-[44px]"
-                            style={{ WebkitAppearance: 'none' }}
-                        >
-                            Upload New Report
-                        </button>
+                <div className="mb-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                        <div className="min-w-0">
+                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
+                            <p className="text-[14px] md:text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
+                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
+                            <TrustLayer variant="compact" className="mt-3" />
+                        </div>
+                        <div className="flex flex-wrap gap-2 shrink-0 print:hidden">
+                            <button
+                                onClick={() => setRefreshKey((k) => k + 1)}
+                                disabled={loading}
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[40px]"
+                                title="Refresh results"
+                                style={{ WebkitAppearance: 'none' }}
+                            >
+                                <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                                <span className="hidden sm:inline">Refresh</span>
+                            </button>
+                            <button
+                                onClick={handlePrint}
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[40px]"
+                                style={{ WebkitAppearance: 'none' }}
+                            >
+                                <Printer size={16} />
+                                <span className="hidden sm:inline">Export PDF</span>
+                                <span className="sm:hidden">PDF</span>
+                            </button>
+                            <button
+                                onClick={() => router.push('/dashboard?openUpload=1')}
+                                className="text-white rounded-[10px] px-3 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[40px] flex items-center gap-1.5"
+                                style={{ WebkitAppearance: 'none' }}
+                            >
+                                Upload
+                                <span className="hidden sm:inline"> New Report</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

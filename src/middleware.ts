@@ -33,7 +33,19 @@ export default async function middleware(request: NextRequest) {
         pathname === '/privacy' ||
         pathname.includes('.')
     ) {
-        return NextResponse.next({ request: { headers: requestHeaders } })
+        const response = NextResponse.next({ request: { headers: requestHeaders } });
+
+        // Clear onboarding cookie when landing on auth or home page 
+        // to prevent stale redirects for new users.
+        if (pathname === '/auth' || pathname === '/') {
+            response.cookies.set('onboarding_complete', 'false', {
+                path: '/',
+                maxAge: 0,
+                httpOnly: false
+            });
+        }
+
+        return response;
     }
 
     // Initial response with headers

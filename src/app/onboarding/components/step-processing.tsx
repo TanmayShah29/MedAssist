@@ -3,7 +3,7 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import type { ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { saveProfileFromSession } from "@/app/actions/user-data";
@@ -33,13 +33,13 @@ export function StepProcessing() {
     const hasStarted = useRef(false);
 
     // New stages configuration with durations
-    const stages = [
+    const stages = useMemo(() => [
         { step: 1, label: 'Scanning your lab report...', detail: 'OCR reading every value on the page', duration: 8000 },
         { step: 2, label: 'Identifying biomarkers...', detail: 'Finding hemoglobin, glucose, vitamins and more', duration: 6000 },
         { step: 3, label: 'Comparing reference ranges...', detail: 'Checking what\'s optimal, what needs attention', duration: 5000 },
         { step: 4, label: 'Generating plain English explanations...', detail: 'Making medical jargon actually understandable', duration: 5000 },
         { step: 5, label: 'Calculating your health score...', detail: 'Building your personal health overview', duration: 4000 },
-    ]
+    ], []);
 
     // Cycle through stages based on duration
     useEffect(() => {
@@ -56,12 +56,12 @@ export function StepProcessing() {
             if (currentStageIndex < stages.length) {
                 timer = setTimeout(() => {
                     setCurrentStageIndex(prev => Math.min(prev + 1, stages.length - 1));
-                }, stages[currentStageIndex].duration);
+                }, stages[currentStageIndex]?.duration || 0);
             }
         }
 
         return () => clearTimeout(timer);
-    }, [currentStageIndex, state]); // Dependency on currentStageIndex allows the chain to continue
+    }, [currentStageIndex, state, stages]); // Dependency on currentStageIndex allows the chain to continue
 
     const goBackToUpload = () => {
         setErrorData(null);
@@ -70,7 +70,7 @@ export function StepProcessing() {
         setStep(3);
     };
 
-    const runProcessing = async () => {
+    const runProcessing = useCallback(async () => {
         try {
             setErrorData(null);
             setState("uploading");
@@ -186,7 +186,7 @@ export function StepProcessing() {
             setErrorData(getErrorMessage((err as Error).message || "Network error"));
             setState("error");
         }
-    };
+    }, [setAnalysisResult]);
 
     const onComplete = () => {
         completeStep(4);
@@ -197,7 +197,7 @@ export function StepProcessing() {
         if (hasStarted.current) return;
         hasStarted.current = true;
         runProcessing();
-    }, []);
+    }, [runProcessing]);
 
     // Error State
     if (state === "error" && errorData) {

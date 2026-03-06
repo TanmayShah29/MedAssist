@@ -53,6 +53,7 @@ export function FeedbackButton() {
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="text-[#A8A29E] hover:text-[#1C1917] transition-colors p-1"
+                                aria-label="Close"
                             >
                                 <X size={16} />
                             </button>

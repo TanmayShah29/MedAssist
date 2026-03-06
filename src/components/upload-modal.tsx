@@ -216,6 +216,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                     <button
                                         onClick={onClose}
                                         className="p-2 hover:bg-[#F5F4EF] rounded-full transition-colors text-[#A8A29E] hover:text-[#1C1917]"
+                                        aria-label="Close"
                                     >
                                         <X size={20} />
                                     </button>
@@ -382,6 +383,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                         type="button"
                                                         onClick={() => removeManualRow(row.id)}
                                                         className="p-2 text-[#A8A29E] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        aria-label="Remove biomarker"
                                                     >
                                                         <Trash2 size={18} />
                                                     </button>

@@ -2,12 +2,22 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from "groq-sdk";
+import { checkRateLimit } from '@/services/rateLimitService';
+import { z } from 'zod';
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
 export async function POST(request: NextRequest) {
+    const rateLimitResult = await checkRateLimit();
+    if (!rateLimitResult.success) {
+        return NextResponse.json(
+            { error: rateLimitResult.message || 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+        );
+    }
+
     const cookieStore = await cookies()
 
     const supabase = createServerClient(
@@ -19,9 +29,13 @@ export async function POST(request: NextRequest) {
                     return cookieStore.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        cookieStore.set(name, value, options)
-                    )
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // Ignored
+                    }
                 },
             },
         }
@@ -34,7 +48,23 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { biomarkers } = await request.json()
+        const body = await request.json()
+
+        const questionSchema = z.object({
+            biomarkers: z.array(z.object({
+                name: z.string(),
+                value: z.union([z.number(), z.string()]).transform(v => Number(v)).refine(n => !Number.isNaN(n)),
+                unit: z.string(),
+                status: z.string()
+            })).optional()
+        });
+
+        const parseResult = questionSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid input' }, { status: 400 });
+        }
+
+        const { biomarkers } = parseResult.data;
 
         if (!biomarkers || biomarkers.length === 0) {
             return NextResponse.json({ questions: [] });

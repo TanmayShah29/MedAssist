@@ -101,6 +101,7 @@ export function MedicineCabinet() {
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
                     className="p-2 bg-[#F5F4EF] hover:bg-[#EFEDE6] rounded-full transition-colors"
+                    aria-label={showAddForm ? "Close add supplement form" : "Add supplement"}
                 >
                     {showAddForm ? <X size={20} className="text-[#57534E]" /> : <Plus size={20} className="text-[#57534E]" />}
                 </button>
@@ -176,6 +177,7 @@ export function MedicineCabinet() {
                             <button
                                 onClick={() => handleDelete(supp.id)}
                                 className="p-2 text-[#A8A29E] hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100"
+                                aria-label={`Remove ${supp.name}`}
                             >
                                 <Trash2 size={16} />
                             </button>

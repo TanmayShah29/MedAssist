@@ -29,10 +29,6 @@ export function ClientLayout({
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Determine if current page needs the app shell
   const needsAppShell = pathname ? appShellRoutes.some(
     route => pathname.startsWith(route)
@@ -43,20 +39,17 @@ export function ClientLayout({
     route => pathname === route || (route !== "/" && pathname.startsWith(route))
   ) : false;
 
-  // Preloader — only on first app shell load
+  // Lazy initialize loading state only on client mount
   useEffect(() => {
-    if (needsAppShell && mounted) {
+    setMounted(true);
+    if (needsAppShell) {
       try {
-        const hasLoaded = sessionStorage.getItem("medassist_loaded");
-        if (!hasLoaded) {
+        if (!sessionStorage.getItem("medassist_loaded")) {
           setLoading(true);
         }
-      } catch (_e) {
-        // Silently fail if sessionStorage is unavailable (e.g. Private Mode)
-        console.warn("sessionStorage unavailable", _e);
-      }
+      } catch (_e) { }
     }
-  }, [needsAppShell, mounted]);
+  }, [needsAppShell]);
 
   const handlePreloaderComplete = () => {
     try {

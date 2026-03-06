@@ -72,7 +72,7 @@ export function Navbar() {
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                         Basic Tier
                     </div>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="Settings">
                         <Settings className="h-5 w-5" />
                     </Button>
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
@@ -86,6 +86,7 @@ export function Navbar() {
                     size="icon"
                     className="md:hidden"
                     onClick={() => setIsOpen(!isOpen)}
+                    aria-label={isOpen ? "Close menu" : "Open menu"}
                 >
                     {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>

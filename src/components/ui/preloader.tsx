@@ -161,13 +161,13 @@ function MinimalPreloader({ onComplete }: { onComplete?: () => void }) {
 
 // ── Pipeline Preloader ─────────────────────────────────────────────────────
 function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
-    const steps = [
+    const steps = React.useMemo(() => [
         { label: "Groq Medical NLP", ms: 700 },
         { label: "Entity Extraction", ms: 500 },
         { label: "Risk Scoring", ms: 600 },
         { label: "Groq AI Layer", ms: 800 },
         { label: "Ready", ms: 300 },
-    ];
+    ], []);
     const [done, setDone] = React.useState(0);
 
     React.useEffect(() => {
@@ -182,7 +182,7 @@ function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
             elapsed += step.ms;
         });
         return () => timers.forEach(clearTimeout);
-    }, [onComplete]);
+    }, [onComplete, steps]);
 
     return (
         <div className="space-y-6">

@@ -2,6 +2,8 @@
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Shield, Check } from "lucide-react";
 import { StepBasicInfo } from "./components/step-basic-info";
 import { StepSymptoms } from "./components/step-symptoms";
@@ -20,6 +22,20 @@ const STEP_LABELS = [
 
 export default function OnboardingPage() {
     const { currentStep } = useOnboardingStore();
+    const router = useRouter();
+
+    // Safety check: if they somehow get here but are done, send them to dashboard
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (typeof window !== 'undefined') {
+                const isComplete = document.cookie.includes('onboarding_complete=true');
+                if (isComplete) {
+                    router.push('/dashboard');
+                }
+            }
+        };
+        checkStatus();
+    }, [router]);
 
     return (
         <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">

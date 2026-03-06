@@ -33,7 +33,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                         setQuestions(parsed);
                         return; // Found in cache, exit early
                     }
-                } catch (e) {
+                } catch (_e) {
                     // Ignore parsing errors and fetch
                 }
             }

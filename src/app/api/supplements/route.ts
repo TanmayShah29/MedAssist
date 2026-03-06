@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '@/services/rateLimitService';
+import { z } from 'zod';
 
 export async function GET(_request: NextRequest) {
     const cookieStore = await cookies()
@@ -13,9 +15,13 @@ export async function GET(_request: NextRequest) {
                     return cookieStore.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        cookieStore.set(name, value, options)
-                    )
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // Ignored
+                    }
                 },
             },
         }
@@ -35,6 +41,14 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimitResult = await checkRateLimit();
+    if (!rateLimitResult.success) {
+        return NextResponse.json(
+            { error: rateLimitResult.message || 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+        );
+    }
+
     const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -45,9 +59,13 @@ export async function POST(request: NextRequest) {
                     return cookieStore.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        cookieStore.set(name, value, options)
-                    )
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // Ignored
+                    }
                 },
             },
         }
@@ -58,17 +76,22 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.json()
-        const { name, dosage, frequency, start_date } = body
+        const supplementSchema = z.object({
+            name: z.string().trim().min(1, 'Name is required'),
+            dosage: z.string().optional().nullable(),
+            frequency: z.string().optional().nullable(),
+            start_date: z.string().refine((date) => !isNaN(new Date(date).getTime()), {
+                message: 'Invalid start_date. Use YYYY-MM-DD.'
+            })
+        });
 
-        if (!name || !start_date) {
-            return NextResponse.json({ error: 'Name and start date are required' }, { status: 400 })
+        const parseResult = supplementSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid request body' }, { status: 400 });
         }
 
-        const parsedDate = new Date(start_date)
-        if (isNaN(parsedDate.getTime())) {
-            return NextResponse.json({ error: 'Invalid start_date. Use YYYY-MM-DD.' }, { status: 400 })
-        }
-        const startDateIso = parsedDate.toISOString().split('T')[0]
+        const { name, dosage, frequency, start_date } = parseResult.data;
+        const startDateIso = new Date(start_date).toISOString().split('T')[0];
 
         const { data, error } = await supabase
             .from('supplements')
@@ -96,9 +119,13 @@ export async function DELETE(request: NextRequest) {
                     return cookieStore.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        cookieStore.set(name, value, options)
-                    )
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // Ignored
+                    }
                 },
             },
         }

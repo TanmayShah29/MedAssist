@@ -37,6 +37,7 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
                             <button
                                 onClick={onClose}
                                 className="p-2 rounded-md text-[#6B7280] hover:text-white hover:bg-[#1C1C1F] transition-colors"
+                                aria-label="Close"
                             >
                                 <X className="w-5 h-5" />
                             </button>

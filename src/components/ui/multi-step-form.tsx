@@ -284,13 +284,13 @@ function StepUpload({ file, onFile }: {
 
 // ── Step 4: Processing ─────────────────────────────────────────────────────
 function StepProcessing({ onComplete }: { onComplete: () => void }) {
-    const steps = [
+    const steps = React.useMemo(() => [
         { label: "Extracting medical entities", duration: 800 },
         { label: "Running Groq Medical NLP", duration: 1200 },
         { label: "Calculating risk scores", duration: 900 },
         { label: "Generating health insights", duration: 1000 },
         { label: "Updating your dashboard", duration: 600 },
-    ];
+    ], []);
 
     const [currentStep, setCurrentStep] = React.useState(0);
 
@@ -305,7 +305,7 @@ function StepProcessing({ onComplete }: { onComplete: () => void }) {
         const done = setTimeout(onComplete, elapsed + 500);
         timers.push(done);
         return () => timers.forEach(clearTimeout);
-    }, []);
+    }, [onComplete, steps]);
 
     return (
         <div className="space-y-3 py-2">

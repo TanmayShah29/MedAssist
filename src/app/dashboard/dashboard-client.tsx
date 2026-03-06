@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { logger } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -124,13 +124,13 @@ export default function DashboardClient({
     }, []);
 
     // Derived Data taking Demo Mode into account
-    const displayLabResults = demoMode
+    const displayLabResults = useMemo(() => demoMode
         ? [DEMO_LAB_RESULT, ...initialLabResults]
-        : initialLabResults;
+        : initialLabResults, [demoMode, initialLabResults]);
 
-    const displayBiomarkers = demoMode
+    const displayBiomarkers = useMemo(() => demoMode
         ? [...DEMO_HISTORY, ...initialBiomarkers]
-        : initialBiomarkers;
+        : initialBiomarkers, [demoMode, initialBiomarkers]);
 
     // Deduplicate to get the latest entry for each biomarker name
     const latestBiomarkers = Array.from(
@@ -193,8 +193,7 @@ export default function DashboardClient({
     let healthScore = 0;
     if (displayLabResults && displayLabResults.length > 0) {
         const latestResult = displayLabResults[0];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const rawJson: any = latestResult.raw_ai_json;
+        const rawJson = latestResult?.raw_ai_json as { healthScore?: number } | undefined;
         if (rawJson && typeof rawJson.healthScore === 'number') {
             healthScore = rawJson.healthScore;
         }
@@ -221,7 +220,7 @@ export default function DashboardClient({
         : null
 
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] p-6 text-[#1C1917] font-sans" id="dashboard-content">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] px-4 py-6 md:p-6 text-[#1C1917] font-sans" id="dashboard-content">
 
             {/* ── Print-only Header ── */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
@@ -236,20 +235,10 @@ export default function DashboardClient({
             </div>
 
             {/* ── Header row ── */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 24
-            }}>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 style={{
-                            fontFamily: 'Instrument Serif',
-                            fontSize: 32,
-                            color: '#1C1917',
-                            margin: 0
-                        }}>
+                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917] m-0">
                             Clinical Overview
                         </h1>
                         {isOffline && (
@@ -260,20 +249,20 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated ? (
-                        <p style={{ fontSize: 13, color: '#A8A29E', margin: '4px 0 0 0' }}>
+                        <p className="text-[13px] text-[#A8A29E] mt-1">
                             Last report: {lastUpdated}
                         </p>
                     ) : (
-                        <p className="text-[15px] text-[#57534E] mt-1">
+                        <p className="text-[14px] text-[#57534E] mt-1">
                             {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
                             {profile?.first_name || 'Patient'}
                         </p>
                     )}
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 shrink-0 print:hidden">
                     <button
                         onClick={handlePrint}
-                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm print:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Print Report"
                         style={{ WebkitAppearance: 'none' }}
                     >
@@ -282,20 +271,8 @@ export default function DashboardClient({
 
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        style={{
-                            background: '#0EA5E9',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 10,
-                            padding: '10px 20px',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            minHeight: 44
-                        }}
+                        className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2.5 text-sm font-semibold transition-colors flex items-center gap-2 min-h-[44px]"
+                        style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload size={16} />
                         Upload Report

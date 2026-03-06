@@ -34,7 +34,7 @@ export default function LandingPage() {
       setIsSignedIn(!!user);
     }
     checkUser();
-  }, []);
+  }, [supabase.auth]);
 
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7]">

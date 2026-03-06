@@ -33,7 +33,22 @@ export async function POST(req: NextRequest) {
         const supabaseAuth = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            )
+                        } catch {
+                            // Ignored
+                        }
+                    }
+                }
+            }
         );
         const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
         if (!authUser) {
@@ -200,27 +215,27 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
         return NextResponse.json({ success: false, error: 'You must be signed in to save results.' }, { status: 401 });
     }
 
-    let payload: { biomarkers: Array<{ name: string; value: number; unit: string }> };
+    const manualPayloadSchema = z.object({
+        biomarkers: z.array(z.object({
+            name: z.string().trim().min(1),
+            value: z.union([z.number(), z.string()]).transform(v => Number(v)).refine(n => !Number.isNaN(n)),
+            unit: z.string().trim().default('unit').transform(u => u || 'unit')
+        })).min(1, 'Please add at least one biomarker with a valid name and numeric value.')
+    });
+
+    let payloadRaw;
     try {
-        payload = JSON.parse(manualPayloadRaw) as typeof payload;
+        payloadRaw = JSON.parse(manualPayloadRaw);
     } catch {
-        return NextResponse.json({ success: false, error: 'Invalid manual entry data.' }, { status: 400 });
-    }
-    if (!payload?.biomarkers?.length) {
-        return NextResponse.json({ success: false, error: 'Please add at least one biomarker (name, value, unit).' }, { status: 400 });
+        return NextResponse.json({ success: false, error: 'Invalid manual entry data format.' }, { status: 400 });
     }
 
-    const normalized = payload.biomarkers
-        .map((b) => ({
-            name: String(b?.name ?? '').trim(),
-            value: Number(b?.value),
-            unit: String(b?.unit ?? 'unit').trim() || 'unit',
-        }))
-        .filter((b) => b.name.length > 0 && !Number.isNaN(b.value));
-
-    if (normalized.length === 0) {
-        return NextResponse.json({ success: false, error: 'Please add at least one biomarker with a valid name and numeric value.' }, { status: 400 });
+    const parseResult = manualPayloadSchema.safeParse(payloadRaw);
+    if (!parseResult.success) {
+        return NextResponse.json({ success: false, error: parseResult.error.issues[0]?.message || 'Invalid data.' }, { status: 400 });
     }
+
+    const normalized = parseResult.data.biomarkers;
 
     const syntheticText = normalized
         .map((b) => `${b.name}: ${b.value} ${b.unit}`)

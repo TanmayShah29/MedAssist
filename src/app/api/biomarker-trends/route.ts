@@ -1,16 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { checkRateLimit } from '@/services/rateLimitService';
+import { z } from 'zod';
 
 export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const biomarkerName = searchParams.get('name');
-
-    if (!biomarkerName) {
-        return NextResponse.json({ error: 'Biomarker name is required' }, { status: 400 });
+    const rateLimitResult = await checkRateLimit();
+    if (!rateLimitResult.success) {
+        return NextResponse.json(
+            { error: rateLimitResult.message || 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+        );
     }
+
+    const { searchParams } = new URL(req.url);
+    const rawName = searchParams.get('name');
+
+    const querySchema = z.object({
+        name: z.string().min(1, 'Biomarker name is required').max(200)
+    });
+
+    const parseResult = querySchema.safeParse({ name: rawName });
+    if (!parseResult.success) {
+        return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid parameter' }, { status: 400 });
+    }
+    const biomarkerName = parseResult.data.name;
 
     const cookieStore = await cookies();
     const supabase = createServerClient(

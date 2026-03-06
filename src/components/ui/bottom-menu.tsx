@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     MessageSquare,
@@ -16,16 +17,16 @@ export interface MenuItem {
     id: string;
     label: string;
     icon: React.ReactNode;
-    href?: string;
+    href: string;
     badge?: number;
 }
 
 const DEFAULT_ITEMS: MenuItem[] = [
-    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: "results", label: "Results", icon: <FlaskConical className="w-5 h-5" />, badge: 2 },
-    { id: "assistant", label: "AI", icon: <MessageSquare className="w-5 h-5" /> },
-    { id: "profile", label: "Profile", icon: <User className="w-5 h-5" /> },
-    { id: "settings", label: "Settings", icon: <Settings className="w-5 h-5" /> },
+    { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: "results", label: "Results", href: "/results", icon: <FlaskConical className="w-5 h-5" />, badge: 2 },
+    { id: "assistant", label: "AI", href: "/assistant", icon: <MessageSquare className="w-5 h-5" /> },
+    { id: "profile", label: "Profile", href: "/profile", icon: <User className="w-5 h-5" /> },
+    { id: "settings", label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
 ];
 
 export interface BottomMenuProps {
@@ -42,11 +43,18 @@ export function BottomMenu({
     onChange,
     className,
 }: BottomMenuProps) {
+    const router = useRouter();
     const [active, setActive] = React.useState(activeId || items[0]?.id);
 
-    const handleSelect = (id: string) => {
-        setActive(id);
-        onChange?.(id);
+    // Keep active in sync when activeId prop changes (e.g. on route change)
+    React.useEffect(() => {
+        if (activeId) setActive(activeId);
+    }, [activeId]);
+
+    const handleSelect = (item: MenuItem) => {
+        setActive(item.id);
+        onChange?.(item.id);
+        router.push(item.href);
     };
 
     return (
@@ -66,7 +74,7 @@ export function BottomMenu({
                     return (
                         <button
                             key={item.id}
-                            onClick={() => handleSelect(item.id)}
+                            onClick={() => handleSelect(item)}
                             className="relative flex flex-col items-center gap-1 px-3 py-3 
                          min-w-[56px] rounded-lg transition-colors"
                             aria-label={item.label}

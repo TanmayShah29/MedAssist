@@ -220,8 +220,8 @@ Rules:
         if (error instanceof Error && error.name === 'AbortError') {
             throw new Error('AI analysis timed out. Please try again.');
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
+        const isRateLimit = (error as { status?: number })?.status === 429 || (error as Error).message?.includes("rate_limit");
+        if (isRateLimit) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
@@ -290,8 +290,8 @@ Rules:
 
         return completion.choices[0].message.content || "";
     } catch (error: unknown) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
+        const isRateLimit = (error as { status?: number })?.status === 429 || (error as Error).message?.includes("rate_limit");
+        if (isRateLimit) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );
@@ -350,8 +350,8 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
 
         return completion.choices[0].message.content || "";
     } catch (error: unknown) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((error as any).status === 429 || (error as Error).message?.includes("rate_limit")) {
+        const isRateLimit = (error as { status?: number })?.status === 429 || (error as Error).message?.includes("rate_limit");
+        if (isRateLimit) {
             throw new Error(
                 "RATE_LIMIT: Too many requests. Please wait a minute and try again."
             );

@@ -19,6 +19,18 @@ function AuthContent() {
     const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
+    // Helper to clear stale onboarding state before signup
+    const clearOnboardingState = () => {
+        if (typeof window !== 'undefined') {
+            try {
+                // Clear state store
+                window.localStorage.removeItem('medassist-onboarding');
+                // Clear the cookie that middleware uses
+                document.cookie = "onboarding_complete=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            } catch (_e) { }
+        }
+    };
+
     useEffect(() => {
         const modeParam = searchParams.get('mode');
         if (modeParam === 'signup') setMode('signup');
@@ -31,6 +43,9 @@ function AuthContent() {
 
         try {
             if (mode === 'signup') {
+                // Clear any stale state before creating a new account
+                clearOnboardingState();
+
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -41,16 +56,14 @@ function AuthContent() {
                 if (error) throw error;
 
                 if (data.user && !data.session) {
-                    toast.success("Check your email to confirm your account, then sign in.", { duration: 10000 });
-                    // Also use a standard alert just in case the toast is missed by the user
-                    alert("Account created successfully! Please check your email to confirm your account before logging in.");
+                    toast.success("Confirmation email sent!", {
+                        description: "Please check your email to confirm your account, then you can sign in.",
+                        duration: 10000
+                    });
                     return;
                 }
 
-                // Clear any leftover onboarding state from previous users before starting
-                if (typeof window !== 'undefined') {
-                    try { window.localStorage.removeItem('medassist-onboarding'); } catch (_e) { }
-                }
+                // Stale state already cleared above for clarity
 
                 router.push('/onboarding');
             } else {
@@ -77,11 +90,12 @@ function AuthContent() {
         } catch (error: unknown) {
             console.error("Auth error:", error);
             const msg = (error as Error).message || "Authentication failed";
-            toast.error(msg, { duration: 5000 });
-            // If the user gets stuck, standard alert is visceral
-            if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("password") || msg.toLowerCase().includes("already registered")) {
-                alert(msg);
-            }
+            toast.error(msg, {
+                description: msg.toLowerCase().includes("rate limit")
+                    ? "Too many requests. Please wait a minute."
+                    : "Please check your details and try again.",
+                duration: 5000
+            });
         } finally {
             setIsLoading(false);
         }

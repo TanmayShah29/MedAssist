@@ -3,6 +3,14 @@ export const IMAGE_BASED_PDF_MESSAGE =
     'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
 const OCR_TIMEOUT_MS = 58_000; // 58s to avoid hung requests, max limit for Vercel Hobby is 60s
 
+interface OCRResponse {
+    IsErroredOnProcessing?: boolean;
+    ErrorMessage?: string[];
+    ParsedResults?: Array<{
+        ParsedText: string;
+    }>;
+}
+
 export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'application/pdf'): Promise<string> {
     const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
 
@@ -37,18 +45,14 @@ export async function extractPdfText(fileBuffer: Buffer, mimeType: string = 'app
         clearTimeout(timeoutId)
     }
 
-    const data = await response.json()
+    const data = (await response.json()) as OCRResponse;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!response.ok || (data as any).IsErroredOnProcessing) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        throw new Error(`OCR failed: ${(data as any).ErrorMessage?.[0] || 'Unknown error'}`)
+    if (!response.ok || data.IsErroredOnProcessing) {
+        throw new Error(`OCR failed: ${data.ErrorMessage?.[0] || 'Unknown error'}`)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const text = (data as any).ParsedResults
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ?.map((r: any) => r.ParsedText)
+    const text = data.ParsedResults
+        ?.map((r) => r.ParsedText)
         .join('\n') || ''
 
     if (!text || text.trim().length < 50) {

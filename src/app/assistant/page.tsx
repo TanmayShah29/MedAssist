@@ -259,6 +259,7 @@ export default function AssistantPage() {
                     <button
                         onClick={handleSendMessage}
                         disabled={!inputValue.trim() || isProcessing}
+                        aria-label="Send message"
                         style={{
                             background: isProcessing || !inputValue.trim() ? '#94A3B8' : '#0EA5E9',
                             cursor: isProcessing || !inputValue.trim() ? 'not-allowed' : 'pointer',
