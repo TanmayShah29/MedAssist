@@ -16,7 +16,9 @@ import {
     WifiOff,
 
     Sparkles,
-    ArrowRight
+    ArrowRight,
+    TrendingUp,
+    TrendingDown
 } from 'lucide-react'
 
 
@@ -66,6 +68,143 @@ function getDelta(current: number | string, previous: number | string | null | u
     const diff = curr - prev;
     const percent = Math.round((diff / prev) * 100);
     return { diff, percent };
+}
+
+function PriorityActionBanner({ criticalCount }: { criticalCount: number }) {
+    if (criticalCount === 0) return null;
+
+    return (
+        <div style={{
+            background: '#FEF2F2',
+            border: '1px solid #FECACA',
+            borderLeft: '4px solid #DC2626',
+            borderRadius: 14,
+            padding: '16px 20px',
+            marginBottom: 24,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap'
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ background: '#DC2626', color: 'white', padding: 8, borderRadius: 10 }}>
+                    <AlertCircle size={20} />
+                </div>
+                <div>
+                    <h4 style={{ color: '#991B1B', fontWeight: 700, fontSize: 16, margin: 0 }}>Action Needed</h4>
+                    <p style={{ color: '#B91C1C', fontSize: 13, margin: '2px 0 0 0' }}>
+                        We identified {criticalCount} {criticalCount === 1 ? 'critical finding' : 'critical findings'} in your latest report.
+                    </p>
+                </div>
+            </div>
+            <button
+                onClick={() => {
+                    const el = document.getElementById('personalized-care-plan');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                style={{
+                    background: '#DC2626',
+                    color: 'white',
+                    padding: '8px 16px',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer'
+                }}
+            >
+                Review Clinical Insights
+            </button>
+        </div>
+    );
+}
+
+function LongitudinalComparisonCard({
+    latestBiomarkers,
+    previousBiomarkers,
+    reportDate,
+    previousReportDate
+}: {
+    latestBiomarkers: Biomarker[],
+    previousBiomarkers: Biomarker[],
+    reportDate: string,
+    previousReportDate: string
+}) {
+    const changes = latestBiomarkers.map(curr => {
+        const prev = previousBiomarkers.find(p => p.name === curr.name);
+        if (!prev) return null;
+        const delta = getDelta(curr.value, prev.value);
+        if (!delta || Math.abs(delta.percent) < 5) return null; // Only show >5% change
+        return {
+            name: curr.name,
+            currentValue: curr.value,
+            previousValue: prev.value,
+            unit: curr.unit,
+            percent: delta.percent,
+            status: curr.status
+        };
+    }).filter(Boolean) as any[];
+
+    if (changes.length === 0) return null;
+
+    // Show 3 biggest changes
+    const topChanges = changes.sort((a, b) => Math.abs(b.percent) - Math.abs(a.percent)).slice(0, 3);
+
+    return (
+        <div style={{
+            background: 'white',
+            border: '1px solid #E8E6DF',
+            borderRadius: 18,
+            padding: 24,
+            marginBottom: 24
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1C1917', margin: 0 }}>Progress Report</h3>
+                    <p style={{ fontSize: 12, color: '#A8A29E', margin: '4px 0 0 0' }}>
+                        Changes from {new Date(previousReportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} to {new Date(reportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    </p>
+                </div>
+                <div style={{ background: '#F0F9FF', color: '#0EA5E9', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+                    {changes.length} significant changes
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                {topChanges.map((change, idx) => (
+                    <div key={idx} style={{
+                        padding: 16,
+                        background: '#FAF9F6',
+                        borderRadius: 12,
+                        border: '1px solid #E8E6DF'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#44403C' }}>{change.name}</span>
+                            <span style={{
+                                fontSize: 12,
+                                fontWeight: 700,
+                                color: change.percent > 0 ? (change.status === 'optimal' ? '#059669' : '#DC2626') : (change.status === 'optimal' ? '#059669' : '#DC2626'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4
+                            }}>
+                                {change.percent > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                {Math.abs(change.percent)}%
+                            </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                            <span style={{ fontSize: 20, fontWeight: 800, color: '#1C1917' }}>{change.currentValue}</span>
+                            <span style={{ fontSize: 12, color: '#A8A29E' }}>{change.unit}</span>
+                        </div>
+                        <p style={{ fontSize: 11, color: '#78716C', margin: '4px 0 0 0' }}>
+                            Was {change.previousValue} {change.unit}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 // ── Chart Components ──
@@ -145,6 +284,7 @@ export default function DashboardClient({
 
     const latestLabResult = displayLabResults[0];
     const longitudinalInsights: string[] = (latestLabResult?.raw_ai_json?.longitudinalInsights as string[]) || [];
+    const symptomConnections: any[] = (latestLabResult as any)?.symptom_connections || [];
 
     // Offline Resilience: Save to LocalStorage (never mix demo with real data)
     useEffect(() => {
@@ -457,6 +597,66 @@ export default function DashboardClient({
                     <div className="flex flex-col gap-6 mb-6">
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
+                        {symptomConnections.length > 0 && (
+                            <div style={{
+                                background: '#FFF7ED',
+                                border: '1px solid #FED7AA',
+                                borderLeft: '4px solid #F59E0B',
+                                borderRadius: 14,
+                                padding: 24,
+                                marginBottom: 16
+                            }}>
+                                <p style={{
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    color: '#92400E',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.06em',
+                                    margin: '0 0 16px 0'
+                                }}>
+                                    YOUR SYMPTOMS MAY BE CONNECTED TO THESE RESULTS
+                                </p>
+                                {symptomConnections.map((conn: any) => (
+                                    <div key={conn.symptom} style={{
+                                        marginBottom: 16,
+                                        paddingBottom: 16,
+                                        borderBottom: '1px solid #FED7AA'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                                            <div style={{
+                                                background: '#F59E0B',
+                                                color: 'white',
+                                                borderRadius: 6,
+                                                padding: '2px 10px',
+                                                fontSize: 12,
+                                                fontWeight: 600
+                                            }}>
+                                                {conn.symptom}
+                                            </div>
+                                            <span style={{ fontSize: 12, color: '#A8A29E' }}>
+                                                may be related to
+                                            </span>
+                                            {conn.relatedBiomarkers.map((b: string) => (
+                                                <div key={b} style={{
+                                                    background: '#F5F4EF',
+                                                    border: '1px solid #E8E6DF',
+                                                    borderRadius: 6,
+                                                    padding: '2px 8px',
+                                                    fontSize: 12,
+                                                    color: '#57534E'
+                                                }}>
+                                                    {b}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p style={{ fontSize: 13, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
+                                            {conn.explanation}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Section 6a — Symptom empty state notice */}
                         {initialSymptoms.length === 0 && totalCount > 0 && (
                             <div style={{
@@ -486,12 +686,24 @@ export default function DashboardClient({
                             </div>
                         )}
 
+                        {/* Feature 3: Longitudinal Comparison */}
+                        {displayLabResults.length >= 2 && (
+                            <LongitudinalComparisonCard
+                                latestBiomarkers={latestBiomarkers}
+                                previousBiomarkers={displayBiomarkers.filter(b => b.lab_result_id === displayLabResults[1].id)}
+                                reportDate={displayLabResults[0].uploaded_at || displayLabResults[0].created_at || ''}
+                                previousReportDate={displayLabResults[1].uploaded_at || displayLabResults[1].created_at || ''}
+                            />
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <HealthScoreOverview
                                 score={healthScore}
                                 optimalCount={optimalCount}
                                 warningCount={warningCount}
                                 criticalCount={criticalCount}
+                                biomarkers={latestBiomarkers}
+                                onClick={() => setShowScoreModal(true)}
                             />
                             <TrendSnapshot
                                 latestBiomarkers={latestBiomarkers}
@@ -507,7 +719,7 @@ export default function DashboardClient({
             {
                 totalCount > 0 && (
                     <>
-                        <div className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
+                        <div id="personalized-care-plan" className="bg-[#0F172A] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <Sparkles size={120} />
                             </div>
@@ -624,127 +836,149 @@ export default function DashboardClient({
 
 
             {/* ── Grouped Biomarkers (Core Data) ── */}
-            <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
-                    <div className="flex gap-4 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter" style={{ marginLeft: 'auto' }}>
-                        <span style={{ marginRight: 12 }}>Optimal: {optimalCount}</span>
-                        <span style={{ marginRight: 12 }}>Monitor: {warningCount}</span>
-                        <span>Action: {criticalCount}</span>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter">
+                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />Optimal: {optimalCount}</span>
+                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" />Monitor: {warningCount}</span>
+                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-500" />Action: {criticalCount}</span>
                 </div>
+            </div>
 
-                {biomarkers.length === 0 ? (
-                    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6">
-                            <ClipboardList className="w-8 h-8 text-[#A8A29E]" />
-                        </div>
-                        <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
-                        <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
-                            Upload your first lab report to see your health overview.
-                        </p>
-                        <button
-                            onClick={() => setShowUploadModal(true)}
-                            className="text-white rounded-[10px] px-6 py-3 font-medium bg-sky-500 hover:bg-sky-600 transition-colors"
-                            style={{ WebkitAppearance: 'none' }}
-                        >
-                            Upload your first report
-                        </button>
+            {biomarkers.length === 0 ? (
+                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
+                    <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6">
+                        <ClipboardList className="w-8 h-8 text-[#A8A29E]" />
                     </div>
-                ) : (
-                    <div className="space-y-8">
-                        {['hematology', 'metabolic', 'inflammation', 'vitamins', 'other'].map(cat => {
-                            // Category fallback logic: anything not in the first 4 goes to 'other'
-                            const catBiomarkers = latestBiomarkers.filter(b => {
-                                const bCat = b.category?.toLowerCase() || 'other';
-                                if (cat === 'other') {
-                                    return !['hematology', 'metabolic', 'inflammation', 'vitamins'].includes(bCat);
-                                }
-                                return bCat === cat;
-                            });
+                    <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
+                    <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
+                        Upload your first lab report to see your health overview.
+                    </p>
+                    <button
+                        onClick={() => setShowUploadModal(true)}
+                        className="text-white rounded-[10px] px-6 py-3 font-medium bg-sky-500 hover:bg-sky-600 transition-colors"
+                        style={{ WebkitAppearance: 'none' }}
+                    >
+                        Upload your first report
+                    </button>
+                </div>
+            ) : (
+                <div className="space-y-8">
+                    {['hematology', 'metabolic', 'inflammation', 'vitamins', 'other'].map(cat => {
+                        // Category fallback logic: anything not in the first 4 goes to 'other'
+                        const catBiomarkers = latestBiomarkers.filter(b => {
+                            const bCat = b.category?.toLowerCase() || 'other';
+                            if (cat === 'other') {
+                                return !['hematology', 'metabolic', 'inflammation', 'vitamins'].includes(bCat);
+                            }
+                            return bCat === cat;
+                        });
 
-                            if (catBiomarkers.length === 0) return null;
+                        if (catBiomarkers.length === 0) return null;
 
-                            return (
-                                <div key={cat} className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
-                                        <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {catBiomarkers.map((b) => {
-                                            const prev = displayBiomarkers.find(pb =>
-                                                pb.name === b.name &&
-                                                pb.lab_result_id !== latestLabResult?.id
-                                            );
-                                            const delta = getDelta(parseFloat(String(b.value)), prev?.value !== undefined ? parseFloat(String(prev.value)) : undefined);
+                        return (
+                            <div key={cat} className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
+                                    <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {catBiomarkers.map((b) => {
+                                        const prev = displayBiomarkers.find(pb =>
+                                            pb.name === b.name &&
+                                            pb.lab_result_id !== latestLabResult?.id
+                                        );
+                                        const delta = getDelta(parseFloat(String(b.value)), prev?.value !== undefined ? parseFloat(String(prev.value)) : undefined);
 
-                                            return (
+                                        return (
+                                            <div
+                                                key={b.id}
+                                                className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
+                                                onClick={() => handleBiomarkerClick(b)}
+                                                onTouchStart={(e) => {
+                                                    const el = e.currentTarget;
+                                                    // Prevent double-activation if hover is also active
+                                                    if (el.classList.contains('active-tooltip')) return;
+                                                    el.classList.add('active-tooltip');
+                                                    setTimeout(() => el.classList.remove('active-tooltip'), 3000);
+                                                }}
+                                            >
+                                                {/* Plain English Tooltip - Safari prefix added via utility class for safety */}
                                                 <div
-                                                    key={b.id}
-                                                    className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
-                                                    onClick={() => handleBiomarkerClick(b)}
-                                                    onTouchStart={(e) => {
-                                                        const el = e.currentTarget;
-                                                        el.classList.add('active-tooltip');
-                                                        setTimeout(() => el.classList.remove('active-tooltip'), 3000);
+                                                    className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm transform-gpu gpu-accelerate"
+                                                    style={{
+                                                        WebkitTransition: "all 0.2s ease-out"
                                                     }}
                                                 >
-                                                    {/* Plain English Tooltip - Safari prefix added via utility class for safety */}
-                                                    <div
-                                                        className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm transform-gpu gpu-accelerate"
-                                                        style={{
-                                                            WebkitTransition: "all 0.2s ease-out"
-                                                        }}
-                                                    >
-                                                        <p className="text-white text-[11px] font-medium leading-relaxed">
-                                                            {BIOMARKER_DEFINITIONS[b.name] || 'Clinical biomarker used to assess specific metabolic or systemic health functions.'}
-                                                        </p>
-                                                    </div>
+                                                    <p className="text-white text-[11px] font-medium leading-relaxed">
+                                                        {BIOMARKER_DEFINITIONS[b.name] || 'Clinical biomarker used to assess specific metabolic or systemic health functions.'}
+                                                    </p>
+                                                </div>
 
-                                                    <div className="flex justify-between items-start">
-                                                        <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.status === 'optimal' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                                            b.status === 'warning' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                                                'bg-red-50 text-red-700 border-red-100'
-                                                            }`}>
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'optimal' ? 'bg-emerald-500' :
-                                                                b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
-                                                                }`} />
-                                                            {b.status.toUpperCase()}
-                                                        </div>
-                                                        <div className="text-right" style={{ marginLeft: 'auto' }}>
-                                                            <div className="text-[15px] font-bold text-[#1C1917]">{b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span></div>
-                                                            {delta ? (
-                                                                <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${delta.diff > 0 ? (b.status === 'optimal' ? 'text-emerald-600' : 'text-red-600') : (b.status === 'optimal' ? 'text-red-600' : 'text-emerald-600')}`}>
-                                                                    {delta.diff > 0 ? (
-                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m18 15-6-6-6 6" /></svg>
-                                                                    ) : (
-                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m6 9 6 6 6-6" /></svg>
-                                                                    )}
-                                                                    {Math.abs(delta.percent)}% from last
-                                                                </div>
-                                                            ) : (
-                                                                <div className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-tighter">No previous data</div>
-                                                            )}
-                                                        </div>
+                                                <div className="flex justify-between items-start">
+                                                    <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.status === 'optimal' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                        b.status === 'warning' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                            'bg-red-50 text-red-700 border-red-100'
+                                                        }`}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'optimal' ? 'bg-emerald-500' :
+                                                            b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                                                            }`} />
+                                                        {b.status.toUpperCase()}
                                                     </div>
-
-                                                    <div className="grow shrink basis-0">
-                                                        <span className="text-[15px] font-bold text-[#1C1917] block mb-1">{b.name}</span>
-                                                        <p className="text-[11px] text-[#A8A29E] line-clamp-1 leading-relaxed italic">
-                                                            {b.ai_interpretation || 'Clinical data point extracted from report.'}
-                                                        </p>
+                                                    <div className="text-right" style={{ marginLeft: 'auto' }}>
+                                                        <div className="text-[15px] font-bold text-[#1C1917]">{b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span></div>
+                                                        {delta ? (
+                                                            <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${delta.diff > 0 ? (b.status === 'optimal' ? 'text-emerald-600' : 'text-red-600') : (b.status === 'optimal' ? 'text-red-600' : 'text-emerald-600')}`}>
+                                                                {delta.diff > 0 ? (
+                                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m18 15-6-6-6 6" /></svg>
+                                                                ) : (
+                                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 2 }}><path d="m6 9 6 6 6-6" /></svg>
+                                                                )}
+                                                                {Math.abs(delta.percent)}% from last
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-tighter">No previous data</div>
+                                                        )}
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+
+                                                <div className="grow shrink basis-0 flex flex-col">
+                                                    <span className="text-[15px] font-bold text-[#1C1917] block mb-1">{b.name}</span>
+                                                    <p className="text-[11px] text-[#A8A29E] line-clamp-2 leading-relaxed italic mb-auto">
+                                                        {b.ai_interpretation || 'Clinical data point extracted from report.'}
+                                                    </p>
+
+                                                    {b.reference_range_min !== undefined && b.reference_range_min !== null &&
+                                                        b.reference_range_max !== undefined && b.reference_range_max !== null &&
+                                                        b.reference_range_max > b.reference_range_min && (
+                                                            <div className="mt-3">
+                                                                <div className="flex justify-between text-[10px] text-[#A8A29E] font-medium mb-1">
+                                                                    <span>{b.reference_range_min}</span>
+                                                                    <span>{b.reference_range_max} {b.unit}</span>
+                                                                </div>
+                                                                <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
+                                                                    <div
+                                                                        className={`absolute top-0 bottom-0 left-0 rounded-full ${b.status === 'optimal' ? 'bg-emerald-500' :
+                                                                            b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                                                                            }`}
+                                                                        style={{
+                                                                            width: `${Math.max(0, Math.min(100, ((Number(b.value) - b.reference_range_min) / (b.reference_range_max - b.reference_range_min)) * 100))}%`,
+                                                                            minWidth: '4px'
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             {/* ── Medicine Cabinet (Supplementary Care) ── */}
             {
@@ -790,29 +1024,49 @@ export default function DashboardClient({
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
 
-                            <h3 className="text-2xl font-bold text-[#1C1917] mb-4 relative">Scoring Methodology</h3>
+                            <h3 className="text-2xl font-bold text-[#1C1917] mb-4 relative">Score Breakdown</h3>
                             <p className="text-sm text-[#57534E] mb-6 relative">
-                                Your health score is an optimistic calculation designed to provide clinical clarity while rewarding healthy biomarkers.
+                                Your health score is calculated based on these clinical categories and their respective importance to overall wellness.
                             </p>
 
-                            <div className="space-y-4 relative mb-8">
-                                <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                    <span className="text-xs font-bold text-emerald-700 uppercase">Optimal Value</span>
-                                    <span className="text-sm font-bold text-emerald-700">+100 pts</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
-                                    <span className="text-xs font-bold text-amber-700 uppercase">Monitor (Warning)</span>
-                                    <span className="text-sm font-bold text-amber-700">+75 pts</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
-                                    <span className="text-xs font-bold text-red-700 uppercase">Action Needed</span>
-                                    <span className="text-sm font-bold text-red-700">+40 pts</span>
-                                </div>
+                            <div className="space-y-3 mb-8 relative">
+                                {[
+                                    { name: 'Hematology', weight: 10 },
+                                    { name: 'Metabolic', weight: 15 },
+                                    { name: 'Inflammation', weight: 10 },
+                                    { name: 'Vitamins', weight: 5 }
+                                ].map(cat => {
+                                    const catMarkers = latestBiomarkers.filter(b => b.category?.toLowerCase() === cat.name.toLowerCase());
+                                    const optimalInCat = catMarkers.filter(b => b.status === 'optimal').length;
+                                    const totalInCat = catMarkers.length;
+
+                                    return (
+                                        <div key={cat.name} className="flex flex-col gap-2 p-3 bg-white border border-[#E8E6DF] rounded-xl">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-bold text-[#44403C] uppercase">{cat.name}</span>
+                                                <span className="text-[10px] font-bold text-sky-600">WEIGHT: {cat.weight}</span>
+                                            </div>
+                                            {totalInCat > 0 ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="grow h-1.5 bg-[#F5F4EF] rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-emerald-500 rounded-full"
+                                                            style={{ width: `${(optimalInCat / totalInCat) * 100}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-emerald-600">{optimalInCat}/{totalInCat} OPT</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-[10px] text-[#A8A29E] italic">Data not present in latest report</span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <div className="p-4 bg-[#F5F4EF] rounded-xl border border-[#E8E6DF] mb-6">
                                 <p className="text-[11px] leading-relaxed text-[#57534E]">
-                                    <strong>The Optimism Rule:</strong> If your report contains at least one Optimal biomarker, your score cannot fall below 50. This prevents minor deviations from being demoralizing while still highlighting areas for focus.
+                                    <strong>The Optimism Rule:</strong> If your report contains at least one Optimal biomarker, your score cannot fall below 50. This prevents minor deviations from being demoralizing.
                                 </p>
                             </div>
 
@@ -821,7 +1075,7 @@ export default function DashboardClient({
                                 className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black transition-all"
                                 style={{ WebkitAppearance: 'none' }}
                             >
-                                Understood
+                                Close
                             </button>
                         </motion.div>
                     </motion.div>

@@ -149,7 +149,9 @@ export async function POST(req: NextRequest) {
             labValues: analysisResult.biomarkers as unknown as ExtractedLabValue[],
             fileName: file.name,
             rawOcrText: extractedText,
-            rawAiJson: analysisResult
+            rawAiJson: analysisResult,
+            symptomConnections: analysisResult.symptomConnections,
+            plainSummary: analysisResult.plainSummary
         });
 
         if (!saveResult.success) {

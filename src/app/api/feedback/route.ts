@@ -52,7 +52,10 @@ export async function POST(req: NextRequest) {
             }
         );
         const { data: { user } } = await supabase.auth.getUser();
-        if (user) userId = user.id;
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        userId = user.id;
 
         if (!supabaseAdmin) {
             return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 });

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { validateAndRecalculateScore, normalizeStatus } from '../lib/health-logic';
 
 describe('Health Logic Utilities', () => {
-    
+
     describe('normalizeStatus', () => {
         it('should normalize "normal" to "optimal"', () => {
             expect(normalizeStatus('normal')).toBe('optimal');
@@ -22,11 +22,7 @@ describe('Health Logic Utilities', () => {
     });
 
     describe('validateAndRecalculateScore', () => {
-        it('should return the groqScore if it is valid (0-100)', () => {
-            expect(validateAndRecalculateScore(85, [])).toBe(85);
-        });
-
-        it('should recalculate if groqScore is 0 or invalid', () => {
+        it('should always recalculate based on biomarker statuses, ignoring groqScore', () => {
             const biomarkers = [
                 { status: 'optimal' },
                 { status: 'optimal' },
@@ -45,7 +41,7 @@ describe('Health Logic Utilities', () => {
             ];
             // ((100*1) + (40*3)) / 4 = 220 / 4 = 55 (already above floor)
             expect(validateAndRecalculateScore(0, biomarkers)).toBe(55);
-            
+
             const lowBiomarkers = [
                 { status: 'optimal' },
                 { status: 'critical' },

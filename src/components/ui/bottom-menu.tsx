@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import {
     LayoutDashboard,
     MessageSquare,
@@ -16,17 +17,17 @@ import { cn } from "@/lib/utils";
 export interface MenuItem {
     id: string;
     label: string;
-    icon: React.ReactNode;
+    icon: React.ElementType;
     href: string;
     badge?: number;
 }
 
 const DEFAULT_ITEMS: MenuItem[] = [
-    { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: "results", label: "Results", href: "/results", icon: <FlaskConical className="w-5 h-5" />, badge: 2 },
-    { id: "assistant", label: "AI", href: "/assistant", icon: <MessageSquare className="w-5 h-5" /> },
-    { id: "profile", label: "Profile", href: "/profile", icon: <User className="w-5 h-5" /> },
-    { id: "settings", label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { id: "results", label: "Results", href: "/results", icon: FlaskConical, badge: 2 },
+    { id: "assistant", label: "AI", href: "/assistant", icon: MessageSquare },
+    { id: "profile", label: "Profile", href: "/profile", icon: User },
+    { id: "settings", label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export interface BottomMenuProps {
@@ -39,84 +40,54 @@ export interface BottomMenuProps {
 // ── Component ──────────────────────────────────────────────────────────────
 export function BottomMenu({
     items = DEFAULT_ITEMS,
-    activeId,
-    onChange,
     className,
 }: BottomMenuProps) {
-    const router = useRouter();
-    const [active, setActive] = React.useState(activeId || items[0]?.id);
-
-    // Keep active in sync when activeId prop changes (e.g. on route change)
-    React.useEffect(() => {
-        if (activeId) setActive(activeId);
-    }, [activeId]);
-
-    const handleSelect = (item: MenuItem) => {
-        setActive(item.id);
-        onChange?.(item.id);
-        router.push(item.href);
-    };
+    const pathname = usePathname();
 
     return (
         <nav
             className={cn(
-                // Only visible on mobile — hidden on lg+ where sidebar takes over
-                "fixed bottom-0 left-0 right-0 z-50 lg:hidden",
+                "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
                 "bg-white/80 backdrop-blur-xl border-t border-slate-200",
-                "px-2 pb-[env(safe-area-inset-bottom)]",
+                "pb-[env(safe-area-inset-bottom)]",
                 "gpu-accelerate",
                 className
             )}
         >
-            <div className="flex items-center justify-around">
+            <div className="flex justify-between items-center px-4 pt-3 pb-3 relative">
                 {items.map((item) => {
-                    const isActive = active === item.id;
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
                     return (
-                        <button
-                            key={item.id}
-                            onClick={() => handleSelect(item)}
-                            className="relative flex flex-col items-center gap-1 px-3 py-3 
-                         min-w-[56px] rounded-lg transition-colors"
-                            aria-label={item.label}
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "flex flex-col items-center gap-1 group relative py-1 px-2 transition-all duration-200 active:scale-95 flex-1",
+                                isActive ? "text-sky-500" : "text-[#A8A29E] hover:text-[#57534E]"
+                            )}
                         >
-                            {/* Active Dot Indicator - NEW DESIGN */}
+                            <div className={cn(
+                                "p-1.5 rounded-xl transition-colors duration-200",
+                                isActive ? "bg-sky-50" : "group-hover:bg-[#F5F4EF]"
+                            )}>
+                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+
                             {isActive && (
                                 <motion.div
-                                    layoutId="bottom-menu-indicator"
-                                    className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-sky-500"
-                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                    layoutId="bottom-menu-active-dot"
+                                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-sky-500 rounded-full"
                                 />
                             )}
 
-                            {/* Badge */}
                             {item.badge && item.badge > 0 && (
-                                <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 
-                                 rounded-full bg-red-500 text-white text-[9px] 
-                                 font-bold flex items-center justify-center z-10">
+                                <span className="absolute top-0 right-1 sm:right-2 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center z-10">
                                     {item.badge > 9 ? "9+" : item.badge}
                                 </span>
                             )}
-
-                            {/* Icon */}
-                            <motion.span
-                                animate={{
-                                    color: isActive ? "#0EA5E9" : "#94A3B8",
-                                    scale: isActive ? 1.0 : 1,
-                                }}
-                                transition={{ duration: 0.15 }}
-                                className="relative z-10"
-                            >
-                                {item.icon}
-                            </motion.span>
-
-                            {/* Label */}
-                            <motion.span
-                                animate={{ color: isActive ? "#0EA5E9" : "#94A3B8" }}
-                                className="relative z-10 text-[10px] font-medium leading-none"
-                            >
-                                {item.label}
-                            </motion.span>
-                        </button>
+                        </Link>
                     );
                 })}
             </div>

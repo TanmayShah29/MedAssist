@@ -22,6 +22,8 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "mg/dL",
         status: "optimal",
         category: "metabolic",
+        reference_range_min: 70,
+        reference_range_max: 99,
         created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Glucose is within optimal range."
     },
@@ -32,6 +34,8 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "mg/dL",
         status: "warning",
         category: "metabolic",
+        reference_range_min: 70,
+        reference_range_max: 99,
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Glucose has risen 15% over the last quarter. This confirms a pre-diabetic trend that warrants dietary review."
     },

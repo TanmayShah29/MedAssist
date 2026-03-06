@@ -9,6 +9,8 @@ interface HealthScoreOverviewProps {
     optimalCount: number;
     warningCount: number;
     criticalCount: number;
+    biomarkers?: any[];
+    onClick?: () => void;
 }
 
 function getScoreLabel(score: number): { label: string; color: string; bg: string } {
@@ -18,7 +20,7 @@ function getScoreLabel(score: number): { label: string; color: string; bg: strin
     return { label: "Needs Attention", color: "#991B1B", bg: "#FFF1F2" };
 }
 
-export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount }: HealthScoreOverviewProps) {
+export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount, biomarkers = [], onClick }: HealthScoreOverviewProps) {
     const [displayScore, setDisplayScore] = useState(0);
 
     useEffect(() => {
@@ -39,7 +41,10 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
     const scoreInfo = getScoreLabel(score);
 
     return (
-        <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-center relative group">
+        <div
+            onClick={onClick}
+            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-center relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md' : ''}`}
+        >
             <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider mb-2 flex items-center justify-between">
                 Health Stability Score
                 <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">

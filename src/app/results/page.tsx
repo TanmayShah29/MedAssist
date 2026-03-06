@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react'
 import { logger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, RefreshCw } from 'lucide-react'
+import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, RefreshCw, AlertCircle, Sparkles } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { TrustLayer } from '@/components/trust-layer'
 import { Biomarker } from '@/types/medical'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
+import { RangeBar } from '@/components/ui/range-bar'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -18,105 +19,7 @@ const WellnessTrendChart = dynamic(
 
 const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
 
-// ── Helper Component ──
-function RangeBar({ value: rawValue, min, max, status }: {
-    value: number | string
-    min: number | null
-    max: number | null
-    status: string
-}) {
-    if (!min || !max) return null
-    const value = parseFloat(String(rawValue))
-    if (Number.isNaN(value)) return null
-
-    // Calculate position as percentage
-    const range = max - min
-    const buffer = range * 0.2 // 20% buffer on each side
-    const displayMin = min - buffer
-    const displayMax = max + buffer
-    const displayRange = displayMax - displayMin
-
-    // Avoid division by zero
-    if (displayRange === 0) return null
-
-    const valuePosition = Math.min(100, Math.max(0, ((value - displayMin) / displayRange) * 100))
-    const refMinPosition = Math.max(0, Math.min(100, ((min - displayMin) / displayRange) * 100))
-    const refMaxPosition = Math.max(0, Math.min(100, ((max - displayMin) / displayRange) * 100))
-
-    const dotColor = status === 'optimal' ? '#10B981' : status === 'warning' ? '#F59E0B' : '#EF4444'
-
-    return (
-        <div style={{ position: 'relative', marginTop: 8, width: '100%', maxWidth: '220px' }}>
-            <div style={{ fontSize: 9, color: '#A8A29E', marginBottom: 4, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <span>Low</span>
-                <span>Normal</span>
-                <span>High</span>
-            </div>
-            <div style={{ position: 'relative', height: 24, width: '100%' }}>
-                {/* Background track */}
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    background: '#E8E6DF',
-                    borderRadius: 2,
-                    transform: 'translateY(-50%)'
-                }} />
-
-                {/* Reference range highlight */}
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: `${refMinPosition}%`,
-                    width: `${Math.max(0, refMaxPosition - refMinPosition)}%`,
-                    height: 4,
-                    background: '#D1FAE5',
-                    borderRadius: 2,
-                    transform: 'translateY(-50%)'
-                }} />
-
-                {/* Value dot */}
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: `${valuePosition}%`,
-                    width: 12,
-                    height: 12,
-                    background: dotColor,
-                    borderRadius: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    border: '2px solid white',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                    zIndex: 1
-                }} />
-
-                {/* Min/Max labels */}
-                <div style={{
-                    position: 'absolute',
-                    bottom: -16,
-                    left: `${refMinPosition}%`,
-                    fontSize: 10,
-                    color: '#A8A29E',
-                    transform: 'translateX(-50%)'
-                }}>
-                    {min}
-                </div>
-                <div style={{
-                    position: 'absolute',
-                    bottom: -16,
-                    left: `${refMaxPosition}%`,
-                    fontSize: 10,
-                    color: '#A8A29E',
-                    transform: 'translateX(-50%)'
-                }}>
-                    {max}
-                </div>
-            </div>
-        </div>
-    )
-}
+// ── Main UI Component ──────────────────────────────────────────────────────
 
 export default function ResultsPage() {
     const router = useRouter()
@@ -205,7 +108,7 @@ export default function ResultsPage() {
 
             const { data: lrData } = await supabase
                 .from('lab_results')
-                .select('id, file_name, created_at, raw_ai_json')
+                .select('id, file_name, created_at, raw_ai_json, plain_summary')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
             setLabResults(lrData || [])
@@ -240,24 +143,46 @@ export default function ResultsPage() {
             <div className="min-h-[100dvh] bg-[#FAFAF7] px-4 py-6 md:p-6 text-[#1C1917] font-sans">
 
                 {/* ── Print-only Header ── */}
-                <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold uppercase tracking-tight">MedAssist Analysis Report</h1>
-                        <p className="text-sm font-medium mt-1">Patient Lab Data Interpretation · Clinical Context Intelligence</p>
+                <div className="hidden print:block mb-8">
+                    <div className="flex items-center justify-between border-b-2 border-slate-900 pb-6 mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold uppercase tracking-tight text-slate-900">MedAssist Analysis Report</h1>
+                            <p className="text-sm font-medium mt-1 text-slate-600">Patient Lab Data Interpretation · Clinical Summary</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-sm font-bold text-slate-900">DATE: {mounted ? new Date().toLocaleDateString() : ''}</p>
+                            <p className="text-xs text-slate-500">Report ID: {selectedReportId}</p>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <p className="text-sm font-bold">DATE: {mounted ? new Date().toLocaleDateString() : ''}</p>
-                        <p className="text-xs">Generated by Groq AI (Llama 3.3)</p>
+
+                    {/* Feature 9: Print-only Patient Info & "Bottom Line" */}
+                    <div className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div className="mb-4">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Clinical Interpretation</span>
+                            <h2 className="text-xl font-bold text-slate-900 mt-1">
+                                {selectedReportId === 'all' ? labResults[0]?.plain_summary : labResults.find(r => r.id === selectedReportId)?.plain_summary || "No clinical summary available."}
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase text-slate-500">Critical Findings</p>
+                                <p className="text-sm font-medium">{criticalCount} Biomarkers flagged as critical</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold uppercase text-slate-500">Action Recommended</p>
+                                <p className="text-sm font-medium">Review detailed biomarkers with primary care physician</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* ── Header ── */}
                 <div className="mb-6">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                             <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
                             <p className="text-[14px] md:text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
-                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual. Discuss all results with your doctor.</p>
+                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual.</p>
                             <TrustLayer variant="compact" className="mt-3" />
                         </div>
                         <div className="flex flex-wrap gap-2 shrink-0 print:hidden">
@@ -291,6 +216,28 @@ export default function ResultsPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Feature 6: Plain English Summary */}
+                {labResults.length > 0 && (selectedReportId === 'all' || selectedReportId === labResults[0]?.id) && (
+                    <div className="mb-8 p-6 bg-white border border-sky-100 rounded-2xl shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+                            <Sparkles size={64} className="text-sky-500" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="px-2 py-0.5 bg-sky-50 text-sky-600 text-[10px] font-bold uppercase rounded-md border border-sky-100">
+                                    The Bottom Line
+                                </span>
+                            </div>
+                            <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
+                                {selectedReportId === 'all' ? labResults[0]?.plain_summary : labResults.find(r => r.id === selectedReportId)?.plain_summary || "Select a report to see the bottom line interpretation."}
+                            </h2>
+                            <p className="text-xs text-slate-400 mt-4 italic">
+                                * This clinical interpretation is generated by AI based on your specific biomarkers and reference ranges.
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {/* ── Report Selector ── */}
                 <div style={{ marginBottom: 24 }} className="print:hidden">
@@ -336,16 +283,16 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Status summary row ── */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1">{optimalCount}</span>
                         <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">Optimal</span>
                     </div>
-                    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 text-center">
+                    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#92400E] block leading-none mb-1">{warningCount}</span>
                         <span className="text-[12px] font-semibold text-[#92400E] uppercase tracking-wide">Monitor</span>
                     </div>
-                    <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 text-center">
+                    <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#991B1B] block leading-none mb-1">{criticalCount}</span>
                         <span className="text-[12px] font-semibold text-[#991B1B] uppercase tracking-wide">Action Needed</span>
                     </div>
@@ -353,7 +300,7 @@ export default function ResultsPage() {
 
                 {/* ── Category tabs & Search ── */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+                    <div className="flex gap-2 overflow-x-auto pb-3 md:pb-0 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth mask-fade-right">
                         {CATEGORIES.map(category => (
                             <button
                                 key={category}
@@ -361,9 +308,9 @@ export default function ResultsPage() {
                                     setSelectedCategory(category)
                                     setSelectedBiomarker(null)
                                 }}
-                                className={`px-4 py-2 rounded-[10px] text-[15px] font-semibold capitalize whitespace-nowrap transition-colors ${selectedCategory === category
-                                    ? 'bg-sky-500 text-white'
-                                    : 'bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] hover:bg-[#EFEDE6]'
+                                className={`px-4 py-2.5 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 ${selectedCategory === category
+                                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
+                                    : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF]'
                                     }`}
                             >
                                 {category}
@@ -465,10 +412,13 @@ export default function ResultsPage() {
                                                 </p>
                                             )}
                                             <RangeBar
-                                                value={b.value}
-                                                min={b.reference_range_min || null}
-                                                max={b.reference_range_max || null}
-                                                status={b.status}
+                                                value={parseFloat(String(b.value))}
+                                                min={b.reference_range_min || 0}
+                                                max={b.reference_range_max || 100}
+                                                referenceMin={b.reference_range_min || 0}
+                                                referenceMax={b.reference_range_max || 100}
+                                                unit={b.unit}
+                                                status={b.status as 'optimal' | 'warning' | 'critical'}
                                             />
                                         </div>
 

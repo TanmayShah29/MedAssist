@@ -118,6 +118,26 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                         </div>
                                     </div>
                                 </div>
+
+                                {biomarker.reference_range_min !== undefined && biomarker.reference_range_min !== null &&
+                                    biomarker.reference_range_max !== undefined && biomarker.reference_range_max !== null &&
+                                    biomarker.reference_range_max > biomarker.reference_range_min && (
+                                        <div className="mt-4 pt-4 border-t border-[#E8E6DF]">
+                                            <div className="flex justify-between text-xs text-[#A8A29E] font-medium mb-2">
+                                                <span>Min: {biomarker.reference_range_min}</span>
+                                                <span>Max: {biomarker.reference_range_max}</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
+                                                <div
+                                                    className={`absolute top-0 bottom-0 left-0 rounded-full ${styles.dot}`}
+                                                    style={{
+                                                        width: `${Math.max(0, Math.min(100, ((Number(biomarker.value) - biomarker.reference_range_min) / (biomarker.reference_range_max - biomarker.reference_range_min)) * 100))}%`,
+                                                        minWidth: '4px'
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                             </div>
 
                             {/* AI Interpretation */}

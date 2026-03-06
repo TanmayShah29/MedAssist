@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Brain, Activity } from "lucide-react"
+import { Brain, Activity, ClipboardList } from "lucide-react"
 
 interface ClinicalEntity {
     name: string
@@ -12,9 +12,10 @@ interface ClinicalEntity {
 interface AnalysisPanelProps {
     biomarkers: import('@/types/medical').Biomarker[]
     symptoms: string[]
+    doctorQuestions?: { question: string, context: string }[]
 }
 
-export function AnalysisPanel({ biomarkers, symptoms }: AnalysisPanelProps) {
+export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: AnalysisPanelProps) {
     // Transform biomarkers and symptoms into clinical entities
     const entities: ClinicalEntity[] = [
         ...symptoms.map(s => ({ name: s, type: 'Symptom' })),
@@ -76,6 +77,28 @@ export function AnalysisPanel({ biomarkers, symptoms }: AnalysisPanelProps) {
                     )}
                 </div>
             </div>
+
+            {/* Feature 8: Doctor Ready Questions */}
+            {doctorQuestions.length > 0 && (
+                <div className="pt-4 border-t border-[#E8E6DF]">
+                    <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3 flex items-center gap-2">
+                        <ClipboardList size={14} className="text-sky-500" />
+                        Questions for your Doctor
+                    </h3>
+                    <div className="space-y-3">
+                        {doctorQuestions.map((q, i) => (
+                            <div key={i} className="p-3 bg-white border border-sky-100 rounded-xl shadow-sm">
+                                <p className="text-[13px] font-bold text-slate-800 leading-tight mb-1">
+                                    {q.question}
+                                </p>
+                                <p className="text-[11px] text-[#57534E]">
+                                    {q.context}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

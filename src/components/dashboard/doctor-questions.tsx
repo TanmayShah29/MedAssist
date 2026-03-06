@@ -68,7 +68,8 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
         setTimeout(() => setCopiedIdx(null), 2000);
     };
 
-    if (biomarkers.length === 0) return null;
+    const hasFlags = biomarkers.some(b => b.status === "warning" || b.status === "critical");
+    if (!hasFlags) return null;
 
     return (
         <div className={cn("bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm", className)}>

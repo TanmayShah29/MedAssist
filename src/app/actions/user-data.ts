@@ -13,6 +13,8 @@ interface SaveLabResultArgs {
     fileName?: string;
     rawOcrText?: string;
     rawAiJson?: unknown;
+    symptomConnections?: any[];
+    plainSummary?: string;
 }
 
 export async function saveLabResult(args: SaveLabResultArgs) {
@@ -40,7 +42,9 @@ export async function saveLabResult(args: SaveLabResultArgs) {
                 p_summary: summary,
                 p_biomarkers: labValues, // Pass the whole array, Postgres handles JSONB
                 p_raw_ocr_text: rawOcrText,
-                p_raw_ai_json: rawAiJson
+                p_raw_ai_json: rawAiJson,
+                p_symptom_connections: args.symptomConnections || [],
+                p_plain_summary: args.plainSummary || null
             }
         );
 

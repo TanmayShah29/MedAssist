@@ -24,6 +24,12 @@ export const ExtractionResultSchema = z.object({
     healthScore: z.number().int().min(0).max(100),
     riskLevel: z.enum(["low", "moderate", "high"]),
     summary: z.string().min(10, "Summary is too short"),
+    plainSummary: z.string().optional().default(""),
+    symptomConnections: z.array(z.object({
+        symptom: z.string(),
+        relatedBiomarkers: z.array(z.string()),
+        explanation: z.string()
+    })).optional().default([])
 });
 
 export type ExtractionResult = z.infer<typeof ExtractionResultSchema>;

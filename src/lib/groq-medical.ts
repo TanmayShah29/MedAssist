@@ -28,6 +28,12 @@ export interface ExtractionResult {
     healthScore: number;
     riskLevel: "low" | "moderate" | "high";
     summary: string;
+    plainSummary: string;
+    symptomConnections: Array<{
+        symptom: string;
+        relatedBiomarkers: string[];
+        explanation: string;
+    }>;
     longitudinalInsights?: string[];
 }
 
@@ -107,6 +113,14 @@ Return only a JSON object with this structure:
   "healthScore": number (0-100),
   "riskLevel": "low" | "moderate" | "high",
   "summary": string (2-3 sentences),
+  "plainSummary": string (2-3 sentences),
+  "symptomConnections": [
+    {
+      "symptom": string,
+      "relatedBiomarkers": string[],
+      "explanation": string
+    }
+  ],
   "longitudinalInsights": string[] (optional, list of detected trends or multi-biomarker patterns)
 }
 
@@ -143,6 +157,8 @@ Rules:
     GOOD example: "Hemoglobin measures the oxygen-carrying protein in your red blood cells. Your level of 11.2 g/dL is below the reference range of 12–16 g/dL, which can indicate mild anemia. This may result from low iron intake, vitamin B12 deficiency, or increased red blood cell breakdown — worth discussing with your doctor if you experience fatigue or breathlessness. Always consult your doctor before making health decisions."
     BAD example: "Hemoglobin is a protein that carries oxygen. Your result is slightly low. Please consult a doctor."
 - summary: 2-3 sentence plain English overview. Educational tone only.
+- plainSummary: a 2-3 sentence plain English summary of the overall report. Reference the actual categories present and any flagged values specifically. Example: "Your blood count is healthy with all markers in the normal range. Your metabolic panel shows one concern — glucose is elevated at 145 mg/dL which is above the normal limit of 100. Vitamin levels were not included in this report."
+- symptomConnections: map user's reported symptoms to relevant extracted biomarkers. Only include connections that are medically relevant to the actual extracted values. If no connection exists for a symptom, omit it from the array.
 - Return ONLY the JSON object. No other text.`,
                     },
                     {
@@ -202,6 +218,8 @@ Rules:
                 summary: typeof parsedJson.summary === 'string' && parsedJson.summary.length > 5
                     ? parsedJson.summary
                     : 'Lab report processed. Please consult your doctor for interpretation.',
+                plainSummary: typeof parsedJson.plainSummary === 'string' ? parsedJson.plainSummary : '',
+                symptomConnections: Array.isArray(parsedJson.symptomConnections) ? parsedJson.symptomConnections : [],
             };
         }
 
@@ -299,6 +317,59 @@ Rules:
         throw new Error(
             `AI question failed: ${(error as Error).message || "Unknown error"}`
         );
+    }
+}
+
+export async function generateDoctorQuestions(biomarkers: BiomarkerContext[]): Promise<string[]> {
+    const focusMarkers = biomarkers
+        .filter(b => b.status !== 'optimal')
+        .sort((a, b) => (a.status === 'critical' ? -1 : 1))
+        .slice(0, 5);
+
+    if (focusMarkers.length === 0) {
+        return [
+            "What proactive steps can I take to maintain my current optimal levels?",
+            "Are there any specific screenings I should plan for my age group?",
+            "How often should I repeat this exact panel to track my stability?"
+        ];
+    }
+
+    try {
+        const context = focusMarkers.map(b =>
+            `${b.name}: ${b.value} ${b.unit} (Status: ${b.status}, Ref: ${b.reference_range_min}-${b.reference_range_max})`
+        ).join('\n');
+
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a clinical assistant. Generate 3 highly specific, professional questions for a user to ask their doctor based on their lab results.
+Questions should:
+- Reference specific values and units
+- Be professional but easy for the user to say
+- Focus on the most concerning (critical/warning) findings
+- Ask about potential next steps, lifestyle changes, or follow-up tests
+- NO preamble, just a JSON array of strings.`
+                },
+                {
+                    role: "user",
+                    content: `Generate questions for these markers:\n${context}`
+                }
+            ],
+            model: MODEL,
+            response_format: { type: "json_object" },
+            temperature: 0.3,
+        });
+
+        const result = JSON.parse(completion.choices[0].message.content || '{"questions": []}');
+        return result.questions || result || [];
+    } catch (err) {
+        logger.error("Failed to generate doctor questions", err);
+        return [
+            "What do these specific findings mean for my long-term health?",
+            "What lifestyle changes could help improve my marker levels?",
+            "When should we re-test to see if my interventions are working?"
+        ];
     }
 }
 

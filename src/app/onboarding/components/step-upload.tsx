@@ -56,6 +56,10 @@ export function StepUpload() {
             toast.error(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 10MB.`);
             return;
         }
+        if (file.type !== 'application/pdf') {
+            toast.error('Only PDF files are supported.');
+            return;
+        }
         setUploadedFile(file);
     };
 
@@ -132,6 +136,22 @@ export function StepUpload() {
                 riskLevel: analysis.riskLevel ?? "low",
                 summary: analysis.summary ?? "",
             });
+
+            // Bug 5 fix branch: Save profile info + symptoms to Supabase on manual entry
+            try {
+                const { saveProfileFromSession } = await import("@/app/actions/user-data");
+                await saveProfileFromSession({
+                    first_name: basicInfo.firstName || undefined,
+                    last_name: basicInfo.lastName || undefined,
+                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
+                    sex: basicInfo.sex || undefined,
+                    blood_type: basicInfo.bloodType || undefined,
+                    symptoms: selectedSymptoms,
+                });
+            } catch (err) {
+                logger.error("Failed to save profile during manual entry:", err);
+            }
+
             completeStep(3);
             setStep(5);
         } catch (err) {
@@ -364,8 +384,7 @@ export function StepUpload() {
                     Upload your lab report
                 </h2>
                 <p className="text-[#57534E] text-sm">
-                    Groq AI works with any PDF, JPG, or PNG.
-                    Photos of paper reports work great too.
+                    Upload your digital lab report for instant AI analysis.
                 </p>
             </div>
 
@@ -387,7 +406,7 @@ export function StepUpload() {
                     <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
+                        accept=".pdf"
                         className="hidden"
                         onChange={handleFileSelect}
                     />
@@ -399,7 +418,7 @@ export function StepUpload() {
                         Click to upload or drag & drop
                     </p>
                     <p className="text-xs text-[#A8A29E] mb-4">
-                        PDF, JPG, PNG up to 10MB
+                        PDF up to 10MB
                     </p>
                     <a
                         href="/samples/sample-report.pdf"

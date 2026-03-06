@@ -46,6 +46,7 @@ export default function AssistantPage() {
     const [inputValue, setInputValue] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [activeTab, setActiveTab] = useState<"chat" | "context">("chat");
+    const [doctorQuestions, setDoctorQuestions] = useState<{ question: string, context: string }[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Fetch Data
@@ -61,8 +62,17 @@ export default function AssistantPage() {
                 supabase.from('conversations').select('id, role, content, created_at').eq('user_id', user.id).order('created_at', { ascending: true }).limit(50)
             ]);
 
+            let fetchedBiomarkers: Biomarker[] = [];
+            let fetchedSymptoms: string[] = [];
+
             if (bResponse.data && bResponse.data.length > 0) {
-                setBiomarkers(bResponse.data);
+                fetchedBiomarkers = bResponse.data;
+                setBiomarkers(fetchedBiomarkers);
+            }
+
+            if (sResponse.data) {
+                fetchedSymptoms = sResponse.data.map((s: { symptom: string }) => s.symptom);
+                setSymptoms(fetchedSymptoms);
             }
 
             if (cResponse.data && cResponse.data.length > 0) {
@@ -72,22 +82,52 @@ export default function AssistantPage() {
                     content: m.content,
                     timestamp: new Date(m.created_at)
                 })));
-            } else if (bResponse.data && bResponse.data.length > 0) {
-                // Find most critical biomarker
-                const critical = bResponse.data.find((b: Biomarker) => b.status === "critical")
-                    || bResponse.data.find((b: Biomarker) => b.status === "warning")
-                    || bResponse.data[0];
+            } else if (fetchedBiomarkers.length > 0) {
+                // Feature 8: Proactive Greeting
+                try {
+                    const gRes = await fetch('/api/assistant/greeting', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ biomarkers: fetchedBiomarkers, symptoms: fetchedSymptoms })
+                    });
+                    const gData = await gRes.json();
+                    if (gData.greeting) {
+                        setMessages([{
+                            id: "1",
+                            role: "assistant",
+                            content: gData.greeting,
+                            timestamp: new Date()
+                        }]);
+                    }
+                } catch (e) {
+                    // Fallback to simple proactive message
+                    const critical = fetchedBiomarkers.find((b: Biomarker) => b.status === "critical")
+                        || fetchedBiomarkers.find((b: Biomarker) => b.status === "warning")
+                        || fetchedBiomarkers[0];
 
-                setMessages([
-                    {
+                    setMessages([{
                         id: "1",
                         role: "assistant",
-                        content: `Hello! I'm here to help you understand your health data. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}. What would you like to know about your results?`,
+                        content: `Hello! I'm here to help you understand your health data. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}. What would you like to know?`,
                         timestamp: new Date()
-                    }
-                ]);
+                    }]);
+                }
             }
-            if (sResponse.data) setSymptoms(sResponse.data.map((s: { symptom: string }) => s.symptom));
+
+            // Feature 8: Proactive Insights (Doctor Questions)
+            if (fetchedBiomarkers.length > 0) {
+                try {
+                    const qRes = await fetch('/api/generate-questions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ biomarkers: fetchedBiomarkers })
+                    });
+                    const qData = await qRes.json();
+                    if (qData.questions) setDoctorQuestions(qData.questions);
+                } catch (e) {
+                    console.error("Failed to fetch doctor questions", e);
+                }
+            }
         };
         fetchData();
     }, []);
@@ -159,11 +199,18 @@ export default function AssistantPage() {
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, newAiMsg]);
-        } catch (_error) {
+        } catch (error) {
+            let errorText = "I'm having trouble connecting to the server. Please try again later.";
+            if (error instanceof Error && error.message) {
+                errorText = error.message;
+            } else if (typeof error === 'string') {
+                errorText = error;
+            }
+
             const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 role: "assistant",
-                content: "I'm having trouble connecting to the server. Please try again later.",
+                content: errorText,
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, errorMsg]);
@@ -369,7 +416,11 @@ export default function AssistantPage() {
                                 <div className="space-y-4">
                                     <AssistantSidebar biomarkers={biomarkers} />
                                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
-                                        <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
+                                        <AnalysisPanel
+                                            biomarkers={biomarkers}
+                                            symptoms={symptoms}
+                                            doctorQuestions={doctorQuestions}
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -384,7 +435,11 @@ export default function AssistantPage() {
                         <div className="hidden lg:block space-y-5 overflow-y-auto">
                             <AssistantSidebar biomarkers={biomarkers} />
                             <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
-                                <AnalysisPanel biomarkers={biomarkers} symptoms={symptoms} />
+                                <AnalysisPanel
+                                    biomarkers={biomarkers}
+                                    symptoms={symptoms}
+                                    doctorQuestions={doctorQuestions}
+                                />
                             </div>
                         </div>
                     </div>

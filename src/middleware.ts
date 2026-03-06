@@ -28,23 +28,21 @@ export default async function middleware(request: NextRequest) {
     if (
         pathname.startsWith('/api') ||
         pathname.startsWith('/_next') ||
-        pathname.startsWith('/auth') ||
+        pathname === '/auth/callback' ||
         pathname === '/terms' ||
         pathname === '/privacy' ||
         pathname.includes('.')
     ) {
         const response = NextResponse.next({ request: { headers: requestHeaders } });
 
-        // Clear onboarding cookie when landing on auth or home page 
-        // to prevent stale redirects for new users.
-        if (pathname === '/auth' || pathname === '/') {
+        // Clear onboarding cookie when landing on home page 
+        if (pathname === '/') {
             response.cookies.set('onboarding_complete', 'false', {
                 path: '/',
                 maxAge: 0,
                 httpOnly: false
             });
         }
-
         return response;
     }
 
@@ -73,8 +71,11 @@ export default async function middleware(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Not signed in — redirect to auth
+    // Not signed in
     if (!user) {
+        if (pathname === '/auth') {
+            return response;
+        }
         return NextResponse.redirect(new URL('/auth', request.url))
     }
 
@@ -98,6 +99,11 @@ export default async function middleware(request: NextRequest) {
             maxAge: 60 * 60 * 24 * 7,
             path: '/'
         })
+    }
+
+    // Signed in routing
+    if (pathname === '/auth') {
+        return NextResponse.redirect(new URL(onboardingComplete ? '/dashboard' : '/onboarding', request.url))
     }
 
     // Signed in but onboarding incomplete — send to onboarding
