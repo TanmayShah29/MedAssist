@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { logger } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -70,7 +70,7 @@ function getDelta(current: number | string, previous: number | string | null | u
     return { diff, percent };
 }
 
-function PriorityActionBanner({ criticalCount }: { criticalCount: number }) {
+function _PriorityActionBanner({ criticalCount }: { criticalCount: number }) {
     if (criticalCount === 0) return null;
 
     return (
@@ -131,11 +131,12 @@ function LongitudinalComparisonCard({
     reportDate: string,
     previousReportDate: string
 }) {
+    type Change = { name: string; currentValue: string; previousValue: string; unit: string; percent: number; status: string };
     const changes = latestBiomarkers.map(curr => {
         const prev = previousBiomarkers.find(p => p.name === curr.name);
         if (!prev) return null;
         const delta = getDelta(curr.value, prev.value);
-        if (!delta || Math.abs(delta.percent) < 5) return null; // Only show >5% change
+        if (!delta || Math.abs(delta.percent) < 5) return null;
         return {
             name: curr.name,
             currentValue: curr.value,
@@ -143,8 +144,8 @@ function LongitudinalComparisonCard({
             unit: curr.unit,
             percent: delta.percent,
             status: curr.status
-        };
-    }).filter(Boolean) as any[];
+        } as Change;
+    }).filter((c): c is Change => c !== null);
 
     if (changes.length === 0) return null;
 
@@ -283,8 +284,8 @@ export default function DashboardClient({
     );
 
     const latestLabResult = displayLabResults[0];
-    const longitudinalInsights: string[] = (latestLabResult?.raw_ai_json?.longitudinalInsights as string[]) || [];
-    const symptomConnections: any[] = (latestLabResult as any)?.symptom_connections || [];
+    const longitudinalInsights: string[] = (latestLabResult?.raw_ai_json as { longitudinalInsights?: string[] })?.longitudinalInsights || [];
+    const symptomConnections: { symptom: string; biomarker: string; relevance: string; relatedBiomarkers?: string[]; explanation?: string }[] = (latestLabResult as { symptom_connections?: { symptom: string; biomarker: string; relevance: string; relatedBiomarkers?: string[]; explanation?: string }[] })?.symptom_connections || [];
 
     // Offline Resilience: Save to LocalStorage (never mix demo with real data)
     useEffect(() => {
@@ -616,7 +617,7 @@ export default function DashboardClient({
                                 }}>
                                     YOUR SYMPTOMS MAY BE CONNECTED TO THESE RESULTS
                                 </p>
-                                {symptomConnections.map((conn: any) => (
+                                {symptomConnections.map((conn) => (
                                     <div key={conn.symptom} style={{
                                         marginBottom: 16,
                                         paddingBottom: 16,
@@ -636,7 +637,7 @@ export default function DashboardClient({
                                             <span style={{ fontSize: 12, color: '#A8A29E' }}>
                                                 may be related to
                                             </span>
-                                            {conn.relatedBiomarkers.map((b: string) => (
+                                            {conn.relatedBiomarkers?.map((b: string) => (
                                                 <div key={b} style={{
                                                     background: '#F5F4EF',
                                                     border: '1px solid #E8E6DF',

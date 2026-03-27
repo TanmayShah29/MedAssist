@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     try {
         const greeting = await generateAIGreeting(biomarkers || [], symptoms || [], profile?.first_name || 'Guest')
         return NextResponse.json({ greeting })
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: 'Failed to generate greeting' }, { status: 500 })
     }
 }

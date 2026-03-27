@@ -26,8 +26,10 @@ export function ClientLayout({
   // Safely determine pathname, prioritizing client-side usePathname()
   const pathname = nextPathname || initialPathname || "";
 
-  const [loading, setLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !sessionStorage.getItem("medassist_loaded");
+  });
 
   // Determine if current page needs the app shell
   const needsAppShell = pathname ? appShellRoutes.some(
@@ -38,18 +40,6 @@ export function ClientLayout({
   const isStandalone = pathname ? standaloneRoutes.some(
     route => pathname === route || (route !== "/" && pathname.startsWith(route))
   ) : false;
-
-  // Lazy initialize loading state only on client mount
-  useEffect(() => {
-    setMounted(true);
-    if (needsAppShell) {
-      try {
-        if (!sessionStorage.getItem("medassist_loaded")) {
-          setLoading(true);
-        }
-      } catch (_e) { }
-    }
-  }, [needsAppShell]);
 
   const handlePreloaderComplete = () => {
     try {

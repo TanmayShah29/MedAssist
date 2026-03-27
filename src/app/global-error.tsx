@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-
+import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export default function GlobalError({
     error,
@@ -9,6 +10,10 @@ export default function GlobalError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    useEffect(() => {
+        logger.error("Global error boundary caught:", { error, digest: error.digest });
+    }, [error]);
+
     return (
         <html>
             <body>
@@ -17,8 +22,13 @@ export default function GlobalError({
                     <p className="text-slate-400 mb-6 max-w-md text-center">
                         We apologize for the inconvenience. Our team has been notified.
                         <br />
-                        Digest: {error.digest}
+                        {error.digest && <span className="text-xs text-slate-500">Error ID: {error.digest}</span>}
                     </p>
+                    {process.env.NODE_ENV === "development" && (
+                        <pre style={{ textAlign: 'left', background: '#1e293b', padding: '1rem', overflow: 'auto', maxWidth: '100%', fontSize: '12px', marginBottom: '1rem' }}>
+                            {error.message}
+                        </pre>
+                    )}
                     <div className="flex gap-4">
                         <button
                             onClick={() => reset()}
@@ -28,7 +38,6 @@ export default function GlobalError({
                         </button>
                         <button
                             onClick={() => {
-                                // Clear Supabase cookies manually as an emergency reset
                                 document.cookie.split(";").forEach((c) => {
                                     const name = c.split("=")[0].trim();
                                     if (name.includes('supabase') || name.includes('sb-')) {

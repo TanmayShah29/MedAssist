@@ -99,7 +99,7 @@ export default function AssistantPage() {
                             timestamp: new Date()
                         }]);
                     }
-                } catch (e) {
+                } catch (_e) {
                     // Fallback to simple proactive message
                     const critical = fetchedBiomarkers.find((b: Biomarker) => b.status === "critical")
                         || fetchedBiomarkers.find((b: Biomarker) => b.status === "warning")

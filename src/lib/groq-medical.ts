@@ -323,7 +323,7 @@ Rules:
 export async function generateDoctorQuestions(biomarkers: BiomarkerContext[]): Promise<string[]> {
     const focusMarkers = biomarkers
         .filter(b => b.status !== 'optimal')
-        .sort((a, b) => (a.status === 'critical' ? -1 : 1))
+        .sort((a, _b) => (a.status === 'critical' ? -1 : 1))
         .slice(0, 5);
 
     if (focusMarkers.length === 0) {

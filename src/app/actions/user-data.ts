@@ -13,7 +13,7 @@ interface SaveLabResultArgs {
     fileName?: string;
     rawOcrText?: string;
     rawAiJson?: unknown;
-    symptomConnections?: any[];
+    symptomConnections?: { symptom: string; biomarker?: string; relevance?: string; relatedBiomarkers?: string[]; explanation?: string }[];
     plainSummary?: string;
 }
 

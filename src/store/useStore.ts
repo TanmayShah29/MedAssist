@@ -96,9 +96,9 @@ export const useStore = create<AppState>()(
             riskAnalysis: null,
             insightAnalysis: null,
 
-            setHasData: (status) => {
+            setHasData: async (status) => {
                 set({ hasData: status });
-                if (status) get().refreshAnalysis();
+                if (status) await get().refreshAnalysis();
             },
 
             updateUser: (profile) => set((state) => ({

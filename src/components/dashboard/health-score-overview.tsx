@@ -4,12 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import { animate } from 'framer-motion';
 
+import { Biomarker } from '@/types/medical';
+
 interface HealthScoreOverviewProps {
     score: number;
     optimalCount: number;
     warningCount: number;
     criticalCount: number;
-    biomarkers?: any[];
+    biomarkers?: Biomarker[];
     onClick?: () => void;
 }
 
@@ -20,7 +22,7 @@ function getScoreLabel(score: number): { label: string; color: string; bg: strin
     return { label: "Needs Attention", color: "#991B1B", bg: "#FFF1F2" };
 }
 
-export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount, biomarkers = [], onClick }: HealthScoreOverviewProps) {
+export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount, biomarkers: _biomarkers = [], onClick }: HealthScoreOverviewProps) {
     const [displayScore, setDisplayScore] = useState(0);
 
     useEffect(() => {

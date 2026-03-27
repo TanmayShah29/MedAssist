@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { checkRateLimit } from '@/services/rateLimitService';
+import { checkRateLimitEdge } from '@/services/rateLimitService.edge';
 import { z } from 'zod';
 
 export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
-    const rateLimitResult = await checkRateLimit();
+    const rateLimitResult = await checkRateLimitEdge();
     if (!rateLimitResult.success) {
         return NextResponse.json(
             { error: rateLimitResult.message || 'Too many requests' },

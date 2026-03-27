@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
             healthScore: analysisResult.healthScore,
             riskLevel: analysisResult.riskLevel,
             summary: analysisResult.summary,
-            labValues: analysisResult.biomarkers as unknown as ExtractedLabValue[],
+            labValues: analysisResult.biomarkers as ExtractedLabValue[],
             fileName: file.name,
             rawOcrText: extractedText,
             rawAiJson: analysisResult,
@@ -253,7 +253,7 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
         healthScore: analysisResult.healthScore,
         riskLevel: analysisResult.riskLevel,
         summary: analysisResult.summary,
-        labValues: analysisResult.biomarkers as unknown as ExtractedLabValue[],
+        labValues: analysisResult.biomarkers as ExtractedLabValue[],
         fileName: 'Manual entry',
         rawOcrText: undefined,
         rawAiJson: analysisResult
