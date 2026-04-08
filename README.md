@@ -1,7 +1,6 @@
 # MedAssist — AI-Powered Clinical Intelligence
 
-![Landing Page Mockup](https://raw.githubusercontent.com/TanmayShah29/MedAssist/main/public/screenshot-landing.png)
-*Note: Replace with standard deployment snapshot.*
+![Landing Page Mockup](https://raw.githubusercontent.com/TanmayShah29/MedAssist/main/public/image.png)
 
 ## 1. Abstract
 **MedAssist** is an intelligent health platform engineered to bridge the clinical communication gap between complex diagnostics and patient health literacy. It transforms unstructured, clinical blood work PDFs into longitudinal, plain-English insights, enabling proactive healthcare management and reducing physician consultation friction. 
