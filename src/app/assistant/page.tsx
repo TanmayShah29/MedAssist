@@ -125,7 +125,7 @@ export default function AssistantPage() {
                     const qData = await qRes.json();
                     if (qData.questions) setDoctorQuestions(qData.questions);
                 } catch (e) {
-                    console.error("Failed to fetch doctor questions", e);
+                console.warn("Failed to fetch doctor questions", e);
                 }
             }
         };
@@ -155,13 +155,14 @@ export default function AssistantPage() {
         scrollToBottom();
     }, [messages]);
 
-    const handleSendMessage = async () => {
-        if (!inputValue.trim() || isProcessing) return;
+    const handleSendMessage = async (overrideMsg?: string) => {
+        const messageToSend = overrideMsg || inputValue;
+        if (!messageToSend.trim() || isProcessing) return;
 
         const newUserMsg: Message = {
             id: Date.now().toString(),
             role: "user",
-            content: inputValue,
+            content: messageToSend,
             timestamp: new Date()
         };
 
@@ -174,9 +175,10 @@ export default function AssistantPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    question: inputValue,
-                    biomarkers: biomarkers,
+                    question: messageToSend,
                     symptoms: symptoms
+                    // biomarkers intentionally omitted — the server fetches them
+                    // directly from the DB to ensure data integrity
                 })
             });
 
@@ -186,8 +188,7 @@ export default function AssistantPage() {
 
             const aiContent = data.answer || "I'm sorry, I couldn't process that.";
 
-            // Add engagement nudge if strictly needed
-            const showNudge = biomarkers.length > 0 && biomarkers.length < 20;
+            const showNudge = false; // Removed engagement nudge — it felt patronising and broke the AI's tone
             const finalContent = showNudge
                 ? `${aiContent}\n\nThe more reports you upload, the more personalized my analysis becomes.`
                 : aiContent;
@@ -274,22 +275,41 @@ export default function AssistantPage() {
                 {/* Suggested Questions */}
                 {messages.filter(m => m.role === 'user').length === 0 && (
                     <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none mb-1">
-                        {[
-                            "What do my latest results mean?",
-                            "Are there any hidden risks?",
-                            "How can I improve my health score?",
-                            "What should I ask my doctor?"
-                        ].map((q, i) => (
-                            <button
-                                key={i}
-                                onClick={() => {
-                                    setInputValue(q);
-                                }}
-                                className="whitespace-nowrap px-4 py-2 bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
-                            >
-                                {q}
-                            </button>
-                        ))}
+                        {(() => {
+                            const criticalMarkers = biomarkers.filter(b => b.status === 'critical').map(b => b.name);
+                            const warningMarkers = biomarkers.filter(b => b.status === 'warning').map(b => b.name);
+                            const dynamicQuestions = [];
+                            
+                            if (criticalMarkers.length > 0) {
+                                dynamicQuestions.push(`Explain my flagged ${criticalMarkers[0]}`);
+                                dynamicQuestions.push(`How do I fix my ${criticalMarkers[0]}?`);
+                            }
+                            if (warningMarkers.length > 0) {
+                                dynamicQuestions.push(`What should I eat to improve ${warningMarkers[0]}?`);
+                            }
+                            if (dynamicQuestions.length === 0) {
+                                dynamicQuestions.push(
+                                    "What do my latest results mean?",
+                                    "Are there any hidden risks?",
+                                    "How can I improve my health score?",
+                                    "What should I ask my doctor?"
+                                );
+                            } else {
+                                dynamicQuestions.push("What do my latest results mean?");
+                            }
+
+                            return dynamicQuestions.map((q, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        handleSendMessage(q);
+                                    }}
+                                    className="whitespace-nowrap px-4 py-2 bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
+                                >
+                                    {q}
+                                </button>
+                            ));
+                        })()}
                     </div>
                 )}
 
@@ -304,7 +324,7 @@ export default function AssistantPage() {
                         placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
                     />
                     <button
-                        onClick={handleSendMessage}
+                        onClick={() => handleSendMessage()}
                         disabled={!inputValue.trim() || isProcessing}
                         aria-label="Send message"
                         style={{

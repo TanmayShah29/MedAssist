@@ -45,20 +45,39 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'LDL Cholesterol': '"Bad" cholesterol that can build up in your arteries.',
     'HDL Cholesterol': '"Good" cholesterol that helps remove other forms of cholesterol.',
     'Triglycerides': 'A type of fat found in your blood; indicates heart health.',
+    'Total Cholesterol': 'The total amount of cholesterol circulating in your blood.',
     'Vitamin D': 'Essential for bone health and immune system function.',
     'C-Reactive Protein (CRP)': 'A marker of inflammation in the body.',
+    'hs-CRP': 'High-sensitivity CRP; specifically assesses cardiovascular inflammation risk.',
     'Iron': 'Used to make hemoglobin, which carries oxygen in your blood.',
-    'Ferritin': 'A protein that stores iron in your cells.',
+    'Ferritin': 'A protein that stores iron; indicates your body\'s total iron reserves.',
     'TSH': 'Thyroid Stimulating Hormone; regulates your metabolism.',
+    'Free T3': 'The active form of the thyroid hormone.',
+    'Free T4': 'The main hormone produced by the thyroid gland.',
     'B12': 'Vital for nerve tissue health, brain function, and red blood cells.',
     'Magnesium': 'Involved in over 300 biochemical reactions in the body.',
+    'Calcium': 'Vital for bone strength, muscle function, and nerve signaling.',
+    'Sodium': 'An electrolyte that regulates fluid balance and blood pressure.',
+    'Potassium': 'An electrolyte crucial for heart function and muscle contraction.',
     'ALT': 'Liver enzyme that can indicate liver health.',
     'AST': 'Another liver enzyme used to evaluate liver function.',
+    'ALP': 'An enzyme related to bile ducts and bone health.',
+    'Bilirubin': 'A yellowish substance made during the normal breakdown of red blood cells.',
+    'Albumin': 'A protein made by your liver; prevents fluid from leaking out of blood vessels.',
     'Creatinine': 'Waste product filtered by kidneys; used to measure kidney function.',
+    'BUN': 'Blood Urea Nitrogen; evaluates how well your kidneys are working.',
+    'eGFR': 'Estimated Glomerular Filtration Rate; indicates overall kidney function.',
     'Hemoglobin': 'Protein in red blood cells that carries oxygen.',
+    'Hematocrit': 'The proportion of your blood that consists of red blood cells.',
     'WBC': 'White blood cells; the core of your immune system defense.',
     'RBC': 'Red blood cells; responsible for delivering oxygen to tissues.',
-}
+    'Platelets': 'Cell fragments that help your blood clot.',
+    'Cortisol': 'The primary stress hormone; affects metabolism and immune response.',
+    'Testosterone': 'A hormone important for muscle mass, bone density, and sex drive.',
+    'Estradiol': 'The primary female sex hormone, important in multiple metabolic functions.',
+    'Insulin': 'A hormone that helps your body use or store glucose for energy.',
+    'ApoB': 'The primary protein in LDL cholesterol; a precise marker for heart disease risk.',
+};
 
 function getDelta(current: number | string, previous: number | string | null | undefined) {
     if (previous === null || previous === undefined) return null;
@@ -234,7 +253,6 @@ export default function DashboardClient({
 
     const [selectedBiomarkerData, setSelectedBiomarkerData] = useState<Biomarker | null>(null);
     const [showDetailSheet, setShowDetailSheet] = useState(false);
-    const [debugMode, setDebugMode] = useState(false);
     const [isOffline, setIsOffline] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
     const [showScoreModal, setShowScoreModal] = useState(false);
@@ -503,30 +521,6 @@ export default function DashboardClient({
                 )
             }
 
-            {/* ── Developer Tools Overlay (Subtle) ── */}
-            <div className="fixed bottom-24 right-6 z-[45] flex flex-col gap-2 print:hidden">
-                <button
-                    onClick={() => setDemoMode(!demoMode)}
-                    className={`flex items-center justify-center w-10 h-10 rounded-full transition-all shadow-lg ${demoMode
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-white text-[#A8A29E] border border-[#E8E6DF] hover:text-[#57534E]'
-                        }`}
-                    title="Toggle Demo Mode"
-                >
-                    <PlayCircle size={20} />
-                </button>
-                <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E8E6DF] transition-all shadow-lg ${debugMode ? 'text-sky-500 border-sky-200' : 'text-[#A8A29E]'}`}
-                    title="Toggle Debug Info"
-                >
-                    <input
-                        type="checkbox"
-                        checked={debugMode}
-                        onChange={(e) => setDebugMode(e.target.checked)}
-                        className="w-4 h-4 accent-sky-500 cursor-pointer"
-                    />
-                </div>
-            </div>
 
             {/* ── Dashboard Content ── */}
             {

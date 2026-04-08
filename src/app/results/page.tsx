@@ -108,9 +108,9 @@ export default function ResultsPage() {
 
             const { data: lrData } = await supabase
                 .from('lab_results')
-                .select('id, file_name, created_at, raw_ai_json, plain_summary')
+                .select('id, file_name, uploaded_at, raw_ai_json, plain_summary')
                 .eq('user_id', user.id)
-                .order('created_at', { ascending: false })
+                .order('uploaded_at', { ascending: false })
             setLabResults(lrData || [])
             setLoading(false)
         }

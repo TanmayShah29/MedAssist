@@ -65,9 +65,11 @@ export class ExtractionErrorBoundary extends Component<Props, State> {
                         Try Again
                     </Button>
 
-                    <p className="text-[10px] text-gray-400">
-                        Internal Trace: {this.state.error?.name}
-                    </p>
+                    {process.env.NODE_ENV !== 'production' && (
+                        <p className="text-[10px] text-gray-400">
+                            Internal Trace: {this.state.error?.name}
+                        </p>
+                    )}
                 </div>
             );
         }

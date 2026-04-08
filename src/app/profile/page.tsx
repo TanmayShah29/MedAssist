@@ -12,7 +12,7 @@ import { SYMPTOM_OPTIONS } from "@/lib/constants";
 export default function ProfilePage() {
     const router = useRouter();
     const [profile, setProfile] = useState<{ first_name: string; last_name: string; age?: number; sex?: string; blood_type?: string } | null>(null);
-    const [reports, setReports] = useState<{ id: string; created_at: string; summary: string }[]>([]);
+    const [reports, setReports] = useState<{ id: string; uploaded_at: string; summary: string }[]>([]);
     const [symptoms, setSymptoms] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
             const [profileRes, reportsRes, symptomsRes] = await Promise.all([
                 supabase.from('profiles').select('first_name, last_name, age, sex, blood_type').eq('id', user.id).single(),
-                supabase.from('lab_results').select('id, created_at, summary').eq('user_id', user.id).order('created_at', { ascending: false }),
+                supabase.from('lab_results').select('id, uploaded_at, summary').eq('user_id', user.id).order('uploaded_at', { ascending: false }),
                 supabase.from('symptoms').select('symptom').eq('user_id', user.id)
             ]);
 
@@ -224,7 +224,7 @@ export default function ProfilePage() {
                                             Blood Panel Report
                                         </p>
                                         <p className="text-xs text-[#A8A29E] mt-0.5">
-                                            {new Date(report.created_at).toLocaleDateString(undefined, {
+                                            {new Date(report.uploaded_at).toLocaleDateString(undefined, {
                                                 year: 'numeric', month: 'short', day: 'numeric'
                                             })}
                                         </p>

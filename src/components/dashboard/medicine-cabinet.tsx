@@ -47,7 +47,7 @@ export function MedicineCabinet() {
 
     const handleAddSupplement = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newSupp.name || !newSupp.start_date) return;
+        if (!newSupp.name.trim() || !newSupp.start_date) return;
 
         try {
             const res = await fetch('/api/supplements', {
@@ -56,6 +56,10 @@ export function MedicineCabinet() {
                 body: JSON.stringify(newSupp)
             });
             const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || 'Failed to add supplement');
+                return;
+            }
             if (data.supplement) {
                 setSupplements([data.supplement, ...supplements]);
                 setShowAddForm(false);
@@ -65,10 +69,10 @@ export function MedicineCabinet() {
                     frequency: "",
                     start_date: new Date().toISOString().split('T')[0]
                 });
-                toast.success("Supplement added to your cabinet");
+                toast.success('Supplement added to your cabinet');
             }
         } catch (_error) {
-            toast.error("Failed to add supplement");
+            toast.error('Failed to add supplement. Please check your connection.');
         }
     };
 
@@ -79,10 +83,13 @@ export function MedicineCabinet() {
             });
             if (res.ok) {
                 setSupplements(supplements.filter(s => s.id !== id));
-                toast.success("Supplement removed");
+                toast.success('Supplement removed');
+            } else {
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.error || 'Failed to remove supplement');
             }
         } catch (_error) {
-            toast.error("Failed to remove supplement");
+            toast.error('Failed to remove supplement. Please check your connection.');
         }
     };
 

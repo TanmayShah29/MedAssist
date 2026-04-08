@@ -23,19 +23,25 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
 
     useEffect(() => {
         if (biomarkers.length > 0) {
-            const cacheKey = `medassist_doctor_questions_${biomarkers.length}_${biomarkers[0]?.id}`;
-            const cached = localStorage.getItem(cacheKey);
+            // Cache key based on the IDs and statuses of flagged biomarkers
+            // so the cache invalidates when results change, not just count
+            const flagged = biomarkers.filter(b => b.status === 'warning' || b.status === 'critical');
+            const cacheKey = `medassist_dq_${flagged
+                .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+                .map(b => `${b.id}:${b.status}`)
+                .join('|')}`;
 
-            if (cached) {
-                try {
+            try {
+                const cached = sessionStorage.getItem(cacheKey); // sessionStorage: clears on tab close
+                if (cached) {
                     const parsed = JSON.parse(cached);
                     if (parsed && Array.isArray(parsed)) {
                         setQuestions(parsed);
-                        return; // Found in cache, exit early
+                        return;
                     }
-                } catch (_e) {
-                    // Ignore parsing errors and fetch
                 }
+            } catch (_e) {
+                // Ignore cache errors
             }
 
             const fetchQuestions = async () => {
@@ -49,7 +55,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                     const data = await response.json();
                     if (data.questions && Array.isArray(data.questions)) {
                         setQuestions(data.questions);
-                        localStorage.setItem(cacheKey, JSON.stringify(data.questions));
+                        try { sessionStorage.setItem(cacheKey, JSON.stringify(data.questions)); } catch (_e) { }
                     }
                 } catch (error) {
                     logger.error("Failed to fetch doctor questions", error);

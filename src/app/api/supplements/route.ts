@@ -109,6 +109,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const rateLimitResult = await checkRateLimit();
+    if (!rateLimitResult.success) {
+        return NextResponse.json(
+            { error: rateLimitResult.message || 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+        );
+    }
+
     const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,

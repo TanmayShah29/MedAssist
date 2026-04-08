@@ -27,7 +27,7 @@ async function DashboardContent({ user }: { user: { id: string } }) {
     )
 
     const [profileResponse, biomarkerResponse, symptomResponse, labResponse] = await Promise.all([
-        supabase.from('profiles').select('id, first_name, last_name, onboarding_complete').eq('id', user.id).single(),
+        supabase.from('profiles').select('id, first_name, last_name, age, sex, blood_type, onboarding_complete').eq('id', user.id).single(),
         supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(200), // Bug 9: increased from 50
         supabase.from('symptoms').select('symptom').eq('user_id', user.id),
         supabase.from('lab_results')

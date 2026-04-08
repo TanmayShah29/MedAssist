@@ -108,16 +108,15 @@ export async function POST(request: NextRequest) {
 
         const { data: globalCache } = await supabase
             .from('global_ai_cache')
-            .select('response_json')
+            .select('response_json, usage_count')
             .eq('cache_key', cacheKey)
             .single();
 
         if (globalCache) {
-            // Update usage count asynchronously
-            supabase.from('global_ai_cache')
-                .update({ usage_count: (globalCache as unknown as { usage_count: number }).usage_count + 1, updated_at: new Date().toISOString() })
-                .eq('cache_key', cacheKey)
-                .then();
+            // Update usage count
+            await supabase.from('global_ai_cache')
+                .update({ usage_count: ((globalCache.usage_count as number) || 0) + 1, updated_at: new Date().toISOString() })
+                .eq('cache_key', cacheKey);
 
             return NextResponse.json({
                 questions: globalCache.response_json,

@@ -204,7 +204,13 @@ Rules:
             logger.error("AI Validation Error (Zod issues):", JSON.stringify(validationResult.error.issues, null, 2));
             // Scenario A variant: try to salvage biomarkers if the rest of the schema failed
             const salvaged = (parsedJson.biomarkers || []).filter(
-                (b: Record<string, unknown>) => b.name && b.value !== undefined && b.status
+                (b: Record<string, unknown>) =>
+                    typeof b.name === 'string' &&
+                    b.name.trim().length > 0 &&
+                    typeof b.value === 'number' &&
+                    !Number.isNaN(b.value) &&
+                    typeof b.status === 'string' &&
+                    ['optimal', 'warning', 'critical'].includes(b.status as string)
             );
             if (salvaged.length === 0) {
                 throw new AIExtractionError("AI returned data that failed validation and no valid biomarkers could be extracted. Please try again.");
@@ -284,11 +290,6 @@ Rules:
 - Do not use any emojis in your response`
 
     try {
-        // FOR AUDIT - Log system prompt
-        console.log("\n================ GROQ ASSISTANT SYSTEM PROMPT ================\n");
-        console.log(systemPrompt);
-        console.log("\n==============================================================\n");
-
         const completion = await groq.chat.completions.create({
             messages: [
                 {

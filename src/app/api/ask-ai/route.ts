@@ -2,8 +2,28 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { answerHealthQuestion } from '@/lib/groq-medical'
+import { checkRateLimit } from '@/services/rateLimitService'
+import { z } from 'zod'
+import { logger } from '@/lib/logger'
+
+export const maxDuration = 30;
+export const runtime = 'nodejs';
+
+const requestSchema = z.object({
+    question: z.string().trim().min(1, 'Question is required').max(1000, 'Question is too long'),
+    symptoms: z.array(z.string()).optional().default([]),
+});
 
 export async function POST(request: NextRequest) {
+    // IP-level rate limit (shared across all users / accounts)
+    const rateLimitResult = await checkRateLimit();
+    if (!rateLimitResult.success) {
+        return NextResponse.json(
+            { error: rateLimitResult.message || 'Too many requests.' },
+            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+        );
+    }
+
     const cookieStore = await cookies()
 
     const supabase = createServerClient(
@@ -29,7 +49,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Section 1b — Per-user rate limit: max 10 messages per minute
+    // Per-user rate limit: max 10 messages per minute
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString()
     const { count: msgCount } = await supabase
         .from('conversations')
@@ -44,11 +64,23 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    const { question, symptoms } = await request.json()
-
-    if (!question || question.trim().length === 0) {
-        return NextResponse.json({ error: 'Question is required' }, { status: 400 })
+    // Safe body parsing
+    let body: unknown;
+    try {
+        body = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
+
+    const parseResult = requestSchema.safeParse(body);
+    if (!parseResult.success) {
+        return NextResponse.json(
+            { error: parseResult.error.issues[0]?.message || 'Invalid input' },
+            { status: 400 }
+        );
+    }
+
+    const { question, symptoms } = parseResult.data;
 
     // Fetch biomarkers server-side for integrity
     const { data: rawBiomarkers } = await supabase
@@ -58,7 +90,7 @@ export async function POST(request: NextRequest) {
         .order('created_at', { ascending: false })
         .limit(50)
 
-    // Bug 8 fix: Deduplicate by name — keep most recent per biomarker
+    // Deduplicate by name — keep most recent per biomarker
     type BiomarkerRow = { name: string; value: string | number; unit: string; status: string; reference_range_min: number | null; reference_range_max: number | null; ai_interpretation: string };
     const biomarkers = Array.from(
         (rawBiomarkers || []).reduce((acc, b) => {
@@ -81,19 +113,21 @@ export async function POST(request: NextRequest) {
         .single()
 
     try {
-        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms || [], previousMessages || [], profile)
+        const answer = await answerHealthQuestion(question, biomarkers || [], symptoms, previousMessages || [], profile)
 
-        // Save history
-        await supabase.from('conversations').insert([
+        // Save history (awaited to prevent serverless function termination)
+        const { error: insertError } = await supabase.from('conversations').insert([
             { user_id: user.id, role: 'user', content: question },
             { user_id: user.id, role: 'assistant', content: answer }
-        ])
+        ]);
+        if (insertError) logger.error('[ask-ai] Failed to save conversation history:', insertError);
 
         return NextResponse.json({ answer })
     } catch (error: unknown) {
         if ((error as Error).message?.startsWith('RATE_LIMIT')) {
             return NextResponse.json({ error: (error as Error).message }, { status: 429 })
         }
+        logger.error('[ask-ai] Groq error:', error);
         return NextResponse.json({ error: 'Failed to get answer. Please try again.' }, { status: 500 })
     }
 }

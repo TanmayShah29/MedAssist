@@ -8,6 +8,13 @@ import { toast } from 'sonner';
 
 const IMAGE_BASED_PDF_CODE = 'IMAGE_BASED_PDF';
 
+const COMMON_SYMPTOMS = [
+    "Fatigue", "Fever", "Headache", "Nausea",
+    "Dizziness", "Shortness of breath", "Chest pain",
+    "Joint pain", "Muscle ache", "Loss of appetite",
+    "Weight loss", "Weight gain", "Trouble sleeping"
+];
+
 interface UploadModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -37,6 +44,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [manualRows, setManualRows] = useState<ManualRow[]>([
         { id: nextId(), name: '', value: '', unit: 'mg/dL' },
     ]);
+    const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -87,7 +95,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('symptoms', JSON.stringify([]));
+            formData.append('symptoms', JSON.stringify(selectedSymptoms));
 
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
@@ -158,6 +166,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             const formData = new FormData();
             formData.append('manualPayload', JSON.stringify({ biomarkers }));
+            formData.append('symptoms', JSON.stringify(selectedSymptoms));
 
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
@@ -251,6 +260,37 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                     <PenLine size={18} />
                                     Enter manually
                                 </button>
+                            </div>
+
+                            {/* Symptoms section common to both tabs */}
+                            <div className="px-6 pt-6 pb-2 border-b border-[#E8E6DF] bg-white">
+                                <p className="text-sm font-semibold text-[#1C1917] mb-3">Any current symptoms? (Optional)</p>
+                                <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto pr-2 pb-2">
+                                    {COMMON_SYMPTOMS.map((symptom) => {
+                                        const isSelected = selectedSymptoms.includes(symptom);
+                                        return (
+                                            <button
+                                                key={symptom}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedSymptoms(prev =>
+                                                        isSelected
+                                                            ? prev.filter(s => s !== symptom)
+                                                            : [...prev, symptom]
+                                                    );
+                                                }}
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors border",
+                                                    isSelected
+                                                        ? "bg-sky-100 border-sky-300 text-sky-800"
+                                                        : "bg-white border-[#E8E6DF] text-[#57534E] hover:bg-[#F5F4EF]"
+                                                )}
+                                            >
+                                                {symptom}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             <div className="p-6">

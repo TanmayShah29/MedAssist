@@ -21,7 +21,7 @@ export class ExtractionValidationError extends Error {
     }
 }
 
-const MIN_EXTRACTED_LENGTH = 50;
+const MIN_EXTRACTED_LENGTH = 100;
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
 export interface ExtractionResult {

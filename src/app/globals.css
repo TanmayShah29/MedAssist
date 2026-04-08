@@ -168,7 +168,6 @@
 }
 
 @media print {
-
   /* 1. Hide UI elements */
   nav,
   aside,
@@ -176,38 +175,34 @@
   .print-hidden,
   [role="status"],
   .feedback-button,
-  .bottom-menu {
+  .bottom-menu,
+  #header-nav {
     display: none !important;
   }
 
   /* 2. Reset layout */
   body,
   main,
-  .flex,
-  .grid {
+  #dashboard-content {
     display: block !important;
     width: 100% !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
-    color: black !important;
   }
 
-  /* 3. Force white background and high contrast */
+  /* 3. Preserve specific colors but fix page contrast */
   * {
-    background: transparent !important;
-    color: black !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
-  .bg-white,
-  .bg-slate-50 {
-    background: white !important;
-    border-color: #eee !important;
+  .text-white {
+    color: black !important;
   }
 
   /* 4. Ensure lists don't scroll/cut off */
@@ -219,35 +214,53 @@
   /* 5. Page breaks */
   section,
   .card,
-  .grid>div {
+  .grid > div {
     page-break-inside: avoid;
     break-inside: avoid;
     margin-bottom: 20px !important;
   }
 
   h1,
-  h2 {
+  h2,
+  h3 {
     page-break-after: avoid;
   }
 
-  /* 6. Typography */
+  /* 6. Typography tweaks for dense summary */
+  body {
+    font-size: 11pt;
+  }
+
   h1 {
-    font-size: 24pt !important;
+    font-size: 20pt !important;
+    color: black !important;
   }
 
   h2 {
-    font-size: 18pt !important;
+    font-size: 16pt !important;
+    color: black !important;
   }
 
   p,
   span {
-    font-size: 11pt !important;
+    font-size: 10pt !important;
+  }
+  
+  /* Make key biomarkers pop */
+  .text-red-600, .text-red-500 {
+    color: #DC2626 !important;
+    font-weight: 800 !important;
+  }
+
+  .text-amber-600, .text-amber-500 {
+    color: #D97706 !important;
+    font-weight: 800 !important;
   }
 
   /* 7. Show actual URLs next to links (optional but clinical) */
-  a[href]:after {
+  a[href]:not([href^="#"]):after {
     content: " (" attr(href) ")";
-    font-size: 9pt;
+    font-size: 8pt;
     color: #666;
   }
 

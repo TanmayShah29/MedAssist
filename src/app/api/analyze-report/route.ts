@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
             throw extractErr;
         }
 
-        if (!extractedText || extractedText.trim().length < 50) {
+        if (!extractedText || extractedText.trim().length < 100) {
             return NextResponse.json({
                 success: false,
                 error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
@@ -256,7 +256,9 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
         labValues: analysisResult.biomarkers as ExtractedLabValue[],
         fileName: 'Manual entry',
         rawOcrText: undefined,
-        rawAiJson: analysisResult
+        rawAiJson: analysisResult,
+        symptomConnections: analysisResult.symptomConnections,
+        plainSummary: analysisResult.plainSummary
     });
 
     if (!saveResult.success) {

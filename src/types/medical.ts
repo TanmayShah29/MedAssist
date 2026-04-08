@@ -2,6 +2,10 @@ export interface Profile {
     id: string;
     first_name: string;
     last_name: string;
+    age?: number | null;
+    sex?: string | null;
+    blood_type?: string | null;
+    onboarding_complete?: boolean;
     role?: string;
     parent_id?: string | null;
 }

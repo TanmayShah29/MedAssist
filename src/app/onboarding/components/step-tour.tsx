@@ -3,8 +3,7 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
-import { saveLabResult, completeOnboarding } from "@/app/actions/user-data";
-import { createClient } from "@/lib/supabase/client";
+import { completeOnboarding } from "@/app/actions/user-data";
 import { toast } from "sonner";
 import { logger } from "@/lib/logger";
 
@@ -15,32 +14,9 @@ export function StepTour() {
     const handleFinish = async () => {
         setIsLoading(true);
 
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            toast.error("You must be logged in to save results.");
-            setIsLoading(false);
-            return;
-        }
-
         try {
-            // 1. Only save results if we actually have them
-            if (analysisResult) {
-                const result = await saveLabResult({
-                    userId: user.id,
-                    healthScore: analysisResult.healthScore,
-                    riskLevel: analysisResult.riskLevel,
-                    summary: analysisResult.summary,
-                    labValues: analysisResult.biomarkers || [],
-                });
-
-                if (!result.success) {
-                    logger.error("Failed to save results:", result.error);
-                }
-            }
-
-            // 2. Mark onboarding as complete via Server Action (handles both DB and server-side Cookie)
+            // Results were already saved to Supabase by /api/analyze-report.
+            // All we need here is to mark onboarding as complete.
             const result = await completeOnboarding();
 
             if (!result.success) {
@@ -57,8 +33,6 @@ export function StepTour() {
             window.location.href = "/dashboard";
         }
     };
-
-    // (Removed null check for analysisResult so fallback UI always renders)
 
     return (
         <div style={{ textAlign: 'center', padding: '48px 24px' }}>
@@ -83,7 +57,9 @@ export function StepTour() {
                 Your dashboard is ready
             </h2>
             <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32, maxWidth: 360, margin: '0 auto 32px auto' }}>
-                Your health data is loaded and waiting. Upload your next report after your upcoming blood test to start tracking trends.
+                {analysisResult
+                    ? `We found ${analysisResult.biomarkers.length} biomarkers in your report. Your health data is loaded and waiting.`
+                    : 'Your profile is set up. Upload your first lab report to see your health overview.'}
             </p>
             <button
                 onClick={() => handleFinish()}

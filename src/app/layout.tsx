@@ -31,17 +31,19 @@ const STANDALONE_ROUTES = [
   "/onboarding",
 ];
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://medassist.vercel.app';
+
 export const metadata = {
   title: "MedAssist — Understand Your Lab Results",
   description: "Transform your confusing blood work PDFs into plain-English insights with AI-powered lab report analysis.",
   openGraph: {
     title: "MedAssist — Understand Your Lab Results",
     description: "AI-powered clinical intelligence for your lab reports.",
-    url: "https://medassist.vercel.app",
+    url: SITE_URL,
     siteName: "MedAssist",
     images: [
       {
-        url: "https://medassist.vercel.app/og-image.png",
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
       },
@@ -53,10 +55,10 @@ export const metadata = {
     card: "summary_large_image",
     title: "MedAssist — Understand Your Lab Results",
     description: "AI-powered clinical intelligence for your lab reports.",
-    images: ["https://medassist.vercel.app/og-image.png"],
+    images: [`${SITE_URL}/og-image.png`],
   },
   alternates: {
-    canonical: "https://medassist.vercel.app",
+    canonical: SITE_URL,
   },
 };
 
@@ -78,7 +80,7 @@ export default async function RootLayout({
         />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0EA5E9" />
-        <link rel="apple-touch-icon" href="/window.svg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/og-image.png" />
       </head>
       <body className="bg-[#FAFAF7] font-sans overflow-x-hidden">
         <ClientLayout 

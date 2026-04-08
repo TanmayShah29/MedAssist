@@ -1,161 +1,254 @@
--- Enable RLS
-create table if not exists rate_limits (
-  fingerprint text not null,
-  window_start timestamp with time zone not null,
-  request_count int not null default 1,
-  primary key (fingerprint, window_start)
+-- =============================================================================
+-- MedAssist — Full Database Schema (Production-Hardened)
+-- Last updated: 2026-04-08
+-- Changes vs v1:
+--   - All SECURITY DEFINER functions now have SET search_path = public (H1)
+--   - All RLS policies use (select auth.uid()) for per-query init plan (H4)
+--   - Duplicate/conflicting RLS policies removed (H3, H6)
+--   - feedback INSERT policy now scoped to own user_id (H2)
+--   - Added index on biomarkers.lab_result_id and feedback.user_id (H5, M5)
+--   - Removed unused indexes: idx_biomarkers_user_id, idx_lab_results_user_id, idx_profiles_email (M6)
+-- =============================================================================
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- RATE LIMITS
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS rate_limits (
+  fingerprint TEXT NOT NULL,
+  window_start TIMESTAMP WITH TIME ZONE NOT NULL,
+  request_count INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (fingerprint, window_start)
 );
 
-alter table rate_limits enable row level security;
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
 
--- Rate Limits Policies
-DO $$ 
+DROP POLICY IF EXISTS "Deny all access" ON rate_limits;
+CREATE POLICY "Deny all access" ON rate_limits FOR ALL USING (false);
+
+-- Deterministic rate limit check (search_path secured)
+DROP FUNCTION IF EXISTS public.check_rate_limit(text, integer, integer);
+
+CREATE FUNCTION public.check_rate_limit(
+  p_fingerprint TEXT,
+  p_limit INT,
+  p_window_seconds INT DEFAULT 60
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  current_window_start TIMESTAMP WITH TIME ZONE;
+  current_count INT;
 BEGIN
-    DROP POLICY IF EXISTS "Deny all access" ON rate_limits;
-END $$;
-create policy "Deny all access" on rate_limits for all using (false);
+  current_window_start := to_timestamp(
+    floor(extract(epoch FROM now()) / p_window_seconds) * p_window_seconds
+  );
+  INSERT INTO rate_limits (fingerprint, window_start, request_count)
+  VALUES (p_fingerprint, current_window_start, 1)
+  ON CONFLICT (fingerprint, window_start)
+  DO UPDATE SET request_count = rate_limits.request_count + 1
+  RETURNING request_count INTO current_count;
+  RETURN current_count <= p_limit;
+END;
+$$;
 
--- Deterministic Rate Limit Check
-create or replace function check_rate_limit(
-  p_fingerprint text,
-  p_window_seconds int,
-  p_limit int
-) returns boolean as $$
-declare
-  current_window_start timestamp with time zone;
-  current_count int;
-begin
-  -- Calculate window start (deterministic based on epoch)
-  current_window_start := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
+GRANT EXECUTE ON FUNCTION check_rate_limit(TEXT, INT, INT) TO anon, authenticated;
 
-  -- Insert or Update logic
-  insert into rate_limits (fingerprint, window_start, request_count)
-  values (p_fingerprint, current_window_start, 1)
-  on conflict (fingerprint, window_start)
-  do update set request_count = rate_limits.request_count + 1
-  returning request_count into current_count;
-
-  -- Return true if within limit, false if exceeded
-  return current_count <= p_limit;
-end;
-$$ language plpgsql security definer;
-
--- Grant execution to anon and authenticated roles
-grant execute on function check_rate_limit(text, int, int) to anon, authenticated;
-
--- Profiles Table
-create table if not exists profiles (
-  id uuid not null primary key,
-  updated_at timestamp with time zone,
-  first_name text,
-  last_name text,
-  blood_type text,
-  onboarding_complete boolean default false,
-  constraint id foreign key (id) references auth.users (id) on delete cascade
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PROFILES
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID NOT NULL PRIMARY KEY,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  first_name TEXT,
+  last_name TEXT,
+  blood_type TEXT,
+  age INT,
+  sex TEXT,
+  email TEXT,
+  onboarding_complete BOOLEAN DEFAULT false,
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
-alter table profiles enable row level security;
+-- Idempotent column additions for existing databases
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS age INT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS sex TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
 
-DO $$ 
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop all old policies (including duplicates from v1)
+DROP POLICY IF EXISTS "Users see own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
+DROP POLICY IF EXISTS "profiles_select" ON profiles;
+DROP POLICY IF EXISTS "profiles_insert" ON profiles;
+DROP POLICY IF EXISTS "profiles_update" ON profiles;
+
+-- Single set of clean, optimized policies
+CREATE POLICY "profiles_select" ON profiles
+  FOR SELECT USING ((SELECT auth.uid()) = id);
+
+CREATE POLICY "profiles_insert" ON profiles
+  FOR INSERT WITH CHECK ((SELECT auth.uid()) = id);
+
+CREATE POLICY "profiles_update" ON profiles
+  FOR UPDATE USING ((SELECT auth.uid()) = id)
+  WITH CHECK ((SELECT auth.uid()) = id);
+
+-- Trigger: auto-create profile on sign-up
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-    DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
-    DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
-    DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
-END $$;
+  INSERT INTO public.profiles (id, email, onboarding_complete)
+  VALUES (new.id, new.email, false)
+  ON CONFLICT (id) DO NOTHING;
+  RETURN new;
+END;
+$$;
 
-create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
-create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
-create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- Lab Results Table
-create table if not exists lab_results (
-  id bigint generated by default as identity primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  health_score int,
-  risk_level text,
-  summary text,
-  file_name text,
-  processed boolean default false,
-  processing_time_ms integer,
-  raw_ocr_text text,
-  raw_ai_json jsonb
+-- ─────────────────────────────────────────────────────────────────────────────
+-- LAB RESULTS
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS lab_results (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  health_score INT,
+  risk_level TEXT,
+  summary TEXT,
+  plain_summary TEXT,
+  file_name TEXT,
+  processed BOOLEAN DEFAULT false,
+  processing_time_ms INTEGER,
+  raw_ocr_text TEXT,
+  raw_ai_json JSONB,
+  symptom_connections JSONB
 );
 
-alter table lab_results enable row level security;
+-- Idempotent column additions
+ALTER TABLE lab_results ADD COLUMN IF NOT EXISTS uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+ALTER TABLE lab_results ADD COLUMN IF NOT EXISTS plain_summary TEXT;
+ALTER TABLE lab_results ADD COLUMN IF NOT EXISTS symptom_connections JSONB;
 
-DO $$ 
-BEGIN
-    DROP POLICY IF EXISTS "Users can view their own lab results" ON lab_results;
-    DROP POLICY IF EXISTS "Users can insert their own lab results" ON lab_results;
-END $$;
+ALTER TABLE lab_results ENABLE ROW LEVEL SECURITY;
 
-create policy "Users can view their own lab results" on lab_results for select using (auth.uid() = user_id);
-create policy "Users can insert their own lab results" on lab_results for insert with check (auth.uid() = user_id);
+-- Drop all old policies
+DROP POLICY IF EXISTS "Users see own lab_results" ON lab_results;
+DROP POLICY IF EXISTS "Users can view their own lab results" ON lab_results;
+DROP POLICY IF EXISTS "Users can insert their own lab results" ON lab_results;
+DROP POLICY IF EXISTS "lab_results_select" ON lab_results;
+DROP POLICY IF EXISTS "lab_results_insert" ON lab_results;
 
--- Biomarkers Table
-create table if not exists biomarkers (
-  id bigint generated by default as identity primary key,
-  lab_result_id bigint not null references lab_results(id) on delete cascade,
-  user_id uuid references profiles(id) on delete cascade,
-  name text,
-  value float,
-  unit text,
-  status text,
-  reference_range_min float,
-  reference_range_max float,
-  category text,
-  confidence numeric,
-  ai_interpretation text
+CREATE POLICY "lab_results_select" ON lab_results
+  FOR SELECT USING ((SELECT auth.uid()) = user_id);
+
+CREATE POLICY "lab_results_insert" ON lab_results
+  FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- BIOMARKERS
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS biomarkers (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  lab_result_id BIGINT NOT NULL REFERENCES lab_results(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT,
+  value FLOAT,
+  unit TEXT,
+  status TEXT,
+  reference_range_min FLOAT,
+  reference_range_max FLOAT,
+  category TEXT,
+  confidence NUMERIC,
+  ai_interpretation TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
-alter table biomarkers enable row level security;
+ALTER TABLE biomarkers ENABLE ROW LEVEL SECURITY;
 
-DO $$ 
-BEGIN
-    DROP POLICY IF EXISTS "Users can view their own biomarkers" ON biomarkers;
-    DROP POLICY IF EXISTS "Users can insert their own biomarkers" ON biomarkers;
-    DROP POLICY IF EXISTS "Users see own biomarkers" ON biomarkers;
-END $$;
+DROP POLICY IF EXISTS "Users see own biomarkers" ON biomarkers;
+DROP POLICY IF EXISTS "biomarkers_all" ON biomarkers;
 
-create policy "Users see own biomarkers" on biomarkers for all using (auth.uid() = user_id);
+CREATE POLICY "biomarkers_all" ON biomarkers
+  FOR ALL USING ((SELECT auth.uid()) = user_id);
 
--- Symptoms Table
-create table if not exists symptoms (
-  id bigint generated by default as identity primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
-  symptom_text text not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Index for FK join (dashboard, trend charts)
+CREATE INDEX IF NOT EXISTS idx_biomarkers_lab_result_id ON biomarkers(lab_result_id);
+-- Note: idx_biomarkers_user_id intentionally NOT created (RLS filters by user; unused per advisor)
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SYMPTOMS
+-- NOTE: column is 'symptom' (not 'symptom_text') to match all application code
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS symptoms (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  symptom TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-alter table symptoms enable row level security;
-
-DO $$ 
+-- Idempotent: rename symptom_text → symptom on existing databases
+DO $$
 BEGIN
-    DROP POLICY IF EXISTS "Users can manage their own symptoms" ON symptoms;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'symptoms' AND column_name = 'symptom_text'
+  ) THEN
+    ALTER TABLE symptoms RENAME COLUMN symptom_text TO symptom;
+  END IF;
 END $$;
 
-CREATE POLICY "Users can manage their own symptoms" ON symptoms FOR ALL USING (auth.uid() = user_id);
+ALTER TABLE symptoms ENABLE ROW LEVEL SECURITY;
 
--- Feedback Table
+DROP POLICY IF EXISTS "Users see own symptoms" ON symptoms;
+DROP POLICY IF EXISTS "Users can manage their own symptoms" ON symptoms;
+DROP POLICY IF EXISTS "symptoms_all" ON symptoms;
+
+CREATE POLICY "symptoms_all" ON symptoms
+  FOR ALL USING ((SELECT auth.uid()) = user_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- FEEDBACK
+-- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS feedback (
   id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::TEXT, NOW()) NOT NULL,
   message TEXT NOT NULL,
   url TEXT,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
-alter table feedback enable row level security;
+ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 
-DO $$ 
-BEGIN
-    DROP POLICY IF EXISTS "Users can insert feedback" ON feedback;
-END $$;
+-- Drop both old insecure policies (WITH CHECK (true) allowed any user_id)
+DROP POLICY IF EXISTS "Users can insert feedback" ON feedback;
+DROP POLICY IF EXISTS "Authenticated users can insert feedback" ON feedback;
+DROP POLICY IF EXISTS "Users can insert own feedback" ON feedback;
 
-CREATE POLICY "Users can insert feedback" ON feedback FOR INSERT WITH CHECK (true);
+-- Scoped: users can only insert rows where user_id = their own UID
+CREATE POLICY "Users can insert own feedback" ON feedback
+  FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
 
--- Supplements Table
+-- Index for FK join
+CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SUPPLEMENTS
+-- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS supplements (
   id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -165,40 +258,71 @@ CREATE TABLE IF NOT EXISTS supplements (
   start_date DATE NOT NULL,
   end_date DATE,
   active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, now()) NOT NULL
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-alter table supplements enable row level security;
+ALTER TABLE supplements ENABLE ROW LEVEL SECURITY;
 
-DO $$ 
-BEGIN
-    DROP POLICY IF EXISTS "Users can manage their own supplements" ON supplements;
-END $$;
+DROP POLICY IF EXISTS "Users can manage their own supplements" ON supplements;
+DROP POLICY IF EXISTS "supplements_all" ON supplements;
 
-CREATE POLICY "Users can manage their own supplements" ON supplements FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "supplements_all" ON supplements
+  FOR ALL
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
--- Global AI Cache Table
+-- ─────────────────────────────────────────────────────────────────────────────
+-- GLOBAL AI CACHE (Doctor Questions pattern cache)
+-- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS global_ai_cache (
   id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   cache_key TEXT UNIQUE NOT NULL,
   response_json JSONB NOT NULL,
   usage_count INT DEFAULT 1,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, now()) NOT NULL
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- RLS: deny direct access; only service role bypasses
 ALTER TABLE global_ai_cache ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-    DROP POLICY IF EXISTS "Deny all direct access" ON global_ai_cache;
-END $$;
+-- Deny direct access — data flows through SECURITY DEFINER RPCs only
+DROP POLICY IF EXISTS "Deny all direct access" ON global_ai_cache;
+DROP POLICY IF EXISTS "Authenticated users can read global AI cache" ON global_ai_cache;
+DROP POLICY IF EXISTS "Authenticated users can upsert global AI cache" ON global_ai_cache;
+DROP POLICY IF EXISTS "global_ai_cache_deny_direct" ON global_ai_cache;
 
-CREATE POLICY "Deny all direct access" ON global_ai_cache FOR ALL USING (false) WITH CHECK (false);
+CREATE POLICY "global_ai_cache_deny_direct" ON global_ai_cache
+  FOR ALL USING (false) WITH CHECK (false);
 
--- Updated Save Function with raw data support
-CREATE OR REPLACE FUNCTION save_complete_report(
+-- ─────────────────────────────────────────────────────────────────────────────
+-- CONVERSATIONS (AI chat history + per-user rate limiting)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS conversations (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
+
+-- Drop both old policies (including the duplicate that caused advisor warnings)
+DROP POLICY IF EXISTS "Users manage own conversations" ON conversations;
+DROP POLICY IF EXISTS "Users see own conversations" ON conversations;
+DROP POLICY IF EXISTS "conversations_all" ON conversations;
+
+CREATE POLICY "conversations_all" ON conversations
+  FOR ALL USING ((SELECT auth.uid()) = user_id);
+
+-- Composite index for fast per-user history queries and rate limit checks
+CREATE INDEX IF NOT EXISTS conversations_user_id_created_at_idx
+  ON conversations (user_id, created_at DESC);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SAVE COMPLETE REPORT RPC (search_path secured)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.save_complete_report(
   p_user_id UUID,
   p_file_name TEXT,
   p_health_score INT,
@@ -206,65 +330,42 @@ CREATE OR REPLACE FUNCTION save_complete_report(
   p_summary TEXT,
   p_biomarkers JSONB,
   p_raw_ocr_text TEXT DEFAULT NULL,
-  p_raw_ai_json JSONB DEFAULT NULL
-) RETURNS BIGINT AS $$
+  p_raw_ai_json JSONB DEFAULT NULL,
+  p_symptom_connections JSONB DEFAULT NULL,
+  p_plain_summary TEXT DEFAULT NULL
+)
+RETURNS BIGINT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
   v_report_id BIGINT;
 BEGIN
-  -- 1. Insert into lab_results
   INSERT INTO lab_results (
-    user_id, 
-    file_name, 
-    health_score, 
-    risk_level, 
-    summary, 
-    processed,
-    raw_ocr_text,
-    raw_ai_json
+    user_id, file_name, health_score, risk_level, summary, plain_summary,
+    processed, raw_ocr_text, raw_ai_json, symptom_connections, uploaded_at
   )
   VALUES (
-    p_user_id, 
-    p_file_name, 
-    p_health_score, 
-    p_risk_level, 
-    p_summary, 
-    true,
-    p_raw_ocr_text,
-    p_raw_ai_json
+    p_user_id, p_file_name, p_health_score, p_risk_level, p_summary, p_plain_summary,
+    true, p_raw_ocr_text, p_raw_ai_json, p_symptom_connections,
+    timezone('utc'::text, now())
   )
   RETURNING id INTO v_report_id;
 
-  -- 2. Insert biomarkers from JSONB array
   INSERT INTO biomarkers (
-    user_id, 
-    lab_result_id, 
-    name, 
-    value, 
-    unit, 
-    status, 
-    reference_range_min, 
-    reference_range_max, 
-    category, 
-    confidence, 
-    ai_interpretation
+    user_id, lab_result_id, name, value, unit, status,
+    reference_range_min, reference_range_max, category, confidence, ai_interpretation
   )
-  SELECT 
-    p_user_id,
-    v_report_id,
-    (b->>'name')::TEXT,
-    (b->>'value')::FLOAT,
-    (b->>'unit')::TEXT,
-    (b->>'status')::TEXT,
-    (b->>'referenceMin')::FLOAT,
-    (b->>'referenceMax')::FLOAT,
-    (b->>'category')::TEXT,
-    (b->>'confidence')::FLOAT,
-    (b->>'aiInterpretation')::TEXT
+  SELECT
+    p_user_id, v_report_id,
+    (b->>'name')::TEXT, (b->>'value')::FLOAT, (b->>'unit')::TEXT, (b->>'status')::TEXT,
+    (b->>'referenceMin')::FLOAT, (b->>'referenceMax')::FLOAT,
+    (b->>'category')::TEXT, (b->>'confidence')::FLOAT, (b->>'aiInterpretation')::TEXT
   FROM jsonb_array_elements(p_biomarkers) AS b;
 
   RETURN v_report_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
--- Grant execution to authenticated users
-GRANT EXECUTE ON FUNCTION save_complete_report(UUID, TEXT, INT, TEXT, TEXT, JSONB, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION save_complete_report(UUID, TEXT, INT, TEXT, TEXT, JSONB, TEXT, JSONB, JSONB, TEXT) TO authenticated;
