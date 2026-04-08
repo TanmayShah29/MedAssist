@@ -81,7 +81,7 @@ export default function LandingPage() {
               className="bg-sky-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-sky-600 transition-all active:scale-95 shadow-md shadow-sky-500/20 min-h-[44px]"
               style={{ WebkitAppearance: 'none', marginLeft: 8 }}
             >
-              {isSignedIn ? 'Go to Dashboard' : 'Sign up'}
+              {isSignedIn ? 'Go to Dashboard' : 'Sign up free'}
             </button>
           </div>
         </div>
@@ -201,7 +201,6 @@ export default function LandingPage() {
               </div>
 
               <div className="grow shrink basis-auto w-full min-w-0 relative">
-                {/* Visual representation of a timeline/correlation */}
                 <div className="w-full aspect-square bg-gradient-to-br from-indigo-500/10 to-sky-500/20 rounded-[48px] border border-white/5 p-8 lg:p-12 relative overflow-hidden group">
                   <div className="absolute inset-0 flex items-center justify-center opacity-20 blur-xl group-hover:opacity-30 transition-opacity">
                     <div className="w-full space-y-8">
@@ -297,7 +296,6 @@ export default function LandingPage() {
 
             {/* Pipeline steps */}
             <div className="relative">
-              {/* Connecting line */}
               <div className="absolute left-10 top-10 bottom-10 w-0.5 
                             bg-border-light hidden md:block" />
 
@@ -335,7 +333,6 @@ export default function LandingPage() {
                     transition={{ delay: idx * 0.2, duration: 0.5 }}
                     className="relative flex items-start"
                   >
-                    {/* Step number circle */}
                     <div className={`
                     relative z-10 flex-shrink-0
                     w-20 h-20 rounded-3xl
@@ -353,7 +350,6 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    {/* Content */}
                     <div className="grow shrink basis-auto w-full pt-2" style={{ marginLeft: 32 }}>
                       <h3 className="text-2xl font-bold text-[#1C1917] mb-3">
                         {item.title}
@@ -407,19 +403,16 @@ export default function LandingPage() {
         <section className="py-24 px-6 bg-white overflow-hidden">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center gap-16">
-              {/* Left: Interactive-looking Dashboard Mockup */}
               <div className="grow shrink basis-auto relative w-full lg:max-w-xl">
                 <motion.div
                   initial={{ opacity: 0.01, x: -40 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   className="bg-white rounded-3xl border border-[#E8E6DF] shadow-2xl p-6 relative z-10 overflow-hidden"
                 >
-                  {/* Mock Header */}
                   <div className="flex justify-between items-center mb-8">
                     <div className="h-4 w-32 bg-border-light rounded-full" />
                     <div className="h-8 w-8 bg-sky-500 rounded-lg" />
                   </div>
-                  {/* Mock Hero Card */}
                   <div className="bg-sky-500 rounded-2xl p-6 text-white mb-6">
                     <div className="h-3 w-20 bg-white/20 rounded-full mb-4" />
                     <div className="flex items-baseline gap-2">
@@ -427,7 +420,6 @@ export default function LandingPage() {
                       <div className="text-sm font-bold bg-white/20 px-2 py-0.5 rounded">Good</div>
                     </div>
                   </div>
-                  {/* Mock Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white border border-[#E8E6DF] rounded-xl p-4">
                       <div className="h-2 w-12 bg-emerald-100 rounded-full mb-2" />
@@ -439,12 +431,10 @@ export default function LandingPage() {
                     </div>
                   </div>
                 </motion.div>
-                {/* Decorative elements */}
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-sky-500/5 rounded-full blur-3xl" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl" />
               </div>
 
-              {/* Right: Trust Statements */}
               <div className="grow shrink basis-auto w-full">
                 <h2 className="text-4xl font-bold text-[#1C1917] mb-8">
                   Your health data is <br />
@@ -488,7 +478,6 @@ export default function LandingPage() {
         <section className="py-24 px-6 bg-page">
           <div className="max-w-5xl mx-auto bg-white border border-[#E8E6DF] rounded-[32px] p-12 lg:p-20 shadow-sm">
 
-            {/* Section label */}
             <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.2em] text-center mb-4">
               TECHNICAL ARCHITECTURE
             </p>
@@ -502,7 +491,6 @@ export default function LandingPage() {
               interpret, and structure your lab data with high accuracy.
             </p>
 
-            {/* Pipeline steps */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-0 border border-[#E8E6DF] rounded-2xl overflow-hidden">
               {[
                 {
@@ -514,9 +502,9 @@ export default function LandingPage() {
                 },
                 {
                   step: '02',
-                  title: 'OCR Extraction',
-                  tech: 'OCR.space',
-                  description: 'Extracting raw values, units, and clinical reference ranges.',
+                  title: 'Text Extraction',
+                  tech: 'pdf-parse',
+                  description: 'Native text extraction for digital PDFs. OCR.space fallback for scanned reports.',
                   color: 'text-violet-500'
                 },
                 {
@@ -561,7 +549,6 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* Tech stack row at bottom */}
             <div className="mt-16 pt-10 border-t border-[#E8E6DF] flex flex-wrap justify-center">
               <span className="text-sm font-medium text-[#57534E] self-center" style={{ marginRight: 12 }}>
                 Powered by Groq AI & Llama 3.3
@@ -615,7 +602,7 @@ export default function LandingPage() {
                   {
                     timeline: "Upload #3+",
                     title: "True Health IQ",
-                    description: "Understand your body&apos;s patterns and predict future outcomes.",
+                    description: "Understand your body's patterns and predict future outcomes.",
                     icon: "3",
                   },
                 ].map((stage, idx) => (
@@ -683,7 +670,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── WHAT IT'S NOT ─────────────────────────────── */}
+        {/* ── MEDICAL DISCLAIMERS ─────────────────────────────── */}
         <section className="py-24 px-6">
           <div className="max-w-3xl mx-auto">
             <motion.div
@@ -755,7 +742,6 @@ export default function LandingPage() {
         <footer className="py-12 px-6 border-t border-[#E8E6DF] bg-page">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              {/* Logo */}
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-white" />
@@ -763,7 +749,6 @@ export default function LandingPage() {
                 <span className="font-display text-xl text-[#1C1917]">MedAssist</span>
               </div>
 
-              {/* Disclaimer */}
               <p className="text-[13px] text-[#A8A29E] text-center max-w-lg leading-relaxed">
                 AI-generated health insights. For educational purposes only.
                 Always consult a qualified physician. Powered by Groq AI & Llama 3.3.
@@ -774,7 +759,6 @@ export default function LandingPage() {
                 <Link href="/privacy" className="hover:text-[#1C1917] transition-colors">Privacy</Link>
               </div>
 
-              {/* Credits */}
               <div className="flex items-center text-[11px] text-[#A8A29E]">
                 <span>© 2026 MedAssist</span>
                 <span className="mx-3 text-border-medium" aria-hidden="true">|</span>
@@ -784,7 +768,7 @@ export default function LandingPage() {
           </div>
         </footer>
 
-      </div> {/* End Isolate Wrapper */}
+      </div>
     </div>
   );
 }
