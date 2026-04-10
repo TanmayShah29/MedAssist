@@ -1,24 +1,50 @@
 {
-    "cleanUrls": true,
-    "trailingSlash": false,
-    "headers": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "src/app/api/analyze-report/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/ask-ai/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/assistant/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/supplements/route.ts": {
+      "maxDuration": 15
+    },
+    "src/app/api/feedback/route.ts": {
+      "maxDuration": 15
+    }
+  },
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
         {
-            "source": "/fonts/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
-        },
-        {
-            "source": "/_next/static/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
-    ]
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/og-image.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
+  ]
 }

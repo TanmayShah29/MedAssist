@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Send, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { logger } from "@/lib/logger";
 import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -85,17 +86,22 @@ export default function AssistantPage() {
             } else if (fetchedBiomarkers.length > 0) {
                 // Feature 8: Proactive Greeting
                 try {
-                    const gRes = await fetch('/api/assistant/greeting', {
+                    // Use the existing ask-ai endpoint with a greeting prompt
+                    // instead of the non-existent /api/assistant/greeting route
+                    const gRes = await fetch('/api/ask-ai', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ biomarkers: fetchedBiomarkers, symptoms: fetchedSymptoms })
+                        body: JSON.stringify({
+                            question: `Please greet me by name and briefly comment on my most notable lab result. Keep it to 2-3 sentences.`,
+                            symptoms: fetchedSymptoms
+                        })
                     });
                     const gData = await gRes.json();
-                    if (gData.greeting) {
+                    if (gData.answer) {
                         setMessages([{
                             id: "1",
                             role: "assistant",
-                            content: gData.greeting,
+                            content: gData.answer,
                             timestamp: new Date()
                         }]);
                     }
@@ -124,8 +130,8 @@ export default function AssistantPage() {
                     });
                     const qData = await qRes.json();
                     if (qData.questions) setDoctorQuestions(qData.questions);
-                } catch (e) {
-                console.warn("Failed to fetch doctor questions", e);
+                } catch (_e) {
+                    logger.warn("Failed to fetch doctor questions", _e);
                 }
             }
         };

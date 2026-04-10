@@ -1,92 +1,229 @@
-# MedAssist — Understand Your Lab Results
+# MedAssist
 
-MedAssist is an intelligent health platform that transforms confusing blood work PDFs into plain-English insights. By connecting raw clinical data with advanced AI, MedAssist helps you track your longitudinal health trends and prepare for your next doctor's visit with confidence.
+AI-powered lab report analysis. Upload a blood work PDF, get plain-English explanations of every biomarker, track trends over time, and know exactly what to ask your doctor.
 
-## Key Features
-- **AI Lab Report Analysis**: Automated extraction of biomarkers from PDF reports using pdf-parse (digital PDFs) and OCR.space (scanned PDFs, requires API key).
-- **Personalized Care Plans**: Data-driven diet and lifestyle recommendations based on your out-of-range values.
-- **Longitudinal Tracking**: Visualize how your health markers change over time with interactive trend charts.
-- **Doctor Preparation**: Auto-generated questions tailored to your specific clinical flags.
-- **Privacy First**: Enterprise-grade security with Supabase row-level encryption. Your data is never sold.
-- **Sample Data Mode**: Explore all app features with realistic sample data after signing up — no lab report needed to get started.
-- **Supplement & Medication Tracking**: Log what you're taking and see automated correlation markers on your biomarker trend charts.
-- **Data Portability & Control**: Export functionality and complete account deletion options for full control over your health data.
-- **Continuous Feedback**: Built-in feedback system to continually improve the user experience.
-
-## Tech Stack
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
-- **Database & Auth**: [Supabase](https://supabase.com/)
-- **AI Engine**: [Groq SDK](https://groq.com/) (Llama 3.3 70B)
-- **OCR Engine**: [pdf-parse](https://www.npmjs.com/package/pdf-parse) (primary) + [OCR.space API](https://ocr.space/) (scanned PDF fallback)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Charts**: [Recharts](https://recharts.org/)
-
-## Getting Started
-
-### Prerequisites
-- Node.js 20+
-- A Supabase account
-- A Groq API key
-- An OCR.space API key *(optional — only needed for scanned/image-based PDFs)*
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/tanmayshah/medassist.git
-   cd medassist
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local and fill in your keys
-   ```
-
-4. Set up the database:
-   - Open your [Supabase project SQL editor](https://supabase.com/dashboard)
-   - Copy the full contents of `supabase_schema.sql`
-   - Run the SQL — it is fully idempotent (safe to re-run on an existing database)
-
-5. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-## Environment Variables
-
-See `.env.example` for the full annotated list. Summary:
-
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ Yes | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Yes | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ Yes | Service role key (server-only, for saving reports) |
-| `GROQ_API_KEY` | ✅ Yes | Groq API key for AI analysis |
-| `OCR_SPACE_API_KEY` | ⚠️ Optional | Enables scanned PDF support. Without it, only digital PDFs work. |
-| `NEXT_PUBLIC_APP_URL` | ⚠️ Optional | Base URL for absolute links in emails |
-
-## Database Setup
-
-The `supabase_schema.sql` file is the single source of truth for the database. It is:
-- **Idempotent** — safe to re-run on an existing database; uses `CREATE IF NOT EXISTS`, `ALTER ... ADD COLUMN IF NOT EXISTS`, and `DROP POLICY IF EXISTS` throughout.
-- **Self-migrating** — includes inline `DO $$` blocks for backward-compatible migrations (e.g., renaming columns on existing databases).
-
-Run it in the Supabase SQL editor any time you pull new changes that include schema updates.
-
-## Deployment
-
-Deploy to Vercel in one click:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftanmayshah%2Fmedassist)
-
-After deploying, add your environment variables in Vercel → Project Settings → Environment Variables, then run `supabase_schema.sql` against your production Supabase project.
+**Stack:** Next.js 16 · Supabase · Groq AI (Llama 3.3 70B) · Tailwind CSS 4 · TypeScript
 
 ---
-© 2026 MedAssist. Built by Tanmay Shah.
+
+## Features
+
+- **PDF Analysis** — Extract every biomarker from a digital lab report PDF in 20–40 seconds
+- **Manual Entry** — Type in values directly if you don't have a PDF
+- **Health Score** — 0–100 score calculated from your biomarker statuses
+- **Trend Charts** — Longitudinal charts showing each biomarker across all uploads
+- **AI Assistant** — Ask questions about your results in plain language
+- **Supplement Tracking** — Log supplements and see correlation markers on trend charts
+- **Doctor Questions** — AI-generated, value-specific questions for your next appointment
+- **Symptom Connections** — Link your reported symptoms to related biomarkers
+- **Account Deletion** — One click to permanently erase all data
+
+---
+
+## Quickstart (local dev)
+
+### 1. Prerequisites
+
+- Node.js 20+
+- A [Supabase](https://supabase.com) project (free tier is fine)
+- A [Groq](https://console.groq.com) API key (free tier is fine)
+
+### 2. Clone and install
+
+```bash
+git clone https://github.com/your-username/medassist.git
+cd medassist
+npm install
+```
+
+### 3. Set up environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key   # Project Settings → API → service_role
+GROQ_API_KEY=gsk_your_key
+```
+
+> ⚠️ **Never commit `.env.local`.** It's already in `.gitignore`.
+
+### 4. Set up the database
+
+Run the full schema in the Supabase SQL editor:
+
+```bash
+# Copy and paste the contents of supabase_schema.sql into:
+# Supabase Dashboard → SQL Editor → New query → Run
+```
+
+This creates all tables, RLS policies, and the `check_rate_limit` and `save_complete_report` RPCs that the app requires.
+
+### 5. Run
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Deploying to production (Vercel)
+
+### 1. Push to GitHub
+
+```bash
+git add .
+git commit -m "production ready"
+git push origin main
+```
+
+### 2. Import into Vercel
+
+- Go to [vercel.com/new](https://vercel.com/new) → Import your repo
+- Framework: **Next.js** (auto-detected)
+- Root directory: `.` (default)
+
+### 3. Set environment variables in Vercel
+
+In your Vercel project → **Settings → Environment Variables**, add:
+
+| Variable | Value | Required |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | ✅ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key | ✅ |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | ✅ |
+| `GROQ_API_KEY` | Groq API key | ✅ |
+| `NEXT_PUBLIC_SITE_URL` | `https://yourdomain.com` | Recommended |
+| `OCR_SPACE_API_KEY` | [ocr.space](https://ocr.space/ocrapi) free key | Optional |
+| `SENTRY_DSN` | Sentry project DSN | Optional |
+
+### 4. Supabase Auth redirect URLs
+
+In Supabase → **Authentication → URL Configuration**:
+
+- **Site URL:** `https://yourdomain.com`
+- **Redirect URLs:** `https://yourdomain.com/auth/callback`
+
+### 5. Deploy
+
+Vercel deploys automatically on every push to `main`. Manual deploy:
+
+```bash
+npx vercel --prod
+```
+
+---
+
+## Error monitoring (Sentry — optional but recommended)
+
+```bash
+npm install @sentry/nextjs
+npx @sentry/wizard@latest -i nextjs
+```
+
+Then in `src/instrumentation.ts`, uncomment the Sentry block and add `SENTRY_DSN` to your Vercel env vars. The `logger.onError` hook will forward all `logger.error()` calls to Sentry automatically.
+
+---
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── analyze-report/   # PDF → AI extraction → DB save
+│   │   ├── ask-ai/           # AI health assistant Q&A
+│   │   ├── assistant/        # Clinical insight generation
+│   │   ├── biomarker-trends/ # Trend data for charts (Edge runtime)
+│   │   ├── generate-questions/ # AI doctor question generation
+│   │   ├── supplements/      # CRUD for supplement tracking
+│   │   ├── feedback/         # User feedback collection
+│   │   └── account/delete/   # Permanent account deletion
+│   ├── actions/              # Next.js Server Actions (DB writes via supabaseAdmin)
+│   ├── dashboard/            # Main health dashboard
+│   ├── results/              # Per-report detail view
+│   ├── assistant/            # AI chat interface
+│   ├── profile/              # User profile management
+│   ├── settings/             # App settings
+│   ├── onboarding/           # First-run onboarding flow
+│   └── auth/                 # Sign in / sign up
+├── components/               # React UI components
+├── lib/
+│   ├── groq-medical.ts       # All Groq AI calls (extraction, Q&A, greeting)
+│   ├── retry.ts              # Exponential-backoff retry utility
+│   ├── logger.ts             # Structured logger with Sentry hook
+│   ├── env.ts                # Environment variable validation
+│   ├── health-logic.ts       # Health score calculation
+│   └── supabase-admin.ts     # Service-role Supabase client (server-only)
+├── services/
+│   ├── aiAnalysisService.ts  # Thin wrapper over groq-medical.ts
+│   ├── extractionService.ts  # PDF text extraction with error mapping
+│   └── rateLimitService.ts   # IP-hashed rate limiting via Supabase RPC
+├── middleware.ts             # Auth + onboarding routing
+└── instrumentation.ts        # Next.js startup hook (env validation + Sentry init)
+```
+
+---
+
+## Testing
+
+```bash
+npm test           # Run all tests once
+npm run test:watch # Watch mode
+```
+
+Test files live in `src/__tests__/`:
+
+| File | What it covers |
+|---|---|
+| `health-logic.test.ts` | Score calculation, status normalisation |
+| `retry.test.ts` | Retry logic, backoff, no-retry conditions |
+| `api-validation.test.ts` | Zod schemas for all API routes |
+| `extractionService.test.ts` | PDF extraction error handling |
+
+---
+
+## Rate limits
+
+| Limit | Value |
+|---|---|
+| IP — per minute | 10 requests |
+| IP — per hour | 100 requests |
+| User — uploads per hour | 5 reports |
+| User — AI messages per minute | 10 messages |
+
+Rate limiting uses the `check_rate_limit` Supabase RPC with hashed IPs (raw IPs are never stored).
+
+Set `DISABLE_RATE_LIMIT=true` in `.env.local` to bypass during local development.
+
+---
+
+## Security
+
+- **Service role key** is never exposed to the client — only used in Server Actions and API routes
+- **Row-Level Security (RLS)** is enabled on all Supabase tables; users can only access their own data
+- **Security headers** on every response: CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy
+- **Input validation** with Zod on all API routes before any DB or AI call
+- **Server-side file validation** — file type, size (10 MB limit), and MIME type checked before processing
+- **AI content safety** — system prompts forbid diagnostic language; all responses include medical disclaimers
+
+---
+
+## Environment variable reference
+
+See [`.env.example`](.env.example) for the full annotated list.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+Built by [Tanmay Shah](https://github.com/your-username).

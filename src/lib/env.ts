@@ -11,6 +11,8 @@
  * OPTIONAL — features degrade gracefully if absent:
  *   OCR_SPACE_API_KEY              — Fallback OCR for scanned/image-based PDFs.
  *                                    Without this, only digital PDFs are supported.
+ *   NEXT_PUBLIC_SITE_URL           — Canonical URL for sitemaps and OG images.
+ *   SENTRY_DSN                     — Sentry DSN for error monitoring.
  */
 const REQUIRED = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -21,6 +23,8 @@ const REQUIRED = [
 
 const OPTIONAL = [
   'OCR_SPACE_API_KEY',
+  'NEXT_PUBLIC_SITE_URL',
+  'SENTRY_DSN',
 ] as const;
 
 export function validateEnv(): void {
@@ -39,7 +43,7 @@ export function validateEnv(): void {
     if (missingOptional.length > 0) {
       console.warn(
         `[env] Optional vars not set: ${missingOptional.join(', ')}. ` +
-        `Scanned/image-based PDFs will not be supported without OCR_SPACE_API_KEY.`
+        `Some features (OCR fallback, sitemaps, error monitoring) will be limited.`
       );
     }
   }

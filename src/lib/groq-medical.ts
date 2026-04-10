@@ -1,6 +1,7 @@
 import Groq from "groq-sdk";
 import { ExtractionResultSchema } from "./validations/analysis";
 import { logger } from "@/lib/logger";
+import { withRetry } from "@/lib/retry";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -39,7 +40,7 @@ export interface ExtractionResult {
 
 export interface BiomarkerContext {
   name: string;
-  value: number | string; // DB stores as FLOAT but arrives as string in some queries
+  value: number | string;
   unit: string;
   status: string;
   reference_range_min?: number | null;
@@ -47,7 +48,7 @@ export interface BiomarkerContext {
   ai_interpretation?: string;
 }
 
-// ── Extraction ─────────────────────────────────────────────────────────────
+// ── Custom error ────────────────────────────────────────────────────────────
 
 export class AIExtractionError extends Error {
   constructor(message: string) {
@@ -56,38 +57,20 @@ export class AIExtractionError extends Error {
   }
 }
 
-export async function extractAndInterpretBiomarkers(
-  pdfText: string,
-  symptoms: string[],
-  history: BiomarkerContext[] = []
-): Promise<ExtractionResult> {
-  const historicalContext =
-    history.length > 0
-      ? `\n\nUser's Historical Lab Data:\n${history
-          .map((b) => `- ${b.name}: ${b.value} ${b.unit} (${b.status})`)
-          .join("\n")}`
-      : "";
+// ── System prompt (extracted so it's easier to edit) ───────────────────────
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
-
-  try {
-    const completion = await groq.chat.completions.create(
-      {
-        messages: [
-          {
-            role: "system",
-            content: `You are a medical data extraction assistant. You are an educational tool — you NEVER diagnose, prescribe, or provide treatment plans.
+function buildSystemPrompt(symptoms: string[], historicalContext: string): string {
+  return `You are a medical data extraction assistant. You are an educational tool — you NEVER diagnose, prescribe, or provide treatment plans.
 
 Extract ALL biomarker values from the provided lab report text. Return ONLY valid JSON — no markdown, no backticks, no explanation outside the JSON.
 
-CRITICAL INSTRUCTION: NEVER guess, impute, or hallucinate values. If a specific biomarker (e.g., Vitamin D, Iron) is NOT explicitly listed in the text with a corresponding value, DO NOT include it in the JSON output at all. Only extract what is visibly present.
+CRITICAL INSTRUCTION: NEVER guess, impute, or hallucinate values. If a specific biomarker is NOT explicitly listed in the text with a corresponding numeric value, DO NOT include it. Only extract what is visibly present.
 
 MANDATORY: Every interpretation or summary MUST end with "Always consult your doctor before making health decisions."
 
 Do not use emojis in your interpretations or summary.
 
-If historical data is provided, identify trends (e.g., "Glucose has risen 5% since last month") and recognize patterns (e.g., if Ferritin and Hemoglobin are both low, note the correlation).
+If historical data is provided, identify trends (e.g., "Glucose has risen 5% since last month") and note multi-biomarker correlations.
 
 If the user has reported symptoms, consider them when writing interpretations, but NEVER use diagnostic language.
 
@@ -103,147 +86,92 @@ Return only a JSON object with this structure:
       "referenceMin": number | null,
       "referenceMax": number | null,
       "status": "optimal" | "warning" | "critical",
-      "category": must be EXACTLY one of: "hematology" | "inflammation" | "metabolic" | "vitamins" | "other"
-             Use these definitions:
-             - hematology: CBC values like Hemoglobin, RBC, WBC, Platelets, Hematocrit, PCV, MCV, MCH, MCHC, Neutrophils, Lymphocytes, Eosinophils, Basophils, Monocytes, Reticulocytes
-             - inflammation: CRP, ESR, Ferritin, Procalcitonin, IL-6, Fibrinogen, D-Dimer
-             - metabolic: Glucose, HbA1c, Insulin, Cholesterol (Total/LDL/HDL/VLDL), Triglycerides, Creatinine, BUN, eGFR, Uric Acid, ALT, AST, ALP, GGT, Bilirubin, Albumin, Total Protein, Sodium, Potassium, Chloride, Bicarbonate, Calcium, Magnesium, Phosphorus, Iron, TIBC, TSH, T3, T4
-             - vitamins: Vitamin B12, Vitamin D, Vitamin C, Vitamin E, Vitamin K, Folate, Folic Acid, Zinc, Selenium, Biotin, Thiamine, Riboflavin
-             - other: anything that doesn't fit the above categories
+      "category": EXACTLY one of: "hematology" | "inflammation" | "metabolic" | "vitamins" | "other"
+        Definitions:
+        - hematology: CBC — Hemoglobin, RBC, WBC, Platelets, Hematocrit, PCV, MCV, MCH, MCHC, Neutrophils, Lymphocytes, Eosinophils, Basophils, Monocytes
+        - inflammation: CRP, ESR, Ferritin, Procalcitonin, IL-6, Fibrinogen, D-Dimer
+        - metabolic: Glucose, HbA1c, Insulin, Cholesterol (Total/LDL/HDL/VLDL), Triglycerides, Creatinine, BUN, eGFR, Uric Acid, ALT, AST, ALP, GGT, Bilirubin, Albumin, Sodium, Potassium, Calcium, Iron, TSH, T3, T4
+        - vitamins: Vitamin B12, Vitamin D, Vitamin C, Folate, Zinc, Selenium
+        - other: anything not in the above
       "confidence": number (0-1),
-      "aiInterpretation": string (plain English, never diagnostic)
+      "aiInterpretation": string (plain English, never diagnostic, ends with medical disclaimer)
     }
   ],
-  "healthScore": number (0-100, integer),
+  "healthScore": integer (0-100),
   "riskLevel": "low" | "moderate" | "high",
-  "summary": string (2-3 sentences),
+  "summary": string (2-3 sentences, ends with "Always consult your doctor before making health decisions."),
   "plainSummary": string (2-3 sentences referencing actual flagged values),
   "symptomConnections": [
-    {
-      "symptom": string,
-      "relatedBiomarkers": string[],
-      "explanation": string
-    }
+    { "symptom": string, "relatedBiomarkers": string[], "explanation": string }
   ],
-  "longitudinalInsights": string[] (optional, list of detected trends or multi-biomarker patterns)
+  "longitudinalInsights": string[] (optional — trends and multi-biomarker patterns)
 }
 
-Calculate a health score from 0-100 using this exact formula:
-- Each biomarker with status "optimal" contributes 100 points
-- Each biomarker with status "warning" contributes 75 points
-- Each biomarker with status "critical" contributes 40 points
-- Final score = sum of all points divided by (total biomarkers × 100) × 100
-- Apply a minimum floor: if any biomarkers are optimal, score cannot be below 50
-- Round to nearest whole number
-
-Score interpretation:
-- 85-100: Excellent · 70-84: Good · 55-69: Fair · Below 55: Needs Attention
-
-MANDATORY: AI summary MUST end with "Always consult your doctor before making health decisions."
+Health score formula:
+- optimal = 100 pts, warning = 75 pts, critical = 40 pts
+- score = (sum of pts / (n × 100)) × 100, rounded to integer
+- minimum floor of 50 if any biomarkers are optimal
 
 aiInterpretation rules:
-1. State what the biomarker measures in simple, plain terms (1 sentence)
-2. Reference the patient's actual numeric value AND their reference range
+1. State what the biomarker measures in plain terms
+2. Reference the patient's actual value AND the reference range
 3. If out of range, explain 2-3 possible causes in plain language
-4. If in range, briefly note why this is good
-5. NEVER make it only "consult a doctor" — always give educational information first
-6. NEVER say "you have", "diagnosed with", "you are suffering from"
-7. NEVER use emojis
+4. NEVER say "you have", "diagnosed with", "you are suffering from"
+5. NEVER use emojis
 
-Return ONLY the JSON object. No other text.`,
-          },
-          {
-            role: "user",
-            content: `Extract all biomarkers from this lab report:\n\n${pdfText}`,
-          },
-        ],
-        model: MODEL,
-        temperature: 0.1,
-        max_tokens: 4000,
-        response_format: { type: "json_object" },
-      },
-      { signal: controller.signal }
-    );
+Return ONLY the JSON object. No preamble, no markdown.`;
+}
 
-    const raw = completion.choices[0]?.message?.content;
-    if (!raw || raw.trim().length === 0) {
-      throw new AIExtractionError("AI analysis returned no content. Please try again.");
-    }
+// ── Lab report extraction ───────────────────────────────────────────────────
 
-    logger.info(
-      "\n================ GROQ RAW JSON RESPONSE ================\n" +
-        raw +
-        "\n========================================================\n"
-    );
+export async function extractAndInterpretBiomarkers(
+  pdfText: string,
+  symptoms: string[],
+  history: BiomarkerContext[] = []
+): Promise<ExtractionResult> {
+  const historicalContext =
+    history.length > 0
+      ? `\n\nUser's Historical Lab Data:\n${history
+          .map((b) => `- ${b.name}: ${b.value} ${b.unit} (${b.status})`)
+          .join("\n")}`
+      : "";
 
-    // Strip accidental markdown code fences before parsing
-    const cleaned = raw
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    let parsedJson;
+  // Each retry attempt gets its own fresh AbortController so that a timeout
+  // on attempt N doesn't immediately abort attempts N+1, N+2.
+  const runOnce = async (): Promise<Groq.Chat.Completions.ChatCompletion> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
     try {
-      parsedJson = JSON.parse(cleaned);
-    } catch (err) {
-      logger.error("AI JSON Parse Error:", err);
-      throw new AIExtractionError("AI returned malformed JSON data. Please try again.");
+      return await groq.chat.completions.create(
+        {
+          messages: [
+            {
+              role: "system",
+              content: buildSystemPrompt(symptoms, historicalContext),
+            },
+            {
+              role: "user",
+              content: `Extract all biomarkers from this lab report:\n\n${pdfText}`,
+            },
+          ],
+          model: MODEL,
+          temperature: 0.1,
+          max_tokens: 4000,
+          response_format: { type: "json_object" },
+        },
+        { signal: controller.signal }
+      );
+    } finally {
+      clearTimeout(timeoutId);
     }
+  };
 
-    const validationResult = ExtractionResultSchema.safeParse(parsedJson);
-    if (!validationResult.success) {
-      logger.error(
-        "AI Validation Error (Zod issues):",
-        JSON.stringify(validationResult.error.issues, null, 2)
-      );
-
-      // Attempt salvage: accept biomarkers that pass basic structural checks
-      const salvaged = (parsedJson.biomarkers || []).filter(
-        (b: Record<string, unknown>) =>
-          typeof b.name === "string" &&
-          b.name.trim().length > 0 &&
-          typeof b.value === "number" &&
-          !Number.isNaN(b.value) &&
-          typeof b.status === "string" &&
-          ["optimal", "warning", "critical"].includes(b.status as string)
-      );
-
-      if (salvaged.length === 0) {
-        throw new AIExtractionError(
-          "AI returned data that failed validation and no valid biomarkers could be extracted. Please try again."
-        );
-      }
-
-      logger.warn(
-        `Salvaged ${salvaged.length} biomarkers after Zod validation failure — proceeding with partial data.`
-      );
-
-      return {
-        biomarkers: salvaged,
-        healthScore:
-          typeof parsedJson.healthScore === "number" ? parsedJson.healthScore : 50,
-        riskLevel: ["low", "moderate", "high"].includes(parsedJson.riskLevel)
-          ? parsedJson.riskLevel
-          : "moderate",
-        summary:
-          typeof parsedJson.summary === "string" && parsedJson.summary.length > 5
-            ? parsedJson.summary
-            : "Lab report processed. Please consult your doctor for interpretation.",
-        plainSummary:
-          typeof parsedJson.plainSummary === "string" ? parsedJson.plainSummary : "",
-        symptomConnections: Array.isArray(parsedJson.symptomConnections)
-          ? parsedJson.symptomConnections
-          : [],
-      };
-    }
-
-    if (validationResult.data.biomarkers.length === 0) {
-      throw new AIExtractionError(
-        "No biomarkers were found in this PDF. Make sure you are uploading a digital lab report with numeric test results, not a prescription or doctor note."
-      );
-    }
-
-    return validationResult.data;
+  let completion: Groq.Chat.Completions.ChatCompletion;
+  try {
+    completion = await withRetry(runOnce, {
+      maxAttempts: 3,
+      initialDelayMs: 800,
+    });
   } catch (error: unknown) {
     if (error instanceof AIExtractionError) throw error;
     if (error instanceof Error && error.name === "AbortError") {
@@ -253,17 +181,94 @@ Return ONLY the JSON object. No other text.`,
       (error as { status?: number })?.status === 429 ||
       (error as Error).message?.includes("rate_limit");
     if (isRateLimit) {
-      throw new Error(
-        "RATE_LIMIT: Too many requests. Please wait a minute and try again."
-      );
+      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
     }
     throw new Error(`AI analysis failed: ${(error as Error).message || "Unknown error"}`);
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  const raw = completion.choices[0]?.message?.content;
+  if (!raw || raw.trim().length === 0) {
+    throw new AIExtractionError("AI analysis returned no content. Please try again.");
+  }
+
+  logger.info(
+    "\n================ GROQ RAW JSON ================\n" +
+      raw.slice(0, 500) +
+      (raw.length > 500 ? "\n… (truncated)" : "") +
+      "\n================================================\n"
+  );
+
+  // Strip accidental markdown fences before parsing
+  const cleaned = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  let parsedJson: Record<string, unknown>;
+  try {
+    parsedJson = JSON.parse(cleaned);
+  } catch (err) {
+    logger.error("AI JSON Parse Error:", err);
+    throw new AIExtractionError("AI returned malformed JSON. Please try again.");
+  }
+
+  const validationResult = ExtractionResultSchema.safeParse(parsedJson);
+  if (!validationResult.success) {
+    logger.error(
+      "AI Validation Error (Zod):",
+      JSON.stringify(validationResult.error.issues, null, 2)
+    );
+
+    // Attempt salvage: accept biomarkers that pass a basic structural check
+    const salvaged = (parsedJson.biomarkers as Record<string, unknown>[] || []).filter(
+      (b) =>
+        typeof b.name === "string" &&
+        b.name.trim().length > 0 &&
+        typeof b.value === "number" &&
+        !Number.isNaN(b.value) &&
+        typeof b.status === "string" &&
+        ["optimal", "warning", "critical"].includes(b.status as string)
+    );
+
+    if (salvaged.length === 0) {
+      throw new AIExtractionError(
+        "AI returned data that failed validation and no valid biomarkers could be extracted. Please try again."
+      );
+    }
+
+    logger.warn(
+      `Salvaged ${salvaged.length} biomarkers after Zod validation failure.`
+    );
+
+    return {
+      biomarkers: salvaged as unknown as BiomarkerResult[],
+      healthScore:
+        typeof parsedJson.healthScore === "number" ? parsedJson.healthScore : 50,
+      riskLevel: ["low", "moderate", "high"].includes(parsedJson.riskLevel as string)
+        ? (parsedJson.riskLevel as "low" | "moderate" | "high")
+        : "moderate",
+      summary:
+        typeof parsedJson.summary === "string" && parsedJson.summary.length > 5
+          ? parsedJson.summary
+          : "Lab report processed. Please consult your doctor for interpretation.",
+      plainSummary:
+        typeof parsedJson.plainSummary === "string" ? parsedJson.plainSummary : "",
+      symptomConnections: Array.isArray(parsedJson.symptomConnections)
+        ? (parsedJson.symptomConnections as ExtractionResult["symptomConnections"])
+        : [],
+    };
+  }
+
+  if (validationResult.data.biomarkers.length === 0) {
+    throw new AIExtractionError(
+      "No biomarkers were found in this PDF. Make sure you are uploading a digital lab report with numeric test results, not a prescription or doctor note."
+    );
+  }
+
+  return validationResult.data;
 }
 
-// ── Health Q&A (AI Assistant) ──────────────────────────────────────────────
+// ── Health Q&A ──────────────────────────────────────────────────────────────
 
 export async function answerHealthQuestion(
   question: string,
@@ -305,35 +310,43 @@ Rules:
 - Keep responses concise and actionable
 - Do not use any emojis in your response`;
 
-  try {
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...previousMessages,
-        { role: "user", content: question },
-      ],
-      model: MODEL,
-      temperature: 0.3,
-      max_tokens: 400,
-    });
+  const runOnce = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25_000);
+    try {
+      return await groq.chat.completions.create(
+        {
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...previousMessages,
+            { role: "user", content: question },
+          ],
+          model: MODEL,
+          temperature: 0.3,
+          max_tokens: 400,
+        },
+        { signal: controller.signal }
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
 
+  try {
+    const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
     const isRateLimit =
       (error as { status?: number })?.status === 429 ||
       (error as Error).message?.includes("rate_limit");
     if (isRateLimit) {
-      throw new Error(
-        "RATE_LIMIT: Too many requests. Please wait a minute and try again."
-      );
+      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
     }
-    throw new Error(
-      `AI question failed: ${(error as Error).message || "Unknown error"}`
-    );
+    throw new Error(`AI question failed: ${(error as Error).message || "Unknown error"}`);
   }
 }
 
-// ── AI Greeting ────────────────────────────────────────────────────────────
+// ── AI Greeting ─────────────────────────────────────────────────────────────
 
 export async function generateAIGreeting(
   biomarkers: BiomarkerContext[],
@@ -382,17 +395,13 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
       (error as { status?: number })?.status === 429 ||
       (error as Error).message?.includes("rate_limit");
     if (isRateLimit) {
-      throw new Error(
-        "RATE_LIMIT: Too many requests. Please wait a minute and try again."
-      );
+      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
     }
-    throw new Error(
-      `AI greeting failed: ${(error as Error).message || "Unknown error"}`
-    );
+    throw new Error(`AI greeting failed: ${(error as Error).message || "Unknown error"}`);
   }
 }
 
-// ── Clinical Insight (Generic — used by /api/assistant) ───────────────────
+// ── Clinical Insight ─────────────────────────────────────────────────────────
 
 export interface ClinicalInsight {
   type: "symptom" | "lab" | "report";
@@ -435,9 +444,8 @@ Return this schema:
     if (contextType === "report") {
       systemPrompt = `You are an expert medical report analyzer. Given the text of a medical report, provide:
 1. A clear summary of key findings
-2. Any values outside normal reference ranges, highlighted
-3. Possible conditions suggested by the results
-4. Recommended follow-up actions
+2. Any values outside normal reference ranges
+3. Recommended follow-up actions
 Always remind the user to consult a qualified doctor.
 
 Return the response in JSON format:
@@ -474,9 +482,7 @@ IMPORTANT: "status" must be exactly one of: "optimal", "warning", or "critical"`
   }
 }
 
-// ── Appointment Prep ───────────────────────────────────────────────────────
-// NOTE: This function is implemented and tested but not yet wired to a UI route.
-// It is ready for use when the "Appointment Prep" feature is built out.
+// ── Appointment Prep ─────────────────────────────────────────────────────────
 
 export async function getAppointmentPrep(
   context: string

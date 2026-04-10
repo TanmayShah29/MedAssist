@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function ErrorPage({
     error,
@@ -12,8 +13,7 @@ export default function ErrorPage({
     reset: () => void;
 }) {
     useEffect(() => {
-        // Log the error to an error reporting service
-        console.error('Unhandled app exception:', error);
+        logger.error('Unhandled app exception:', error);
     }, [error]);
 
     return (

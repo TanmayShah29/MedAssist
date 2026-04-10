@@ -3,7 +3,11 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
 import { z } from 'zod';
+
+export const maxDuration = 15;
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
     const rateLimitResult = await checkRateLimit();
@@ -69,6 +73,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true });
     } catch (err) {
+        logger.error('[feedback] Failed to save feedback', err);
         return NextResponse.json(
             { error: (err as Error).message || 'Failed to send feedback.' },
             { status: 500 }

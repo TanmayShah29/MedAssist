@@ -1,4 +1,14 @@
 User-agent: *
 Allow: /
+Allow: /terms
+Allow: /privacy
+Disallow: /dashboard
+Disallow: /results
+Disallow: /assistant
+Disallow: /profile
+Disallow: /settings
+Disallow: /onboarding
+Disallow: /auth
+Disallow: /api/
 
 Sitemap: https://medassist.health/sitemap.xml

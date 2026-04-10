@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Shield, Loader2, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { logger } from "@/lib/logger";
 
 function AuthContent() {
     const router = useRouter();
@@ -88,7 +89,7 @@ function AuthContent() {
                 }
             }
         } catch (error: unknown) {
-            console.error("Auth error:", error);
+            logger.error("Auth error:", error);
             const msg = (error as Error).message || "Authentication failed";
             toast.error(msg, {
                 description: msg.toLowerCase().includes("rate limit")

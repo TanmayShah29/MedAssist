@@ -126,9 +126,9 @@ export function StepUpload() {
                 confidence: (b.confidence as number) ?? 0.8,
                 aiInterpretation: (b.aiInterpretation as string) || "See your doctor for interpretation.",
                 trend: "",
-                category: ["hematology", "inflammation", "metabolic", "vitamins"].includes((b.category as string) || "")
+                category: ["hematology", "inflammation", "metabolic", "vitamins", "other"].includes((b.category as string) || "")
                     ? (b.category as ExtractedLabValue["category"])
-                    : "metabolic",
+                    : "other",
             }));
             setAnalysisResult({
                 biomarkers: labValues,

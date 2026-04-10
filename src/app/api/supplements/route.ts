@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit } from '@/services/rateLimitService';
 import { z } from 'zod';
 
+export const maxDuration = 15;
+export const runtime = 'nodejs';
+
 export async function GET(_request: NextRequest) {
     const cookieStore = await cookies()
     const supabase = createServerClient(

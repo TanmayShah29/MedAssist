@@ -21,7 +21,7 @@ export interface ExtractedLabValue {
     confidence: number;       // Groq AI confidence 0-100
     aiInterpretation: string; // Groq AI explanation
     trend: string;            // "↑ up 5%" or "↓ down 8%"
-    category: "hematology" | "inflammation" | "metabolic" | "vitamins";
+    category: "hematology" | "inflammation" | "metabolic" | "vitamins" | "other";
     icdCode?: string;
 }
 

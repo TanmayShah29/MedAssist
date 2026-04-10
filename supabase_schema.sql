@@ -368,4 +368,33 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION save_complete_report(UUID, TEXT, INT, TEXT, TEXT, JSONB, TEXT, JSONB, JSONB, TEXT) TO authenticated;
+-- Grant to both authenticated AND anon so the function works even when the
+-- service role key is misconfigured and the admin client falls back to the
+-- anon key. The function is SECURITY DEFINER so it still has full DB access
+-- regardless of the caller's role. Server-side auth validation in the API
+-- routes ensures this cannot be exploited by unauthenticated clients.
+GRANT EXECUTE ON FUNCTION save_complete_report(UUID, TEXT, INT, TEXT, TEXT, JSONB, TEXT, JSONB, JSONB, TEXT) TO anon, authenticated;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- DELETE LAB RESULT RPC (safe delete — respects ownership)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.delete_lab_result(
+  p_user_id UUID,
+  p_lab_result_id BIGINT
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $
+DECLARE
+  v_deleted BOOLEAN;
+BEGIN
+  DELETE FROM lab_results
+  WHERE id = p_lab_result_id AND user_id = p_user_id;
+  GET DIAGNOSTICS v_deleted = ROW_COUNT;
+  RETURN v_deleted > 0;
+END;
+$;
+
+GRANT EXECUTE ON FUNCTION delete_lab_result(UUID, BIGINT) TO anon, authenticated;

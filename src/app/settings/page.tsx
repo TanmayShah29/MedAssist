@@ -59,9 +59,8 @@ export default function SettingsPage() {
                 .eq("user_id", user.id)
                 .order("created_at", { ascending: false });
 
-            // Create CSV
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Date,Biomarker,Value,Unit,Status\n";
+            // Build CSV content (plain text, no data URI prefix)
+            let csvContent = "Date,Biomarker,Value,Unit,Status\n";
 
             if (biomarkers) {
                 biomarkers.forEach(b => {
@@ -76,13 +75,17 @@ export default function SettingsPage() {
                 });
             }
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "medassist-health-data.csv");
+            // Use Blob + createObjectURL — avoids data URI length limits
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'medassist-health-data.csv';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            // Release memory
+            URL.revokeObjectURL(url);
 
             toast.success("Health data exported successfully.");
         } catch (error: unknown) {
