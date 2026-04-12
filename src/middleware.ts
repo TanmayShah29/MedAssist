@@ -14,6 +14,11 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.next({ request: { headers: requestHeaders } })
     }
 
+    // Demo page — publicly accessible, no auth required
+    if (pathname === '/demo' || pathname.startsWith('/demo/')) {
+        return NextResponse.next({ request: { headers: requestHeaders } })
+    }
+
     // Legacy /login → show sign-in form
     if (pathname === '/login') {
         return NextResponse.redirect(new URL('/auth?mode=login', request.url))

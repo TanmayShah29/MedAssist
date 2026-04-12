@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     return (
-        <div className="flex h-[100dvh] bg-slate-50 relative">
+        <div className="flex h-[100dvh] bg-[#FAFAF7] relative">
             {/* Desktop Sidebar (hidden on mobile) */}
             <Sidebar className="hidden md:flex" />
 
@@ -21,10 +21,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Main Content */}
             <main className="grow shrink basis-0 flex flex-col h-full relative">
                 {/* Mobile Header Trigger */}
-                <div className="md:hidden h-14 border-b border-slate-200 flex items-center px-4 bg-white flex-shrink-0 z-40">
+                <div className="md:hidden h-14 border-b border-[#E8E6DF] flex items-center px-4 bg-[#F5F4EF] flex-shrink-0 z-40">
                     <button
                         onClick={() => setIsMobileOpen(true)}
-                        className="p-2 -ml-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors"
+                        className="p-2 -ml-2 rounded-md text-[#57534E] hover:bg-[#EFEDE6] transition-colors"
                     >
                         <Menu className="w-5 h-5" />
                     </button>
@@ -32,7 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         <div className="w-5 h-5 rounded bg-sky-500 flex items-center justify-center">
                             <Activity className="w-3 h-3 text-white" />
                         </div>
-                        <span className="font-semibold text-slate-900 tracking-tight">MedAssist</span>
+                        <span className="font-display font-semibold text-[#1C1917] tracking-tight">MedAssist</span>
                     </div>
                 </div>
 

@@ -46,8 +46,8 @@ export function validateAndRecalculateScore(
  */
 export function normalizeStatus(status: string): 'optimal' | 'warning' | 'critical' {
   const s = status?.toLowerCase()?.trim();
-  if (s === 'normal' || s === 'optimal' || s === 'stable' || s === 'within range') return 'optimal';
-  if (s === 'critical' || s === 'high' || s === 'low' || s === 'action required' || s === 'abnormal') return 'critical';
+  if (['normal', 'optimal', 'stable', 'within range', 'ok', 'good', 'adequate', 'satisfactory'].includes(s)) return 'optimal';
+  if (['critical', 'high', 'low', 'action required', 'abnormal', 'deficient', 'severely low', 'severely high', 'very low', 'very high', 'insufficient'].includes(s)) return 'critical';
   // Default ambiguous values to warning (conservative — better to flag than ignore)
   return 'warning';
 }

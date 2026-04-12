@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { withRetry } from '../lib/retry';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7,7 +7,11 @@ import { withRetry } from '../lib/retry';
 
 describe('withRetry', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useRealTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('returns immediately when fn succeeds on the first call', async () => {
@@ -23,11 +27,7 @@ describe('withRetry', () => {
       .mockRejectedValueOnce(new Error('network glitch'))
       .mockResolvedValue('recovered');
 
-    const promise = withRetry(fn, { initialDelayMs: 10 });
-    // Advance timers so the delay resolves
-    await vi.runAllTimersAsync();
-    const result = await promise;
-
+    const result = await withRetry(fn, { initialDelayMs: 1 });
     expect(result).toBe('recovered');
     expect(fn).toHaveBeenCalledTimes(2);
   });
@@ -36,10 +36,7 @@ describe('withRetry', () => {
     const error = new Error('persistent failure');
     const fn = vi.fn().mockRejectedValue(error);
 
-    const promise = withRetry(fn, { maxAttempts: 3, initialDelayMs: 10 });
-    await vi.runAllTimersAsync();
-
-    await expect(promise).rejects.toThrow('persistent failure');
+    await expect(withRetry(fn, { maxAttempts: 3, initialDelayMs: 1 })).rejects.toThrow('persistent failure');
     expect(fn).toHaveBeenCalledTimes(3);
   });
 
@@ -83,10 +80,8 @@ describe('withRetry', () => {
       .mockRejectedValueOnce(serverError)
       .mockResolvedValue('success after 500');
 
-    const promise = withRetry(fn, { maxAttempts: 2, initialDelayMs: 10 });
-    await vi.runAllTimersAsync();
-
-    await expect(promise).resolves.toBe('success after 500');
+    const result = await withRetry(fn, { maxAttempts: 2, initialDelayMs: 1 });
+    expect(result).toBe('success after 500');
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
@@ -120,7 +115,5 @@ describe('withRetry', () => {
 
     // All delays should be ≤ maxDelayMs + 20% jitter headroom
     delays.forEach(d => expect(d).toBeLessThanOrEqual(180));
-
-    vi.restoreAllMocks();
   });
 });

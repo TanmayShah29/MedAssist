@@ -62,6 +62,12 @@ export default function LandingPage() {
 
           {/* Nav CTAs */}
           <div className="flex items-center">
+            <Link
+              href="/demo"
+              className="text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors px-4 py-3 min-h-[44px] flex items-center"
+            >
+              Try Demo
+            </Link>
             {!isSignedIn && (
               <Link
                 href="/auth?mode=login"
@@ -124,23 +130,30 @@ export default function LandingPage() {
 
               {/* Primary CTA */}
               <div className="flex flex-col items-center mt-8">
-                <button
-                  onClick={() => {
-                    if (isSignedIn) {
-                      // Reset cookie so middleware fetches fresh state from DB
-                      document.cookie = "onboarding_complete=; path=/; max-age=0";
-                      router.push('/dashboard');
-                    } else {
-                      router.push('/auth?mode=signup');
-                    }
-                  }}
-                  className="bg-sky-500 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-sky-600 transition-all shadow-lg shadow-sky-500/25 active:scale-95"
-                  style={{ WebkitAppearance: 'none' }}
-                >
-                  {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
-                </button>
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                  <Link
+                    href="/demo"
+                    className="bg-sky-500 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-sky-600 transition-all shadow-lg shadow-sky-500/25 active:scale-95"
+                  >
+                    Try interactive demo
+                  </Link>
+                  <button
+                    onClick={() => {
+                      if (isSignedIn) {
+                        document.cookie = "onboarding_complete=; path=/; max-age=0";
+                        router.push('/dashboard');
+                      } else {
+                        router.push('/auth?mode=signup');
+                      }
+                    }}
+                    className="text-sky-600 px-8 py-4 rounded-xl text-lg font-bold border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50 transition-all active:scale-95"
+                    style={{ WebkitAppearance: 'none' }}
+                  >
+                    {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
+                  </button>
+                </div>
                 <p className="text-xs text-[#A8A29E] mt-3">
-                  Free to start · No credit card required · Takes 3 minutes
+                  No login required to try the demo · Free to sign up · No credit card
                 </p>
               </div>
             </motion.div>

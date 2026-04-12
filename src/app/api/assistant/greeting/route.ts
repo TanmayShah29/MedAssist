@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAIGreeting } from '@/lib/groq-medical'
 import { checkRateLimit } from '@/services/rateLimitService'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit();
@@ -40,7 +41,31 @@ export async function POST(request: NextRequest) {
         .eq('id', user.id)
         .single()
 
-    const { biomarkers, symptoms } = await request.json()
+    let body;
+    try {
+        body = await request.json()
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
+
+    const greetingSchema = z.object({
+        biomarkers: z.array(
+            z.object({
+                name: z.string().trim().max(100),
+                value: z.union([z.string(), z.number()]),
+                unit: z.string().trim().max(50),
+                status: z.string().trim().max(50)
+            })
+        ).optional().default([]),
+        symptoms: z.array(z.string().trim().max(200)).optional().default([])
+    });
+
+    const parseResult = greetingSchema.safeParse(body);
+    if (!parseResult.success) {
+        return NextResponse.json({ error: 'Invalid payload data' }, { status: 400 });
+    }
+
+    const { biomarkers, symptoms } = parseResult.data;
 
     try {
         const greeting = await generateAIGreeting(biomarkers || [], symptoms || [], profile?.first_name || 'Guest')

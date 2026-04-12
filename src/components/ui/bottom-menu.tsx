@@ -48,7 +48,7 @@ export function BottomMenu({
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
-                "bg-white/80 backdrop-blur-xl border-t border-slate-200",
+                "bg-[#FAFAF7]/90 backdrop-blur-xl border-t border-[#E8E6DF]",
                 "pb-[env(safe-area-inset-bottom)]",
                 "gpu-accelerate",
                 className

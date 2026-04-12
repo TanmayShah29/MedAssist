@@ -1,3 +1,19 @@
+/**
+ * Shared constants used across frontend and backend.
+ * Centralised here to prevent drift between client validation and server enforcement.
+ */
+
+/** Maximum file size for uploaded lab report PDFs (bytes). */
+export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+
+/** Maximum number of report uploads per user per hour. */
+export const MAX_UPLOADS_PER_HOUR = 5;
+
+/** Maximum number of symptoms a user can submit in a single AI request. */
+export const MAX_SYMPTOMS_PER_REQUEST = 20;
+
+/** Maximum number of AI chat messages per user per minute. */
+export const MAX_MESSAGES_PER_MINUTE = 10;
 
 export const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"];
 

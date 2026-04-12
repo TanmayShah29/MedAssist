@@ -32,24 +32,18 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
 
             const diff = parseFloat(String(current.value)) - parseFloat(String(previous.value));
             if (isNaN(diff)) return null;
-            if (diff === 0) return { name: current.name, status: 'stable', label: 'Stable', icon: Minus, color: 'text-amber-500' };
+            const pct = Math.round(Math.abs(diff / parseFloat(String(previous.value))) * 100);
+            if (diff === 0) return { name: current.name, status: 'stable', label: 'Stable', pct: 0, icon: Minus, color: 'text-amber-500' };
 
-            // Determine if increase/decrease is good or bad simply by looking at status change or just directional
-            // A simple approach: 
-            const _isImprovement = (current.status === 'optimal' && previous.status !== 'optimal') ||
-                (diff > 0 && current.status === 'optimal'); // This is a simplification. 
-            // Truly knowing if improved is hard without knowing the specific marker.
-            // Let's just state Increased/Decreased/Stable objectively, but style it.
-
-            const direction = diff > 0 ? 'Increased' : 'Decreased';
+            const direction = diff > 0 ? 'Up' : 'Down';
             const icon = diff > 0 ? TrendingUp : TrendingDown;
 
-            // If it's optimal now, that's good. Else neutral/warning.
             let color = 'text-[#57534E]';
             if (current.status === 'optimal' && diff !== 0) color = 'text-emerald-500';
             else if (current.status === 'critical') color = 'text-red-500';
+            else if (current.status === 'warning') color = 'text-amber-500';
 
-            return { name: current.name, label: direction, icon, color };
+            return { name: current.name, label: direction, pct, icon, color };
         })
         .filter(Boolean)
         .slice(0, 4); // Show up to 4
@@ -64,9 +58,9 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
                     return (
                         <div key={idx} className="flex justify-between items-center py-2 border-b border-[#E8E6DF]/50 last:border-0">
                             <span className="text-[14px] font-bold text-[#1C1917]">{item.name}</span>
-                            <div className={`flex items-center gap-1.5 text-[13px] font-semibold ${item.color}`}>
+                            <div className={`flex items-center gap-1.5 text-[13px] font-bold ${item.color}`}>
                                 <Icon className="w-4 h-4" />
-                                {item.label}
+                                {item.label}{item.pct > 0 ? ` ${item.pct}%` : ''}
                             </div>
                         </div>
                     );

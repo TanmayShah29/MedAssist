@@ -21,51 +21,52 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
     const [loading, setLoading] = useState(false);
     const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
+    // Build a stable string key from flagged biomarker IDs+statuses so the effect
+    // only re-runs when the actual flagged data changes, not on every parent render.
+    const flaggedKey = biomarkers
+        .filter(b => b.status === 'warning' || b.status === 'critical')
+        .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+        .map(b => `${b.id}:${b.status}`)
+        .join('|');
+
     useEffect(() => {
-        if (biomarkers.length > 0) {
-            // Cache key based on the IDs and statuses of flagged biomarkers
-            // so the cache invalidates when results change, not just count
-            const flagged = biomarkers.filter(b => b.status === 'warning' || b.status === 'critical');
-            const cacheKey = `medassist_dq_${flagged
-                .sort((a, b) => String(a.id).localeCompare(String(b.id)))
-                .map(b => `${b.id}:${b.status}`)
-                .join('|')}`;
+        if (!flaggedKey) return; // no flagged markers → nothing to ask
 
-            try {
-                const cached = sessionStorage.getItem(cacheKey); // sessionStorage: clears on tab close
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (parsed && Array.isArray(parsed)) {
-                        setQuestions(parsed);
-                        return;
-                    }
+        const cacheKey = `medassist_dq_${flaggedKey}`;
+
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed)) {
+                    setQuestions(parsed);
+                    return;
                 }
-            } catch (_e) {
-                // Ignore cache errors
             }
+        } catch (_e) { /* cache read failed — continue to fetch */ }
 
-            const fetchQuestions = async () => {
-                setLoading(true);
-                try {
-                    const response = await fetch('/api/generate-questions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ biomarkers })
-                    });
-                    const data = await response.json();
-                    if (data.questions && Array.isArray(data.questions)) {
-                        setQuestions(data.questions);
-                        try { sessionStorage.setItem(cacheKey, JSON.stringify(data.questions)); } catch (_e) { }
-                    }
-                } catch (error) {
-                    logger.error("Failed to fetch doctor questions", error);
-                } finally {
-                    setLoading(false);
+        const fetchQuestions = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch('/api/generate-questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ biomarkers }),
+                });
+                const data = await response.json();
+                if (data.questions && Array.isArray(data.questions)) {
+                    setQuestions(data.questions);
+                    try { sessionStorage.setItem(cacheKey, JSON.stringify(data.questions)); } catch (_e) { }
                 }
-            };
-            fetchQuestions();
-        }
-    }, [biomarkers]);
+            } catch (error) {
+                logger.error('Failed to fetch doctor questions', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flaggedKey]); // stable string — only changes when flagged set actually changes
 
     const copyToClipboard = (text: string, index: number) => {
         navigator.clipboard.writeText(text);

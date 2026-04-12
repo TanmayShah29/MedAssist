@@ -5,13 +5,14 @@ import { answerHealthQuestion } from '@/lib/groq-medical'
 import { checkRateLimit } from '@/services/rateLimitService'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
+import { MAX_SYMPTOMS_PER_REQUEST } from '@/lib/constants'
 
 export const maxDuration = 30;
 export const runtime = 'nodejs';
 
 const requestSchema = z.object({
     question: z.string().trim().min(1, 'Question is required').max(1000, 'Question is too long'),
-    symptoms: z.array(z.string()).optional().default([]),
+    symptoms: z.array(z.string()).max(MAX_SYMPTOMS_PER_REQUEST, `Too many symptoms (max ${MAX_SYMPTOMS_PER_REQUEST})`).optional().default([]),
 });
 
 export async function POST(request: NextRequest) {

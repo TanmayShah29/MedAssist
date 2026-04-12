@@ -12,7 +12,8 @@ import {
     User,
     Settings,
     Shield,
-    LogOut
+    LogOut,
+    Activity
 } from "lucide-react";
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -121,11 +122,11 @@ export function Sidebar({ className }: { className?: string }) {
             <div className="h-16 flex items-center justify-between px-5 
                       border-b border-[#E8E6DF]">
                 <Link href="/dashboard" className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center 
-                          justify-center shadow-sm shadow-sky-500/30">
-                        <Shield className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center 
+                          justify-center shadow-sm shadow-sky-500/20">
+                        <Activity className="w-5 h-5 text-white" />
                     </div>
-                    <span className="font-display text-lg text-[#1C1917]">MedAssist</span>
+                    <span className="font-display text-xl text-[#1C1917] tracking-tight">MedAssist</span>
                 </Link>
                 {/* Live status dot */}
                 <span className="flex h-2 w-2 relative">

@@ -29,7 +29,8 @@ export const ExtractionResultSchema = z.object({
         symptom: z.string(),
         relatedBiomarkers: z.array(z.string()),
         explanation: z.string()
-    })).optional().default([])
+    })).optional().default([]),
+    longitudinalInsights: z.array(z.string()).optional().default([])
 });
 
 export type ExtractionResult = z.infer<typeof ExtractionResultSchema>;

@@ -77,6 +77,14 @@ export async function saveLabResult(args: SaveLabResultArgs) {
     // still have EXECUTE permission, which is granted to `authenticated`.
     const supabase = await getAuthClient();
 
+    // SECURITY: Verify that the userId in the payload matches the session user.
+    // This prevents IDOR attacks where a caller passes another user's ID.
+    const { data: { user: sessionUser } } = await supabase.auth.getUser();
+    if (!sessionUser || sessionUser.id !== userId) {
+      logger.error(`saveLabResult: userId mismatch (payload=${userId}, session=${sessionUser?.id})`);
+      return { success: false, error: "Unauthorized: session does not match target user." };
+    }
+
     const { data: labResultId, error: rpcError } = await supabase.rpc(
       "save_complete_report",
       {
@@ -153,6 +161,21 @@ export async function updateUserProfile(
 ) {
   if (!supabaseAdmin)
     return { success: false, error: "Database connection unavailable" };
+
+  // SECURITY: Verify that the userId matches the authenticated session.
+  // updateUserProfile uses supabaseAdmin (service role, bypasses RLS),
+  // so we must enforce ownership here to prevent IDOR.
+  try {
+    const supabase = await getAuthClient();
+    const { data: { user: sessionUser } } = await supabase.auth.getUser();
+    if (!sessionUser || sessionUser.id !== userId) {
+      logger.error(`updateUserProfile: userId mismatch (payload=${userId}, session=${sessionUser?.id})`);
+      return { success: false, error: "Unauthorized: session does not match target user." };
+    }
+  } catch (authErr) {
+    logger.error("updateUserProfile: auth verification failed", authErr);
+    return { success: false, error: "Authentication verification failed." };
+  }
 
   try {
     const { first_name, last_name, age, sex, blood_type, symptoms } = data;

@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { MAX_FILE_SIZE_BYTES, MAX_UPLOADS_PER_HOUR } from '@/lib/constants';
 
 /** Client can use this to show clean image-based PDF message and manual entry option. */
 export const IMAGE_BASED_PDF_ERROR_CODE = 'IMAGE_BASED_PDF';
@@ -65,9 +66,9 @@ export async function POST(req: NextRequest) {
             .select('*', { count: 'exact', head: true })
             .eq('user_id', authUser.id)
             .gte('uploaded_at', oneHourAgo);
-        if (uploadCount !== null && uploadCount >= 5) {
+        if (uploadCount !== null && uploadCount >= MAX_UPLOADS_PER_HOUR) {
             return NextResponse.json(
-                { success: false, error: 'Rate limit exceeded. You can analyze up to 5 reports per hour. Please try again later.' },
+                { success: false, error: `Rate limit exceeded. You can analyze up to ${MAX_UPLOADS_PER_HOUR} reports per hour. Please try again later.` },
                 { status: 429 }
             );
         }
@@ -86,8 +87,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'No file uploaded. Upload a PDF or use manual entry.' }, { status: 400 });
         }
 
-        if (file.size > 10 * 1024 * 1024) {
-            return NextResponse.json({ success: false, error: 'File size exceeds 10MB limit.' }, { status: 400 });
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            return NextResponse.json({ success: false, error: `File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.` }, { status: 400 });
         }
 
         // Section 1d — Server-side file type validation
@@ -102,6 +103,14 @@ export async function POST(req: NextRequest) {
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+
+        // Section 1e — PDF Magic Bytes validation (%PDF-)
+        if (buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-') {
+            return NextResponse.json(
+                { success: false, error: 'Invalid file content. The file does not appear to be a valid PDF.' },
+                { status: 400 }
+            );
+        }
 
         logger.info("Starting text extraction...");
         let extractedText: string;
@@ -242,7 +251,7 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
     const syntheticText = normalized
         .map((b) => `${b.name}: ${b.value} ${b.unit}`)
         .join('\n');
-    const preamble = 'Lab values (manually entered):\n';
+    const preamble = 'Lab values (manually entered by user — ONLY extract these specific values, do not add any others):\n';
     const fullText = preamble + syntheticText;
 
     const history = await getUserBiomarkerHistory(user.id);

@@ -89,11 +89,25 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export function WellnessTrendChart({ data, supplements = [], className }: WellnessTrendChartProps) {
-    useTheme() // Call useTheme to ensure hook rules are followed, but don't destructure theme
-    const [filter, setFilter] = useState<typeof timeFilters[number]>('6M');
+    useTheme()
+    const [filter, setFilter] = useState<typeof timeFilters[number]>('ALL');
 
-    // Enrich data with supplements
-    const enrichedData = data.map(item => {
+    // Filter data by time range
+    const filteredData = (() => {
+        if (filter === 'ALL') return data;
+        const now = Date.now();
+        const msMap: Record<string, number> = { '3M': 90, '6M': 180, '1Y': 365 };
+        const cutoff = now - msMap[filter] * 24 * 60 * 60 * 1000;
+        const filtered = data.filter(d => {
+            // data.date may be a label like 'Oct 23' or a real ISO string
+            const parsed = Date.parse(d.date);
+            return isNaN(parsed) ? true : parsed >= cutoff;
+        });
+        return filtered.length > 1 ? filtered : data;
+    })();
+
+    // Enrich filteredData with supplements
+    const enrichedData = filteredData.map(item => {
         const itemDate = new Date(item.date);
         // Find supplement started on this date (or closest to it for visualization)
         const supp = supplements.find(s => {

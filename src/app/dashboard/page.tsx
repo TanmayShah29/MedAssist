@@ -38,7 +38,12 @@ async function DashboardContent({ user }: { user: { id: string } }) {
     ])
 
     const profile = profileResponse.data
-    const biomarkers = (biomarkerResponse.data || []) as import('@/types/medical').Biomarker[]
+    // Normalise value to number at the data boundary — the DB stores it as TEXT
+    // so every downstream component receives a clean number instead of a string.
+    const biomarkers = ((biomarkerResponse.data || []) as import('@/types/medical').Biomarker[]).map(b => ({
+        ...b,
+        value: parseFloat(String(b.value)),
+    }));
     const symptoms = (symptomResponse.data || []).map((s: { symptom: string }) => s.symptom)
     const labResults = labResponse.data || []
 

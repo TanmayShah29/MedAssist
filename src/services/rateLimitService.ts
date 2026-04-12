@@ -26,15 +26,23 @@ function hashIp(ip: string): string {
     return crypto.createHash('sha256').update(ip).digest('hex');
 }
 
-/**
- * EXTRACT CLIENT IP
- * Normalized extraction logic.
- */
 async function getClientIp(): Promise<string> {
     const headersList = await headers();
-    const forwardedFor = headersList.get("x-forwarded-for");
-    if (forwardedFor) return forwardedFor.split(",")[0].trim();
+    
+    // Priority 1: Vercel-specific forwarded-for (sanitized by Vercel)
+    const vercelForwardedFor = headersList.get("x-vercel-forwarded-for");
+    if (vercelForwardedFor) return vercelForwardedFor.split(",")[0].trim();
 
+    // Priority 2: Standard x-forwarded-for
+    // We take the leftmost IP which is the original client IP.
+    // NOTE: In production, we should only trust headers from our proxy (Vercel).
+    const forwardedFor = headersList.get("x-forwarded-for");
+    if (forwardedFor) {
+        const ips = forwardedFor.split(",").map(ip => ip.trim());
+        return ips[0] || "unknown";
+    }
+
+    // Priority 3: x-real-ip
     const realIp = headersList.get("x-real-ip");
     if (realIp) return realIp.trim();
 
