@@ -153,14 +153,27 @@ const Sidebar = ({ currentPage, onNavigate }: { currentPage: string; onNavigate:
   ];
 
   return (
-    <aside style={{ width: 240, flexShrink: 0, background: "white", borderRight: `1px solid ${T.border}`, display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
+    <aside style={{
+      width: 240, flexShrink: 0,
+      background: "#F0EFE9",
+      borderRight: `1px solid ${T.border}`,
+      display: "flex", flexDirection: "column",
+      height: "100vh", position: "sticky", top: 0,
+    }}>
       {/* Logo */}
-      <div style={{ padding: "24px 20px 20px", borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: T.brand, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Icon path={Icons.shield} size={18} color="white" />
+      <div style={{ padding: "20px 20px 18px", borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: T.brand, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(14,165,233,0.3)" }}>
+              <Icon path={Icons.shield} size={17} color="white" />
+            </div>
+            <span className="font-display" style={{ fontSize: 21, color: T.text }}>MedAssist</span>
           </div>
-          <span className="font-display" style={{ fontSize: 22, color: T.text }}>MedAssist</span>
+          {/* Live dot */}
+          <div style={{ position: "relative", width: 8, height: 8 }}>
+            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#10B981", opacity: 0.5, animation: "pulse 2s ease infinite" }} />
+            <div style={{ position: "relative", width: 8, height: 8, borderRadius: "50%", background: "#10B981" }} />
+          </div>
         </div>
         <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 100, fontSize: 10, fontWeight: 700, color: "#92400E" }}>
           DEMO MODE
@@ -168,14 +181,25 @@ const Sidebar = ({ currentPage, onNavigate }: { currentPage: string; onNavigate:
       </div>
 
       {/* Nav */}
-      <nav style={{ padding: "12px 12px", flex: 1 }}>
+      <nav style={{ padding: "10px 10px", flex: 1 }}>
+        <p style={{ fontSize: 9, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.14em", padding: "6px 12px", marginBottom: 4 }}>Navigation</p>
         {nav.map(item => {
           const active = currentPage === item.id;
           return (
-            <button key={item.id} onClick={() => onNavigate(item.id)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "none", cursor: "pointer", marginBottom: 2, background: active ? "#EFF6FF" : "transparent", color: active ? T.brand : T.textSec, fontWeight: active ? 700 : 500, fontSize: 14, transition: "all 0.15s", textAlign: "left" as const }}
-              onMouseEnter={e => !active && (e.currentTarget.style.background = T.card)}
+            <button key={item.id} onClick={() => onNavigate(item.id)} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 11,
+              padding: "9px 12px", borderRadius: 10, border: "none",
+              cursor: "pointer", marginBottom: 2,
+              background: active ? "#E0F2FE" : "transparent",
+              color: active ? T.brand : T.textSec,
+              fontWeight: active ? 700 : 500,
+              fontSize: 14, transition: "all 0.15s",
+              textAlign: "left" as const,
+              borderLeft: active ? `3px solid ${T.brand}` : "3px solid transparent",
+            }}
+              onMouseEnter={e => !active && (e.currentTarget.style.background = T.cardHover)}
               onMouseLeave={e => !active && (e.currentTarget.style.background = "transparent")}>
-              <Icon path={item.icon} size={18} color={active ? T.brand : T.textMuted} />
+              <Icon path={item.icon} size={17} color={active ? T.brand : T.textMuted} />
               {item.label}
               {item.id === "assistant" && (
                 <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, background: T.brand, color: "white", padding: "1px 6px", borderRadius: 100 }}>AI</span>
@@ -185,15 +209,25 @@ const Sidebar = ({ currentPage, onNavigate }: { currentPage: string; onNavigate:
         })}
       </nav>
 
+      {/* AI Status mini-card */}
+      <div style={{ margin: "0 10px 10px", padding: "12px 14px", background: "#0F172A", borderRadius: 12, border: "1px solid #1E293B" }}>
+        <p style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8 }}>AI Status</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0 }} />
+          <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "monospace" }}>Groq · Llama 3.3</span>
+          <span style={{ marginLeft: "auto", fontSize: 9, color: "#475569" }}>online</span>
+        </div>
+      </div>
+
       {/* Profile */}
-      <div style={{ padding: "16px 20px", borderTop: `1px solid ${T.border}` }}>
+      <div style={{ padding: "14px 20px", borderTop: `1px solid ${T.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: T.brand }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: T.brand, flexShrink: 0 }}>
             {DEMO_PROFILE.first_name[0]}
           </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{DEMO_PROFILE.first_name} {DEMO_PROFILE.last_name}</div>
-            <div style={{ fontSize: 11, color: T.textMuted }}>Demo Patient</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{DEMO_PROFILE.first_name} {DEMO_PROFILE.last_name}</div>
+            <div style={{ fontSize: 11, color: T.textMuted }}>Demo Patient · Age {DEMO_PROFILE.age}</div>
           </div>
         </div>
       </div>
@@ -1030,6 +1064,14 @@ const SettingsPage = () => {
 export default function DemoPage() {
   const [currentPage, setCurrentPage] = useState("dashboard");
 
+  const pageLabels: Record<string, string> = {
+    dashboard: "Clinical Overview",
+    results: "Lab Results",
+    assistant: "AI Assistant",
+    profile: "Clinical Profile",
+    settings: "Account Settings",
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case "dashboard": return <DashboardPage onNavigate={setCurrentPage} />;
@@ -1053,13 +1095,52 @@ export default function DemoPage() {
       <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main style={{ flex: 1, overflowY: currentPage === "assistant" ? "hidden" : "auto", background: T.page }}>
-          {/* Top bar with back to landing */}
-          <div style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(250,250,247,0.9)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${T.border}`, padding: "10px 24px", display: "flex", justifyContent: "flex-end" }}>
-            <a href="/" style={{ background: T.card, border: `1px solid ${T.border}`, color: T.textSec, borderRadius: 10, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
-              <Icon path={Icons.arrowLeft} size={14} color={T.textSec} />
-              Back to Landing
-            </a>
+
+          {/* ── Demo banner ── */}
+          <div style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 40,
+            background: "rgba(250,250,247,0.95)",
+            backdropFilter: "blur(12px)",
+            borderBottom: `1px solid ${T.border}`,
+            padding: "10px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+          }}>
+            {/* Left: breadcrumb */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.brand, animation: "pulse 2s ease infinite" }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Demo</span>
+              <Icon path={Icons.chevronRight} size={12} color={T.textMuted} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{pageLabels[currentPage]}</span>
+            </div>
+
+            {/* Right: demo pill + back */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                letterSpacing: "0.1em", color: "#92400E",
+                background: "#FEF3C7", border: "1px solid #FDE68A",
+                padding: "3px 10px", borderRadius: 100,
+              }}>
+                ✦ Interactive Demo — no account needed
+              </span>
+              <a href="/" style={{
+                background: T.card, border: `1px solid ${T.border}`,
+                color: T.textSec, borderRadius: 10, padding: "7px 16px",
+                fontSize: 13, fontWeight: 600, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+                textDecoration: "none",
+              }}>
+                <Icon path={Icons.arrowLeft} size={13} color={T.textSec} />
+                Exit demo
+              </a>
+            </div>
           </div>
+
           {renderPage()}
         </main>
       </div>

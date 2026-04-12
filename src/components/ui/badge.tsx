@@ -168,42 +168,4 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 
 Badge.displayName = "Badge";
 
-// Badge group for entity tags (used in assistant page)
-export function BadgeGroup({
-    badges,
-    max = 5,
-    className,
-}: {
-    badges: Array<{ label: string; variant: BadgeProps["variant"]; id: string }>;
-    max?: number;
-    className?: string;
-}) {
-    const [showAll, setShowAll] = React.useState(false);
-    const visible = showAll ? badges : badges.slice(0, max);
-    const hidden = badges.length - max;
-
-    return (
-        <div className={cn("flex flex-wrap gap-1.5", className)}>
-            <AnimatePresence>
-                {visible.map((badge) => (
-                    <Badge key={badge.id} variant={badge.variant} dot animate>
-                        {badge.label}
-                    </Badge>
-                ))}
-            </AnimatePresence>
-            {!showAll && hidden > 0 && (
-                <button
-                    onClick={() => setShowAll(true)}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full 
-                     text-xs font-medium bg-slate-100 text-slate-500 
-                     border border-slate-200 hover:bg-slate-200 
-                     transition-colors"
-                >
-                    +{hidden} more
-                </button>
-            )}
-        </div>
-    );
-}
-
 export { Badge, badgeVariants };

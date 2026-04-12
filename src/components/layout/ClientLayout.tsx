@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Preloader } from "@/components/ui/preloader";
 import { Sidebar } from "@/components/layout/sidebar";
-import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { BottomMenu } from "@/components/ui/bottom-menu";
 import { FeedbackButton } from "@/components/feedback-button";
 import { Toaster } from "sonner";
@@ -98,7 +97,6 @@ export function ClientLayout({
               ">
               <Sidebar />
             </aside>
-            <MobileSidebar />
             <main className="
                 grow shrink basis-0
                 lg:ml-60
