@@ -357,11 +357,11 @@ export default function AssistantPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-20 lg:pt-8 pb-8">
+            <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100 flex flex-col">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-4 lg:pt-8 pb-4 lg:pb-8 flex-1 flex flex-col w-full">
 
-                    {/* HEADER */}
-                    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    {/* HEADER - Hidden on mobile because MobileNavbar handles it */}
+                    <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                         <div>
                             <h1 className="font-display text-3xl text-[#1C1917]">
                                 AI Health Assistant
@@ -383,7 +383,7 @@ export default function AssistantPage() {
 
                     {/* CONTEXT SUMMARY CARD */}
                     {contextData && (
-                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6">
+                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6 hidden lg:block">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
                                 <Activity className="w-3 h-3" />
                                 Current Context
@@ -409,10 +409,10 @@ export default function AssistantPage() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch h-[calc(100dvh-300px)] min-h-[600px]">
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch flex-1 min-h-0">
 
                         {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
-                        <div className="lg:hidden w-full mb-4">
+                        <div className="lg:hidden w-full flex flex-col h-full overflow-hidden">
                             <div className="flex p-1 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] mb-4">
                                 <button
                                     onClick={() => setActiveTab("chat")}
@@ -435,11 +435,11 @@ export default function AssistantPage() {
                             </div>
 
                             {activeTab === "chat" ? (
-                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm h-[500px]">
+                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1 mb-4">
                                     {renderChatPanel()}
                                 </div>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-4 overflow-y-auto pb-20">
                                     <AssistantSidebar biomarkers={biomarkers} />
                                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
                                         <AnalysisPanel

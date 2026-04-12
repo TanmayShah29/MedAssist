@@ -11,6 +11,7 @@ import { TrustLayer } from '@/components/trust-layer'
 import { Biomarker } from '@/types/medical'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { RangeBar } from '@/components/ui/range-bar'
+import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -37,6 +38,7 @@ export default function ResultsPage() {
     const [supplements, setSupplements] = useState<{ id: number, name: string, start_date: string }[]>([])
     const [mounted, setMounted] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
+    const [showDetailSheet, setShowDetailSheet] = useState(false)
 
     useEffect(() => {
         setMounted(true)
@@ -137,6 +139,13 @@ export default function ResultsPage() {
     const optimalCount = deduplicatedForCounts.filter(b => b.status === 'optimal').length
     const warningCount = deduplicatedForCounts.filter(b => b.status === 'warning').length
     const criticalCount = deduplicatedForCounts.filter(b => b.status === 'critical').length
+
+    const handleBiomarkerClick = (b: Biomarker) => {
+        setSelectedBiomarker(b);
+        if (window.innerWidth < 1024) {
+            setShowDetailSheet(true);
+        }
+    };
 
     return (
         <ErrorBoundary>
@@ -381,7 +390,7 @@ export default function ResultsPage() {
                                 {filteredBiomarkers.map((b, i) => (
                                     <div
                                         key={b.id}
-                                        onClick={() => setSelectedBiomarker(b)}
+                                        onClick={() => handleBiomarkerClick(b)}
                                         className={`flex items-center p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
                                             } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
                                                 b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
@@ -435,7 +444,7 @@ export default function ResultsPage() {
                     </div>
 
                     {/* Right column: Detail */}
-                    <div className="lg:col-span-2">
+                    <div className="hidden lg:block lg:col-span-2">
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
                                 <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center">
@@ -533,6 +542,14 @@ export default function ResultsPage() {
                     </div>
 
                 </div>
+
+                {/* Mobile Detail Sheet */}
+                <BiomarkerDetailSheet
+                    isOpen={showDetailSheet}
+                    onClose={() => setShowDetailSheet(false)}
+                    biomarker={selectedBiomarker}
+                    history={biomarkers}
+                />
 
                 {/* ── Doctor Questions ── */}
                 <DoctorQuestions biomarkers={biomarkers} className="mt-8" />

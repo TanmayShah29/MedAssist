@@ -48,13 +48,13 @@ export function BottomMenu({
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
-                "bg-[#FAFAF7]/90 backdrop-blur-xl border-t border-[#E8E6DF]",
+                "bg-[#FAFAF7]/95 backdrop-blur-2xl border-t border-[#E8E6DF]",
                 "pb-[env(safe-area-inset-bottom)]",
-                "gpu-accelerate",
+                "gpu-accelerate shadow-[0_-8px_30px_rgb(0,0,0,0.04)]",
                 className
             )}
         >
-            <div className="flex justify-between items-center px-4 pt-3 pb-3 relative">
+            <div className="flex justify-between items-center px-6 pt-3 pb-3 relative">
                 {items.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -63,17 +63,22 @@ export function BottomMenu({
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex flex-col items-center gap-1 group relative py-1 px-2 transition-all duration-200 active:scale-95 flex-1",
-                                isActive ? "text-sky-500" : "text-[#A8A29E] hover:text-[#57534E]"
+                                "flex flex-col items-center gap-1 group relative py-1 transition-all duration-200 active:scale-90 flex-1",
+                                isActive ? "text-sky-500" : "text-[#A8A29E]"
                             )}
                         >
                             <div className={cn(
-                                "p-1.5 rounded-xl transition-colors duration-200",
-                                isActive ? "bg-sky-50" : "group-hover:bg-[#F5F4EF]"
+                                "p-2 rounded-2xl transition-all duration-300",
+                                isActive ? "bg-sky-50 shadow-inner" : "group-hover:bg-[#F5F4EF]"
                             )}>
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+                            <span className={cn(
+                                "text-[9px] font-bold uppercase tracking-[0.1em] transition-colors",
+                                isActive ? "text-sky-600" : "text-[#A8A29E]"
+                            )}>
+                                {item.label}
+                            </span>
 
                             {isActive && (
                                 <motion.div

@@ -11,7 +11,6 @@ import {
     FlaskConical,
     User,
     Settings,
-    Shield,
     LogOut,
     Activity
 } from "lucide-react";

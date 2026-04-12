@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react"
+import { motion } from "framer-motion"
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(

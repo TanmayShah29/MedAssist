@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Preloader } from "@/components/ui/preloader";
 import { Sidebar } from "@/components/layout/sidebar";
+import { MobileNavbar } from "@/components/layout/mobile-navbar";
 import { BottomMenu } from "@/components/ui/bottom-menu";
 import { FeedbackButton } from "@/components/feedback-button";
 import { Toaster } from "sonner";
@@ -71,7 +72,7 @@ export function ClientLayout({
     <>
       {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
       {isStandalone && (
-        <div className="min-h-[100dvh]">
+        <div className="min-h-[100dvh] overflow-x-hidden">
           {children}
         </div>
       )}
@@ -84,6 +85,8 @@ export function ClientLayout({
             onComplete={handlePreloaderComplete}
             variant="pipeline"
           />
+
+          <MobileNavbar />
 
           <div
             className="flex min-h-[100dvh]"
@@ -101,7 +104,9 @@ export function ClientLayout({
                 grow shrink basis-0
                 lg:ml-60
                 min-h-[100dvh]
-                overflow-y-auto
+                flex flex-col
+                overflow-x-hidden
+                pt-16 lg:pt-0
                 pb-[calc(5rem+env(safe-area-inset-bottom))]
                 lg:pb-0
                 page-enter
@@ -118,7 +123,7 @@ export function ClientLayout({
 
       {/* ── FALLBACK ── */}
       {!isStandalone && !needsAppShell && (
-        <div className="min-h-[100dvh]">
+        <div className="min-h-[100dvh] overflow-x-hidden">
           {children}
         </div>
       )}

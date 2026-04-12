@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { createBrowserClient } from '@supabase/ssr';

@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 // Phase 7: Add Framer Motion and state for filters
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Pill } from "lucide-react"
 
 const timeFilters = ['3M', '6M', '1Y', 'ALL'] as const;
@@ -93,7 +93,7 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
     const [filter, setFilter] = useState<typeof timeFilters[number]>('ALL');
 
     // Filter data by time range
-    const filteredData = (() => {
+    const filteredData = useMemo(() => {
         if (filter === 'ALL') return data;
         const now = Date.now();
         const msMap: Record<string, number> = { '3M': 90, '6M': 180, '1Y': 365 };
@@ -104,24 +104,26 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
             return isNaN(parsed) ? true : parsed >= cutoff;
         });
         return filtered.length > 1 ? filtered : data;
-    })();
+    }, [data, filter]);
 
     // Enrich filteredData with supplements
-    const enrichedData = filteredData.map(item => {
-        const itemDate = new Date(item.date);
-        // Find supplement started on this date (or closest to it for visualization)
-        const supp = supplements.find(s => {
-            const sDate = new Date(s.start_date);
-            // Simple match for same day/month for mock/demo purposes
-            // In real app, we might want more complex logic to snap to chart points
-            return sDate.toLocaleDateString() === itemDate.toLocaleDateString();
-        });
+    const enrichedData = useMemo(() => {
+        return filteredData.map(item => {
+            const itemDate = new Date(item.date);
+            // Find supplement started on this date (or closest to it for visualization)
+            const supp = supplements.find(s => {
+                const sDate = new Date(s.start_date);
+                // Simple match for same day/month for mock/demo purposes
+                // In real app, we might want more complex logic to snap to chart points
+                return sDate.toLocaleDateString() === itemDate.toLocaleDateString();
+            });
 
-        return {
-            ...item,
-            supplement: supp?.name
-        };
-    });
+            return {
+                ...item,
+                supplement: supp?.name
+            };
+        });
+    }, [filteredData, supplements]);
 
     return (
         <motion.div

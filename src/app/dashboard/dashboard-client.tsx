@@ -333,7 +333,7 @@ export default function DashboardClient({
 
             {/* Header row */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-                <div>
+                <div className="hidden lg:block">
                     <div className="flex items-center gap-3">
                         <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917]">Clinical Overview</h1>
                         {isOffline && (
@@ -350,6 +350,17 @@ export default function DashboardClient({
                             {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
                             {profile?.first_name || 'Patient'}
                         </p>
+                    )}
+                </div>
+                <div className="lg:hidden flex items-center justify-between w-full">
+                    {lastUpdated && (
+                        <p className="text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider">Report: {lastUpdated}</p>
+                    )}
+                    {isOffline && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-auto">
+                            <WifiOff size={12} />
+                            OFFLINE
+                        </div>
                     )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0 print:hidden">
