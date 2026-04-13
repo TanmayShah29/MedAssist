@@ -64,28 +64,32 @@ export function MobileNavbar() {
   return (
     <header className="
       lg:hidden fixed top-0 left-0 right-0 z-[60]
-      h-16 bg-[#FAFAF7]/80 backdrop-blur-xl border-b border-[#E8E6DF]
-      flex items-center justify-between px-4
+      h-14 bg-[#FAFAF7]/80 backdrop-blur-xl border-b border-[#E8E6DF]
+      flex items-center justify-between px-3
       safe-area-top
     ">
-      <Link href="/dashboard" className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/20">
-          <Activity className="w-5 h-5 text-white" />
-        </div>
-        <span className="font-display text-lg text-[#1C1917] tracking-tight font-bold">
+      <div className="flex items-center gap-2 min-w-0">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/20">
+            <Activity className="w-4 h-4 text-white" />
+          </div>
+        </Link>
+        <span className="font-display text-base text-[#1C1917] tracking-tight font-bold truncate max-w-[140px]">
           {getTitle(pathname)}
         </span>
-      </Link>
+      </div>
 
-      <Link href="/profile" className="
-        w-9 h-9 rounded-full bg-white border border-[#E8E6DF]
-        flex items-center justify-center shadow-sm
-        active:scale-95 transition-transform
-      ">
-        <span className="text-xs font-bold text-sky-600">
-          {userInitials}
-        </span>
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link href="/profile" className="
+          w-8 h-8 rounded-full bg-white border border-[#E8E6DF]
+          flex items-center justify-center shadow-sm
+          active:scale-95 transition-transform
+        ">
+          <span className="text-[10px] font-bold text-sky-600">
+            {userInitials}
+          </span>
+        </Link>
+      </div>
     </header>
   );
 }

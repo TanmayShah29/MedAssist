@@ -149,7 +149,7 @@ export default function ResultsPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-[100dvh] bg-[#FAFAF7] px-4 py-6 md:p-6 text-[#1C1917] font-sans">
+            <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 text-[#1C1917] font-sans">
 
                 {/* ── Print-only Header ── */}
                 <div className="hidden print:block mb-8">
@@ -339,10 +339,10 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Two column layout ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
 
-                    {/* Left column: List */}
-                    <div className="lg:col-span-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] overflow-hidden">
+                    {/* Left column: List - full width on mobile */}
+                    <div className="col-span-1 lg:col-span-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] overflow-hidden">
                         {loading ? (
                             <div className="p-4 space-y-4">
                                 {[...Array(5)].map((_, i) => (

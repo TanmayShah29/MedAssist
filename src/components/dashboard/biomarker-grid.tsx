@@ -106,7 +106,7 @@ export function BiomarkerGrid({
                                     <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
                                     <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
                                     {catBiomarkers.map(b => {
                                         const prev = displayBiomarkers.find(
                                             pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId

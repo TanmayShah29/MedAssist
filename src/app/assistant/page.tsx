@@ -46,7 +46,7 @@ export default function AssistantPage() {
     ]);
     const [inputValue, setInputValue] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
-    const [activeTab, setActiveTab] = useState<"chat" | "context">("chat");
+    const [showContextModal, setShowContextModal] = useState(false);
     const [doctorQuestions, setDoctorQuestions] = useState<{ question: string, context: string }[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -358,7 +358,7 @@ export default function AssistantPage() {
     return (
         <ErrorBoundary>
             <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100 flex flex-col">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 pt-4 lg:pt-8 pb-4 lg:pb-8 flex-1 flex flex-col w-full">
+                <div className="px-3 pt-3 pb-4 md:px-6 md:pt-8 md:pb-8 max-w-5xl mx-auto flex-1 flex flex-col w-full">
 
                     {/* HEADER - Hidden on mobile because MobileNavbar handles it */}
                     <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -409,55 +409,14 @@ export default function AssistantPage() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5 items-stretch flex-1 min-h-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
 
-                        {/* MOBILE TABS / DESKTOP DIRECT VIEW */}
-                        <div className="lg:hidden w-full flex flex-col h-full overflow-hidden">
-                            <div className="flex p-1 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] mb-4">
-                                <button
-                                    onClick={() => setActiveTab("chat")}
-                                    className={cn(
-                                        "grow shrink basis-0 py-2 text-sm font-bold rounded-[8px] transition-all",
-                                        activeTab === "chat" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
-                                    )}
-                                >
-                                    Chat
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("context")}
-                                    className={cn(
-                                        "grow shrink basis-0 py-2 text-sm font-bold rounded-[8px] transition-all",
-                                        activeTab === "context" ? "bg-white text-[#1C1917] shadow-sm" : "text-[#A8A29E]"
-                                    )}
-                                >
-                                    Health Data
-                                </button>
-                            </div>
-
-                            {activeTab === "chat" ? (
-                                <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1 mb-4">
-                                    {renderChatPanel()}
-                                </div>
-                            ) : (
-                                <div className="space-y-4 overflow-y-auto pb-20">
-                                    <AssistantSidebar biomarkers={biomarkers} />
-                                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
-                                        <AnalysisPanel
-                                            biomarkers={biomarkers}
-                                            symptoms={symptoms}
-                                            doctorQuestions={doctorQuestions}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* LEFT: CONVERSATION PANEL (Desktop) */}
-                        <div className="hidden lg:flex bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex-col overflow-hidden shadow-sm relative">
+                        {/* FULL WIDTH CHAT ON MOBILE */}
+                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1">
                             {renderChatPanel()}
                         </div>
 
-                        {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL (Desktop) */}
+                        {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL - Modal on mobile */}
                         <div className="hidden lg:block space-y-5 overflow-y-auto">
                             <AssistantSidebar biomarkers={biomarkers} />
                             <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
@@ -469,6 +428,41 @@ export default function AssistantPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Mobile Context Toggle Button */}
+                    <button
+                        onClick={() => setShowContextModal(true)}
+                        className="lg:hidden fixed bottom-20 right-4 z-40 w-12 h-12 bg-sky-500 rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center text-white"
+                    >
+                        <Activity className="w-5 h-5" />
+                    </button>
+
+                    {/* Mobile Context Modal */}
+                    {showContextModal && (
+                        <div className="lg:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end">
+                            <div className="bg-[#FAFAF7] w-full rounded-t-[24px] max-h-[80vh] overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))]">
+                                <div className="sticky top-0 bg-[#FAFAF7] p-4 border-b border-[#E8E6DF] flex justify-between items-center">
+                                    <h2 className="font-display text-xl text-[#1C1917]">Health Data</h2>
+                                    <button
+                                        onClick={() => setShowContextModal(false)}
+                                        className="w-8 h-8 rounded-full bg-[#F5F4EF] flex items-center justify-center text-[#57534E]"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className="p-4 space-y-4">
+                                    <AssistantSidebar biomarkers={biomarkers} />
+                                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
+                                        <AnalysisPanel
+                                            biomarkers={biomarkers}
+                                            symptoms={symptoms}
+                                            doctorQuestions={doctorQuestions}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>

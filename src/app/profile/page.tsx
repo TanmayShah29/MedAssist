@@ -101,7 +101,7 @@ export default function ProfilePage() {
     const reportCount = reports.length;
 
     return (
-        <div className="max-w-[1400px] mx-auto px-6 py-8 space-y-6">
+        <div className="max-w-4xl mx-auto px-3 py-4 md:px-6 md:py-8 space-y-5 md:space-y-6">
 
             <div>
                 <h1 className="font-display text-3xl text-[#1C1917]">Clinical Profile</h1>
@@ -128,7 +128,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Two column layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-5">
 
                 {/* Left Column */}
                 <div className="flex flex-col gap-5">

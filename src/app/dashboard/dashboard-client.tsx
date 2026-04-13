@@ -317,7 +317,7 @@ export default function DashboardClient({
     // ── Render ─────────────────────────────────────────────────────────────
 
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] px-4 py-6 md:p-6 text-[#1C1917] font-sans" id="dashboard-content">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 text-[#1C1917] font-sans" id="dashboard-content">
 
             {/* Print header */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
@@ -519,7 +519,7 @@ export default function DashboardClient({
                     )}
 
                     {/* Score + Trends */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
                         <HealthScoreOverview
                             score={healthScore}
                             optimalCount={optimalCount}
@@ -560,11 +560,11 @@ export default function DashboardClient({
                 </div>
             )}
 
-            {/* ── Insights Feed ── */}
+                    {/* ── Insights Feed ── */}
             {totalCount > 0 && (
                 <div className="mb-6">
                     <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PERSONALIZED INSIGHTS</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_1fr] lg:gap-6">
                         <AIInsightsFeed analysis={{ summary: latestLabResult?.summary || '' }} />
                         <ActionItems biomarkers={biomarkers} />
                     </div>

@@ -118,7 +118,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 md:p-10 font-sans">
+        <div className="max-w-2xl mx-auto px-3 py-4 md:p-10 font-sans">
             <h1 className="text-3xl font-display font-bold text-[#1C1917] mb-8">Account Settings</h1>
 
             <section className="bg-white border border-[#E8E6DF] rounded-[16px] p-6 mb-6 shadow-sm">
