@@ -4,7 +4,7 @@ import { useOnboardingStore } from "@/lib/onboarding-store";
 import type { ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { saveProfileFromSession } from "@/app/actions/user-data";
 
@@ -421,6 +421,13 @@ export function StepProcessing() {
 
             <div className="mt-12 text-center">
                 <p className="text-xs text-[#A8A29E] font-medium">This usually takes 20–40 seconds</p>
+                <button
+                    onClick={goBackToUpload}
+                    className="mt-4 text-sm text-[#57534E] hover:text-[#1C1917] font-medium flex items-center gap-1.5 mx-auto"
+                >
+                    <ChevronLeft className="w-4 h-4" />
+                    Upload a different file
+                </button>
             </div>
         </div>
     );

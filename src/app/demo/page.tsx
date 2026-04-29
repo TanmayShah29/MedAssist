@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
 /* ─── DESIGN TOKENS ────────────────────────────────────────────────────── */
@@ -143,7 +144,7 @@ const RangeBar = ({ value, min, max, status }: { value: number; min: number; max
 };
 
 /* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
-const Sidebar = ({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string) => void }) => {
+const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: string; currentPage: string; onNavigate: (page: string) => void }) => {
   const nav = [
     { id: "dashboard", label: "Dashboard", icon: Icons.dashboard },
     { id: "results", label: "Lab Results", icon: Icons.fileText },
@@ -153,7 +154,7 @@ const Sidebar = ({ currentPage, onNavigate }: { currentPage: string; onNavigate:
   ];
 
   return (
-    <aside style={{
+    <aside className={className} style={{
       width: 240, flexShrink: 0,
       background: "#F0EFE9",
       borderRight: `1px solid ${T.border}`,
@@ -1091,10 +1092,21 @@ export default function DemoPage() {
         @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
         @keyframes scoreCount { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+        @media (max-width: 768px) {
+          .demo-sidebar { display: none !important; }
+          .demo-main { margin-left: 0 !important; width: 100% !important; }
+          .demo-detail-sheet { width: 100% !important; max-width: 100% !important; left: 0 !important; right: 0 !important; }
+          .demo-bottom-nav { display: flex !important; }
+          .demo-hero-title { font-size: 36px !important; }
+          .demo-grid-2 { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 769px) {
+          .demo-bottom-nav { display: none !important; }
+        }
       `}</style>
       <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-        <main style={{ flex: 1, overflowY: currentPage === "assistant" ? "hidden" : "auto", background: T.page }}>
+        <Sidebar className="demo-sidebar" currentPage={currentPage} onNavigate={setCurrentPage} />
+        <main className="demo-main" style={{ flex: 1, overflowY: "auto", background: T.page }}>
 
           {/* ── Demo banner ── */}
           <div style={{
@@ -1128,7 +1140,7 @@ export default function DemoPage() {
               }}>
                 ✦ Interactive Demo — no account needed
               </span>
-              <a href="/" style={{
+              <Link href="/" style={{
                 background: T.card, border: `1px solid ${T.border}`,
                 color: T.textSec, borderRadius: 10, padding: "7px 16px",
                 fontSize: 13, fontWeight: 600, cursor: "pointer",
@@ -1137,12 +1149,38 @@ export default function DemoPage() {
               }}>
                 <Icon path={Icons.arrowLeft} size={13} color={T.textSec} />
                 Exit demo
-              </a>
+              </Link>
             </div>
           </div>
 
           {renderPage()}
-        </main>
+          </main>
+          
+          {/* Mobile Bottom Nav */}
+          <nav className="demo-bottom-nav" style={{
+            display: 'none',
+            position: 'fixed', bottom: 0, left: 0, right: 0,
+            background: '#FFF', borderTop: '1px solid #E8E6DF',
+            padding: '8px 16px',
+            justifyContent: 'space-around', zIndex: 50,
+          }}>
+            {["dashboard", "results", "assistant", "profile", "settings"].map(id => {
+              const active = currentPage === id;
+              const labels: Record<string, string> = { dashboard: "Home", results: "Labs", assistant: "AI", profile: "Profile", settings: "Settings" };
+              const iconPaths: Record<string, string> = { dashboard: Icons.dashboard as string, results: Icons.fileText as string, assistant: Icons.sparkles as string, profile: Icons.user as string, settings: Icons.settings as string };
+              const iconPath = iconPaths[id];
+              return (
+                <button key={id} onClick={() => setCurrentPage(id)} style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                  padding: '8px 12px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', minWidth: 44, minHeight: 44,
+                }}>
+                  <Icon path={iconPath} size={22} color={active ? T.brand : '#A8A29E'} />
+                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? T.brand : '#A8A29E' }}>{labels[id]}</span>
+                </button>
+              );
+            })}
+          </nav>
       </div>
     </>
   );

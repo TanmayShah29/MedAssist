@@ -54,7 +54,7 @@ export function BottomMenu({
                 className
             )}
         >
-            <div className="flex justify-between items-center px-6 pt-3 pb-3 relative">
+            <div className="flex justify-between items-center px-6 pt-3 pb-3 relative px-safe">
                 {items.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -63,7 +63,7 @@ export function BottomMenu({
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex flex-col items-center gap-1 group relative py-1 transition-all duration-200 active:scale-90 flex-1",
+                                "flex flex-col items-center gap-1 group relative py-1 transition-all duration-200 active:scale-90 flex-1 min-h-[44px] justify-center",
                                 isActive ? "text-sky-500" : "text-[#A8A29E]"
                             )}
                         >
@@ -74,7 +74,7 @@ export function BottomMenu({
                                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
                             <span className={cn(
-                                "text-[9px] font-bold uppercase tracking-[0.1em] transition-colors",
+                                "text-[11px] md:text-[9px] font-bold uppercase tracking-[0.1em] transition-colors",
                                 isActive ? "text-sky-600" : "text-[#A8A29E]"
                             )}>
                                 {item.label}

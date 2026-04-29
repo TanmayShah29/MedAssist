@@ -161,7 +161,10 @@ export function StepUpload() {
         }
     };
 
-    const onSkip = async () => {
+    const handleSkip = async () => {
+        if (!window.confirm("Continue without uploading a lab report? You can always upload one later from the dashboard.")) {
+            return;
+        }
         try {
             setUploadedFile(null);
             completeStep(3);
@@ -338,7 +341,7 @@ export function StepUpload() {
 
                     {/* Option 3 — Not yet */}
                     <div
-                        onClick={onSkip}
+                        onClick={handleSkip}
                         className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group sm:col-span-2"
                     >
                         <div className="flex justify-center mb-3">
@@ -350,7 +353,9 @@ export function StepUpload() {
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
                             No problem — explore the app first and upload when you get your next lab results
                         </p>
-                        <span className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors">
+                        <span 
+                            className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors"
+                        >
                             Continue without report
                         </span>
                     </div>

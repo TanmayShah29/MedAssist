@@ -85,15 +85,15 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                     <div className="p-2 bg-indigo-50 rounded-lg">
                         <MessageSquare className="w-5 h-5 text-indigo-600" />
                     </div>
-                    <div style={{ marginLeft: 12 }}>
+                    <div className="ml-3">
                         <h3 className="text-[18px] font-bold text-[#1C1917]">Ask Your Doctor</h3>
                         <p className="text-[12px] text-[#A8A29E]">Personalized questions for your next visit</p>
                     </div>
                 </div>
                 {loading && (
-                    <div className="flex items-center gap-2 text-[11px] text-[#A8A29E]" style={{ marginLeft: 'auto' }}>
+                    <div className="flex items-center gap-2 text-[11px] text-[#A8A29E] ml-auto">
                         <div className="w-3 h-3 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-                        <span style={{ marginLeft: 8 }}>Generating...</span>
+                        <span className="ml-2">Generating...</span>
                     </div>
                 )}
             </div>
@@ -115,16 +115,16 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                                 </p>
                                 <button
                                     onClick={() => copyToClipboard(item.question, idx)}
-                                    className="p-1.5 rounded-md hover:bg-white transition-colors text-[#A8A29E] hover:text-indigo-600"
+                                    className="p-3 -m-1.5 rounded-md hover:bg-white transition-colors text-[#A8A29E] hover:text-indigo-600 flex items-center justify-center min-h-[44px] min-w-[44px]"
                                     title="Copy to clipboard"
-                                    style={{ WebkitAppearance: 'none', marginLeft: 12 }}
+                                    style={{ WebkitAppearance: 'none' }}
                                 >
-                                    {copiedIdx === idx ? <CheckCircle2 size={14} /> : <ClipboardCopy size={14} />}
+                                    {copiedIdx === idx ? <CheckCircle2 size={16} /> : <ClipboardCopy size={16} />}
                                 </button>
                             </div>
                             <div className="flex items-start gap-2 text-[13px] text-[#57534E] leading-relaxed">
                                 <Info size={14} className="text-indigo-400 mt-0.5 shrink-0" />
-                                <p className="italic opacity-80" style={{ marginLeft: 8 }}>{item.context}</p>
+                                <p className="italic opacity-80 ml-2">{item.context}</p>
                             </div>
                         </div>
                     ))

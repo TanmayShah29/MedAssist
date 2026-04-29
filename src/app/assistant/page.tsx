@@ -10,13 +10,15 @@ import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Biomarker } from "@/types/medical";
+import DOMPurify from "dompurify";
 
 // Types
 type Message = {
     id: string;
-    role: "user" | "assistant" | "system_reasoning";
+    role: "user" | "assistant" | "system_reasoning" | "typing";
     content: string;
     timestamp: Date;
+    isError?: boolean;
 };
 
 type ContextData = {
@@ -218,7 +220,8 @@ export default function AssistantPage() {
                 id: (Date.now() + 1).toString(),
                 role: "assistant",
                 content: errorText,
-                timestamp: new Date()
+                timestamp: new Date(),
+                isError: true
             };
             setMessages(prev => [...prev, errorMsg]);
         } finally {
@@ -266,18 +269,58 @@ export default function AssistantPage() {
                                     {msg.content}
                                 </p>
                             </div>
-                        ) : (
+                        ) : msg.role === "typing" ? (
                             <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
-                                {msg.content}
+                                <div className="flex items-center gap-2">
+                                    <div className="flex gap-1">
+                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </div>
+                                    <span className="text-xs text-[#A8A29E]">Thinking...</span>
+                                </div>
                             </div>
+                        ) : msg.isError ? (
+                            <div className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                                <p>{msg.content}</p>
+                                <button
+                                    onClick={() => {
+                                        const originalMsg = messages.find(m => m.id === msg.id && m.role === 'user');
+                                        if (originalMsg) {
+                                            setMessages(prev => prev.filter(m => m.id !== msg.id));
+                                            handleSendMessage(originalMsg.content);
+                                        }
+                                    }}
+                                    className="mt-2 text-xs font-semibold text-red-600 hover:text-red-700 flex items-center gap-1"
+                                >
+                                    ↻ Retry
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
                         )}
                     </div>
                 ))}
+                {isProcessing && messages[messages.length - 1]?.role !== 'typing' && (
+                    <div className="flex w-full justify-start">
+                        <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                            <div className="flex items-center gap-2">
+                                <div className="flex gap-1">
+                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                </div>
+                                <span className="text-xs text-[#A8A29E]">Thinking...</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky transform-gpu bottom-0 z-10">
+            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10"
+                 style={{ paddingBottom: 'max(1rem, calc(1rem + env(safe-area-inset-bottom, 0px)))' }}>
                 {/* Suggested Questions */}
                 {messages.filter(m => m.role === 'user').length === 0 && (
                     <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none mb-1">
@@ -310,7 +353,7 @@ export default function AssistantPage() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="whitespace-nowrap px-4 py-2 bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
+                                    className="whitespace-nowrap px-4 py-2.5 min-h-[44px] bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
                                 >
                                     {q}
                                 </button>

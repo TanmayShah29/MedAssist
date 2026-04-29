@@ -106,7 +106,7 @@ export function ClientLayout({
                 min-h-[100dvh]
                 flex flex-col
                 overflow-x-hidden
-                pt-16 lg:pt-0
+                pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0
                 pb-[calc(5rem+env(safe-area-inset-bottom))]
                 lg:pb-0
                 page-enter

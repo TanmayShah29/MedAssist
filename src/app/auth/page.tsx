@@ -20,6 +20,21 @@ function AuthContent() {
     const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
+    const getPasswordStrength = (pw: string): { level: number; label: string; color: string } => {
+        if (!pw) return { level: 0, label: '', color: '' }
+        let score = 0
+        if (pw.length >= 8) score++
+        if (pw.length >= 12) score++
+        if (/[A-Z]/.test(pw)) score++
+        if (/[0-9]/.test(pw)) score++
+        if (/[^A-Za-z0-9]/.test(pw)) score++
+        if (score <= 1) return { level: 1, label: 'Weak', color: 'bg-red-400' }
+        if (score <= 3) return { level: 2, label: 'Fair', color: 'bg-amber-400' }
+        if (score <= 4) return { level: 3, label: 'Good', color: 'bg-emerald-400' }
+        return { level: 4, label: 'Strong', color: 'bg-emerald-500' }
+    }
+    const strength = getPasswordStrength(password)
+
     // Helper to clear stale onboarding state before signup
     const clearOnboardingState = () => {
         if (typeof window !== 'undefined') {
@@ -150,19 +165,35 @@ function AuthContent() {
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="••••••••"
                     />
+                    {mode === 'signup' && password && (
+                        <div className="mt-2">
+                            <div className="flex gap-1 mb-1">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= strength.level ? strength.color : 'bg-[#E8E6DF]'}`} />
+                                ))}
+                            </div>
+                            <p className={`text-[11px] font-medium ${strength.level >= 3 ? 'text-emerald-600' : strength.level >= 2 ? 'text-amber-600' : 'text-red-500'}`}>
+                                {strength.label} {password.length < 8 && <span className="text-[#A8A29E]">· Min 8 characters</span>}
+                            </p>
+                            <p className="text-[10px] text-[#A8A29E] mt-1">
+                                Use 8+ characters with uppercase, numbers, and symbols
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {mode === 'signup' && (
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 8 }}>
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            checked={agreedToTerms}
-                            onChange={e => setAgreedToTerms(e.target.checked)}
-                            className="w-4 h-4 min-w-[16px] min-h-[16px] rounded border-[#E8E6DF] text-sky-500 focus:ring-sky-500 cursor-pointer"
-                            style={{ marginTop: 2, accentColor: '#0EA5E9', appearance: 'auto', WebkitAppearance: 'checkbox' }}
-                        />
-                        <label htmlFor="terms" style={{ fontSize: 13, color: '#57534E', lineHeight: 1.5 }}>
+                        <label htmlFor="terms" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', minHeight: 44, padding: '4px 0' }}>
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                checked={agreedToTerms}
+                                onChange={e => setAgreedToTerms(e.target.checked)}
+                                className="w-4 h-4 rounded border-[#E8E6DF] text-sky-500 focus:ring-sky-500 cursor-pointer"
+                                style={{ marginTop: 2, accentColor: '#0EA5E9' }}
+                            />
+                            <span style={{ fontSize: 13, color: '#57534E', lineHeight: 1.5 }}>
                             I agree to the{' '}
                             <a href="/terms" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
                                 Terms of Service
@@ -171,6 +202,7 @@ function AuthContent() {
                             <a href="/privacy" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
                                 Privacy Policy
                             </a>
+                        </span>
                         </label>
                     </div>
                 )}
@@ -224,7 +256,7 @@ function AuthContent() {
 export default function AuthPage() {
     return (
         <div className="min-h-[100dvh] bg-[#F0EFE9] flex flex-col justify-center items-center p-4">
-            <Link href="/" className="absolute top-8 left-8 flex items-center gap-2">
+            <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 flex items-center gap-2 z-10">
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
                     <Shield className="w-4 h-4 text-white" />
                 </div>

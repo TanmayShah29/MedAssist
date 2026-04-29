@@ -64,31 +64,34 @@ export function MobileNavbar() {
   return (
     <header className="
       lg:hidden fixed top-0 left-0 right-0 z-[60]
-      h-14 bg-[#FAFAF7]/80 backdrop-blur-xl border-b border-[#E8E6DF]
-      flex items-center justify-between px-3
-      safe-area-top
+      bg-[#FAFAF7]/80 backdrop-blur-xl border-b border-[#E8E6DF]
+      flex flex-col
     ">
-      <div className="flex items-center gap-2 min-w-0">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/20">
-            <Activity className="w-4 h-4 text-white" />
-          </div>
-        </Link>
-        <span className="font-display text-base text-[#1C1917] tracking-tight font-bold truncate max-w-[140px]">
-          {getTitle(pathname)}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Link href="/profile" className="
-          w-8 h-8 rounded-full bg-white border border-[#E8E6DF]
-          flex items-center justify-center shadow-sm
-          active:scale-95 transition-transform
-        ">
-          <span className="text-[10px] font-bold text-sky-600">
-            {userInitials}
+      {/* iOS notch spacer */}
+      <div className="w-full safe-area-top" />
+      <div className="h-14 flex items-center justify-between px-3 w-full px-safe">
+        <div className="flex items-center gap-2 min-w-0">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/20">
+              <Activity className="w-4 h-4 text-white" />
+            </div>
+          </Link>
+          <span className="font-display text-base text-[#1C1917] tracking-tight font-bold truncate max-w-[140px]">
+            {getTitle(pathname)}
           </span>
-        </Link>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link href="/profile" className="
+            w-10 h-10 rounded-full bg-white border border-[#E8E6DF]
+            flex items-center justify-center shadow-sm
+            active:scale-95 transition-transform
+          ">
+            <span className="text-[10px] font-bold text-sky-600">
+              {userInitials}
+            </span>
+          </Link>
+        </div>
       </div>
     </header>
   );

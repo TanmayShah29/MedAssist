@@ -88,6 +88,15 @@ export function BiomarkerGrid({
 
             {latestBiomarkers.length === 0 ? (
                 <EmptyState onUploadClick={onUploadClick} />
+            ) : latestBiomarkers.every(b => !b.value || b.value === null || b.value === '') ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-[14px] py-8 px-6 text-center">
+                    <p className="text-[15px] text-amber-800 mb-4">
+                        Your latest report was uploaded but no biomarkers were detected.
+                    </p>
+                    <p className="text-[13px] text-amber-700">
+                        Try uploading a different file or enter values manually.
+                    </p>
+                </div>
             ) : (
                 <div className="space-y-8">
                     {CATEGORIES.map(cat => {
@@ -104,9 +113,9 @@ export function BiomarkerGrid({
                             <div key={cat} className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
-                                    <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF]" style={{ marginLeft: 12 }} />
+                                    <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
                                 </div>
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 md:gap-4">
                                     {catBiomarkers.map(b => {
                                         const prev = displayBiomarkers.find(
                                             pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId
@@ -195,14 +204,18 @@ function BiomarkerCard({
 
     return (
         <div
-            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
+            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
             onClick={onClick}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }}}
             onTouchStart={(e) => {
                 const el = e.currentTarget;
                 if (el.classList.contains('active-tooltip')) return;
                 el.classList.add('active-tooltip');
                 setTimeout(() => el.classList.remove('active-tooltip'), 3000);
             }}
+            tabIndex={0}
+            role="button"
+            aria-label={`${b.name}: ${b.value} ${b.unit}, status ${b.status}. ${delta ? `${delta.percent} change from last result` : 'No previous data'}`}
         >
             {/* Plain-English hover overlay */}
             <div
@@ -219,8 +232,9 @@ function BiomarkerCard({
                 <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badge}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                     {b.status.toUpperCase()}
+                    <span className="sr-only">({b.status} status)</span>
                 </div>
-                <div className="text-right" style={{ marginLeft: 'auto' }}>
+                <div className="text-right ml-auto">
                     <div className="text-[15px] font-bold text-[#1C1917]">
                         {b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span>
                     </div>

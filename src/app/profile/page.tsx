@@ -101,7 +101,7 @@ export default function ProfilePage() {
     const reportCount = reports.length;
 
     return (
-        <div className="max-w-4xl mx-auto px-3 py-4 md:px-6 md:py-8 space-y-5 md:space-y-6">
+        <div className="max-w-4xl mx-auto px-3 py-4 md:px-6 md:py-8 space-y-5 md:space-y-6 pb-24 md:pb-8">
 
             <div>
                 <h1 className="font-display text-3xl text-[#1C1917]">Clinical Profile</h1>
@@ -146,7 +146,7 @@ export default function ProfilePage() {
                                 {isSaving ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">First Name</label>
                                 <input

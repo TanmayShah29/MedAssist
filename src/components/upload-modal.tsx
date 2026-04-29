@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, Loader2, AlertCircle, PenLine, Plus, Trash2 } from 'lucide-react';
+import { Upload, X, FileText, AlertCircle, PenLine, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 
 const IMAGE_BASED_PDF_CODE = 'IMAGE_BASED_PDF';
+
+const COMMON_BIOMARKERS = [
+    "Glucose", "HbA1c", "Insulin", 
+    "Total Cholesterol", "LDL Cholesterol", "HDL Cholesterol", "Triglycerides",
+    "Creatinine", "BUN", "eGFR", "Uric Acid",
+    "ALT", "AST", "ALP", "GGT", "Bilirubin", "Albumin",
+    "Sodium", "Potassium", "Chloride", "Calcium", "Magnesium", "Iron",
+    "Hemoglobin", "Hematocrit", "RBC", "WBC", "Platelets",
+    "TSH", "T3", "T4", "Vitamin D", "Vitamin B12",
+    "CRP", "ESR", "Ferritin"
+];
 
 const COMMON_SYMPTOMS = [
     "Fatigue", "Fever", "Headache", "Nausea",
@@ -39,12 +50,31 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [processStage, setProcessStage] = useState<'uploading' | 'analyzing' | 'saving' | 'complete' | null>(null);
+    const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [errorCode, setErrorCode] = useState<string | null>(null);
+    const [_uploadSuccess, setUploadSuccess] = useState(false);
     const [manualRows, setManualRows] = useState<ManualRow[]>([
         { id: nextId(), name: '', value: '', unit: 'mg/dL' },
     ]);
     const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setTimeout(() => {
+                setFile(null);
+                setError(null);
+                setErrorCode(null);
+                setIsProcessing(false);
+                setProcessStage(null);
+                setProgress(0);
+                setManualRows([{ id: nextId(), name: '', value: '', unit: 'mg/dL' }]);
+                setSelectedSymptoms([]);
+                setTab('upload');
+            }, 300);
+        }
+    }, [isOpen]);
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -69,6 +99,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
         setFile(selectedFile);
         setError(null);
         setErrorCode(null);
+        setUploadSuccess(true);
     };
 
     const handleDrop = (e: React.DragEvent) => {
@@ -92,15 +123,22 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             setIsProcessing(true);
             setError(null);
             setErrorCode(null);
+            setProcessStage('uploading');
+            setProgress(10);
 
             const formData = new FormData();
             formData.append('file', file);
             formData.append('symptoms', JSON.stringify(selectedSymptoms));
 
+            setTimeout(() => setProgress(20), 100);
+            setProcessStage('analyzing');
+
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
                 body: formData,
             });
+
+            setTimeout(() => setProgress(60), 200);
 
             const data = await response.json();
 
@@ -113,20 +151,33 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setErrorCode(code);
                 setError(errorMessage);
                 setIsProcessing(false);
+                setProcessStage(null);
                 return;
             }
 
-            toast.success('Report analyzed and saved successfully!');
-            onSuccess();
-            onClose();
+            setProgress(80);
+            setProcessStage('saving');
+
             setTimeout(() => {
+                setProgress(100);
+                setProcessStage('complete');
+            }, 300);
+
+            setTimeout(() => {
+                toast.success('Report analyzed and saved successfully!');
+                onSuccess();
+                onClose();
                 setFile(null);
                 setIsProcessing(false);
-            }, 500);
+                setProcessStage(null);
+                setProgress(0);
+            }, 800);
         } catch (err: unknown) {
             setError((err as Error).message || 'Something went wrong processing your report.');
             setErrorCode(null);
             setIsProcessing(false);
+            setProcessStage(null);
+            setProgress(0);
         }
     };
 
@@ -163,32 +214,54 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
         try {
             setIsProcessing(true);
             setError(null);
+            setProcessStage('analyzing');
+            setProgress(30);
 
             const formData = new FormData();
             formData.append('manualPayload', JSON.stringify({ biomarkers }));
             formData.append('symptoms', JSON.stringify(selectedSymptoms));
+
+            setTimeout(() => setProgress(50), 200);
 
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
                 body: formData,
             });
 
+            setTimeout(() => setProgress(70), 400);
+
             const data = await response.json();
 
             if (!response.ok) {
                 setError(data.error || 'Analysis failed');
                 setIsProcessing(false);
+                setProcessStage(null);
+                setProgress(0);
                 return;
             }
 
-            toast.success('Results saved successfully!');
-            onSuccess();
-            onClose();
-            setManualRows([{ id: nextId(), name: '', value: '', unit: 'mg/dL' }]);
-            setIsProcessing(false);
+            setProgress(90);
+            setProcessStage('saving');
+
+            setTimeout(() => {
+                setProgress(100);
+                setProcessStage('complete');
+            }, 300);
+
+            setTimeout(() => {
+                toast.success('Results saved successfully!');
+                onSuccess();
+                onClose();
+                setManualRows([{ id: nextId(), name: '', value: '', unit: 'mg/dL' }]);
+                setIsProcessing(false);
+                setProcessStage(null);
+                setProgress(0);
+            }, 800);
         } catch (err: unknown) {
             setError((err as Error).message || 'Something went wrong.');
             setIsProcessing(false);
+            setProcessStage(null);
+            setProgress(0);
         }
     };
 
@@ -223,7 +296,13 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                 </h2>
                                 {!isProcessing && (
                                     <button
-                                        onClick={onClose}
+                                        onClick={() => {
+                                            const hasUnsavedData = tab === 'manual' && manualRows.some(r => r.name || r.value);
+                                            if (hasUnsavedData && !window.confirm("You have entered data that won't be saved. Close anyway?")) {
+                                                return;
+                                            }
+                                            onClose();
+                                        }}
                                         className="p-2 hover:bg-[#F5F4EF] rounded-full transition-colors text-[#A8A29E] hover:text-[#1C1917]"
                                         aria-label="Close"
                                     >
@@ -295,7 +374,10 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
                             <div className="p-6">
                                 {error && (
-                                    <div className={cn(
+                                    <div
+                                        role="alert"
+                                        aria-live="assertive"
+                                        className={cn(
                                         "mb-6 p-4 rounded-lg flex flex-col gap-3",
                                         isImageBasedError
                                             ? "bg-amber-50 border border-amber-200 text-amber-900"
@@ -305,16 +387,26 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                             <AlertCircle className={cn("w-5 h-5 shrink-0 mt-0.5", isImageBasedError ? "text-amber-600" : "text-red-600")} />
                                             <p className="text-sm">{error}</p>
                                         </div>
-                                        {isImageBasedError && (
+                                        <div className="flex flex-wrap gap-2">
                                             <button
                                                 type="button"
-                                                onClick={resetErrorAndSwitchToManual}
+                                                onClick={() => { setError(null); setErrorCode(null); }}
                                                 className="text-sm font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-2"
                                             >
-                                                <PenLine size={16} />
-                                                Enter values manually instead
+                                                <RotateCcw size={16} />
+                                                Try again
                                             </button>
-                                        )}
+                                            {isImageBasedError && (
+                                                <button
+                                                    type="button"
+                                                    onClick={resetErrorAndSwitchToManual}
+                                                    className="text-sm font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-2"
+                                                >
+                                                    <PenLine size={16} />
+                                                    Enter values manually
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 
@@ -371,10 +463,23 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 <button
                                                     onClick={handleUpload}
                                                     disabled={isProcessing}
-                                                    className="w-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-semibold py-3.5 rounded-lg transition-all shadow-sm shadow-sky-500/20 flex items-center justify-center"
+                                                    className="w-full bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-semibold py-3.5 rounded-lg transition-all shadow-sm shadow-sky-500/20 flex items-center justify-center disabled:opacity-80"
                                                 >
                                                     {isProcessing ? (
-                                                        <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Analyzing Report...</>
+                                                        <div className="flex items-center gap-3 w-full">
+                                                            <div className="flex-1 h-1.5 bg-sky-600/30 rounded-full overflow-hidden">
+                                                                <div
+                                                                    className="h-full bg-white rounded-full transition-all duration-300"
+                                                                    style={{ width: `${progress}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-sm whitespace-nowrap">
+                                                                {processStage === 'uploading' && 'Uploading...'}
+                                                                {processStage === 'analyzing' && 'Analyzing...'}
+                                                                {processStage === 'saving' && 'Saving...'}
+                                                                {processStage === 'complete' && 'Done!'}
+                                                            </span>
+                                                        </div>
                                                     ) : (
                                                         'Analyze with AI'
                                                     )}
@@ -397,28 +502,41 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         <div className="space-y-3 max-h-[280px] overflow-y-auto">
                                             {manualRows.map((row) => (
                                                 <div key={row.id} className="flex gap-2 items-center">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Name (e.g. Glucose)"
-                                                        value={row.name}
-                                                        onChange={(e) => updateManualRow(row.id, 'name', e.target.value)}
-                                                        className="grow shrink basis-0 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                                                    />
-                                                    <input
-                                                        type="text"
-                                                        inputMode="decimal"
-                                                        placeholder="Value"
-                                                        value={row.value}
-                                                        onChange={(e) => updateManualRow(row.id, 'value', e.target.value)}
-                                                        className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                                                    />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Unit"
-                                                        value={row.unit}
-                                                        onChange={(e) => updateManualRow(row.id, 'unit', e.target.value)}
-                                                        className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                                                    />
+                                                    <div className="grow shrink basis-0 min-w-0">
+                                                        <label htmlFor={`name-${row.id}`} className="sr-only">Biomarker name</label>
+                                                        <input
+                                                            id={`name-${row.id}`}
+                                                            type="text"
+                                                            list="biomarker-names"
+                                                            placeholder="Name (e.g. Glucose)"
+                                                            value={row.name}
+                                                            onChange={(e) => updateManualRow(row.id, 'name', e.target.value)}
+                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                        />
+                                                    </div>
+                                                    <div className="w-20">
+                                                        <label htmlFor={`value-${row.id}`} className="sr-only">Value</label>
+                                                        <input
+                                                            id={`value-${row.id}`}
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            placeholder="Value"
+                                                            value={row.value}
+                                                            onChange={(e) => updateManualRow(row.id, 'value', e.target.value)}
+                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                        />
+                                                    </div>
+                                                    <div className="w-20">
+                                                        <label htmlFor={`unit-${row.id}`} className="sr-only">Unit</label>
+                                                        <input
+                                                            id={`unit-${row.id}`}
+                                                            type="text"
+                                                            placeholder="Unit"
+                                                            value={row.unit}
+                                                            onChange={(e) => updateManualRow(row.id, 'unit', e.target.value)}
+                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                        />
+                                                    </div>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeManualRow(row.id)}
@@ -438,13 +556,34 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                             <Plus size={16} />
                                             Add another value
                                         </button>
+                                        <datalist id="biomarker-names">
+                                            {COMMON_BIOMARKERS.map(name => (
+                                                <option key={name} value={name} />
+                                            ))}
+                                        </datalist>
                                         <button
                                             type="button"
                                             onClick={handleManualSubmit}
                                             disabled={isProcessing}
-                                            className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3.5 rounded-lg flex items-center justify-center gap-2"
+                                            className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3.5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-80"
                                         >
-                                            {isProcessing ? <><Loader2 className="w-5 h-5 animate-spin" /> Analyzing...</> : 'Analyze & save'}
+                                            {isProcessing ? (
+                                                <div className="flex items-center gap-3 w-full px-2">
+                                                    <div className="flex-1 h-1.5 bg-sky-600/30 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-white rounded-full transition-all duration-300"
+                                                            style={{ width: `${progress}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-sm whitespace-nowrap">
+                                                        {processStage === 'analyzing' && 'Analyzing...'}
+                                                        {processStage === 'saving' && 'Saving...'}
+                                                        {processStage === 'complete' && 'Done!'}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                'Analyze & save'
+                                            )}
                                         </button>
                                     </div>
                                 )}

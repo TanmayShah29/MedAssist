@@ -11,6 +11,15 @@ interface RangeBarProps {
 }
 
 export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, status }: RangeBarProps) {
+    // Handle null/invalid values - don't render
+    if (value === null || value === undefined || isNaN(value) || !isFinite(value)) {
+        return null
+    }
+
+    if (min === null || min === undefined || max === null || max === undefined) {
+        return null
+    }
+
     // Calculate display range with 20% padding on each side
     const range = max - min
     const displayMin = Math.min(min, value) - range * 0.2

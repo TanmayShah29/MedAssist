@@ -97,7 +97,7 @@ describe('withRetry', () => {
 
   it('caps delay at maxDelayMs', async () => {
     const delays: number[] = [];
-    const originalSetTimeout = globalThis.setTimeout;
+    const _originalSetTimeout = globalThis.setTimeout;
 
     // Spy on sleep calls via the timer mock
     const fn = vi.fn()
@@ -108,7 +108,7 @@ describe('withRetry', () => {
     vi.spyOn(globalThis, 'setTimeout').mockImplementation((cb: () => void, ms?: number) => {
       delays.push(ms ?? 0);
       cb(); // execute immediately
-      return 0 as unknown as ReturnType<typeof originalSetTimeout>;
+      return 0 as unknown as ReturnType<typeof _originalSetTimeout>;
     });
 
     await withRetry(fn, { maxAttempts: 3, initialDelayMs: 100, maxDelayMs: 150 });

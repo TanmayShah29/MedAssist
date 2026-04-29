@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import { animate } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 import { Biomarker } from '@/types/medical';
 
@@ -25,6 +26,7 @@ function getScoreLabel(score: number): { label: string; color: string; bg: strin
 export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount, biomarkers: _biomarkers = [], onClick }: HealthScoreOverviewProps) {
     const [displayScore, setDisplayScore] = useState(0);
     const [animatedDash, setAnimatedDash] = useState(0);
+    const [showTooltip, setShowTooltip] = useState(false);
 
     const r = 52;
     const circ = 2 * Math.PI * r;
@@ -41,6 +43,13 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
         return controls.stop;
     }, [score, circ]);
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick?.();
+        }
+    };
+
     if (score === 0 && optimalCount === 0 && warningCount === 0 && criticalCount === 0) {
         return null;
     }
@@ -50,20 +59,31 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
     return (
         <div
             onClick={onClick}
-            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md' : ''}`}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setShowTooltip(true)}
+            onBlur={() => setShowTooltip(false)}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
+            role={onClick ? "button" : undefined}
+            tabIndex={onClick ? 0 : undefined}
+            aria-label={onClick ? "Health score details" : undefined}
         >
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2">
                     Health Stability Score
                     <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">
                         <Info className="w-3.5 h-3.5" />
-                        <div className="absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 normal-case leading-relaxed font-normal">
+                        <div className={cn(
+                            "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-opacity z-10 normal-case leading-relaxed font-normal",
+                            (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 pointer-events-none md:pointer-events-none'
+                        )}>
                             Simplified stability estimate based on your lab ranges. Click to see breakdown.
                         </div>
                     </div>
                 </h3>
                 {onClick && (
-                    <span className="text-[10px] font-semibold text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-semibold text-sky-500 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                         See breakdown →
                     </span>
                 )}

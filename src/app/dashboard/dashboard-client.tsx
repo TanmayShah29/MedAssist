@@ -250,7 +250,6 @@ export default function DashboardClient({
                 localStorage.setItem(`medassist_cached_${key}_biomarkers`, JSON.stringify(displayBiomarkers));
             } catch (_e) { /* storage full — non-critical */ }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [displayLabResults, displayBiomarkers, demoMode]);
 
     // Latest entry per biomarker name
@@ -353,11 +352,18 @@ export default function DashboardClient({
                     )}
                 </div>
                 <div className="lg:hidden flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                        {profile?.first_name && (
+                            <h1 className="text-[16px] font-bold text-[#1C1917]">
+                                Welcome, {profile.first_name}
+                            </h1>
+                        )}
+                    </div>
                     {lastUpdated && (
-                        <p className="text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider">Report: {lastUpdated}</p>
+                        <p className="text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider ml-auto">Report: {lastUpdated}</p>
                     )}
                     {isOffline && (
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-auto">
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-2">
                             <WifiOff size={12} />
                             OFFLINE
                         </div>
@@ -392,7 +398,7 @@ export default function DashboardClient({
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
                                 </div>
-                                <div style={{ marginLeft: 16 }}>
+                                <div className="ml-3 sm:ml-4">
                                     <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
                                     <p className="text-xs text-[#57534E]">
                                         {criticalCount > 0
@@ -422,7 +428,7 @@ export default function DashboardClient({
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
                                 </div>
-                                <div style={{ marginLeft: 16 }}>
+                                <div className="ml-3 sm:ml-4">
                                     <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
                                     <p className="text-xs text-[#57534E]">
                                         Last test was{' '}
@@ -457,7 +463,7 @@ export default function DashboardClient({
                     </p>
                     <button
                         onClick={() => setDemoMode(false)}
-                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         Show my data

@@ -148,7 +148,7 @@ export function Sidebar({ className }: { className?: string }) {
                             key={item.id}
                             href={item.path}
                             className={cn(
-                                "flex items-center justify-between px-3 py-2.5 rounded-[10px]",
+                                "flex items-center justify-between px-3 py-2.5 rounded-[10px] min-h-[44px]",
                                 "text-sm transition-all duration-150 group border-l-3",
                                 isActive
                                     ? "bg-sky-100 text-sky-700 border-sky-500"
@@ -208,7 +208,7 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
                 <button
                     onClick={handleSignOut}
-                    className="text-[#A8A29E] hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                    className="text-[#A8A29E] hover:text-red-500 transition-colors p-3 -m-1 hover:bg-red-50 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
                     title="Sign Out"
                     style={{ WebkitAppearance: 'none' }}
                 >

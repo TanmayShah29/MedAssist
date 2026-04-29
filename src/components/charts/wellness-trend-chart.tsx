@@ -91,11 +91,11 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 export function WellnessTrendChart({ data, supplements = [], className }: WellnessTrendChartProps) {
     useTheme()
     const [filter, setFilter] = useState<typeof timeFilters[number]>('ALL');
+    const [now] = useState(() => Date.now());
 
     // Filter data by time range
     const filteredData = useMemo(() => {
         if (filter === 'ALL') return data;
-        const now = Date.now();
         const msMap: Record<string, number> = { '3M': 90, '6M': 180, '1Y': 365 };
         const cutoff = now - msMap[filter] * 24 * 60 * 60 * 1000;
         const filtered = data.filter(d => {
@@ -104,7 +104,7 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
             return isNaN(parsed) ? true : parsed >= cutoff;
         });
         return filtered.length > 1 ? filtered : data;
-    }, [data, filter]);
+    }, [data, filter, now]);
 
     // Enrich filteredData with supplements
     const enrichedData = useMemo(() => {

@@ -3,7 +3,7 @@
 
 import React, { useRef, useState } from "react"
 import { motion } from "framer-motion"
-import { Upload } from "lucide-react"
+import { Upload, X } from "lucide-react"
 // Changed: IconUpload from @tabler → Upload from lucide-react
 import { useDropzone } from "react-dropzone"
 
@@ -11,8 +11,10 @@ import { useDropzone } from "react-dropzone"
 
 export const FileUpload = ({
     onChange,
+    onRemove,
 }: {
     onChange?: (files: File[]) => void
+    onRemove?: (file: File) => void
 }) => {
     const [files, setFiles] = useState<File[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -21,6 +23,15 @@ export const FileUpload = ({
         setFiles((prevFiles) => [...prevFiles, ...newFiles])
         if (onChange) {
             onChange(newFiles)
+        }
+    }
+
+    const handleRemove = (file: File, e: React.MouseEvent) => {
+        e.stopPropagation()
+        const newFiles = files.filter(f => f !== file)
+        setFiles(newFiles)
+        if (onRemove) {
+            onRemove(file)
         }
     }
 
@@ -102,6 +113,14 @@ export const FileUpload = ({
                                px-2 py-1 rounded-full">
                                 Ready
                             </span>
+                            <button
+                                type="button"
+                                onClick={(e) => handleRemove(file, e)}
+                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                aria-label="Remove file"
+                            >
+                                <X size={14} />
+                            </button>
                         </motion.div>
                     ))}
 

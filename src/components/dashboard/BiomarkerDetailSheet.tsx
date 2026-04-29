@@ -73,10 +73,10 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-md bg-[#FAFAF7] shadow-2xl z-50 overflow-y-auto"
+                        className="fixed right-0 top-0 h-full w-full max-w-md bg-[#FAFAF7] shadow-2xl z-50 overflow-y-auto px-safe"
                         style={{ WebkitOverflowScrolling: 'touch', height: '-webkit-fill-available' }}
                     >
-                        <div className="p-6">
+                        <div className="p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
                             {/* Header */}
                             <div className="flex justify-between items-start mb-8">
                                 <div>
@@ -93,7 +93,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 </div>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-3 -m-1 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                                     style={{ WebkitAppearance: 'none' }}
                                 >
                                     <X className="w-6 h-6 text-[#57534E]" />

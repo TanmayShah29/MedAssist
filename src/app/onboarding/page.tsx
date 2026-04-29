@@ -56,7 +56,7 @@ export default function OnboardingPage() {
                     </div>
 
                     {/* Progress steps */}
-                    <div className="flex items-center gap-0">
+                    <div className="flex items-center gap-0 overflow-x-auto pb-1 scrollbar-hide">
                         {STEP_LABELS.map((label, idx) => {
                             const stepNum = idx + 1;
                             const isComplete = currentStep > stepNum;
@@ -87,7 +87,7 @@ export default function OnboardingPage() {
                                         </motion.div>
                                         {/* Label */}
                                         <span className={`text-[9px] font-medium mt-1 
-                      whitespace-nowrap hidden md:block
+                      whitespace-nowrap 
                       ${isActive ? "text-sky-600"
                                                 : isComplete ? "text-emerald-600"
                                                     : "text-[#57534E]"}`}>

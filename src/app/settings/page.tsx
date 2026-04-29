@@ -133,13 +133,13 @@ export default function SettingsPage() {
                             placeholder="New Password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-[#FAFAF7] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                            className="w-full px-4 py-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-h-[44px]"
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={isUpdatingPassword}
-                        className="px-4 py-2 bg-sky-500 text-white rounded-[10px] text-sm font-medium hover:bg-sky-600 transition-colors disabled:opacity-70"
+                        className="px-4 py-2.5 bg-sky-500 text-white rounded-[10px] text-sm font-medium hover:bg-sky-600 transition-colors disabled:opacity-70 min-h-[44px]"
                     >
                         {isUpdatingPassword ? "Updating..." : "Update Password"}
                     </button>
@@ -164,7 +164,7 @@ export default function SettingsPage() {
                 <button
                     onClick={handleExportData}
                     disabled={isExporting}
-                    className="px-4 py-2 bg-[#FAFAF7] border border-[#E8E6DF] text-[#1C1917] rounded-[10px] text-sm font-medium hover:bg-[#E8E6DF] transition-colors disabled:opacity-70"
+                className="px-4 py-2.5 bg-[#FAFAF7] border border-[#E8E6DF] text-[#1C1917] rounded-[10px] text-sm font-medium hover:bg-[#E8E6DF] transition-colors disabled:opacity-70 min-h-[44px]"
                 >
                     {isExporting ? "Exporting..." : "Export to CSV"}
                 </button>
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={toggleDebugMode}
-                        className={`px-4 py-2 rounded-[10px] text-sm font-medium transition-colors ${isDebugMode
+                        className={`px-4 py-2.5 rounded-[10px] text-sm font-medium transition-colors min-h-[44px] ${isDebugMode
                             ? "bg-indigo-500 text-white"
                             : "bg-[#FAFAF7] border border-[#E8E6DF] text-[#1C1917]"
                             }`}
@@ -206,7 +206,7 @@ export default function SettingsPage() {
                 <button
                     onClick={handleDeleteAccount}
                     disabled={isDeleting}
-                    className="px-4 py-2 border border-red-200 text-red-600 rounded-[10px] text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-70"
+                    className="px-4 py-2.5 border border-red-200 text-red-600 rounded-[10px] text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-70 min-h-[44px]"
                 >
                     {isDeleting ? "Deleting..." : "Delete Account"}
                 </button>

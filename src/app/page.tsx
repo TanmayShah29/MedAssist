@@ -122,6 +122,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const featuresRef = useRef(null);
   const isFeaturesInView = useInView(featuresRef, { once: true, margin: "-80px" });
@@ -165,7 +166,7 @@ export default function LandingPage() {
               <Activity size={14} /> Live Demo
             </Link>
             {!isSignedIn && (
-              <Link href="/auth?mode=login" className="text-sm font-semibold text-[#57534E] hover:text-[#1C1917] px-4 py-2 transition-colors">
+              <Link href="/auth?mode=login" className="hidden sm:block text-sm font-semibold text-[#57534E] hover:text-[#1C1917] px-4 py-2 transition-colors">
                 Sign in
               </Link>
             )}
@@ -175,12 +176,38 @@ export default function LandingPage() {
             >
               {isSignedIn ? "Dashboard" : "Get started"}
             </button>
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Toggle navigation menu"
+              aria-expanded={menuOpen}
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-lg hover:bg-[#F5F4EF] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+            >
+              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-[#57534E] transition-opacity duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            </button>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {menuOpen && (
+          <div className="md:hidden bg-[#FAFAF7]/95 backdrop-blur-xl border-t border-[#E8E6DF] px-6 py-4 space-y-1">
+            <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">How it works</Link>
+            <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Features</Link>
+            <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Security</Link>
+            <Link href="/demo" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-sky-600 py-3 border-b border-[#F0EEE8]">Live Demo</Link>
+            {!isSignedIn && (
+              <Link href="/auth?mode=login" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-[#57534E] py-3">
+                Sign in
+              </Link>
+            )}
+          </div>
+        )}
       </header>
 
       {/* ── HERO ── */}
-      <section className="pt-28 pb-16 px-6 overflow-hidden">
+      <section className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 

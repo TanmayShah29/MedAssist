@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, RefreshCw, Sparkles } from 'lucide-react'
+import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
 import { TrustLayer } from '@/components/trust-layer'
@@ -75,6 +76,10 @@ export default function ResultsPage() {
                     }
                 } catch (err) {
                     logger.error("Failed to fetch trends", err)
+                    toast.error("Failed to load trend data", {
+                        description: "Could not retrieve historical data. Please try again.",
+                        duration: 4000
+                    })
                 } finally {
                     setLoadingTrends(false)
                 }
@@ -198,7 +203,7 @@ export default function ResultsPage() {
                             <button
                                 onClick={() => setRefreshKey((k) => k + 1)}
                                 disabled={loading}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[40px]"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[44px] h-11"
                                 title="Refresh results"
                                 style={{ WebkitAppearance: 'none' }}
                             >
@@ -207,7 +212,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[40px]"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[44px] h-11"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 <Printer size={16} />
@@ -216,7 +221,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="text-white rounded-[10px] px-3 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[40px] flex items-center gap-1.5"
+                                className="text-white rounded-[10px] px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[44px] h-11 flex items-center gap-1.5"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Upload
@@ -272,7 +277,8 @@ export default function ResultsPage() {
                             fontSize: 14,
                             color: '#1C1917',
                             cursor: 'pointer',
-                            minWidth: 280
+                            width: '100%',
+                            maxWidth: '280px'
                         }}
                     >
                         <option value="all">All reports</option>
@@ -309,7 +315,7 @@ export default function ResultsPage() {
 
                 {/* ── Category tabs & Search ── */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div className="flex gap-2 overflow-x-auto pb-3 md:pb-0 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth mask-fade-right">
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide scroll-smooth mask-fade-right -mx-3 px-3 sm:mx-0 sm:px-0">
                         {CATEGORIES.map(category => (
                             <button
                                 key={category}
@@ -317,7 +323,7 @@ export default function ResultsPage() {
                                     setSelectedCategory(category)
                                     setSelectedBiomarker(null)
                                 }}
-                                className={`px-4 py-2.5 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 ${selectedCategory === category
+                                className={`px-4 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 min-h-[44px] ${selectedCategory === category
                                     ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
                                     : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF]'
                                     }`}
@@ -333,7 +339,7 @@ export default function ResultsPage() {
                             placeholder="Search biomarkers..."
                             value={searchQuery}
                             onChange={(e) => setSearchValue(e.target.value)}
-                            className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full md:w-64 transition-all"
+                            className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full md:w-64 transition-all h-11"
                         />
                     </div>
                 </div>
@@ -372,7 +378,7 @@ export default function ResultsPage() {
                                 <button onClick={() => router.push('/dashboard')} style={{
                                     background: '#0EA5E9', color: 'white', border: 'none',
                                     borderRadius: 10, padding: '10px 20px', fontSize: 14,
-                                    fontWeight: 600, cursor: 'pointer'
+                                    fontWeight: 600, cursor: 'pointer', minHeight: '44px'
                                 }}>
                                     Go to dashboard
                                 </button>
@@ -402,17 +408,19 @@ export default function ResultsPage() {
 
                                         <div className="grow shrink basis-0 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[15px] font-semibold text-[#1C1917] truncate">{b.name}</span>
+                                                <span className="text-[15px] font-semibold text-[#1C1917] truncate" title={b.name}>{b.name}</span>
                                                 <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] truncate">
                                                     {b.category}
                                                 </span>
                                             </div>
                                             <div className="text-[15px] text-[#57534E]">
-                                                {b.value} {b.unit}
-                                                {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) && (
+                                                {b.value !== null && b.value !== undefined ? `${b.value} ${b.unit || ''}` : 'Value unavailable'}
+                                                {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) ? (
                                                     <span className="text-[12px] text-[#A8A29E] ml-2">
-                                                        (ref: {b.reference_range_min}–{b.reference_range_max})
+                                                        (ref: {b.reference_range_min ?? 'N/A'}–{b.reference_range_max ?? 'N/A'})
                                                     </span>
+                                                ) : (
+                                                    <span className="text-[12px] text-[#A8A29E] ml-2">(ref: N/A)</span>
                                                 )}
                                             </div>
                                             {b.lab_results && (b.lab_results.uploaded_at || b.lab_results.created_at) && (
@@ -466,12 +474,14 @@ export default function ResultsPage() {
                                         selectedBiomarker.status === 'warning' ? 'text-amber-500' : 'text-red-500'
                                         }`}>
                                         <div className="text-[32px] font-bold font-display leading-none mb-1">
-                                            {selectedBiomarker.value} {selectedBiomarker.unit}
+                                            {selectedBiomarker.value !== null && selectedBiomarker.value !== undefined ? `${selectedBiomarker.value} ${selectedBiomarker.unit || ''}` : 'N/A'}
                                         </div>
-                                        {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) && (
+                                        {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) ? (
                                             <p className="text-[12px] text-[#A8A29E]">
-                                                Reference: {selectedBiomarker.reference_range_min} – {selectedBiomarker.reference_range_max}
+                                                Reference: {selectedBiomarker.reference_range_min ?? 'N/A'} – {selectedBiomarker.reference_range_max ?? 'N/A'}
                                             </p>
+                                        ) : (
+                                            <p className="text-[12px] text-[#A8A29E]">Reference: N/A</p>
                                         )}
                                     </div>
 
@@ -525,7 +535,7 @@ export default function ResultsPage() {
                                                 </button>
                                             )}
                                             <span className="text-[12px] font-semibold text-[#1C1917]">
-                                                {selectedBiomarker.confidence ? Math.round(selectedBiomarker.confidence * 100) : 0}%
+                                                {selectedBiomarker.confidence !== null && selectedBiomarker.confidence !== undefined ? `${Math.round(selectedBiomarker.confidence * 100)}%` : '—'}
                                             </span>
                                         </div>
                                     </div>
@@ -563,9 +573,10 @@ export default function ResultsPage() {
                     marginTop: 32,
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <div>
+                    alignItems: 'center',
+                    gap: 16,
+                }} className="flex-col sm:flex-row text-center sm:text-left">
+                    <div style={{ minWidth: 0 }}>
                         <p style={{ fontWeight: 600, fontSize: 15, color: '#1C1917', margin: 0 }}>
                             Had a recent blood test?
                         </p>
@@ -580,14 +591,14 @@ export default function ResultsPage() {
                             color: 'white',
                             border: 'none',
                             borderRadius: 10,
-                            padding: '8px 16px',
+                            padding: '10px 20px',
                             fontSize: 14,
                             fontWeight: 600,
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
-                            marginLeft: 16
+                            flexShrink: 0
                         }}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 w-full sm:w-auto justify-center min-h-[44px]"
                     >
                         Upload report
                         <ArrowRight size={16} />
