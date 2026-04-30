@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface UserProfile {
     name: string;
@@ -15,13 +16,22 @@ interface LabReport {
     status: 'analyzed' | 'pending';
 }
 
-// Biomarker Interface matches Component needs
+/**
+ * Biomarker as stored in the Zustand store.
+ *
+ * NOTE: This is a UI-layer type that is intentionally broader than the
+ * backend's `BiomarkerResult` (from `groq-medical.ts`). Extra fields
+ * (`trend`, `referenceRange`, `lastUpdated`) are needed by dashboard
+ * components that display historical data with trend indicators.
+ * The backend type is used for raw AI output; this type is used after
+ * the data has been fetched from Supabase and enriched for display.
+ */
 export interface Biomarker {
     id: string;
     name: string;
     value: number;
     unit: string;
-    category: string; // Relaxed for compatibility with RiskDomain
+    category: string;
     status: 'optimal' | 'warning' | 'critical';
     trend: 'up' | 'down' | 'stable';
     referenceRange: string;
@@ -41,112 +51,83 @@ interface AppState {
     labs: LabReport[];
     biomarkers: Biomarker[];
     riskAnalysis: unknown | null;
-    insightAnalysis: unknown | null; // NEW: Engine Output
+    insightAnalysis: unknown | null;
 
     // Actions
     updateUser: (profile: Partial<UserProfile>) => void;
     setHasData: (status: boolean) => void;
     updateHealthScore: (score: number) => void;
     uploadLab: (report: LabReport) => void;
-    refreshAnalysis: () => void; // NEW: Trigger Engine
     reset: () => void;
 }
 
-const DEFAULT_USER = {
-    name: "John Doe",
-    id: "8492",
-    memberSince: "2024"
+// ── Safe defaults (empty — real data comes from Supabase) ─────────────────────
+//
+// We intentionally do NOT seed mock biomarkers or a fake user here.
+// The store is persisted to localStorage, so any default data would survive
+// page refreshes and could appear on real user sessions. Components that need
+// placeholder UI while loading should use their own local loading state.
+
+const EMPTY_USER: UserProfile = {
+    name: '',
+    id: '',
+    memberSince: '',
 };
 
-const DEFAULT_TREND = [
-    { date: 'Jan 1', score: 72, ideal: 85 },
-    { date: 'Jan 15', score: 76, ideal: 85 },
-    { date: 'Feb 1', score: 88, ideal: 85 },
-    { date: 'Feb 14', score: 92, ideal: 85 },
-];
-
-// Expanded Mock Data for Full Engine Demo
-const DEFAULT_BIOMARKERS: Biomarker[] = [
-    // Cardiometabolic
-    { id: '1', name: 'HbA1c', value: 5.4, unit: '%', category: 'Metabolic', status: 'optimal', trend: 'stable', referenceRange: '< 5.7', lastUpdated: 'Today' },
-    { id: '2', name: 'LDL Cholesterol', value: 118, unit: 'mg/dL', category: 'Cardio', status: 'warning', trend: 'down', referenceRange: '< 100', lastUpdated: '2 weeks ago' },
-
-    // Inflammation
-    { id: '3', name: 'hs-CRP', value: 0.8, unit: 'mg/L', category: 'Inflammation', status: 'optimal', trend: 'down', referenceRange: '< 2.0', lastUpdated: 'Today' },
-
-    // Micronutrient
-    { id: '4', name: 'Vitamin D', value: 28, unit: 'ng/mL', category: 'Vitamin', status: 'warning', trend: 'up', referenceRange: '30-100', lastUpdated: 'Today' },
-    { id: '5', name: 'Ferritin', value: 45, unit: 'ng/mL', category: 'Metabolic', status: 'optimal', trend: 'stable', referenceRange: '30-400', lastUpdated: 'Today' },
-
-    // Hormonal (New)
-    { id: '6', name: 'Cortisol', value: 14.2, unit: 'µg/dL', category: 'Metabolic', status: 'optimal', trend: 'stable', referenceRange: '6-23', lastUpdated: 'Today' },
-    { id: '7', name: 'Testosterone', value: 650, unit: 'ng/dL', category: 'Hormonal', status: 'optimal', trend: 'up', referenceRange: '300-1000', lastUpdated: 'Today' },
-    { id: '8', name: 'TSH', value: 2.5, unit: 'mIU/L', category: 'Hormonal', status: 'optimal', trend: 'stable', referenceRange: '0.4-4.0', lastUpdated: 'Today' }
-];
+// ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useStore = create<AppState>()(
     persist(
-        (set, get) => ({
-            user: DEFAULT_USER,
+        (set) => ({
+            user: EMPTY_USER,
             hasData: false,
-            healthScore: 0, // Calculated by Engine
-            healthTrend: DEFAULT_TREND,
+            healthScore: 0,
+            healthTrend: [],
             labs: [],
-            biomarkers: DEFAULT_BIOMARKERS,
+            biomarkers: [],
             riskAnalysis: null,
             insightAnalysis: null,
 
-            setHasData: async (status) => {
-                set({ hasData: status });
-                if (status) await get().refreshAnalysis();
-            },
+            setHasData: (status) => set({ hasData: status }),
 
             updateUser: (profile) => set((state) => ({
                 user: { ...state.user, ...profile }
             })),
 
-            updateHealthScore: (score) => set({ healthScore: score }), // Legacy logic (kept for compatibility)
+            // updateHealthScore is used by consumers that receive the score
+            // from the API response and want to cache it locally.
+            updateHealthScore: (score) => set({ healthScore: score }),
 
             uploadLab: (report) => {
                 set((state) => ({
                     labs: [...state.labs, report],
-                    hasData: true
+                    hasData: true,
                 }));
-                get().refreshAnalysis();
-            },
-
-            refreshAnalysis: () => {
-                // Placeholder for new engine logic
-                // const risks = analyzeHealthRisks(get().healthTrend);
-                // const insights = await generateInsights(get().biomarkers);
-
-                set({
-                    // riskAnalysis: risks,
-                    // insights: insights,
-                    // lastUpdated: new Date() // This field does not exist in AppState
-                    healthScore: 0 // Reset or placeholder score
-                });
             },
 
             reset: () => set({
+                user: EMPTY_USER,
                 hasData: false,
                 labs: [],
                 healthScore: 0,
+                healthTrend: [],
+                biomarkers: [],
                 riskAnalysis: null,
-                insightAnalysis: null
+                insightAnalysis: null,
             }),
         }),
         {
-            name: 'medassist-storage',
+            name: 'medassist-storage-v2', // Bumped version to bust stale mock data from old key
             storage: createJSONStorage(() => {
                 try {
-                    // Test if localStorage is actually accessible (throws quota error in Safari private mode)
-                    const testKey = '__test__';
+                    // Test if localStorage is actually accessible
+                    // (throws QuotaExceededError in Safari private mode)
+                    const testKey = '__medassist_test__';
                     window.localStorage.setItem(testKey, testKey);
                     window.localStorage.removeItem(testKey);
                     return window.localStorage;
                 } catch (_e) {
-                    // Fallback to in-memory storage if unavailable
+                    // Fallback to in-memory storage
                     const fallbackStorage = new Map<string, string>();
                     return {
                         getItem: (name: string) => fallbackStorage.get(name) || null,

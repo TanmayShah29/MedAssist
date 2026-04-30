@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Send, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ type ContextData = {
 
 
 
-export default function AssistantPage() {
+export function AssistantPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const contextParam = searchParams.get("context");
@@ -69,7 +69,10 @@ export default function AssistantPage() {
             let fetchedSymptoms: string[] = [];
 
             if (bResponse.data && bResponse.data.length > 0) {
-                fetchedBiomarkers = bResponse.data;
+                fetchedBiomarkers = bResponse.data.map((b: Biomarker) => ({
+                    ...b,
+                    value: parseFloat(String(b.value)),
+                }));
                 setBiomarkers(fetchedBiomarkers);
             }
 
@@ -285,7 +288,10 @@ export default function AssistantPage() {
                                 <p>{msg.content}</p>
                                 <button
                                     onClick={() => {
-                                        const originalMsg = messages.find(m => m.id === msg.id && m.role === 'user');
+                                        const errorIndex = messages.findIndex(m => m.id === msg.id);
+                                        const originalMsg = errorIndex > 0
+                                            ? messages.slice(0, errorIndex).reverse().find(m => m.role === 'user')
+                                            : undefined;
                                         if (originalMsg) {
                                             setMessages(prev => prev.filter(m => m.id !== msg.id));
                                             handleSendMessage(originalMsg.content);
@@ -411,7 +417,7 @@ export default function AssistantPage() {
                             </h1>
                             <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2">
                                 <Sparkles className="w-4 h-4 text-sky-500" />
-                                Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "Updated"} · Updated 2 min ago
+                                Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "General context"}
                             </p>
                         </div>
 
@@ -510,5 +516,17 @@ export default function AssistantPage() {
                 </div>
             </div>
         </ErrorBoundary>
+    );
+}
+
+export default function AssistantPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-[100dvh] bg-[#FAFAF7] flex items-center justify-center">
+                <div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" />
+            </div>
+        }>
+            <AssistantPageInner />
+        </Suspense>
     );
 }

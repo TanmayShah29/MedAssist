@@ -38,17 +38,7 @@ export default async function middleware(request: NextRequest) {
         pathname === '/privacy' ||
         pathname.includes('.')
     ) {
-        const response = NextResponse.next({ request: { headers: requestHeaders } });
-
-        // Clear onboarding cookie when landing on home page 
-        if (pathname === '/') {
-            response.cookies.set('onboarding_complete', 'false', {
-                path: '/',
-                maxAge: 0,
-                httpOnly: false
-            });
-        }
-        return response;
+        return NextResponse.next({ request: { headers: requestHeaders } });
     }
 
     // Initial response with headers

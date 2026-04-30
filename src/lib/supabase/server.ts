@@ -1,36 +1,41 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+/**
+ * Shared server-side Supabase client factory.
+ *
+ * Use `getAuthClient()` in Server Components, API routes, and Server Actions
+ * instead of duplicating the createServerClient + cookie boilerplate.
+ *
+ * The returned client uses the anon key + request cookies, so it runs as
+ * the currently authenticated user and correctly respects Row-Level Security.
+ */
 
-export const createClient = async () => {
-    const cookieStore = await cookies()
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value
-                },
-                set(name: string, value: string, options: CookieOptions) {
-                    try {
-                        cookieStore.set({ name, value, ...options })
-                    } catch (_error) {
-                        // The `set` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
-                    }
-                },
-                remove(name: string, options: CookieOptions) {
-                    try {
-                        cookieStore.set({ name, value: '', ...options })
-                    } catch (_error) {
-                        // The `delete` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
-                    }
-                },
-            },
-        }
-    )
+export async function getAuthClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Ignored in read-only contexts (e.g. Server Components after
+            // headers have been sent). Auth token refresh still works
+            // because the middleware handles session refresh independently.
+          }
+        },
+      },
+    }
+  );
 }
+
+/** @deprecated Use `getAuthClient()` instead. Kept for backward-compat with existing imports. */
+export const createClient = getAuthClient;

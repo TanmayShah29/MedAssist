@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { checkRateLimitEdge } from '@/services/rateLimitService.edge';
+import { checkRateLimit } from '@/services/rateLimitService';
 import { z } from 'zod';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
-    const rateLimitResult = await checkRateLimitEdge();
+    const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
         return NextResponse.json(
             { error: rateLimitResult.message || 'Too many requests' },
@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
             value,
             unit,
             lab_results (
+                uploaded_at,
                 created_at
             )
         `)
@@ -76,15 +77,18 @@ export async function GET(req: NextRequest) {
     interface TrendRow {
         value: number;
         unit: string;
-        lab_results: { created_at: string } | { created_at: string }[] | null;
+        lab_results: { uploaded_at?: string; created_at: string } | { uploaded_at?: string; created_at: string }[] | null;
     }
 
     // Transform for Recharts (lab_results may be null if join fails)
     const trends = ((data as TrendRow[]) || [])
-        .filter((b) => Array.isArray(b.lab_results) ? b.lab_results[0]?.created_at : (!Array.isArray(b.lab_results) && b.lab_results?.created_at))
+        .filter((b) => {
+            const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+            return !!(lr?.uploaded_at || lr?.created_at);
+        })
         .map((b) => {
             const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            const d = new Date(lr!.created_at);
+            const d = new Date((lr!.uploaded_at ?? lr!.created_at)!);
             const month = d.toLocaleString('en-US', { month: 'short' });
             const day = d.getDate();
             return {

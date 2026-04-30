@@ -116,7 +116,7 @@ export function ClientLayout({
           </div>
 
           <div className="lg:hidden">
-            <BottomMenu activeId={activeId} />
+            <BottomMenu />
           </div>
         </>
       )}

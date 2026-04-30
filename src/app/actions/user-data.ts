@@ -1,34 +1,10 @@
 "use server";
 
-import { createServerClient } from "@supabase/ssr";
+import { getAuthClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ExtractedLabValue } from "@/lib/onboarding-store";
 import { logger } from "@/lib/logger";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper: authenticated Supabase client using the current request's cookies.
-// This gives the "authenticated" role, which allows calling SECURITY DEFINER
-// RPCs that are granted to `authenticated`. It also respects RLS, so any
-// direct table access is scoped to the logged-in user.
-// ─────────────────────────────────────────────────────────────────────────────
-async function getAuthClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // saveLabResult — persist a full lab report + biomarkers in one atomic RPC

@@ -127,20 +127,26 @@ export default function LandingPage() {
   const featuresRef = useRef(null);
   const isFeaturesInView = useInView(featuresRef, { once: true, margin: "-80px" });
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // Create the browser client once and keep a stable reference across renders.
+  // Using useRef prevents a new SDK instance (and potential duplicate listeners)
+  // from being created on every state change / scroll event.
+  const supabaseRef = useRef(
+    createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
   );
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setIsSignedIn(!!user));
-  }, []); // eslint-disable-line
+    supabaseRef.current.auth.getUser().then(({ data: { user } }) => setIsSignedIn(!!user));
+  }, []); // Safe: supabaseRef.current is stable for the component lifetime
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
 
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
@@ -255,18 +261,17 @@ export default function LandingPage() {
                 No login to try the demo · Free account · No credit card
               </p>
 
-              {/* Trust logos row */}
-              <div className="flex items-center gap-6 mt-8 flex-wrap">
+              {/* Patient-facing trust signals */}
+              <div className="flex flex-wrap gap-3 mt-8">
                 {[
-                  { label: "AI Model", value: "Llama 3.3" },
-                  { label: "Database", value: "Supabase" },
-                  { label: "Stack", value: "Next.js 16" },
-                  { label: "Security", value: "AES-256" },
+                  { icon: "🔒", label: "HIPAA-Aligned" },
+                  { icon: "🚫", label: "No Data Training" },
+                  { icon: "🛡️", label: "AES-256 Encrypted" },
+                  { icon: "✅", label: "Free to Start" },
                 ].map(t => (
-                  <div key={t.label} className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-[#A8A29E] uppercase tracking-wider">{t.label}</span>
-                    <span className="text-[10px] font-mono text-[#57534E] bg-[#F5F4EF] px-1.5 py-0.5 rounded">{t.value}</span>
-                  </div>
+                  <span key={t.label} className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm">
+                    <span>{t.icon}</span> {t.label}
+                  </span>
                 ))}
               </div>
             </motion.div>
@@ -730,9 +735,9 @@ export default function LandingPage() {
               <p className="text-[13px] text-slate-500 leading-relaxed max-w-xs">
                 AI-powered clinical intelligence that transforms your lab reports into plain-English health insights. Built for people, not doctors.
               </p>
-              <div className="flex gap-3 mt-6">
-                {["Supabase", "Next.js 16", "Groq AI"].map(t => (
-                  <span key={t} className="text-[10px] font-mono text-slate-600 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">{t}</span>
+              <div className="flex gap-3 mt-6 flex-wrap">
+                {["HIPAA-Aligned", "AES-256", "No Data Training"].map(t => (
+                  <span key={t} className="text-[10px] font-semibold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">{t}</span>
                 ))}
               </div>
             </div>

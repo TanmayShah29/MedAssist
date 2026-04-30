@@ -116,19 +116,26 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
         return { success: true };
 
     } catch (error) {
-        logger.error("Rate Limit Infrastructure Error:", error);
+        // ⚠️  INFRA FAILURE: the rate-limit DB/RPC is unreachable.
+        // Failing closed means ALL users are blocked until it recovers.
+        // This log should trigger a monitoring alert in production.
+        logger.error(
+            '[RateLimit] Infrastructure failure — rate-limit RPC unreachable. ' +
+            'All traffic is being blocked until DB connectivity is restored.',
+            error
+        );
 
         // Fail open only when explicitly disabled (local dev)
         if (process.env.DISABLE_RATE_LIMIT === 'true') {
-            logger.info('[RateLimit] DISABLE_RATE_LIMIT: failing open despite error');
+            logger.info('[RateLimit] DISABLE_RATE_LIMIT=true: failing open despite infra error');
             return { success: true };
         }
 
-        // Fail closed in production
+        // Fail closed in production (intentional — prevents quota abuse during outage)
         return {
             success: false,
-            message: "Service temporarily unavailable (RLS).",
-            retryAfter: 60 // Default cooldown for system errors
+            message: 'Service temporarily unavailable. Please try again shortly.',
+            retryAfter: 60,
         };
     }
 }

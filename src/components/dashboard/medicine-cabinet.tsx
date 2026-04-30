@@ -201,7 +201,7 @@ export function MedicineCabinet() {
                 <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-rose-400 mt-0.5" />
                     <p className="text-[11px] text-[#A8A29E] leading-relaxed">
-                        Supplements are automatically correlated with your biomarker trends to show you what's working.
+                        Supplement start dates are marked on your biomarker trend charts so you can track what’s working over time.
                     </p>
                 </div>
             </div>

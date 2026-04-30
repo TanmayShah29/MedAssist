@@ -1,10 +1,10 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
+import { getAuthClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { withRetry } from '@/lib/retry';
 import { logger } from '@/lib/logger';
-import Groq from "groq-sdk";
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import Groq from 'groq-sdk';
 import { z } from 'zod';
 
 export const maxDuration = 30;
@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 // Re-use a single Groq client (not instantiated on every request)
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = 'llama-3.3-70b-versatile';
 
 // ── Input validation ────────────────────────────────────────────────────────
 
@@ -30,6 +30,31 @@ const requestSchema = z.object({
     })).optional().default([]),
 });
 
+// Type guard for cached doctor questions stored in raw_ai_json
+function parseCachedQuestions(
+    rawAiJson: unknown
+): { question: string; context: string }[] | null {
+    if (
+        rawAiJson === null ||
+        typeof rawAiJson !== 'object' ||
+        Array.isArray(rawAiJson)
+    ) return null;
+
+    const json = rawAiJson as Record<string, unknown>;
+    const cached = json.cached_doctor_questions;
+    if (!Array.isArray(cached) || cached.length === 0) return null;
+
+    // Validate each entry has the expected shape
+    const validated = cached.filter(
+        (q): q is { question: string; context: string } =>
+            typeof q === 'object' &&
+            q !== null &&
+            typeof (q as Record<string, unknown>).question === 'string' &&
+            typeof (q as Record<string, unknown>).context === 'string'
+    );
+    return validated.length > 0 ? validated : null;
+}
+
 type BiomarkerInput = z.infer<typeof requestSchema>['biomarkers'][number];
 
 // ── Route handler ────────────────────────────────────────────────────────────
@@ -44,25 +69,8 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // 2. Auth
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() { return cookieStore.getAll() },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        );
-                    } catch { /* ignored in read-only contexts */ }
-                },
-            },
-        }
-    );
-
+    // 2. Auth — use shared helper (fix #13)
+    const supabase = await getAuthClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -96,15 +104,14 @@ export async function POST(request: NextRequest) {
             .from('lab_results')
             .select('id, raw_ai_json')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
+            .order('uploaded_at', { ascending: false })
             .limit(1)
             .single();
 
-        if (latestReport?.raw_ai_json?.cached_doctor_questions) {
-            return NextResponse.json({
-                questions: latestReport.raw_ai_json.cached_doctor_questions,
-                cached: true,
-            });
+        // Fix #11: type-safe cache read with validation
+        const cachedLocal = parseCachedQuestions(latestReport?.raw_ai_json);
+        if (cachedLocal) {
+            return NextResponse.json({ questions: cachedLocal, cached: true });
         }
 
         // 5. Only generate questions for flagged biomarkers
@@ -115,8 +122,8 @@ export async function POST(request: NextRequest) {
         if (criticalBiomarkers.length === 0) {
             return NextResponse.json({
                 questions: [{
-                    question: "How can I maintain my current healthy biomarker levels?",
-                    context: "All your biomarkers are currently in the optimal range.",
+                    question: 'How can I maintain my current healthy biomarker levels?',
+                    context: 'All your biomarkers are currently in the optimal range.',
                 }],
             });
         }
@@ -127,23 +134,28 @@ export async function POST(request: NextRequest) {
             .map((b: BiomarkerInput) => `${b.name.toLowerCase()}:${b.status}:${parseFloat(String(b.value)).toFixed(1)}`)
             .join('|')}`;
 
-        const { data: globalCache } = await supabase
-            .from('global_ai_cache')
-            .select('response_json, usage_count')
-            .eq('cache_key', cacheKey)
-            .single();
-
-        if (globalCache) {
-            // Bump usage count asynchronously — don't await, don't block the response
-            supabase.from('global_ai_cache')
-                .update({ usage_count: ((globalCache.usage_count as number) || 0) + 1, updated_at: new Date().toISOString() })
+        // Fix #1: null-guard supabaseAdmin before using it
+        if (supabaseAdmin) {
+            const { data: globalCache } = await supabaseAdmin
+                .from('global_ai_cache')
+                .select('response_json, usage_count')
                 .eq('cache_key', cacheKey)
-                .then(() => { /* fire-and-forget */ });
+                .single();
 
-            return NextResponse.json({ questions: globalCache.response_json, cached: 'global' });
+            if (globalCache) {
+                // Bump usage count asynchronously — don't block the response
+                supabaseAdmin.from('global_ai_cache')
+                    .update({ usage_count: ((globalCache.usage_count as number) || 0) + 1, updated_at: new Date().toISOString() })
+                    .eq('cache_key', cacheKey)
+                    .then(() => { /* fire-and-forget */ });
+
+                return NextResponse.json({ questions: globalCache.response_json, cached: 'global' });
+            }
         }
 
         // 7. Generate questions via Groq (with retry)
+        // Fix #8: Use a JSON object wrapper so response_format: json_object is valid.
+        // The prompt asks for { "questions": [...] } and we unwrap below.
         const questionsPrompt = `Based on these specific lab results that need attention:
 ${criticalBiomarkers.map((b: BiomarkerInput) =>
     `${b.name}: ${b.value} ${b.unit} (status: ${b.status}${
@@ -156,54 +168,83 @@ ${criticalBiomarkers.map((b: BiomarkerInput) =>
 Generate 3-5 specific questions this person should ask their doctor at their next appointment.
 For each question, reference the actual numeric value. Provide a brief "Why ask this" context.
 
-Return EXCLUSIVELY a JSON array — no preamble, no explanation:
-[
-  {
-    "question": "The question with the specific value mentioned",
-    "context": "Why this question matters based on the specific results"
-  }
-]`;
+Return a JSON object with a "questions" key containing an array:
+{
+  "questions": [
+    {
+      "question": "The question with the specific value mentioned",
+      "context": "Why this question matters based on the specific results"
+    }
+  ]
+}`;
 
         const completion = await withRetry(
             () => groq.chat.completions.create({
-                messages: [{ role: "user", content: questionsPrompt }],
+                messages: [{ role: 'user', content: questionsPrompt }],
                 model: MODEL,
                 temperature: 0.1,
-                response_format: { type: "json_object" },
+                response_format: { type: 'json_object' },
                 max_tokens: 700,
             }),
             { maxAttempts: 3, initialDelayMs: 600 }
         );
 
-        // 8. Parse AI response
+        // 8. Parse AI response — always expect { questions: [...] } now (fix #8)
+        const questionsSchema = z.object({
+            questions: z.array(z.object({
+                question: z.string(),
+                context: z.string(),
+            })).min(1),
+        });
+
         let questions: { question: string; context: string }[] = [];
         try {
-            const content = completion.choices[0].message.content || "[]";
+            const content = completion.choices[0].message.content || '{}';
             const parsed = JSON.parse(content);
-            questions = Array.isArray(parsed) ? parsed : (parsed.questions || []);
+            const validated = questionsSchema.safeParse(parsed);
+            if (validated.success) {
+                questions = validated.data.questions;
+            } else {
+                // Fallback: try bare array for backward-compat
+                if (Array.isArray(parsed)) {
+                    questions = parsed.filter(
+                        (q): q is { question: string; context: string } =>
+                            typeof q?.question === 'string' && typeof q?.context === 'string'
+                    );
+                }
+                if (questions.length === 0) throw new Error('No valid questions in response');
+            }
         } catch (e) {
             logger.error('[generate-questions] Failed to parse AI JSON response', e);
             questions = [{
-                question: "Could not generate structured questions. Please ask your doctor about your flagged biomarkers.",
-                context: "There was an error processing the detailed questions.",
+                question: 'Could not generate structured questions. Please ask your doctor about your flagged biomarkers.',
+                context: 'There was an error processing the detailed questions.',
             }];
         }
 
         // 9. Write to both local and global cache (non-blocking)
         if (questions.length > 0) {
             if (latestReport) {
-                const updatedAiJson = { ...latestReport.raw_ai_json, cached_doctor_questions: questions };
+                const updatedAiJson = {
+                    ...(typeof latestReport.raw_ai_json === 'object' && latestReport.raw_ai_json !== null
+                        ? latestReport.raw_ai_json as Record<string, unknown>
+                        : {}),
+                    cached_doctor_questions: questions,
+                };
                 supabase.from('lab_results')
                     .update({ raw_ai_json: updatedAiJson })
                     .eq('id', latestReport.id)
                     .then(() => { /* fire-and-forget */ });
             }
 
-            supabase.from('global_ai_cache').upsert({
-                cache_key: cacheKey,
-                response_json: questions,
-                updated_at: new Date().toISOString(),
-            }, { onConflict: 'cache_key' }).then(() => { /* fire-and-forget */ });
+            // Fix #1: null-guard supabaseAdmin before writing global cache
+            if (supabaseAdmin) {
+                supabaseAdmin.from('global_ai_cache').upsert({
+                    cache_key: cacheKey,
+                    response_json: questions,
+                    updated_at: new Date().toISOString(),
+                }, { onConflict: 'cache_key' }).then(() => { /* fire-and-forget */ });
+            }
         }
 
         return NextResponse.json({ questions, cached: false });

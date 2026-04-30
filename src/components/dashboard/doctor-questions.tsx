@@ -2,144 +2,188 @@
 
 import { useEffect, useState } from "react";
 import { logger } from "@/lib/logger";
-import { MessageSquare, Info, ClipboardCopy, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Info, ClipboardCopy, CheckCircle2, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { SkeletonText } from "@/components/ui/skeleton";
+import { SectionHeader } from "@/components/ui/section-header";
 
 interface Question {
-    question: string;
-    context: string;
+  question: string;
+  context: string;
 }
 
 interface DoctorQuestionsProps {
-    biomarkers: import('@/types/medical').Biomarker[];
-    className?: string;
+  biomarkers: import("@/types/medical").Biomarker[];
+  className?: string;
 }
 
 export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps) {
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [copiedAll, setCopiedAll] = useState(false);
 
-    // Build a stable string key from flagged biomarker IDs+statuses so the effect
-    // only re-runs when the actual flagged data changes, not on every parent render.
-    const flaggedKey = biomarkers
-        .filter(b => b.status === 'warning' || b.status === 'critical')
-        .sort((a, b) => String(a.id).localeCompare(String(b.id)))
-        .map(b => `${b.id}:${b.status}`)
-        .join('|');
+  const flaggedKey = biomarkers
+    .filter(b => b.status === "warning" || b.status === "critical")
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+    .map(b => `${b.id}:${b.status}`)
+    .join("|");
 
-    useEffect(() => {
-        if (!flaggedKey) return; // no flagged markers → nothing to ask
+  useEffect(() => {
+    if (!flaggedKey) return;
 
-        const cacheKey = `medassist_dq_${flaggedKey}`;
+    const cacheKey = `medassist_dq_${flaggedKey}`;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) { setQuestions(parsed); return; }
+      }
+    } catch { /* cache read failed */ }
 
-        try {
-            const cached = sessionStorage.getItem(cacheKey);
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                if (Array.isArray(parsed)) {
-                    setQuestions(parsed);
-                    return;
-                }
-            }
-        } catch (_e) { /* cache read failed — continue to fetch */ }
-
-        const fetchQuestions = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch('/api/generate-questions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ biomarkers }),
-                });
-                const data = await response.json();
-                if (data.questions && Array.isArray(data.questions)) {
-                    setQuestions(data.questions);
-                    try { sessionStorage.setItem(cacheKey, JSON.stringify(data.questions)); } catch (_e) { }
-                }
-            } catch (error) {
-                logger.error('Failed to fetch doctor questions', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchQuestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [flaggedKey]); // stable string — only changes when flagged set actually changes
-
-    const copyToClipboard = (text: string, index: number) => {
-        navigator.clipboard.writeText(text);
-        setCopiedIdx(index);
-        toast.success("Question copied to clipboard");
-        setTimeout(() => setCopiedIdx(null), 2000);
+    const fetchQuestions = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/generate-questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ biomarkers }),
+        });
+        const data = await response.json();
+        if (data.questions && Array.isArray(data.questions)) {
+          setQuestions(data.questions);
+          try { sessionStorage.setItem(cacheKey, JSON.stringify(data.questions)); } catch { /* */ }
+        }
+      } catch (error) {
+        logger.error("Failed to fetch doctor questions", error);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flaggedKey]);
 
-    const hasFlags = biomarkers.some(b => b.status === "warning" || b.status === "critical");
-    if (!hasFlags) return null;
+  const copyOne = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(index);
+    toast.success("Question copied");
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
 
-    return (
-        <div className={cn("bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm", className)}>
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                    <div className="p-2 bg-indigo-50 rounded-lg">
-                        <MessageSquare className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div className="ml-3">
-                        <h3 className="text-[18px] font-bold text-[#1C1917]">Ask Your Doctor</h3>
-                        <p className="text-[12px] text-[#A8A29E]">Personalized questions for your next visit</p>
-                    </div>
-                </div>
-                {loading && (
-                    <div className="flex items-center gap-2 text-[11px] text-[#A8A29E] ml-auto">
-                        <div className="w-3 h-3 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-                        <span className="ml-2">Generating...</span>
-                    </div>
-                )}
-            </div>
+  const copyAll = () => {
+    const allText = questions
+      .map((q, i) => `${i + 1}. ${q.question}`)
+      .join("\n");
+    navigator.clipboard.writeText(allText);
+    setCopiedAll(true);
+    toast.success("All questions copied to clipboard");
+    setTimeout(() => setCopiedAll(false), 2500);
+  };
 
-            <div className="space-y-4">
-                {loading && questions.length === 0 ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-24 bg-slate-50 animate-pulse rounded-xl border border-slate-100" />
-                    ))
-                ) : questions.length > 0 ? (
-                    questions.map((item, idx) => (
-                        <div
-                            key={idx}
-                            className="group bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/30"
-                        >
-                            <div className="flex justify-between items-start gap-4 mb-2">
-                                <p className="text-[15px] font-bold text-[#1C1917] leading-tight grow shrink basis-0">
-                                    {item.question}
-                                </p>
-                                <button
-                                    onClick={() => copyToClipboard(item.question, idx)}
-                                    className="p-3 -m-1.5 rounded-md hover:bg-white transition-colors text-[#A8A29E] hover:text-indigo-600 flex items-center justify-center min-h-[44px] min-w-[44px]"
-                                    title="Copy to clipboard"
-                                    style={{ WebkitAppearance: 'none' }}
-                                >
-                                    {copiedIdx === idx ? <CheckCircle2 size={16} /> : <ClipboardCopy size={16} />}
-                                </button>
-                            </div>
-                            <div className="flex items-start gap-2 text-[13px] text-[#57534E] leading-relaxed">
-                                <Info size={14} className="text-indigo-400 mt-0.5 shrink-0" />
-                                <p className="italic opacity-80 ml-2">{item.context}</p>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#E8E6DF]">
-                        <p className="text-sm text-[#A8A29E]">No specific questions generated. Your results look stable.</p>
-                    </div>
-                )}
-            </div>
+  const hasFlags = biomarkers.some(b => b.status === "warning" || b.status === "critical");
+  if (!hasFlags) return null;
 
-            <div className="mt-6 pt-6 border-t border-[#E8E6DF]">
-                <p className="text-[11px] text-[#A8A29E] leading-relaxed">
-                    <strong>Note:</strong> These questions are generated by AI based on your latest lab results. They are intended to help facilitate a more productive conversation with your healthcare provider.
-                </p>
-            </div>
+  return (
+    <div className={cn("bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] p-5 md:p-6", className)}>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-5 h-5 text-sky-500" />
+          </div>
+          <div>
+            <h3 className="text-[17px] font-bold text-[#1C1917] leading-tight">Ask Your Doctor</h3>
+            <p className="text-[12px] text-[#A8A29E]">Personalized questions for your next visit</p>
+          </div>
         </div>
-    );
+
+        {/* Copy all button */}
+        {questions.length > 0 && !loading && (
+          <button
+            onClick={copyAll}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-[8px] text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] hover:border-sky-300 hover:text-sky-600 transition-all flex-shrink-0 min-h-[36px]"
+            title="Copy all questions"
+            style={{ WebkitAppearance: "none" }}
+          >
+            {copiedAll
+              ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              : <Copy className="w-3.5 h-3.5" />
+            }
+            {copiedAll ? "Copied!" : "Copy all"}
+          </button>
+        )}
+
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex items-center gap-2 text-[11px] text-[#A8A29E]">
+            <div className="w-3 h-3 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin" />
+            <span>Generating…</span>
+          </div>
+        )}
+      </div>
+
+      {/* Question list */}
+      <div className="space-y-3">
+        {loading && questions.length === 0 ? (
+          // Loading skeleton using named shape
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white border border-[#E8E6DF] rounded-[12px] p-4">
+              <SkeletonText lines={2} />
+            </div>
+          ))
+        ) : questions.length > 0 ? (
+          questions.map((item, idx) => (
+            <div
+              key={idx}
+              className="group bg-white border border-[#E8E6DF] rounded-[12px] p-4 transition-all hover:border-sky-200 hover:shadow-sm"
+            >
+              <div className="flex gap-3">
+                {/* Number */}
+                <span className="w-6 h-6 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-[11px] font-bold text-sky-600 flex-shrink-0 mt-0.5">
+                  {idx + 1}
+                </span>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-[14px] font-semibold text-[#1C1917] leading-snug">{item.question}</p>
+                    <button
+                      onClick={() => copyOne(item.question, idx)}
+                      className="p-2 rounded-[8px] text-[#C5C2B8] hover:text-sky-500 hover:bg-sky-50 transition-all flex-shrink-0 opacity-0 group-hover:opacity-100 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                      title="Copy"
+                      style={{ WebkitAppearance: "none" }}
+                    >
+                      {copiedIdx === idx
+                        ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        : <ClipboardCopy className="w-3.5 h-3.5" />
+                      }
+                    </button>
+                  </div>
+
+                  {item.context && (
+                    <div className="flex items-start gap-1.5 mt-2">
+                      <Info className="w-3.5 h-3.5 text-sky-300 mt-0.5 flex-shrink-0" />
+                      <p className="text-[12px] text-[#A8A29E] leading-relaxed">{item.context}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="py-8 text-center border-2 border-dashed border-[#E8E6DF] rounded-[12px]">
+            <p className="text-[13px] text-[#A8A29E]">Your results look stable — no specific questions generated.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer disclaimer */}
+      <div className="mt-5 pt-4 border-t border-[#E8E6DF]">
+        <p className="text-[11px] text-[#A8A29E] leading-relaxed">
+          <strong>Note:</strong> Questions are AI-generated based on your latest biomarkers to help facilitate a more productive conversation with your healthcare provider. They do not constitute medical advice.
+        </p>
+      </div>
+    </div>
+  );
 }

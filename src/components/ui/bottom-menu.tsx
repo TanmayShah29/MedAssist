@@ -24,24 +24,19 @@ export interface MenuItem {
 
 const DEFAULT_ITEMS: MenuItem[] = [
     { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { id: "results", label: "Results", href: "/results", icon: FlaskConical, badge: 2 },
-    { id: "assistant", label: "AI", href: "/assistant", icon: MessageSquare },
-    { id: "profile", label: "Profile", href: "/profile", icon: User },
-    { id: "settings", label: "Settings", href: "/settings", icon: Settings },
+    { id: "results",   label: "Results",   href: "/results",   icon: FlaskConical },
+    { id: "assistant", label: "AI",        href: "/assistant", icon: MessageSquare },
+    { id: "profile",   label: "Profile",   href: "/profile",   icon: User },
+    { id: "settings",  label: "Settings",  href: "/settings",  icon: Settings },
 ];
 
 export interface BottomMenuProps {
     items?: MenuItem[];
-    activeId?: string;
-    onChange?: (id: string) => void;
     className?: string;
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
-export function BottomMenu({
-    items = DEFAULT_ITEMS,
-    className,
-}: BottomMenuProps) {
+export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps) {
     const pathname = usePathname();
 
     return (
@@ -50,48 +45,57 @@ export function BottomMenu({
                 "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
                 "bg-[#FAFAF7]/95 backdrop-blur-2xl border-t border-[#E8E6DF]",
                 "pb-[env(safe-area-inset-bottom)]",
-                "gpu-accelerate shadow-[0_-8px_30px_rgb(0,0,0,0.04)]",
+                "gpu-accelerate shadow-[0_-4px_24px_rgba(28,25,23,0.06)]",
                 className
             )}
+            aria-label="Main navigation"
         >
-            <div className="flex justify-between items-center px-6 pt-3 pb-3 relative px-safe">
+            <div className="flex justify-between items-center px-2 pt-2 pb-2 relative px-safe">
                 {items.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname?.startsWith(item.href);
                     const Icon = item.icon;
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
+                            aria-label={item.label}
+                            aria-current={isActive ? "page" : undefined}
                             className={cn(
-                                "flex flex-col items-center gap-1 group relative py-1 transition-all duration-200 active:scale-90 flex-1 min-h-[44px] justify-center",
+                                "flex flex-col items-center gap-1 group relative flex-1 min-h-[52px] justify-center",
+                                "transition-all duration-150 active:scale-90",
                                 isActive ? "text-sky-500" : "text-[#A8A29E]"
                             )}
                         >
-                            <div className={cn(
-                                "p-2 rounded-2xl transition-all duration-300",
-                                isActive ? "bg-sky-50 shadow-inner" : "group-hover:bg-[#F5F4EF]"
-                            )}>
-                                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                            {/* Active background pill */}
+                            <div className="relative">
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="bottom-nav-active"
+                                        className="absolute inset-0 -inset-x-3 rounded-[10px] bg-sky-50 border border-sky-100"
+                                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                    />
+                                )}
+                                <div className={cn("relative p-2 rounded-[10px] transition-colors", !isActive && "group-hover:bg-[#F5F4EF]")}>
+                                    <Icon
+                                        size={20}
+                                        strokeWidth={isActive ? 2.5 : 2}
+                                        className="transition-colors"
+                                    />
+                                    {/* Badge */}
+                                    {!!item.badge && item.badge > 0 && (
+                                        <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 px-1 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center leading-none">
+                                            {item.badge > 9 ? "9+" : item.badge}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+
                             <span className={cn(
-                                "text-[11px] md:text-[9px] font-bold uppercase tracking-[0.1em] transition-colors",
-                                isActive ? "text-sky-600" : "text-[#A8A29E]"
+                                "text-[9px] font-bold uppercase tracking-[0.1em] transition-colors leading-none",
+                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#A8A29E]"
                             )}>
                                 {item.label}
                             </span>
-
-                            {isActive && (
-                                <motion.div
-                                    layoutId="bottom-menu-active-dot"
-                                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-sky-500 rounded-full"
-                                />
-                            )}
-
-                            {item.badge && item.badge > 0 && (
-                                <span className="absolute top-0 right-1 sm:right-2 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center z-10">
-                                    {item.badge > 9 ? "9+" : item.badge}
-                                </span>
-                            )}
                         </Link>
                     );
                 })}
@@ -107,16 +111,13 @@ export interface FABProps {
     className?: string;
 }
 
-export function FloatingActionButton({
-    onClick,
-    label = "Ask AI",
-    className,
-}: FABProps) {
+export function FloatingActionButton({ onClick, label = "Ask AI", className }: FABProps) {
     return (
         <motion.button
             onClick={onClick}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            aria-label={label}
             className={cn(
                 "fixed bottom-24 right-4 z-50 lg:bottom-8",
                 "flex items-center gap-2 px-4 py-3 rounded-2xl",

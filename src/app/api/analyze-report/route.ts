@@ -6,8 +6,7 @@ import { getUserBiomarkerHistory, saveLabResult } from '@/app/actions/user-data'
 import { ExtractedLabValue } from '@/lib/onboarding-store';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { logger } from '@/lib/logger';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { getAuthClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { MAX_FILE_SIZE_BYTES, MAX_UPLOADS_PER_HOUR } from '@/lib/constants';
 
@@ -30,27 +29,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Require auth to prevent quota abuse
-        const cookieStore = await cookies();
-        const supabaseAuth = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() {
-                        return cookieStore.getAll()
-                    },
-                    setAll(cookiesToSet) {
-                        try {
-                            cookiesToSet.forEach(({ name, value, options }) =>
-                                cookieStore.set(name, value, options)
-                            )
-                        } catch {
-                            // Ignored
-                        }
-                    }
-                }
-            }
-        );
+        const supabaseAuth = await getAuthClient();
         const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
         if (!authUser) {
             return NextResponse.json(
@@ -200,27 +179,7 @@ export async function POST(req: NextRequest) {
 
 /** Build synthetic lab text from manual payload and run AI + save. */
 async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse> {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // Ignored
-                    }
-                }
-            }
-        }
-    );
+    const supabase = await getAuthClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         return NextResponse.json({ success: false, error: 'You must be signed in to save results.' }, { status: 401 });

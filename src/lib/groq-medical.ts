@@ -382,12 +382,16 @@ export async function generateAIGreeting(
     .map((b) => `${b.name}: ${b.value} ${b.unit} (${b.status})`)
     .join("\n");
 
-  try {
-    const completion = await groq.chat.completions.create({
-      messages: [
+  const runOnce = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25_000);
+    try {
+      return await groq.chat.completions.create(
         {
-          role: "system",
-          content: `You are MedAssist AI, a warm and approachable health education assistant.
+          messages: [
+            {
+              role: "system",
+              content: `You are MedAssist AI, a warm and approachable health education assistant.
 
 Generate a personalized opening message for a user named ${firstName}.
 
@@ -406,14 +410,22 @@ User's lab results:
 ${biomarkerSummary}
 
 User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}`,
+            },
+            { role: "user", content: "Generate my personalized greeting." },
+          ],
+          model: MODEL,
+          temperature: 0.5,
+          max_tokens: 300,
         },
-        { role: "user", content: "Generate my personalized greeting." },
-      ],
-      model: MODEL,
-      temperature: 0.5,
-      max_tokens: 300,
-    });
+        { signal: controller.signal }
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
 
+  try {
+    const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
     const isRateLimit =
@@ -512,26 +524,38 @@ IMPORTANT: "status" must be exactly one of: "optimal", "warning", or "critical"`
 export async function getAppointmentPrep(
   context: string
 ): Promise<{ summary: string; checklist: string[]; questions: string[] }> {
-  try {
-    const completion = await groq.chat.completions.create({
-      messages: [
+  const runOnce = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25_000);
+    try {
+      return await groq.chat.completions.create(
         {
-          role: "system",
-          content: `You are a medical appointment preparation assistant. Generate a concise prep guide with:
+          messages: [
+            {
+              role: "system",
+              content: `You are a medical appointment preparation assistant. Generate a concise prep guide with:
 - summary: 1-2 sentence overview of what to expect
 - checklist: 3 items to bring/prepare
 - questions: 2 important questions to ask the doctor
 
 Return ONLY valid JSON with keys: summary, checklist (string array), questions (string array). No markdown.`,
+            },
+            { role: "user", content: `Generate preparation for: ${context}` },
+          ],
+          model: MODEL,
+          temperature: 0.3,
+          max_tokens: 500,
+          response_format: { type: "json_object" },
         },
-        { role: "user", content: `Generate preparation for: ${context}` },
-      ],
-      model: MODEL,
-      temperature: 0.3,
-      max_tokens: 500,
-      response_format: { type: "json_object" },
-    });
+        { signal: controller.signal }
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
 
+  try {
+    const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
     const result = JSON.parse(completion.choices[0].message.content || "{}");
     return {
       summary:

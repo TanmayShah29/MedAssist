@@ -111,7 +111,10 @@ export default function ResultsPage() {
             }
 
             const { data } = await query
-            setBiomarkers((data as Biomarker[]) || [])
+            setBiomarkers(((data as Biomarker[]) || []).map(b => ({
+                ...b,
+                value: parseFloat(String(b.value)),
+            })))
 
             const { data: lrData } = await supabase
                 .from('lab_results')
