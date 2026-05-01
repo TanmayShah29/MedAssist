@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Shield, LayoutDashboard, ArrowLeft } from "lucide-react";
 
@@ -44,13 +45,13 @@ export default function NotFound() {
             <LayoutDashboard className="w-4 h-4" />
             Go to Dashboard
           </Link>
-          <Link
-            href="javascript:history.back()"
+          <button
+            onClick={() => window.history.back()}
             className="flex items-center gap-2 px-6 py-3 bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[10px] font-semibold text-sm hover:border-[#D9D6CD] hover:text-[#1C1917] transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4" />
             Go back
-          </Link>
+          </button>
         </div>
 
         {/* Legal note */}

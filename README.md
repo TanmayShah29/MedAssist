@@ -31,7 +31,7 @@ AI-powered lab report analysis. Upload a blood work PDF, get plain-English expla
 ### 2. Clone and install
 
 ```bash
-git clone https://github.com/your-username/medassist.git
+git clone https://github.com/tanmayshahh/medassist.git
 cd medassist
 npm install
 ```
@@ -226,4 +226,4 @@ See [`.env.example`](.env.example) for the full annotated list.
 
 MIT — see [LICENSE](LICENSE).
 
-Built by [Tanmay Shah](https://github.com/your-username).
+Built by [Tanmay Shah](https://github.com/tanmayshahh).

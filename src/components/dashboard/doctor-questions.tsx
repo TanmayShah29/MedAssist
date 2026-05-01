@@ -6,7 +6,6 @@ import { MessageSquare, Info, ClipboardCopy, CheckCircle2, Copy } from "lucide-r
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SkeletonText } from "@/components/ui/skeleton";
-import { SectionHeader } from "@/components/ui/section-header";
 
 interface Question {
   question: string;

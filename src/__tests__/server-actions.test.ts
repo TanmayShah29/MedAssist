@@ -49,7 +49,7 @@ import { deleteLabResult, updateUserProfile } from '@/app/actions/user-data';
 
 // ── Chain builder ──────────────────────────────────────────────────────────────
 
-function buildDeleteChain(result: unknown) {
+function _buildDeleteChain(result: unknown) {
     const chain = {
         from: vi.fn(),
         delete: vi.fn(),

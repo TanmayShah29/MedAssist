@@ -1,11 +1,16 @@
 {
   "name": "MedAssist",
   "short_name": "MedAssist",
-  "description": "AI-powered health insights and lab report analysis.",
+  "description": "AI-powered health insights and lab report analysis. Understand your blood work in plain English.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#FAFAF7",
   "theme_color": "#0EA5E9",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["health", "medical", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -30,6 +35,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Assistant",
+      "short_name": "Assistant",
+      "url": "/assistant",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

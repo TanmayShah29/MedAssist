@@ -49,7 +49,7 @@ export function ClientLayout({
   };
 
   // Active nav item for bottom menu
-  const activeId = pathname.includes("assistant") ? "assistant"
+  const _activeId = pathname.includes("assistant") ? "assistant"
     : pathname.includes("results") ? "results"
       : pathname.includes("profile") ? "profile"
         : pathname.includes("settings") ? "settings"

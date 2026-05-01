@@ -34,7 +34,7 @@ const securityHeaders = [
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       // Supabase realtime uses wss://
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://api.ocr.space",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
