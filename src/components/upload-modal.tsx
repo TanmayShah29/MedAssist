@@ -45,6 +45,17 @@ function nextId() {
     return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+async function readJsonWithRawBody(response: Response) {
+    const rawText = await response.text();
+    try {
+        return rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+        throw new Error(
+            `Could not parse API response as JSON. Status ${response.status} ${response.statusText}. Body: ${rawText.slice(0, 1000)}. Parse error: ${(error as Error).message}`
+        );
+    }
+}
+
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [tab, setTab] = useState<Tab>('upload');
     const [isDragging, setIsDragging] = useState(false);
@@ -140,7 +151,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             setTimeout(() => setProgress(60), 200);
 
-            const data = await response.json();
+            const data = await readJsonWithRawBody(response);
 
             if (!response.ok) {
                 const code = data.code || null;
@@ -230,7 +241,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             setTimeout(() => setProgress(70), 400);
 
-            const data = await response.json();
+            const data = await readJsonWithRawBody(response);
 
             if (!response.ok) {
                 setError(data.error || 'Analysis failed');

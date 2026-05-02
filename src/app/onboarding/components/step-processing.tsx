@@ -50,6 +50,39 @@ function formatDebugPayload(debug: DebugPayload) {
     }
 }
 
+async function readDebuggableJson(response: Response) {
+    const rawText = await response.text();
+    const responseDebug = {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: response.url,
+        redirected: response.redirected,
+        contentType: response.headers.get("content-type"),
+        rawBodyPreview: rawText.slice(0, 4000),
+    };
+
+    try {
+        return {
+            data: rawText ? JSON.parse(rawText) : {},
+            debug: responseDebug,
+        };
+    } catch (error) {
+        throw Object.assign(
+            new Error(`Failed to parse /api/analyze-report response as JSON: ${(error as Error).message}`),
+            {
+                name: "ResponseJsonParseError",
+                debug: {
+                    ...responseDebug,
+                    parseErrorName: (error as Error).name,
+                    parseErrorMessage: (error as Error).message,
+                    parseErrorStack: (error as Error).stack,
+                },
+            }
+        );
+    }
+}
+
 function ReviewExtractedValues({
     analysisResult,
     onComplete,
@@ -359,8 +392,8 @@ export function StepProcessing() {
                 body: formData,
             });
 
-            clientStage = "parse /api/analyze-report JSON";
-            const data = await response.json();
+            clientStage = "read /api/analyze-report response";
+            const { data, debug: responseDebug } = await readDebuggableJson(response);
 
             if (!response.ok) {
                 let errorMessage = data.error || "Analysis failed";
@@ -370,8 +403,7 @@ export function StepProcessing() {
                 if (data.code === 'IMAGE_BASED_PDF') errorMessage = IMAGE_BASED_MSG;
 
                 setErrorData(getErrorMessage(errorMessage, {
-                    status: response.status,
-                    statusText: response.statusText,
+                    ...responseDebug,
                     response: data,
                 }));
                 setState("error");
@@ -453,11 +485,13 @@ export function StepProcessing() {
             }
 
         } catch (err: unknown) {
+            const debugFromError = (err as { debug?: DebugPayload }).debug;
             setErrorData(getErrorMessage((err as Error).message || "Network error", {
                 clientStage,
                 name: (err as Error).name,
                 message: (err as Error).message,
                 stack: (err as Error).stack,
+                debug: debugFromError,
             }));
             setState("error");
         }

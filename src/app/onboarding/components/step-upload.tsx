@@ -14,6 +14,17 @@ function nextId() {
     return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+async function readJsonWithRawBody(response: Response) {
+    const rawText = await response.text();
+    try {
+        return rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+        throw new Error(
+            `Could not parse API response as JSON. Status ${response.status} ${response.statusText}. Body: ${rawText.slice(0, 1000)}. Parse error: ${(error as Error).message}`
+        );
+    }
+}
+
 interface ManualRow {
     id: string;
     name: string;
@@ -126,7 +137,7 @@ export function StepUpload() {
             }
 
             const res = await fetch("/api/analyze-report", { method: "POST", body: formData });
-            const data = await res.json();
+            const data = await readJsonWithRawBody(res);
             if (!res.ok) {
                 toast.error(data.error || "Analysis failed");
                 setIsManualSubmitting(false);
