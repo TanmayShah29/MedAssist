@@ -99,6 +99,20 @@ export function StepProcessing() {
             formData.append("file", file);
             formData.append("symptoms", JSON.stringify(symptoms));
 
+            // Persist profile context before analysis so this first report can use it.
+            try {
+                await saveProfileFromSession({
+                    first_name: basicInfo.firstName || undefined,
+                    last_name: basicInfo.lastName || undefined,
+                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
+                    sex: basicInfo.sex || undefined,
+                    blood_type: basicInfo.bloodType || undefined,
+                    symptoms,
+                });
+            } catch (_profileErr) {
+                // Non-blocking — the API also receives symptoms directly.
+            }
+
             setState("analyzing");
 
             const response = await fetch("/api/analyze-report", {
@@ -168,7 +182,7 @@ export function StepProcessing() {
 
             setState("complete");
 
-            // Bug 5 fix: Save profile info + symptoms to Supabase (was only in Zustand store before)
+            // Keep profile context fresh after analysis as well.
             try {
                 await saveProfileFromSession({
                     first_name: basicInfo.firstName || undefined,
@@ -176,7 +190,7 @@ export function StepProcessing() {
                     age: basicInfo.age ? Number(basicInfo.age) : undefined,
                     sex: basicInfo.sex || undefined,
                     blood_type: basicInfo.bloodType || undefined,
-                    symptoms: symptoms, // Save to DB — was never persisted before
+                    symptoms,
                 });
             } catch (_profileErr) {
                 // Non-blocking — profile save failure shouldn't block onboarding

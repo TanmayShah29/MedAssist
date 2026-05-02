@@ -20,21 +20,6 @@ function AuthContent() {
     const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
-    const getPasswordStrength = (pw: string): { level: number; label: string; color: string } => {
-        if (!pw) return { level: 0, label: '', color: '' }
-        let score = 0
-        if (pw.length >= 8) score++
-        if (pw.length >= 12) score++
-        if (/[A-Z]/.test(pw)) score++
-        if (/[0-9]/.test(pw)) score++
-        if (/[^A-Za-z0-9]/.test(pw)) score++
-        if (score <= 1) return { level: 1, label: 'Weak', color: 'bg-red-400' }
-        if (score <= 3) return { level: 2, label: 'Fair', color: 'bg-amber-400' }
-        if (score <= 4) return { level: 3, label: 'Good', color: 'bg-emerald-400' }
-        return { level: 4, label: 'Strong', color: 'bg-emerald-500' }
-    }
-    const strength = getPasswordStrength(password)
-
     // Helper to clear stale onboarding state before signup
     const clearOnboardingState = () => {
         if (typeof window !== 'undefined') {
@@ -165,21 +150,6 @@ function AuthContent() {
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="••••••••"
                     />
-                    {mode === 'signup' && password && (
-                        <div className="mt-2">
-                            <div className="flex gap-1 mb-1">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= strength.level ? strength.color : 'bg-[#E8E6DF]'}`} />
-                                ))}
-                            </div>
-                            <p className={`text-[11px] font-medium ${strength.level >= 3 ? 'text-emerald-600' : strength.level >= 2 ? 'text-amber-600' : 'text-red-500'}`}>
-                                {strength.label} {password.length < 8 && <span className="text-[#A8A29E]">· Min 8 characters</span>}
-                            </p>
-                            <p className="text-[10px] text-[#A8A29E] mt-1">
-                                Use 8+ characters with uppercase, numbers, and symbols
-                            </p>
-                        </div>
-                    )}
                 </div>
 
                 {mode === 'signup' && (

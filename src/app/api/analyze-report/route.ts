@@ -16,6 +16,20 @@ export const IMAGE_BASED_PDF_ERROR_CODE = 'IMAGE_BASED_PDF';
 export const maxDuration = 60;
 export const runtime = "nodejs";
 
+const formSymptomsSchema = z.array(z.string().trim().min(1)).max(30).catch([]);
+
+function parseFormSymptoms(raw: FormDataEntryValue | null): string[] {
+    if (typeof raw !== 'string' || raw.trim() === '') return [];
+
+    try {
+        const parsed = JSON.parse(raw);
+        const result = formSymptomsSchema.parse(parsed);
+        return Array.from(new Set(result));
+    } catch {
+        return [];
+    }
+}
+
 export async function POST(req: NextRequest) {
     try {
         validateEnv();
@@ -56,10 +70,11 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get('file') as File | null;
         const manualPayloadRaw = formData.get('manualPayload') as string | null;
+        const requestSymptoms = parseFormSymptoms(formData.get('symptoms'));
 
         // ── Manual entry path (no file) ──
         if (!file && manualPayloadRaw) {
-            return await handleManualEntry(manualPayloadRaw);
+            return await handleManualEntry(manualPayloadRaw, requestSymptoms);
         }
 
         if (!file) {
@@ -122,7 +137,8 @@ export async function POST(req: NextRequest) {
             supabaseAuth.from('symptoms').select('symptom').eq('user_id', authUser.id)
         ]);
         history = historyResult;
-        const userSymptoms = (symptomsResult.data || []).map((s: { symptom: string }) => s.symptom);
+        const savedSymptoms = (symptomsResult.data || []).map((s: { symptom: string }) => s.symptom);
+        const userSymptoms = Array.from(new Set([...requestSymptoms, ...savedSymptoms]));
         logger.info(`Fetched ${history.length} historical biomarkers for user ${authUser.id}`);
 
         logger.info("Starting AI analysis...");
@@ -178,7 +194,7 @@ export async function POST(req: NextRequest) {
 }
 
 /** Build synthetic lab text from manual payload and run AI + save. */
-async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse> {
+async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: string[]): Promise<NextResponse> {
     const supabase = await getAuthClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -213,8 +229,13 @@ async function handleManualEntry(manualPayloadRaw: string): Promise<NextResponse
     const preamble = 'Lab values (manually entered by user — ONLY extract these specific values, do not add any others):\n';
     const fullText = preamble + syntheticText;
 
-    const history = await getUserBiomarkerHistory(user.id);
-    const analysisResult = await analyzeLabText(fullText, { symptoms: [], history });
+    const [history, symptomsResult] = await Promise.all([
+        getUserBiomarkerHistory(user.id),
+        supabase.from('symptoms').select('symptom').eq('user_id', user.id)
+    ]);
+    const savedSymptoms = (symptomsResult.data || []).map((s: { symptom: string }) => s.symptom);
+    const userSymptoms = Array.from(new Set([...requestSymptoms, ...savedSymptoms]));
+    const analysisResult = await analyzeLabText(fullText, { symptoms: userSymptoms, history });
 
     const saveResult = await saveLabResult({
         userId: user.id,

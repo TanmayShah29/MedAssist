@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Upload, X, FileText, Lock, PenLine, Plus, Trash2, Loader2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { logger } from "@/lib/logger";
 
@@ -84,10 +84,12 @@ export function StepUpload() {
     ]);
     const [isManualSubmitting, setIsManualSubmitting] = useState(false);
 
-    // If user has already selected a file (e.g. went back and forth), default to upload view
-    if (uploadedFile && showOptions && !showManualEntry) {
-        setShowOptions(false);
-    }
+    // If user has already selected a file (e.g. went back and forth), default to upload view.
+    useEffect(() => {
+        if (uploadedFile && showOptions && !showManualEntry) {
+            setShowOptions(false);
+        }
+    }, [uploadedFile, showManualEntry, showOptions]);
 
     const addManualRow = () => setManualRows((p) => [...p, { id: nextId(), name: "", value: "", unit: "mg/dL" }]);
     const updateManualRow = (id: string, field: keyof ManualRow, value: string) =>
@@ -107,6 +109,22 @@ export function StepUpload() {
         try {
             const formData = new FormData();
             formData.append("manualPayload", JSON.stringify({ biomarkers }));
+            formData.append("symptoms", JSON.stringify(selectedSymptoms));
+
+            try {
+                const { saveProfileFromSession } = await import("@/app/actions/user-data");
+                await saveProfileFromSession({
+                    first_name: basicInfo.firstName || undefined,
+                    last_name: basicInfo.lastName || undefined,
+                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
+                    sex: basicInfo.sex || undefined,
+                    blood_type: basicInfo.bloodType || undefined,
+                    symptoms: selectedSymptoms,
+                });
+            } catch (err) {
+                logger.error("Failed to save profile before manual analysis:", err);
+            }
+
             const res = await fetch("/api/analyze-report", { method: "POST", body: formData });
             const data = await res.json();
             if (!res.ok) {

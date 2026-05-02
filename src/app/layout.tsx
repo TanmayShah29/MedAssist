@@ -1,19 +1,7 @@
 import React from "react";
 import { headers } from "next/headers";
-import { Instrument_Serif, DM_Sans } from "next/font/google";
 import { ClientLayout } from "@/components/layout/ClientLayout";
 import "./globals.css";
-
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-instrument",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-});
 
 // Pages that should show the full app shell
 const APP_SHELL_ROUTES = [
@@ -71,7 +59,7 @@ export default async function RootLayout({
   const pathname = headersList.get("x-pathname");
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${instrumentSerif.variable} ${dmSans.variable}`}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta
           name="viewport"

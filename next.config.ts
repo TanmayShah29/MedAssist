@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = dirname(fileURLToPath(import.meta.url));
 
 // ─── Security Headers ──────────────────────────────────────────────────────
 // Applied to every route. Kept in one place so they're easy to audit.
@@ -51,8 +55,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pdf-parse'],
 
   // ── Turbopack (Next 16 default) ─────────────────────────────────────────
-  // Empty config silences the webpack-config conflict warning.
-  turbopack: {},
+  // Keep builds rooted in this repo even if a parent directory has a lockfile.
+  turbopack: {
+    root: repoRoot,
+  },
 
   // ── Experimental ────────────────────────────────────────────────────────
   experimental: {
