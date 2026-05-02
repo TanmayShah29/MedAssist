@@ -1,7 +1,7 @@
 import { Biomarker } from "@/types/medical";
 
 export interface DemoLabResult {
-    id: number | string;
+    id: string; // Always a string (e.g. "demo-latest") — matches LabResult.id in production
     created_at: string;
     uploaded_at?: string;
     summary?: string;

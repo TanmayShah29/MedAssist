@@ -62,25 +62,59 @@ export async function saveLabResult(args: SaveLabResultArgs) {
       return { success: false, error: "Unauthorized: session does not match target user." };
     }
 
-    const { data: labResultId, error: rpcError } = await supabase.rpc(
-      "save_complete_report",
-      {
-        p_user_id: userId,
-        p_file_name: fileName,
-        p_health_score: healthScore,
-        p_risk_level: riskLevel,
-        p_summary: summary,
-        p_biomarkers: labValues,
-        p_raw_ocr_text: rawOcrText ?? null,
-        p_raw_ai_json: rawAiJson ?? null,
-        p_symptom_connections: args.symptomConnections ?? null,
-        p_plain_summary: args.plainSummary ?? null,
-      }
-    );
+    // Use explicit inserts instead of the save_complete_report RPC. Some live
+    // Supabase environments may still have an old/stale RPC definition with
+    // biomarker columns ordered incorrectly, which can try to insert a UUID into
+    // lab_result_id (BIGINT). Explicit column inserts make the save path obvious.
+    const db = supabaseAdmin ?? supabase;
 
-    if (rpcError) {
-      logger.error("saveLabResult RPC error:", rpcError);
-      throw new Error(rpcError.message);
+    const { data: labResult, error: reportError } = await db
+      .from("lab_results")
+      .insert({
+        user_id: userId,
+        file_name: fileName,
+        health_score: healthScore,
+        risk_level: riskLevel,
+        summary,
+        plain_summary: args.plainSummary ?? null,
+        processed: true,
+        raw_ocr_text: rawOcrText ?? null,
+        raw_ai_json: rawAiJson ?? null,
+        symptom_connections: args.symptomConnections ?? null,
+        uploaded_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+
+    if (reportError || !labResult?.id) {
+      logger.error("saveLabResult lab_results insert error:", reportError);
+      throw new Error(reportError?.message || "Lab result insert returned no id.");
+    }
+
+    const labResultId = labResult.id as string; // UUID in production DB
+
+    const biomarkerRows = labValues.map((b) => ({
+      user_id: userId,
+      lab_result_id: labResultId,
+      name: b.name,
+      value: b.value,
+      unit: b.unit,
+      status: b.status,
+      reference_range_min: b.referenceMin ?? null,
+      reference_range_max: b.referenceMax ?? null,
+      category: b.category,
+      confidence: b.confidence,
+      ai_interpretation: b.aiInterpretation,
+    }));
+
+    const { error: biomarkerError } = await db
+      .from("biomarkers")
+      .insert(biomarkerRows);
+
+    if (biomarkerError) {
+      logger.error("saveLabResult biomarkers insert error:", biomarkerError);
+      await db.from("lab_results").delete().eq("id", labResultId);
+      throw new Error(biomarkerError.message);
     }
 
     logger.info(`saveLabResult: saved report ${labResultId} for user ${userId}`);
@@ -162,9 +196,9 @@ export async function saveReviewedReportFromSession(input: unknown) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function deleteLabResult(labResultId: number | string) {
-  const id =
-    typeof labResultId === "string" ? parseInt(labResultId, 10) : labResultId;
-  if (Number.isNaN(id) || id < 1) {
+  // lab_results.id is a UUID string in the live DB — never parseInt a UUID.
+  const id = String(labResultId).trim();
+  if (!id) {
     return { success: false, error: "Invalid report ID" };
   }
 

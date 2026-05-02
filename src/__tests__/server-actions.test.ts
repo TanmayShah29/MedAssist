@@ -94,30 +94,26 @@ describe('deleteLabResult — input validation', () => {
         expect(mockFrom).not.toHaveBeenCalled();
     });
 
-    it('rejects non-numeric string IDs before touching the DB', async () => {
-        const result = await deleteLabResult('../../etc/passwd');
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Invalid report ID');
-        expect(mockFrom).not.toHaveBeenCalled();
+    it('passes a UUID string through to the DB (RLS guards access)', async () => {
+        const uuid = 'b534d94e-b7e0-4d21-962f-d62d8de7ed81';
+        const result = await deleteLabResult(uuid);
+        expect(mockFrom).toHaveBeenCalledWith('lab_results');
+        expect(mockDelete).toHaveBeenCalled();
+        expect(mockEq).toHaveBeenCalledWith('id', uuid);
+        expect(result.success).toBe(true);
     });
 
-    it('rejects 0 as an invalid ID', async () => {
-        const result = await deleteLabResult(0);
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Invalid report ID');
-    });
-
-    it('calls .from("lab_results").delete().eq("id", ...) for a valid numeric ID', async () => {
+    it('calls .from("lab_results").delete().eq("id", ...) for a numeric string ID', async () => {
         const result = await deleteLabResult('42');
         expect(mockFrom).toHaveBeenCalledWith('lab_results');
         expect(mockDelete).toHaveBeenCalled();
-        expect(mockEq).toHaveBeenCalledWith('id', 42);
+        expect(mockEq).toHaveBeenCalledWith('id', '42');
         expect(result.success).toBe(true);
     });
 
     it('surfaces the DB error message on failure', async () => {
         mockEq.mockResolvedValue({ data: null, error: { message: 'permission denied' } });
-        const result = await deleteLabResult(99);
+        const result = await deleteLabResult('some-uuid-99');
         // Error is thrown and caught; message is surfaced
         expect(result.success).toBe(false);
     });

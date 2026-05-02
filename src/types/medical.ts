@@ -21,13 +21,13 @@ export interface Biomarker {
     reference_range_max?: number;
     ai_interpretation?: string;
     confidence?: number;
-    lab_result_id?: number;
+    lab_result_id?: string; // UUID in production DB
     lab_results?: { created_at: string; uploaded_at?: string };
     created_at: string;
 }
 
 export interface LabResult {
-    id: number | string;
+    id: string; // UUID in production DB
     health_score?: number;
     created_at?: string;       // legacy alias; prefer uploaded_at
     uploaded_at?: string;      // actual DB column name
