@@ -319,10 +319,12 @@ export function StepProcessing() {
     };
 
     const runProcessing = useCallback(async () => {
+        let clientStage = "start onboarding processing";
         try {
             setErrorData(null);
             setState("uploading");
             setCurrentStageIndex(0);
+            clientStage = "read onboarding store";
 
             // Get file from onboarding store
             const file = useOnboardingStore.getState().uploadedFile;
@@ -343,32 +345,21 @@ export function StepProcessing() {
             const basicInfo = useOnboardingStore.getState().basicInfo;
 
             // Create FormData for upload
+            clientStage = "create upload FormData";
             const formData = new FormData();
             formData.append("file", file);
             formData.append("symptoms", JSON.stringify(symptoms));
             formData.append("save", "false");
 
-            // Persist profile context before analysis so this first report can use it.
-            try {
-                await saveProfileFromSession({
-                    first_name: basicInfo.firstName || undefined,
-                    last_name: basicInfo.lastName || undefined,
-                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
-                    sex: basicInfo.sex || undefined,
-                    blood_type: basicInfo.bloodType || undefined,
-                    symptoms,
-                });
-            } catch (_profileErr) {
-                // Non-blocking — the API also receives symptoms directly.
-            }
-
             setState("analyzing");
 
+            clientStage = "fetch /api/analyze-report";
             const response = await fetch("/api/analyze-report", {
                 method: "POST",
                 body: formData,
             });
 
+            clientStage = "parse /api/analyze-report JSON";
             const data = await response.json();
 
             if (!response.ok) {
@@ -389,6 +380,7 @@ export function StepProcessing() {
 
             setState("finalizing");
 
+            clientStage = "parse analysis JSON";
             let analysisData: { biomarkers?: unknown[]; healthScore?: number; riskLevel?: string; summary?: string };
             try {
                 if (!data.analysis || typeof data.analysis !== 'string') {
@@ -447,6 +439,7 @@ export function StepProcessing() {
 
             // Keep profile context fresh after analysis as well.
             try {
+                clientStage = "save profile context";
                 await saveProfileFromSession({
                     first_name: basicInfo.firstName || undefined,
                     last_name: basicInfo.lastName || undefined,
@@ -461,6 +454,7 @@ export function StepProcessing() {
 
         } catch (err: unknown) {
             setErrorData(getErrorMessage((err as Error).message || "Network error", {
+                clientStage,
                 name: (err as Error).name,
                 message: (err as Error).message,
                 stack: (err as Error).stack,
