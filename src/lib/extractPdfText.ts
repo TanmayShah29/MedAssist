@@ -14,10 +14,6 @@
  * extraction path and was treating every PDF as a rasterised image.
  */
 
-// Use require() since this is server-only code and pdf-parse ships mixed CJS/ESM.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse');
-
 /** User-facing message when all extraction strategies fail. */
 export const IMAGE_BASED_PDF_MESSAGE =
   'This file appears to be image-based (scanned). Please upload a digital lab report or enter values manually.';
@@ -80,6 +76,8 @@ export async function extractPdfText(
 }
 
 async function extractWithPdfParse(fileBuffer: Buffer): Promise<string> {
+  const pdfParse = loadPdfParse();
+
   if (typeof pdfParse === 'function') {
     const parsed = await pdfParse(fileBuffer);
     return parsed.text?.trim() ?? '';
@@ -96,6 +94,21 @@ async function extractWithPdfParse(fileBuffer: Buffer): Promise<string> {
   }
 
   throw new Error('PDF parser is unavailable.');
+}
+
+function loadPdfParse() {
+  // pdf-parse v2 touches these globals during module evaluation in some
+  // server runtimes. Define tiny no-op versions before requiring it so the
+  // API route never crashes before our handler/catch can return JSON.
+  const globalScope = globalThis as Record<string, unknown>;
+
+  if (!globalScope["DOMMatrix"]) globalScope["DOMMatrix"] = class {};
+  if (!globalScope["ImageData"]) globalScope["ImageData"] = class {};
+  if (!globalScope["Path2D"]) globalScope["Path2D"] = class {};
+
+  // Use require() since this is server-only code and pdf-parse ships mixed CJS/ESM.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('pdf-parse');
 }
 
 /**
