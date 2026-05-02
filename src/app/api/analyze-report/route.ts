@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
         const file = formData.get('file') as File | null;
         const manualPayloadRaw = formData.get('manualPayload') as string | null;
         const requestSymptoms = parseFormSymptoms(formData.get('symptoms'));
+        const shouldSave = formData.get('save') !== 'false';
 
         // ── Manual entry path (no file) ──
         if (!file && manualPayloadRaw) {
@@ -145,29 +146,33 @@ export async function POST(req: NextRequest) {
         const analysisResult = await analyzeLabText(extractedText, { symptoms: userSymptoms, history });
 
         // 6. Data Persistence
-        const saveResult = await saveLabResult({
-            userId: authUser.id,
-            healthScore: analysisResult.healthScore,
-            riskLevel: analysisResult.riskLevel,
-            summary: analysisResult.summary,
-            labValues: analysisResult.biomarkers as ExtractedLabValue[],
-            fileName: file.name,
-            rawOcrText: extractedText,
-            rawAiJson: analysisResult,
-            symptomConnections: analysisResult.symptomConnections,
-            plainSummary: analysisResult.plainSummary
-        });
+        if (shouldSave) {
+            const saveResult = await saveLabResult({
+                userId: authUser.id,
+                healthScore: analysisResult.healthScore,
+                riskLevel: analysisResult.riskLevel,
+                summary: analysisResult.summary,
+                labValues: analysisResult.biomarkers as ExtractedLabValue[],
+                fileName: file.name,
+                rawOcrText: extractedText,
+                rawAiJson: analysisResult,
+                symptomConnections: analysisResult.symptomConnections,
+                plainSummary: analysisResult.plainSummary
+            });
 
-        if (!saveResult.success) {
-            logger.error("Failed to save via action:", saveResult.error);
-            return NextResponse.json(
-                { success: false, error: saveResult.error || 'Failed to save results. Please try again.' },
-                { status: 500 }
-            );
+            if (!saveResult.success) {
+                logger.error("Failed to save via action:", saveResult.error);
+                return NextResponse.json(
+                    { success: false, error: saveResult.error || 'Failed to save results. Please try again.' },
+                    { status: 500 }
+                );
+            }
         }
 
         return NextResponse.json({
             success: true,
+            saved: shouldSave,
+            fileName: file.name,
             extractedText,
             analysis: JSON.stringify(analysisResult)
         });

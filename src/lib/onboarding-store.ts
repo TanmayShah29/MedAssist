@@ -32,6 +32,24 @@ export interface ExtractedEntity {
     confidence: number;
 }
 
+export interface AnalysisResultDraft {
+    biomarkers: ExtractedLabValue[];
+    healthScore: number;
+    riskLevel: string;
+    summary: string;
+    fileName?: string;
+    rawOcrText?: string;
+    rawAiJson?: unknown;
+    symptomConnections?: {
+        symptom: string;
+        biomarker?: string;
+        relevance?: string;
+        relatedBiomarkers?: string[];
+        explanation?: string;
+    }[];
+    plainSummary?: string;
+}
+
 export interface OnboardingState {
     // Step tracking
     currentStep: number;
@@ -56,7 +74,7 @@ export interface OnboardingState {
     processingComplete: boolean;
 
     // Analysis result from API
-    analysisResult: { biomarkers: ExtractedLabValue[]; healthScore: number; riskLevel: string; summary: string } | null;
+    analysisResult: AnalysisResultDraft | null;
 
     // Actions
     setStep: (step: number) => void;
@@ -70,7 +88,7 @@ export interface OnboardingState {
         healthScore: number;
         riskLevel: "low" | "moderate" | "high";
     }) => void;
-    setAnalysisResult: (result: { biomarkers: ExtractedLabValue[]; healthScore: number; riskLevel: string; summary: string }) => void;
+    setAnalysisResult: (result: AnalysisResultDraft) => void;
     reset: () => void;
 }
 

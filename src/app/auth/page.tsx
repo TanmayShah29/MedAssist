@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Shield, Loader2, ArrowRight } from "lucide-react";
+import { Shield, Loader2, ArrowRight, Mail, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { logger } from "@/lib/logger";
 
@@ -17,6 +17,8 @@ function AuthContent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+    const [confirmationEmail, setConfirmationEmail] = useState("");
     const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
@@ -57,10 +59,7 @@ function AuthContent() {
                 if (error) throw error;
 
                 if (data.user && !data.session) {
-                    toast.success("Confirmation email sent!", {
-                        description: "Please check your email to confirm your account, then you can sign in.",
-                        duration: 10000
-                    });
+                    setConfirmationEmail(email);
                     return;
                 }
 
@@ -101,6 +100,63 @@ function AuthContent() {
             setIsLoading(false);
         }
     };
+
+    const handleResendConfirmation = async () => {
+        setIsResending(true);
+        try {
+            const { error } = await supabase.auth.resend({
+                type: "signup",
+                email: confirmationEmail,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+            if (error) throw error;
+            toast.success("Confirmation email resent.");
+        } catch (error: unknown) {
+            logger.error("Resend confirmation error:", error);
+            toast.error((error as Error).message || "Could not resend confirmation email.");
+        } finally {
+            setIsResending(false);
+        }
+    };
+
+    if (confirmationEmail) {
+        return (
+            <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-stone-200/50 p-8 border border-[#E8E6DF]">
+                <div className="w-12 h-12 rounded-[14px] bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-6">
+                    <Mail className="w-6 h-6" />
+                </div>
+                <div className="text-center mb-6">
+                    <h1 className="font-display text-3xl text-[#1C1917] mb-2">
+                        Check your email
+                    </h1>
+                    <p className="text-sm text-[#57534E] leading-relaxed">
+                        We sent a confirmation link to <span className="font-semibold text-[#1C1917]">{confirmationEmail}</span>. Open it to finish creating your account and continue onboarding.
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    disabled={isResending}
+                    className="w-full min-h-[44px] rounded-[12px] bg-sky-500 text-white font-semibold hover:bg-sky-600 disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                    {isResending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                    Resend confirmation
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setConfirmationEmail("");
+                        setMode("login");
+                    }}
+                    className="mt-4 w-full text-sm text-[#57534E] hover:text-[#1C1917] transition-colors"
+                >
+                    Back to sign in
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-stone-200/50 p-8 border border-[#E8E6DF]">

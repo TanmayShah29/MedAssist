@@ -1,17 +1,31 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import type { ExtractedLabValue } from "@/lib/onboarding-store";
+import type { AnalysisResultDraft, ExtractedLabValue } from "@/lib/onboarding-store";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2, ChevronLeft } from "lucide-react";
+import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2, ChevronLeft, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { saveProfileFromSession } from "@/app/actions/user-data";
+import { saveProfileFromSession, saveReviewedReportFromSession } from "@/app/actions/user-data";
 
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
 
 const IMAGE_BASED_MSG = 'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
+
+function deriveReviewedScore(biomarkers: ExtractedLabValue[]) {
+    if (biomarkers.length === 0) return 0;
+    const optimal = biomarkers.filter((b) => b.status === "optimal").length;
+    const warning = biomarkers.filter((b) => b.status === "warning").length;
+    const critical = biomarkers.filter((b) => b.status === "critical").length;
+    return Math.max(0, Math.min(100, Math.round(((optimal * 100) + (warning * 65) + (critical * 25)) / biomarkers.length)));
+}
+
+function deriveRiskLevel(biomarkers: ExtractedLabValue[]): "low" | "moderate" | "high" {
+    if (biomarkers.some((b) => b.status === "critical")) return "high";
+    if (biomarkers.some((b) => b.status === "warning")) return "moderate";
+    return "low";
+}
 
 const getErrorMessage = (error: string) => {
     if (error.includes('Rate limit') || error.includes('429'))
@@ -23,6 +37,229 @@ const getErrorMessage = (error: string) => {
     if (error.includes('image-based') || error === IMAGE_BASED_MSG)
         return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true }
     return { title: 'Something went wrong', detail: error, canRetry: true }
+}
+
+function ReviewExtractedValues({
+    analysisResult,
+    onComplete,
+}: {
+    analysisResult: AnalysisResultDraft;
+    onComplete: () => void;
+}) {
+    const { setAnalysisResult } = useOnboardingStore();
+    const [rows, setRows] = useState<ExtractedLabValue[]>(analysisResult.biomarkers);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+
+    const reviewedScore = deriveReviewedScore(rows);
+    const reviewedRiskLevel = deriveRiskLevel(rows);
+    const optimalCount = rows.filter((b) => b.status === "optimal").length;
+    const warningCount = rows.filter((b) => b.status === "warning").length;
+    const criticalCount = rows.filter((b) => b.status === "critical").length;
+
+    const updateRow = (index: number, patch: Partial<ExtractedLabValue>) => {
+        setRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    };
+
+    const addRow = () => {
+        setRows((prev) => [
+            ...prev,
+            {
+                name: "",
+                value: 0,
+                unit: "unit",
+                status: "optimal",
+                referenceMin: null,
+                referenceMax: null,
+                rangePosition: 50,
+                confidence: 0.6,
+                aiInterpretation: "Manually added during review.",
+                trend: "",
+                category: "other",
+            },
+        ]);
+    };
+
+    const removeRow = (index: number) => {
+        setRows((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const saveReviewed = async () => {
+        const validRows = rows
+            .map((row) => ({
+                ...row,
+                name: row.name.trim(),
+                unit: row.unit.trim() || "unit",
+                value: Number(row.value),
+                referenceMin: row.referenceMin === null ? null : Number(row.referenceMin),
+                referenceMax: row.referenceMax === null ? null : Number(row.referenceMax),
+            }))
+            .filter((row) => row.name && !Number.isNaN(row.value));
+
+        if (validRows.length === 0) {
+            setSaveError("Keep at least one biomarker with a name and numeric value.");
+            return;
+        }
+
+        setIsSaving(true);
+        setSaveError(null);
+
+        const reviewedResult: AnalysisResultDraft = {
+            ...analysisResult,
+            biomarkers: validRows,
+            healthScore: reviewedScore,
+            riskLevel: reviewedRiskLevel,
+        };
+
+        const result = await saveReviewedReportFromSession({
+            fileName: analysisResult.fileName || "Reviewed Lab Report",
+            healthScore: reviewedResult.healthScore,
+            riskLevel: reviewedResult.riskLevel,
+            summary: reviewedResult.summary,
+            biomarkers: reviewedResult.biomarkers,
+            rawOcrText: reviewedResult.rawOcrText,
+            rawAiJson: reviewedResult.rawAiJson,
+            symptomConnections: reviewedResult.symptomConnections,
+            plainSummary: reviewedResult.plainSummary,
+        });
+
+        setIsSaving(false);
+
+        if (!result.success) {
+            setSaveError(result.error || "Could not save reviewed report.");
+            return;
+        }
+
+        setAnalysisResult(reviewedResult);
+        onComplete();
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0.01, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl mx-auto w-full px-6 py-10"
+        >
+            <div className="mb-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">
+                    Review extracted data
+                </p>
+                <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                    Confirm what we found
+                </h2>
+                <p className="text-sm text-[#57534E] max-w-2xl">
+                    AI can misread PDFs. Check the names, values, units, and statuses before we build your dashboard.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-5">
+                <div className="rounded-[12px] border border-emerald-100 bg-emerald-50 p-4">
+                    <p className="text-2xl font-bold text-emerald-700">{optimalCount}</p>
+                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Optimal</p>
+                </div>
+                <div className="rounded-[12px] border border-amber-100 bg-amber-50 p-4">
+                    <p className="text-2xl font-bold text-amber-700">{warningCount}</p>
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Monitor</p>
+                </div>
+                <div className="rounded-[12px] border border-red-100 bg-red-50 p-4">
+                    <p className="text-2xl font-bold text-red-700">{criticalCount}</p>
+                    <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">Action</p>
+                </div>
+            </div>
+
+            <div className="rounded-[16px] border border-[#E8E6DF] bg-white overflow-hidden shadow-sm">
+                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#F5F4EF] border-b border-[#E8E6DF] text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">
+                    <span>Name</span>
+                    <span>Value</span>
+                    <span>Unit</span>
+                    <span>Status</span>
+                    <span />
+                </div>
+
+                <div className="max-h-[420px] overflow-y-auto">
+                    {rows.map((row, index) => (
+                        <div key={`${row.name}-${index}`} className="grid grid-cols-1 md:grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 p-4 border-b border-[#E8E6DF] last:border-b-0">
+                            <input
+                                value={row.name}
+                                onChange={(e) => updateRow(index, { name: e.target.value })}
+                                placeholder="Biomarker"
+                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            />
+                            <input
+                                value={String(row.value)}
+                                onChange={(e) => updateRow(index, { value: Number(e.target.value) })}
+                                inputMode="decimal"
+                                placeholder="Value"
+                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            />
+                            <input
+                                value={row.unit}
+                                onChange={(e) => updateRow(index, { unit: e.target.value })}
+                                placeholder="Unit"
+                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            />
+                            <select
+                                value={row.status}
+                                onChange={(e) => updateRow(index, { status: e.target.value as ExtractedLabValue["status"] })}
+                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm capitalize focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            >
+                                <option value="optimal">Optimal</option>
+                                <option value="warning">Monitor</option>
+                                <option value="critical">Action needed</option>
+                            </select>
+                            <button
+                                type="button"
+                                onClick={() => removeRow(index)}
+                                className="h-10 w-10 rounded-[10px] text-[#A8A29E] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
+                                aria-label={`Remove ${row.name || "row"}`}
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <button
+                type="button"
+                onClick={addRow}
+                className="mt-4 flex items-center gap-2 text-sm font-semibold text-sky-600 hover:text-sky-700"
+            >
+                <Plus className="w-4 h-4" />
+                Add missing value
+            </button>
+
+            {saveError && (
+                <div className="mt-4 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {saveError}
+                </div>
+            )}
+
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Reviewed health score</p>
+                    <p className="font-display text-3xl text-[#1C1917]">{reviewedScore}<span className="text-sm text-[#57534E] font-sans"> / 100</span></p>
+                </div>
+                <button
+                    onClick={saveReviewed}
+                    disabled={isSaving}
+                    className="min-h-[44px] rounded-[10px] bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-sky-500/20 hover:bg-sky-600 disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                    {isSaving ? (
+                        <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Saving reviewed report...
+                        </>
+                    ) : (
+                        <>
+                            Save and build dashboard
+                            <ArrowRight className="w-4 h-4" />
+                        </>
+                    )}
+                </button>
+            </div>
+        </motion.div>
+    );
 }
 
 export function StepProcessing() {
@@ -98,6 +335,7 @@ export function StepProcessing() {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("symptoms", JSON.stringify(symptoms));
+            formData.append("save", "false");
 
             // Persist profile context before analysis so this first report can use it.
             try {
@@ -178,6 +416,11 @@ export function StepProcessing() {
                 healthScore: analysisData.healthScore || 0,
                 riskLevel: analysisData.riskLevel || "low",
                 summary: analysisData.summary || "",
+                fileName: data.fileName || file.name,
+                rawOcrText: data.extractedText,
+                rawAiJson: analysisData,
+                symptomConnections: (analysisData as AnalysisResultDraft).symptomConnections,
+                plainSummary: (analysisData as AnalysisResultDraft).plainSummary,
             });
 
             setState("complete");
@@ -266,7 +509,7 @@ export function StepProcessing() {
 
                     {errorData.isImageBased && (
                         <p className="mt-3 text-[13px] text-[#57534E] text-center">
-                            You can also enter your lab values manually from the dashboard after onboarding.
+                            You can go back and enter your lab values manually instead.
                         </p>
                     )}
                     <button
@@ -283,97 +526,8 @@ export function StepProcessing() {
         );
     }
 
-    // Success State
     if (state === "complete" && analysisResult) {
-        const biomarkerCount = analysisResult.biomarkers.length;
-        const healthScore = analysisResult.healthScore;
-        const optimalCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "optimal").length;
-        const warningCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "warning").length;
-        const criticalCount = analysisResult.biomarkers.filter((b: ExtractedLabValue) => b.status === "critical").length;
-
-        return (
-            <motion.div
-                initial={{ opacity: 0.01, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                style={{ textAlign: 'center', padding: '48px 24px', maxWidth: 600, margin: '0 auto' }}
-            >
-                <p style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: '#A8A29E',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    marginBottom: 8
-                }}>
-                    DATA EXTRACTED
-                </p>
-                <h2 style={{
-                    fontFamily: 'Instrument Serif',
-                    fontSize: 32,
-                    color: '#1C1917',
-                    margin: '0 0 8px 0'
-                }}>
-                    Want to see your health score?
-                </h2>
-                <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32 }}>
-                    We found {biomarkerCount} biomarkers in your report. Here is what they mean.
-                </p>
-
-                {/* Health score display */}
-                <div style={{
-                    background: '#F5F4EF',
-                    border: '1px solid #E8E6DF',
-                    borderRadius: 18,
-                    padding: '32px 24px',
-                    marginBottom: 24,
-                    maxWidth: 400,
-                    margin: '0 auto 24px auto'
-                }}>
-                    <div style={{
-                        fontFamily: 'Instrument Serif',
-                        fontSize: 72,
-                        fontWeight: 700,
-                        color: '#0EA5E9',
-                        lineHeight: 1
-                    }}>
-                        {healthScore}
-                    </div>
-                    <div style={{ fontSize: 14, color: '#57534E', marginTop: 8 }}>
-                        out of 100
-                    </div>
-                    <div style={{
-                        marginTop: 16,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 16
-                    }}>
-                        <span style={{ fontSize: 13, color: '#10B981', fontWeight: 500 }}>
-                            {optimalCount} optimal
-                        </span>
-                        <span style={{ fontSize: 13, color: '#F59E0B', fontWeight: 500 }}>
-                            {warningCount} monitor
-                        </span>
-                        <span style={{ fontSize: 13, color: '#EF4444', fontWeight: 500 }}>
-                            {criticalCount} action needed
-                        </span>
-                    </div>
-                </div>
-
-                <button onClick={() => onComplete()} style={{
-                    background: '#0EA5E9',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 10,
-                    padding: '12px 32px',
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                }} className="flex items-center gap-2 mx-auto">
-                    See full breakdown
-                    <ArrowRight size={18} />
-                </button>
-            </motion.div>
-        );
+        return <ReviewExtractedValues analysisResult={analysisResult} onComplete={onComplete} />;
     }
 
     // Processing State (Default)

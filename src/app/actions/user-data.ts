@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ExtractedLabValue } from "@/lib/onboarding-store";
 import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // saveLabResult — persist a full lab report + biomarkers in one atomic RPC
@@ -90,6 +91,70 @@ export async function saveLabResult(args: SaveLabResultArgs) {
     logger.error("saveLabResult failed:", msg);
     return { success: false, error: `Database Error: ${msg}` };
   }
+}
+
+const reviewedBiomarkerSchema = z.object({
+  name: z.string().trim().min(1, "Biomarker name is required"),
+  value: z.coerce.number().refine((n) => !Number.isNaN(n), "Value must be numeric"),
+  unit: z.string().trim().default("unit").transform((u) => u || "unit"),
+  status: z.enum(["optimal", "warning", "critical"]),
+  referenceMin: z.coerce.number().nullable().optional().catch(null),
+  referenceMax: z.coerce.number().nullable().optional().catch(null),
+  rangePosition: z.coerce.number().min(0).max(100).optional().default(50),
+  confidence: z.coerce.number().min(0).max(1).optional().default(0.8),
+  aiInterpretation: z.string().optional().default("Review this value with your clinician."),
+  trend: z.string().optional().default(""),
+  category: z.enum(["hematology", "inflammation", "metabolic", "vitamins", "other"]).optional().default("other"),
+});
+
+const reviewedReportSchema = z.object({
+  fileName: z.string().trim().min(1).default("Reviewed Lab Report"),
+  healthScore: z.coerce.number().int().min(0).max(100),
+  riskLevel: z.enum(["low", "moderate", "high"]),
+  summary: z.string().trim().min(1),
+  biomarkers: z.array(reviewedBiomarkerSchema).min(1, "At least one biomarker is required."),
+  rawOcrText: z.string().optional(),
+  rawAiJson: z.unknown().optional(),
+  symptomConnections: z.array(z.object({
+    symptom: z.string(),
+    biomarker: z.string().optional(),
+    relevance: z.string().optional(),
+    relatedBiomarkers: z.array(z.string()).optional(),
+    explanation: z.string().optional(),
+  })).optional(),
+  plainSummary: z.string().optional(),
+});
+
+export async function saveReviewedReportFromSession(input: unknown) {
+  const supabase = await getAuthClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    logger.error("saveReviewedReportFromSession — no user found", userError);
+    return { success: false, error: "No user session" };
+  }
+
+  const parsed = reviewedReportSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message || "Invalid reviewed report data.",
+    };
+  }
+
+  const report = parsed.data;
+  return saveLabResult({
+    userId: user.id,
+    healthScore: report.healthScore,
+    riskLevel: report.riskLevel,
+    summary: report.summary,
+    labValues: report.biomarkers as ExtractedLabValue[],
+    fileName: report.fileName,
+    rawOcrText: report.rawOcrText,
+    rawAiJson: report.rawAiJson,
+    symptomConnections: report.symptomConnections,
+    plainSummary: report.plainSummary,
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
