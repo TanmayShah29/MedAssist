@@ -10,6 +10,7 @@ import { saveProfileFromSession, saveReviewedReportFromSession } from "@/app/act
 
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
+type DebugPayload = Record<string, unknown> | string | null | undefined;
 
 const IMAGE_BASED_MSG = 'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
 
@@ -27,16 +28,26 @@ function deriveRiskLevel(biomarkers: ExtractedLabValue[]): "low" | "moderate" | 
     return "low";
 }
 
-const getErrorMessage = (error: string) => {
+const getErrorMessage = (error: string, debug?: DebugPayload) => {
     if (error.includes('Rate limit') || error.includes('429'))
-        return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true }
+        return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true, debug }
     if (error.includes('Unauthorized') || error.includes('401'))
-        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth?mode=login' }
+        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth?mode=login', debug }
     if (error.includes('invalid format'))
-        return { title: 'AI parsing error', detail: 'The AI had trouble reading this report format. Try a different PDF.', canRetry: true }
+        return { title: 'AI parsing error', detail: 'The AI had trouble reading this report format. Try a different PDF.', canRetry: true, debug }
     if (error.includes('image-based') || error === IMAGE_BASED_MSG)
-        return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true }
-    return { title: 'Something went wrong', detail: error, canRetry: true }
+        return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true, debug }
+    return { title: 'Something went wrong', detail: error, canRetry: true, debug }
+}
+
+function formatDebugPayload(debug: DebugPayload) {
+    if (!debug) return "";
+    if (typeof debug === "string") return debug;
+    try {
+        return JSON.stringify(debug, null, 2);
+    } catch {
+        return String(debug);
+    }
 }
 
 function ReviewExtractedValues({
@@ -266,7 +277,7 @@ export function StepProcessing() {
     const { setStep, completeStep, setAnalysisResult, analysisResult } = useOnboardingStore();
     const [state, setState] = useState<ProcessingState>("uploading");
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
-    const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string, isImageBased?: boolean } | null>(null);
+    const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string, isImageBased?: boolean, debug?: DebugPayload } | null>(null);
     const hasStarted = useRef(false);
 
     // New stages configuration with durations
@@ -367,7 +378,11 @@ export function StepProcessing() {
                 else if (response.status === 504) errorMessage = "Analysis timed out";
                 if (data.code === 'IMAGE_BASED_PDF') errorMessage = IMAGE_BASED_MSG;
 
-                setErrorData(getErrorMessage(errorMessage));
+                setErrorData(getErrorMessage(errorMessage, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    response: data,
+                }));
                 setState("error");
                 return;
             }
@@ -381,7 +396,12 @@ export function StepProcessing() {
                 }
                 analysisData = JSON.parse(data.analysis) as typeof analysisData;
             } catch {
-                setErrorData({ title: 'Server Error', detail: 'Invalid response. Please try again.', canRetry: true });
+                setErrorData({
+                    title: 'Server Error',
+                    detail: 'Invalid response. Please try again.',
+                    canRetry: true,
+                    debug: { response: data },
+                });
                 setState("error");
                 return;
             }
@@ -440,7 +460,11 @@ export function StepProcessing() {
             }
 
         } catch (err: unknown) {
-            setErrorData(getErrorMessage((err as Error).message || "Network error"));
+            setErrorData(getErrorMessage((err as Error).message || "Network error", {
+                name: (err as Error).name,
+                message: (err as Error).message,
+                stack: (err as Error).stack,
+            }));
             setState("error");
         }
     }, [setAnalysisResult]);
@@ -511,6 +535,18 @@ export function StepProcessing() {
                         <p className="mt-3 text-[13px] text-[#57534E] text-center">
                             You can go back and enter your lab values manually instead.
                         </p>
+                    )}
+                    {errorData.debug && (
+                        <div className="mt-5 rounded-[10px] border border-red-200 bg-white/70 overflow-hidden">
+                            <div className="border-b border-red-100 px-3 py-2">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#991B1B]">
+                                    Debug log
+                                </p>
+                            </div>
+                            <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-words p-3 text-[11px] leading-relaxed text-[#1C1917] font-mono">
+                                {formatDebugPayload(errorData.debug)}
+                            </pre>
+                        </div>
                     )}
                     <button
                         onClick={goBackToUpload}

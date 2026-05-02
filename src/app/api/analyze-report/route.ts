@@ -18,6 +18,20 @@ export const runtime = "nodejs";
 
 const formSymptomsSchema = z.array(z.string().trim().min(1)).max(30).catch([]);
 
+function toDebugPayload(error: unknown, stage: string, extra: Record<string, unknown> = {}) {
+    const err = error as Error & { cause?: unknown; status?: number; code?: string };
+    return {
+        stage,
+        name: err?.name || typeof error,
+        message: err?.message || String(error),
+        stack: err?.stack || null,
+        cause: err?.cause ? String(err.cause) : null,
+        status: err?.status ?? null,
+        code: err?.code ?? null,
+        ...extra,
+    };
+}
+
 function parseFormSymptoms(raw: FormDataEntryValue | null): string[] {
     if (typeof raw !== 'string' || raw.trim() === '') return [];
 
@@ -37,7 +51,11 @@ export async function POST(req: NextRequest) {
         if (!rateLimitResult.success) {
             logger.warn(`Rate limit exceeded: ${rateLimitResult.message}`);
             return NextResponse.json(
-                { success: false, error: rateLimitResult.message },
+                {
+                    success: false,
+                    error: rateLimitResult.message,
+                    debug: { stage: 'rate-limit', ...rateLimitResult },
+                },
                 { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
             );
         }
@@ -47,7 +65,11 @@ export async function POST(req: NextRequest) {
         const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
         if (!authUser) {
             return NextResponse.json(
-                { success: false, error: 'Sign in to analyze reports.' },
+                {
+                    success: false,
+                    error: 'Sign in to analyze reports.',
+                    debug: { stage: 'auth', message: 'No Supabase auth user returned for request cookies.' },
+                },
                 { status: 401 }
             );
         }
@@ -61,7 +83,11 @@ export async function POST(req: NextRequest) {
             .gte('uploaded_at', oneHourAgo);
         if (uploadCount !== null && uploadCount >= MAX_UPLOADS_PER_HOUR) {
             return NextResponse.json(
-                { success: false, error: `Rate limit exceeded. You can analyze up to ${MAX_UPLOADS_PER_HOUR} reports per hour. Please try again later.` },
+                {
+                    success: false,
+                    error: `Rate limit exceeded. You can analyze up to ${MAX_UPLOADS_PER_HOUR} reports per hour. Please try again later.`,
+                    debug: { stage: 'user-upload-limit', uploadCount, max: MAX_UPLOADS_PER_HOUR },
+                },
                 { status: 429 }
             );
         }
@@ -79,11 +105,19 @@ export async function POST(req: NextRequest) {
         }
 
         if (!file) {
-            return NextResponse.json({ success: false, error: 'No file uploaded. Upload a PDF or use manual entry.' }, { status: 400 });
+            return NextResponse.json({
+                success: false,
+                error: 'No file uploaded. Upload a PDF or use manual entry.',
+                debug: { stage: 'request-parse', fields: Array.from(formData.keys()) },
+            }, { status: 400 });
         }
 
         if (file.size > MAX_FILE_SIZE_BYTES) {
-            return NextResponse.json({ success: false, error: `File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.` }, { status: 400 });
+            return NextResponse.json({
+                success: false,
+                error: `File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.`,
+                debug: { stage: 'file-validation', fileName: file.name, fileSize: file.size, max: MAX_FILE_SIZE_BYTES },
+            }, { status: 400 });
         }
 
         // Section 1d — Server-side file type validation
@@ -91,7 +125,11 @@ export async function POST(req: NextRequest) {
         const fileName = file.name.toLowerCase();
         if (!allowedMimeTypes.includes(file.type) || !fileName.endsWith('.pdf')) {
             return NextResponse.json(
-                { success: false, error: 'Invalid file type. Only PDF files are accepted.' },
+                {
+                    success: false,
+                    error: 'Invalid file type. Only PDF files are accepted.',
+                    debug: { stage: 'file-validation', fileName: file.name, fileType: file.type },
+                },
                 { status: 400 }
             );
         }
@@ -102,7 +140,16 @@ export async function POST(req: NextRequest) {
         // Section 1e — PDF Magic Bytes validation (%PDF-)
         if (buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-') {
             return NextResponse.json(
-                { success: false, error: 'Invalid file content. The file does not appear to be a valid PDF.' },
+                {
+                    success: false,
+                    error: 'Invalid file content. The file does not appear to be a valid PDF.',
+                    debug: {
+                        stage: 'pdf-magic-bytes',
+                        fileName: file.name,
+                        fileSize: file.size,
+                        firstBytes: buffer.toString('utf8', 0, Math.min(12, buffer.length)),
+                    },
+                },
                 { status: 400 }
             );
         }
@@ -115,7 +162,12 @@ export async function POST(req: NextRequest) {
         } catch (extractErr) {
             if (extractErr instanceof ImageBasedPdfError) {
                 return NextResponse.json(
-                    { success: false, error: extractErr.message, code: IMAGE_BASED_PDF_ERROR_CODE },
+                    {
+                        success: false,
+                        error: extractErr.message,
+                        code: IMAGE_BASED_PDF_ERROR_CODE,
+                        debug: toDebugPayload(extractErr, 'text-extraction', { fileName: file.name, fileSize: file.size }),
+                    },
                     { status: 400 }
                 );
             }
@@ -126,7 +178,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
-                code: IMAGE_BASED_PDF_ERROR_CODE
+                code: IMAGE_BASED_PDF_ERROR_CODE,
+                debug: {
+                    stage: 'text-extraction-length',
+                    fileName: file.name,
+                    extractedLength: extractedText?.trim().length ?? 0,
+                    preview: extractedText?.slice(0, 500) ?? '',
+                },
             }, { status: 400 });
         }
         logger.info("Text extracted successfully.");
@@ -163,7 +221,16 @@ export async function POST(req: NextRequest) {
             if (!saveResult.success) {
                 logger.error("Failed to save via action:", saveResult.error);
                 return NextResponse.json(
-                    { success: false, error: saveResult.error || 'Failed to save results. Please try again.' },
+                    {
+                        success: false,
+                        error: saveResult.error || 'Failed to save results. Please try again.',
+                        debug: {
+                            stage: 'save-report',
+                            saveResult,
+                            biomarkerCount: analysisResult.biomarkers.length,
+                            fileName: file.name,
+                        },
+                    },
                     { status: 500 }
                 );
             }
@@ -183,18 +250,29 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: 'AI analysis validation failed. The report format may be unsupported.',
-                details: error.issues
+                details: error.issues,
+                debug: toDebugPayload(error, 'zod-validation', { issues: error.issues }),
             }, { status: 422 });
         }
         if (error instanceof ImageBasedPdfError) {
             return NextResponse.json(
-                { success: false, error: error.message, code: IMAGE_BASED_PDF_ERROR_CODE },
+                {
+                    success: false,
+                    error: error.message,
+                    code: IMAGE_BASED_PDF_ERROR_CODE,
+                    debug: toDebugPayload(error, 'image-based-pdf'),
+                },
                 { status: 400 }
             );
         }
 
-        logger.error("Pipeline Error:", (error as Error).message);
-        return NextResponse.json({ success: false, error: (error as Error).message || 'Analysis failed' }, { status: 500 });
+        const debug = toDebugPayload(error, 'pipeline-catch');
+        logger.error("Pipeline Error:", debug);
+        return NextResponse.json({
+            success: false,
+            error: (error as Error).message || 'Analysis failed',
+            debug,
+        }, { status: 500 });
     }
 }
 
@@ -203,7 +281,11 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
     const supabase = await getAuthClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        return NextResponse.json({ success: false, error: 'You must be signed in to save results.' }, { status: 401 });
+        return NextResponse.json({
+            success: false,
+            error: 'You must be signed in to save results.',
+            debug: { stage: 'manual-auth', message: 'No Supabase auth user returned for manual entry request.' },
+        }, { status: 401 });
     }
 
     const manualPayloadSchema = z.object({
@@ -217,13 +299,21 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
     let payloadRaw;
     try {
         payloadRaw = JSON.parse(manualPayloadRaw);
-    } catch {
-        return NextResponse.json({ success: false, error: 'Invalid manual entry data format.' }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({
+            success: false,
+            error: 'Invalid manual entry data format.',
+            debug: toDebugPayload(error, 'manual-payload-json', { manualPayloadRaw }),
+        }, { status: 400 });
     }
 
     const parseResult = manualPayloadSchema.safeParse(payloadRaw);
     if (!parseResult.success) {
-        return NextResponse.json({ success: false, error: parseResult.error.issues[0]?.message || 'Invalid data.' }, { status: 400 });
+        return NextResponse.json({
+            success: false,
+            error: parseResult.error.issues[0]?.message || 'Invalid data.',
+            debug: toDebugPayload(parseResult.error, 'manual-payload-validation', { issues: parseResult.error.issues }),
+        }, { status: 400 });
     }
 
     const normalized = parseResult.data.biomarkers;
@@ -257,7 +347,11 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
 
     if (!saveResult.success) {
         logger.error("Failed to save manual report:", saveResult.error);
-        return NextResponse.json({ success: false, error: saveResult.error || 'Failed to save.' }, { status: 500 });
+        return NextResponse.json({
+            success: false,
+            error: saveResult.error || 'Failed to save.',
+            debug: { stage: 'manual-save-report', saveResult, biomarkerCount: analysisResult.biomarkers.length },
+        }, { status: 500 });
     }
 
     return NextResponse.json({
