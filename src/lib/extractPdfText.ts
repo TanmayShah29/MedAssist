@@ -14,8 +14,7 @@
  * extraction path and was treating every PDF as a rasterised image.
  */
 
-// pdf-parse v2 ESM doesn't expose a default export that Turbopack can resolve.
-// Use require() since this is server-only code.
+// Use require() since this is server-only code and pdf-parse ships mixed CJS/ESM.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse');
 
@@ -55,8 +54,7 @@ export async function extractPdfText(
 ): Promise<string> {
   // ── Stage 1: pdf-parse — handles digital/text-based PDFs ─────────────────
   try {
-    const parsed = await pdfParse(fileBuffer);
-    const text = parsed.text?.trim() ?? '';
+    const text = await extractWithPdfParse(fileBuffer);
     if (text.length >= MIN_TEXT_LENGTH) {
       return text;
     }
@@ -79,6 +77,25 @@ export async function extractPdfText(
 
   // Both stages failed — PDF is truly unreadable (encrypted, corrupt, pure image).
   throw new Error(IMAGE_BASED_PDF_MESSAGE);
+}
+
+async function extractWithPdfParse(fileBuffer: Buffer): Promise<string> {
+  if (typeof pdfParse === 'function') {
+    const parsed = await pdfParse(fileBuffer);
+    return parsed.text?.trim() ?? '';
+  }
+
+  if (typeof pdfParse.PDFParse === 'function') {
+    const parser = new pdfParse.PDFParse({ data: new Uint8Array(fileBuffer) });
+    try {
+      const parsed = await parser.getText();
+      return parsed.text?.trim() ?? '';
+    } finally {
+      await parser.destroy();
+    }
+  }
+
+  throw new Error('PDF parser is unavailable.');
 }
 
 /**
@@ -122,6 +139,9 @@ async function attemptOcrSpaceFallback(
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       throw new Error('OCR timed out. Please try again or enter your values manually.');
+    }
+    if ((err as Error).message?.includes('expected pattern')) {
+      throw new Error('OCR fallback is not configured correctly. Please upload a digital PDF or enter your values manually.');
     }
     console.warn('[OCR.space] Fetch failed:', (err as Error).message);
     return ''; // Non-fatal — outer function handles the empty result
