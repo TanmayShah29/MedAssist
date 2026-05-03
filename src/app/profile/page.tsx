@@ -134,14 +134,14 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-5">
                     {/* Personal Information */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col">
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Personal Information
                             </p>
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-[10px] font-semibold tracking-wide hover:bg-sky-600 transition-colors disabled:opacity-50"
+                                className="min-h-[44px] rounded-[10px] bg-sky-500 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-600 disabled:opacity-50 sm:min-h-[36px]"
                             >
                                 {isSaving ? "Saving..." : "Save Changes"}
                             </button>
@@ -187,7 +187,7 @@ export default function ProfilePage() {
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                            <div className="col-span-2 sm:col-span-1">
+                            <div className="sm:col-span-1">
                                 <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Blood Type</label>
                                 <input
                                     type="text"
@@ -202,13 +202,13 @@ export default function ProfilePage() {
 
                     {/* Report List */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Uploaded Reports
                             </p>
                             <button
-                                onClick={() => router.push('/dashboard')}
-                                className="text-xs text-sky-500 font-semibold tracking-wide hover:text-sky-600 transition-colors bg-white px-2 py-1 rounded-[6px] border border-[#E8E6DF] hover:border-sky-200"
+                                onClick={() => router.push('/dashboard?openUpload=1')}
+                                className="min-h-[44px] rounded-[8px] border border-[#E8E6DF] bg-white px-3 py-2 text-xs font-semibold text-sky-500 transition-colors hover:border-sky-200 hover:text-sky-600 sm:min-h-[36px]"
                             >
                                 + Upload new
                             </button>
@@ -221,7 +221,7 @@ export default function ProfilePage() {
                                     </div>
                                     <div className="grow shrink basis-0 min-w-0">
                                         <p className="text-sm font-medium text-[#1C1917] truncate">
-                                            Blood Panel Report
+                                            {report.summary || 'Blood Panel Report'}
                                         </p>
                                         <p className="text-xs text-[#A8A29E] mt-0.5">
                                             {new Date(report.uploaded_at).toLocaleDateString(undefined, {
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                                             })}
                                         </p>
                                     </div>
-                                    <div className="text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors flex items-center gap-1" onClick={() => router.push('/results')}>
+                                    <div className="hidden text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
                                         View Details
                                         <ChevronRight size={14} />
                                     </div>
@@ -238,7 +238,7 @@ export default function ProfilePage() {
                                             e.stopPropagation();
                                             handleDeleteReport(report.id);
                                         }}
-                                        className="p-2 text-[#A8A29E] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1"
+                                        className="p-2 text-[#A8A29E] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                         title="Delete report"
                                     >
                                         <Trash2 size={14} />
@@ -258,16 +258,16 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-5">
                     {/* Health Summary - Only showing real symptoms */}
                     <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Health Context
                             </p>
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-[10px] font-semibold tracking-wide hover:bg-sky-600 transition-colors disabled:opacity-50"
+                                className="min-h-[44px] rounded-[10px] bg-sky-500 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-600 disabled:opacity-50 sm:min-h-[36px]"
                             >
-                                {isSaving ? "Update Context" : "Update Context"}
+                                {isSaving ? "Updating..." : "Update Context"}
                             </button>
                         </div>
                         <div className="space-y-4">
@@ -297,7 +297,7 @@ export default function ProfilePage() {
                                             key={opt.label}
                                             onClick={() => handleToggleSymptom(opt.label)}
                                             className={cn(
-                                                "text-xs px-2 py-1 rounded-md border transition-all",
+                                                "min-h-[36px] text-xs px-2.5 py-1 rounded-md border transition-all",
                                                 symptoms.includes(opt.label)
                                                     ? "bg-sky-500 text-white border-sky-500"
                                                     : "bg-white text-[#57534E] border-[#E8E6DF] hover:border-sky-300"

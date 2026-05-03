@@ -8,6 +8,8 @@ import {
   Shield, ChevronRight, Lock
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/section-header";
+import { mergeBiomarkerSources } from "@/lib/medical-data";
+import { Biomarker } from "@/types/medical";
 
 // ── Toggle Switch ──────────────────────────────────────────────────────────
 function Toggle({ checked, onToggle, disabled }: { checked: boolean; onToggle: () => void; disabled?: boolean }) {
@@ -112,14 +114,23 @@ export default function SettingsPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const { data: biomarkers } = await supabase
-        .from("biomarkers")
-        .select("name, value, unit, status, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+      const [{ data: biomarkerRows }, { data: labResults }] = await Promise.all([
+        supabase
+          .from("biomarkers")
+          .select("id, name, value, unit, status, category, reference_range_min, reference_range_max, ai_interpretation, lab_result_id, created_at, lab_results!inner(user_id, uploaded_at, created_at)")
+          .eq("lab_results.user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("lab_results")
+          .select("id, uploaded_at, created_at, raw_ai_json")
+          .eq("user_id", user.id)
+          .order("uploaded_at", { ascending: false }),
+      ]);
+
+      const biomarkers = mergeBiomarkerSources(biomarkerRows as Biomarker[] | null, labResults || []);
 
       let csv = "Date,Biomarker,Value,Unit,Status\n";
-      biomarkers?.forEach(b => {
+      biomarkers.forEach(b => {
         csv += [new Date(b.created_at).toLocaleDateString(), b.name, b.value, b.unit, b.status].join(",") + "\n";
       });
 
@@ -167,9 +178,9 @@ export default function SettingsPage() {
             iconColor="text-sky-500"
             iconBg="bg-sky-50"
             title="Change Password"
-            description="Update your account password. Use at least 8 characters."
+            description="Update your account password. Use at least 6 characters."
           >
-            <form onSubmit={handleUpdatePassword} className="flex gap-2">
+            <form onSubmit={handleUpdatePassword} className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -191,7 +202,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isUpdatingPassword || !newPassword}
-                className="px-4 py-2.5 bg-sky-500 text-white rounded-[10px] text-sm font-semibold hover:bg-sky-600 transition-colors disabled:opacity-50 min-h-[44px]"
+                className="px-4 py-2.5 bg-sky-500 text-white rounded-[10px] text-sm font-semibold hover:bg-sky-600 transition-colors disabled:opacity-50 min-h-[44px] sm:shrink-0"
                 style={{ WebkitAppearance: "none" }}
               >
                 {isUpdatingPassword ? "Saving…" : "Update"}
@@ -285,9 +296,9 @@ export default function SettingsPage() {
             ) : (
               <div className="space-y-3">
                 <p className="text-[13px] text-red-700 font-medium">
-                  ⚠️ This will permanently delete all your data. Are you absolutely sure?
+                  This will permanently delete all your data. Are you absolutely sure?
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     onClick={handleDeleteAccount}
                     disabled={isDeleting}

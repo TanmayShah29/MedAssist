@@ -22,19 +22,28 @@ export interface Biomarker {
     ai_interpretation?: string;
     confidence?: number;
     lab_result_id?: string; // UUID in production DB
-    lab_results?: { created_at: string; uploaded_at?: string };
+    lab_results?: { created_at: string; uploaded_at?: string } | { created_at: string; uploaded_at?: string }[];
     created_at: string;
 }
 
 export interface LabResult {
     id: string; // UUID in production DB
     health_score?: number;
+    risk_level?: 'low' | 'moderate' | 'high';
     created_at?: string;       // legacy alias; prefer uploaded_at
     uploaded_at?: string;      // actual DB column name
+    file_name?: string;
     summary?: string;
+    plain_summary?: string | null;
     raw_ai_json?: Record<string, unknown>;
     raw_ocr_text?: string;
     processing_time_ms?: number;
+    processed?: boolean;
+    symptom_connections?: Array<{
+        symptom: string;
+        relatedBiomarkers?: string[];
+        explanation?: string;
+    }> | null;
 }
 
 export interface Symptom {

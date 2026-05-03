@@ -31,8 +31,9 @@ import { BiomarkerGrid } from '@/components/dashboard/biomarker-grid'
 import { CarePlanSection } from '@/components/dashboard/care-plan-section'
 import { LongitudinalInsightsSection } from '@/components/dashboard/longitudinal-insights-section'
 
-import { DEMO_HISTORY, DEMO_LAB_RESULT } from '@/lib/demo-data'
+import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
+import { labResultSummary, latestUniqueBiomarkers } from '@/lib/medical-data'
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -183,12 +184,14 @@ export default function DashboardClient({
     const [selectedBiomarkerData, setSelectedBiomarkerData] = useState<Biomarker | null>(null);
     const [showDetailSheet, setShowDetailSheet] = useState(false);
     const [isOffline, setIsOffline] = useState(false);
-    const [demoMode, setDemoMode] = useState(false);
+    const demoMode = useStore(s => s.demoMode);
+    const setDemoMode = useStore(s => s.setDemoMode);
+    const getDemoLabResults = useStore(s => s.getDemoLabResults);
+    const getDemoBiomarkers = useStore(s => s.getDemoBiomarkers);
     const [showScoreModal, setShowScoreModal] = useState(false);
     const [_supplements, setSupplements] = useState<Record<string, unknown>[]>([]);
 
     const profile = initialProfile;
-    const biomarkers = initialBiomarkers;
     const labResults = initialLabResults;
 
     // ── Effects ────────────────────────────────────────────────────────────
@@ -231,13 +234,13 @@ export default function DashboardClient({
     // ── Derived Data ───────────────────────────────────────────────────────
 
     const displayLabResults = useMemo(
-        () => (demoMode ? [DEMO_LAB_RESULT, ...initialLabResults] : initialLabResults),
-        [demoMode, initialLabResults]
+        () => (demoMode ? [...getDemoLabResults(), ...initialLabResults] : initialLabResults),
+        [demoMode, initialLabResults, getDemoLabResults]
     );
 
     const displayBiomarkers = useMemo(
-        () => (demoMode ? [...DEMO_HISTORY, ...initialBiomarkers] : initialBiomarkers),
-        [demoMode, initialBiomarkers]
+        () => (demoMode ? [...getDemoBiomarkers(), ...initialBiomarkers] : initialBiomarkers),
+        [demoMode, initialBiomarkers, getDemoBiomarkers]
     );
 
     // Cache to localStorage
@@ -254,34 +257,17 @@ export default function DashboardClient({
 
     // Latest entry per biomarker name
     const latestBiomarkers = useMemo(
-        () =>
-            Array.from(
-                displayBiomarkers
-                    .reduce((acc, current) => {
-                        const existing = acc.get(current.name);
-                        if (!existing || new Date(current.created_at || 0) > new Date(existing.created_at || 0)) {
-                            acc.set(current.name, current);
-                        }
-                        return acc;
-                    }, new Map<string, Biomarker>())
-                    .values()
-            ),
+        () => latestUniqueBiomarkers(displayBiomarkers),
         [displayBiomarkers]
     );
 
     const latestLabResult = displayLabResults[0];
+    const latestSummary = labResultSummary(latestLabResult);
 
     const longitudinalInsights: string[] =
         (latestLabResult?.raw_ai_json as { longitudinalInsights?: string[] })?.longitudinalInsights ?? [];
 
-    const symptomConnections: {
-        symptom: string;
-        biomarker: string;
-        relevance: string;
-        relatedBiomarkers?: string[];
-        explanation?: string;
-    }[] =
-        (latestLabResult as { symptom_connections?: typeof symptomConnections })?.symptom_connections ?? [];
+    const symptomConnections = latestLabResult?.symptom_connections ?? [];
 
     // Status counts
     const optimalCount = latestBiomarkers.filter(b => b.status === 'optimal').length;
@@ -352,15 +338,15 @@ export default function DashboardClient({
                     )}
                 </div>
                 <div className="lg:hidden flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                         {profile?.first_name && (
-                            <h1 className="text-[16px] font-bold text-[#1C1917]">
+                            <h1 className="text-[16px] font-bold text-[#1C1917] truncate">
                                 Welcome, {profile.first_name}
                             </h1>
                         )}
                     </div>
                     {lastUpdated && (
-                        <p className="text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider ml-auto">Report: {lastUpdated}</p>
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider ml-auto text-right leading-tight">Report: {lastUpdated}</p>
                     )}
                     {isOffline && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-2">
@@ -393,8 +379,8 @@ export default function DashboardClient({
             {totalCount > 0 && (
                 <div className="flex flex-col md:flex-row gap-4 mb-8">
                     {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-4">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+                            <div className="flex items-center gap-4 min-w-0">
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
                                 </div>
@@ -407,7 +393,7 @@ export default function DashboardClient({
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex gap-2 ml-auto">
+                            <div className="flex gap-2 sm:ml-auto">
                                 {[
                                     { count: optimalCount, label: 'Opt', bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-700' },
                                     { count: warningCount, label: 'Mon', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-700' },
@@ -423,8 +409,8 @@ export default function DashboardClient({
                     )}
 
                     {latestLabResult && initialLabResults.length > 0 && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-4">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+                            <div className="flex items-center gap-4 min-w-0">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
                                 </div>
@@ -440,7 +426,7 @@ export default function DashboardClient({
                                     </p>
                                 </div>
                             </div>
-                            <div className="ml-auto">
+                            <div className="sm:ml-auto">
                                 {Math.floor(
                                     (Date.now() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) /
                                         86_400_000
@@ -457,7 +443,7 @@ export default function DashboardClient({
 
             {/* Demo mode banner */}
             {demoMode && (
-                <div className="mb-6 flex items-center justify-between gap-4 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 print:hidden">
+                <div className="mb-6 flex flex-col gap-3 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between print:hidden">
                     <p className="text-sm font-semibold text-amber-900">
                         You&apos;re viewing <strong>sample data</strong> — not your personal results.
                     </p>
@@ -478,124 +464,114 @@ export default function DashboardClient({
                     onDemo={() => setDemoMode(true)}
                 />
             ) : (
-                <div className="flex flex-col gap-6 mb-6">
-                    <PriorityAlertCard biomarkers={latestBiomarkers} />
+                <div className="flex flex-col xl:flex-row gap-6 mb-6">
 
-                    {/* Symptom connections */}
-                    {symptomConnections.length > 0 && (
-                        <div className="bg-[#FFF7ED] border border-[#FED7AA] border-l-4 border-l-amber-400 rounded-[14px] p-6">
-                            <p className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider mb-4">
-                                Your symptoms may be connected to these results
-                            </p>
-                            {symptomConnections.map(conn => (
-                                <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0">
-                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                        <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
-                                        <span className="text-[12px] text-[#A8A29E]">may be related to</span>
-                                        {conn.relatedBiomarkers?.map(b => (
-                                            <span key={b} className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-md px-2 py-0.5 text-[12px] text-[#57534E]">{b}</span>
-                                        ))}
+                    {/* ── LEFT: Main clinical column ── */}
+                    <div className="flex flex-col gap-6 xl:flex-[2]">
+                        <PriorityAlertCard biomarkers={latestBiomarkers} />
+
+                        {/* Symptom connections */}
+                        {symptomConnections.length > 0 && (
+                            <div className="bg-[#FFF7ED] border border-[#FED7AA] border-l-4 border-l-amber-400 rounded-[14px] p-6">
+                                <p className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider mb-4">
+                                    Your symptoms may be connected to these results
+                                </p>
+                                {symptomConnections.map(conn => (
+                                    <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0">
+                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                            <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
+                                            <span className="text-[12px] text-[#A8A29E]">may be related to</span>
+                                            {conn.relatedBiomarkers?.map(b => (
+                                                <span key={b} className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-md px-2 py-0.5 text-[12px] text-[#57534E]">{b}</span>
+                                            ))}
+                                        </div>
+                                        <p className="text-[13px] text-[#57534E] leading-relaxed">{conn.explanation}</p>
                                     </div>
-                                    <p className="text-[13px] text-[#57534E] leading-relaxed">{conn.explanation}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
 
-                    {/* Symptom empty state nudge */}
-                    {initialSymptoms.length === 0 && totalCount > 0 && (
-                        <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3">
-                            <p className="text-[14px] text-[#57534E]">
-                                Add your symptoms to get more personalised insights.
-                            </p>
-                            <a href="/profile" className="text-[13px] text-sky-500 font-semibold whitespace-nowrap shrink-0">
-                                Add symptoms →
-                            </a>
-                        </div>
-                    )}
+                        {/* Symptom empty state nudge */}
+                        {initialSymptoms.length === 0 && totalCount > 0 && (
+                            <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3">
+                                <p className="text-[14px] text-[#57534E]">
+                                    Add your symptoms to get more personalised insights.
+                                </p>
+                                <a href="/profile" className="text-[13px] text-sky-500 font-semibold whitespace-nowrap shrink-0">
+                                    Add symptoms →
+                                </a>
+                            </div>
+                        )}
 
-                    {/* Longitudinal comparison (2+ reports) */}
-                    {displayLabResults.length >= 2 && (
-                        <LongitudinalComparisonCard
+                        {/* Longitudinal comparison (2+ reports) */}
+                        {displayLabResults.length >= 2 && (
+                            <LongitudinalComparisonCard
+                                latestBiomarkers={latestBiomarkers}
+                                previousBiomarkers={displayBiomarkers.filter(b => b.lab_result_id === displayLabResults[1].id)}
+                                reportDate={displayLabResults[0].uploaded_at || displayLabResults[0].created_at || ''}
+                                previousReportDate={displayLabResults[1].uploaded_at || displayLabResults[1].created_at || ''}
+                            />
+                        )}
+
+                        {/* Score + Trends */}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+                            <HealthScoreOverview
+                                score={healthScore}
+                                optimalCount={optimalCount}
+                                warningCount={warningCount}
+                                criticalCount={criticalCount}
+                                biomarkers={latestBiomarkers}
+                                onClick={() => setShowScoreModal(true)}
+                            />
+                            <TrendSnapshot
+                                latestBiomarkers={latestBiomarkers}
+                                history={displayBiomarkers}
+                                latestLabResult={latestLabResult}
+                            />
+                        </div>
+
+                        {/* AI Insights */}
+                        <div>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PERSONALIZED INSIGHTS</h3>
+                            <AIInsightsFeed analysis={{ summary: latestSummary }} />
+                        </div>
+
+                        {/* Biomarker Grid */}
+                        <BiomarkerGrid
                             latestBiomarkers={latestBiomarkers}
-                            previousBiomarkers={displayBiomarkers.filter(b => b.lab_result_id === displayLabResults[1].id)}
-                            reportDate={displayLabResults[0].uploaded_at || displayLabResults[0].created_at || ''}
-                            previousReportDate={displayLabResults[1].uploaded_at || displayLabResults[1].created_at || ''}
-                        />
-                    )}
-
-                    {/* Score + Trends */}
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-                        <HealthScoreOverview
-                            score={healthScore}
+                            displayBiomarkers={displayBiomarkers}
+                            latestLabResultId={latestLabResult?.id}
                             optimalCount={optimalCount}
                             warningCount={warningCount}
                             criticalCount={criticalCount}
-                            biomarkers={latestBiomarkers}
-                            onClick={() => setShowScoreModal(true)}
+                            onBiomarkerClick={handleBiomarkerClick}
+                            onUploadClick={() => setShowUploadModal(true)}
                         />
-                        <TrendSnapshot
-                            latestBiomarkers={latestBiomarkers}
-                            history={displayBiomarkers}
-                            latestLabResult={latestLabResult}
-                        />
+
+                        {/* Single-report nudge */}
+                        {!demoMode && labResults.length === 1 && (
+                            <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4">
+                                <p className="font-semibold text-[#0369A1] text-[15px]">Your AI gets smarter with every report</p>
+                                <p className="text-[#0284C7] text-[13px] mt-1 leading-relaxed">
+                                    Upload your next report after your upcoming blood test and MedAssist
+                                    will start showing trends — like whether your hemoglobin is improving.
+                                </p>
+                            </div>
+                        )}
                     </div>
-                </div>
-            )}
 
-            {/* ── Care Plan + Doctor Questions ── */}
-            {totalCount > 0 && (
-                <>
-                    <CarePlanSection latestBiomarkers={latestBiomarkers} />
-                    <DoctorQuestions biomarkers={latestBiomarkers} className="mb-8" />
-                </>
-            )}
-
-            {/* ── Longitudinal Insights ── */}
-            <LongitudinalInsightsSection insights={longitudinalInsights} />
-
-            {/* ── Single-report nudge ── */}
-            {labResults.length === 1 && (
-                <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4 mb-6">
-                    <p className="font-semibold text-[#0369A1] text-[15px]">Your AI gets smarter with every report</p>
-                    <p className="text-[#0284C7] text-[13px] mt-1 leading-relaxed">
-                        You have 1 report uploaded. Upload your next report after your upcoming blood test and MedAssist
-                        will start showing you trends — like whether your hemoglobin is improving or your vitamin D is
-                        responding to supplements.
-                    </p>
-                </div>
-            )}
-
-                    {/* ── Insights Feed ── */}
-            {totalCount > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PERSONALIZED INSIGHTS</h3>
-                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_1fr] lg:gap-6">
-                        <AIInsightsFeed analysis={{ summary: latestLabResult?.summary || '' }} />
-                        <ActionItems biomarkers={biomarkers} />
+                    {/* ── RIGHT: Action & care column ── */}
+                    <div className="flex flex-col gap-6 xl:flex-[1]">
+                        <CarePlanSection latestBiomarkers={latestBiomarkers} />
+                        <ActionItems biomarkers={latestBiomarkers} />
+                        <DoctorQuestions biomarkers={latestBiomarkers} />
+                        <LongitudinalInsightsSection insights={longitudinalInsights} />
+                        <div>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
+                            <MedicineCabinet />
+                        </div>
                     </div>
-                </div>
-            )}
 
-            {/* ── Biomarker Grid ── */}
-            <BiomarkerGrid
-                latestBiomarkers={latestBiomarkers}
-                displayBiomarkers={displayBiomarkers}
-                latestLabResultId={latestLabResult?.id}
-                optimalCount={optimalCount}
-                warningCount={warningCount}
-                criticalCount={criticalCount}
-                onBiomarkerClick={handleBiomarkerClick}
-                onUploadClick={() => setShowUploadModal(true)}
-            />
-
-            {/* ── Medicine Cabinet ── */}
-            {totalCount > 0 && (
-                <div className="mt-8 mb-12">
-                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
-                    <div className="max-w-xl">
-                        <MedicineCabinet />
-                    </div>
                 </div>
             )}
 

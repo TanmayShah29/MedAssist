@@ -35,7 +35,7 @@ export function AIInsightsFeed({ analysis }: AIInsightsFeedProps) {
             </div>
 
             {/* CTA Card */}
-            <div className="bg-[#0F172A] rounded-[18px] p-6 border border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center justify-center relative overflow-hidden">
+            <div className="bg-[#1C1917] rounded-[18px] p-6 border border-[#2C2A27] shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center justify-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <Sparkles size={48} className="text-sky-400" />
                 </div>
@@ -44,7 +44,7 @@ export function AIInsightsFeed({ analysis }: AIInsightsFeedProps) {
                         <Sparkles className="w-5 h-5 text-sky-400" />
                     </div>
                     <h4 className="font-bold text-lg text-white mb-2">Questions?</h4>
-                    <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+                    <p className="text-[#A8A29E] text-sm mb-6 leading-relaxed">
                         Our AI can explain exactly what these numbers mean for your health.
                     </p>
                     <Link

@@ -6,6 +6,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ExtractedLabValue } from "@/lib/onboarding-store";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
+import { mergeBiomarkerSources } from "@/lib/medical-data";
+import { Biomarker } from "@/types/medical";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // saveLabResult — persist a full lab report + biomarkers in one atomic RPC
@@ -22,12 +24,11 @@ interface SaveLabResultArgs {
   rawAiJson?: unknown;
   symptomConnections?: {
     symptom: string;
-    biomarker?: string;
-    relevance?: string;
     relatedBiomarkers?: string[];
     explanation?: string;
   }[];
   plainSummary?: string;
+  longitudinalInsights?: string[];
 }
 
 export async function saveLabResult(args: SaveLabResultArgs) {
@@ -302,20 +303,28 @@ export async function getUserBiomarkerHistory(userId: string) {
   try {
     const supabase = await getAuthClient();
 
-    const { data, error } = await supabase
-      .from("biomarkers")
-      .select(
-        "name, value, unit, status, reference_range_min, reference_range_max, ai_interpretation, created_at"
-      )
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const [{ data, error }, { data: labResults }] = await Promise.all([
+      supabase
+        .from("biomarkers")
+        .select(
+          "id, name, value, unit, status, category, reference_range_min, reference_range_max, ai_interpretation, lab_result_id, created_at, lab_results!inner(user_id, uploaded_at, created_at)"
+        )
+        .eq("lab_results.user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(100),
+      supabase
+        .from("lab_results")
+        .select("id, uploaded_at, created_at, raw_ai_json")
+        .eq("user_id", userId)
+        .order("uploaded_at", { ascending: false })
+        .limit(10),
+    ]);
 
     if (error) {
       logger.error("getUserBiomarkerHistory query error:", error.message);
       return [];
     }
-    return data || [];
+    return mergeBiomarkerSources(data as Biomarker[] | null, labResults || []).slice(0, 100);
   } catch (error) {
     logger.error(
       "getUserBiomarkerHistory failed:",

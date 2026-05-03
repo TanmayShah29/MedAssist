@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { z } from 'zod';
+import { mergeBiomarkerSources } from '@/lib/medical-data';
+import { Biomarker } from '@/types/medical';
 
 export const runtime = 'nodejs';
 
@@ -56,44 +58,59 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data, error } = await supabase
-        .from('biomarkers')
-        .select(`
-            value,
-            unit,
-            lab_results (
-                uploaded_at,
-                created_at
-            )
-        `)
-        .eq('user_id', user.id)
-        .eq('name', biomarkerName)
-        .order('created_at', { foreignTable: 'lab_results', ascending: true });
+    const [{ data, error }, { data: labResults }] = await Promise.all([
+        supabase
+            .from('biomarkers')
+            .select(`
+                id,
+                name,
+                value,
+                unit,
+                status,
+                category,
+                reference_range_min,
+                reference_range_max,
+                ai_interpretation,
+                lab_result_id,
+                created_at,
+                lab_results!inner (
+                    user_id,
+                    uploaded_at,
+                    created_at
+                )
+            `)
+            .eq('lab_results.user_id', user.id)
+            .eq('name', biomarkerName)
+            .order('created_at', { ascending: true }),
+        supabase
+            .from('lab_results')
+            .select('id, uploaded_at, created_at, raw_ai_json')
+            .eq('user_id', user.id)
+            .order('uploaded_at', { ascending: true })
+    ]);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    interface TrendRow {
-        value: number;
-        unit: string;
-        lab_results: { uploaded_at?: string; created_at: string } | { uploaded_at?: string; created_at: string }[] | null;
-    }
+    const merged = mergeBiomarkerSources(data as Biomarker[] | null, labResults || [])
+        .filter((b) => b.name.toLowerCase() === biomarkerName.toLowerCase())
+        .sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
 
     // Transform for Recharts (lab_results may be null if join fails)
-    const trends = ((data as TrendRow[]) || [])
+    const trends = merged
         .filter((b) => {
             const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            return !!(lr?.uploaded_at || lr?.created_at);
+            return !!(lr?.uploaded_at || lr?.created_at || b.created_at);
         })
         .map((b) => {
             const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            const d = new Date((lr!.uploaded_at ?? lr!.created_at)!);
+            const d = new Date((lr?.uploaded_at ?? lr?.created_at ?? b.created_at)!);
             const month = d.toLocaleString('en-US', { month: 'short' });
             const day = d.getDate();
             return {
                 date: `${month} ${day}`,
-                value: b.value,
+                value: Number(b.value),
                 unit: b.unit
             };
         });

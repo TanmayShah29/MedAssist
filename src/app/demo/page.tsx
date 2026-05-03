@@ -307,7 +307,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
       </div>
 
       {/* Top Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
+      <div className="demo-top-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         {/* Health Score */}
         <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: 24, cursor: "pointer" }} onClick={() => setShowScoreModal(true)}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -336,16 +336,16 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
         {/* Trend Snapshot */}
         <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: 24 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16 }}>Progress Report</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          <div className="demo-progress-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
             {[
               { name: "Vitamin D", from: 18, to: 42, unit: "ng/mL", pct: 133, dir: "up", good: true },
               { name: "Glucose", from: 92, to: 106, unit: "mg/dL", pct: 15, dir: "up", good: false },
               { name: "Hemoglobin", from: 13.5, to: 11.8, unit: "g/dL", pct: 13, dir: "down", good: false },
             ].map((c, i) => (
-              <div key={i} style={{ background: T.card, borderRadius: 12, padding: 14, border: `1px solid ${T.border}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: T.textSec }}>{c.name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: c.good ? T.optimal : T.critical, display: "flex", alignItems: "center", gap: 2 }}>
+              <div key={i} style={{ background: T.card, borderRadius: 12, padding: 14, border: `1px solid ${T.border}`, minWidth: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: T.textSec, overflowWrap: "anywhere" }}>{c.name}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: c.good ? T.optimal : T.critical, display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
                     <Icon path={c.dir === "up" ? Icons.trendUp : Icons.trendDown} size={11} color={c.good ? T.optimal : T.critical} />
                     {c.pct}%
                   </span>
@@ -365,7 +365,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           <h3 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Longitudinal Insights</h3>
           <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#A5B4FC", textTransform: "uppercase", letterSpacing: "0.1em" }}>Beta</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div className="demo-insights-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {LONGITUDINAL_INSIGHTS.map((insight, i) => (
             <div key={i} style={{ display: "flex", gap: 10, background: "white", padding: 14, borderRadius: 10, border: "1px solid #EEF2FF" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#6366F1", flexShrink: 0, marginTop: 4 }} />
@@ -386,7 +386,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           </div>
           <h3 className="font-display" style={{ fontSize: 22 }}>Personalized Care Plan</h3>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div className="demo-care-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {warning.map((b, i) => (
             <div key={i} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
@@ -747,7 +747,7 @@ const AssistantPage = () => {
   ];
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: T.page }}>
+    <div className="demo-assistant-page" style={{ height: "100vh", display: "flex", flexDirection: "column", background: T.page }}>
       {/* Header */}
       <div style={{ padding: "20px 32px", borderBottom: `1px solid ${T.border}`, background: "white", flexShrink: 0 }}>
         <h1 className="font-display" style={{ fontSize: 28, color: T.text }}>AI Health Assistant</h1>
@@ -758,9 +758,9 @@ const AssistantPage = () => {
       </div>
 
       {/* Main grid */}
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "3fr 2fr", overflow: "hidden" }}>
+      <div className="demo-assistant-grid" style={{ flex: 1, display: "grid", gridTemplateColumns: "3fr 2fr", overflow: "hidden" }}>
         {/* Chat */}
-        <div style={{ display: "flex", flexDirection: "column", borderRight: `1px solid ${T.border}`, overflow: "hidden" }}>
+        <div className="demo-assistant-chat" style={{ display: "flex", flexDirection: "column", borderRight: `1px solid ${T.border}`, overflow: "hidden" }}>
           {/* Messages */}
           <div style={{ flex: 1, overflowY: "auto", padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
             {messages.map(msg => (
@@ -804,7 +804,7 @@ const AssistantPage = () => {
         </div>
 
         {/* Context Panel */}
-        <div style={{ overflowY: "auto", padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="demo-assistant-context" style={{ overflowY: "auto", padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Patient Summary */}
           <div style={{ background: "#E0F2FE", border: "1px solid #BAE6FD", borderRadius: 16, padding: 18 }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: "#0369A1", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Patient Context</p>
@@ -816,7 +816,7 @@ const AssistantPage = () => {
           {/* Quick Stats */}
           <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 16, padding: 18 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>Current Status</p>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+            <div className="demo-status-row" style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
               <HealthScoreRing score={82} />
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8 }}>
                 {[{ label: "Optimal", count: 5, color: T.optimal }, { label: "Monitor", count: 3, color: T.warning }, { label: "Action", count: 0, color: T.critical }].map(s => (
@@ -1064,6 +1064,7 @@ const SettingsPage = () => {
 /* ─── APP SHELL ─────────────────────────────────────────────────────────── */
 export default function DemoPage() {
   const [currentPage, setCurrentPage] = useState("dashboard");
+  const mainRef = useRef<HTMLElement | null>(null);
 
   const pageLabels: Record<string, string> = {
     dashboard: "Clinical Overview",
@@ -1084,6 +1085,10 @@ export default function DemoPage() {
     }
   };
 
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   return (
     <>
       <style>{`
@@ -1096,9 +1101,23 @@ export default function DemoPage() {
           .demo-sidebar { display: none !important; }
           .demo-main { margin-left: 0 !important; width: 100% !important; }
           .demo-detail-sheet { width: 100% !important; max-width: 100% !important; left: 0 !important; right: 0 !important; }
+          .demo-main { padding-bottom: 76px !important; box-sizing: border-box; }
           .demo-bottom-nav { display: flex !important; }
           .demo-hero-title { font-size: 36px !important; }
           .demo-grid-2 { grid-template-columns: 1fr !important; }
+          .demo-top-cards { grid-template-columns: 1fr !important; }
+          .demo-care-grid { grid-template-columns: 1fr !important; }
+          .demo-insights-grid { grid-template-columns: 1fr !important; }
+          .demo-assistant-page { height: auto !important; min-height: calc(100vh - 76px) !important; }
+          .demo-assistant-grid { grid-template-columns: 1fr !important; overflow: visible !important; }
+          .demo-assistant-chat { border-right: 0 !important; min-height: 620px !important; }
+          .demo-assistant-context { overflow: visible !important; }
+        }
+        @media (max-width: 520px) {
+          .demo-progress-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 980px) {
+          .demo-status-row { flex-direction: column !important; align-items: center !important; gap: 16px !important; }
         }
         @media (min-width: 769px) {
           .demo-bottom-nav { display: none !important; }
@@ -1106,7 +1125,7 @@ export default function DemoPage() {
       `}</style>
       <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
         <Sidebar className="demo-sidebar" currentPage={currentPage} onNavigate={setCurrentPage} />
-        <main className="demo-main" style={{ flex: 1, overflowY: "auto", background: T.page }}>
+        <main ref={mainRef} className="demo-main" style={{ flex: 1, overflowY: "auto", background: T.page }}>
 
           {/* ── Demo banner ── */}
           <div style={{

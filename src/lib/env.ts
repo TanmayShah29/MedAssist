@@ -5,10 +5,10 @@
  * REQUIRED — app will throw on startup if any of these are absent:
  *   NEXT_PUBLIC_SUPABASE_URL       — Supabase project URL
  *   NEXT_PUBLIC_SUPABASE_ANON_KEY  — Supabase public anon key
- *   SUPABASE_SERVICE_ROLE_KEY      — Service role key (bypasses RLS for saves)
  *   GROQ_API_KEY                   — Groq API key for Llama 3.3 AI analysis
  *
  * OPTIONAL — features degrade gracefully if absent:
+ *   SUPABASE_SERVICE_ROLE_KEY      — Service role key for admin-only actions
  *   OCR_SPACE_API_KEY              — Fallback OCR for scanned/image-based PDFs.
  *                                    Without this, only digital PDFs are supported.
  *   NEXT_PUBLIC_SITE_URL           — Canonical URL for sitemaps and OG images.
@@ -17,11 +17,11 @@
 const REQUIRED = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-  'SUPABASE_SERVICE_ROLE_KEY',
   'GROQ_API_KEY',
 ] as const;
 
 const OPTIONAL = [
+  'SUPABASE_SERVICE_ROLE_KEY',
   'OCR_SPACE_API_KEY',
   'NEXT_PUBLIC_SITE_URL',
   'SENTRY_DSN',

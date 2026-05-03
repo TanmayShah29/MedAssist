@@ -11,6 +11,8 @@ import { AnalysisPanel } from "@/components/assistant/analysis-panel";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Biomarker } from "@/types/medical";
 import DOMPurify from "dompurify";
+import { latestUniqueBiomarkers, mergeBiomarkerSources } from "@/lib/medical-data";
+import { useStore } from "@/store/useStore";
 
 // Types
 type Message = {
@@ -35,6 +37,8 @@ export function AssistantPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const contextParam = searchParams.get("context");
+    const demoMode = useStore(s => s.demoMode);
+    const getDemoBiomarkers = useStore(s => s.getDemoBiomarkers);
     const [contextData, setContextData] = useState<ContextData | null>(null);
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);
     const [symptoms, setSymptoms] = useState<string[]>([]);
@@ -55,12 +59,45 @@ export function AssistantPageInner() {
     // Fetch Data
     useEffect(() => {
         const fetchData = async () => {
+            if (demoMode) {
+                const demoBiomarkers = latestUniqueBiomarkers(getDemoBiomarkers() as Biomarker[]);
+                setBiomarkers(demoBiomarkers);
+                setSymptoms(["Fatigue", "Low Energy"]);
+                setDoctorQuestions([
+                    {
+                        question: "Could my rising glucose indicate prediabetes?",
+                        context: "Glucose is above the reference range and trending upward in the sample report.",
+                    },
+                    {
+                        question: "Should we investigate my declining hemoglobin?",
+                        context: "Hemoglobin has moved from optimal to monitor range in the sample trend.",
+                    },
+                ]);
+                setMessages([{
+                    id: "1",
+                    role: "assistant",
+                    content: "Hello. You're viewing sample lab data. Vitamin D has recovered well, while Glucose and Hemoglobin are worth discussing with a clinician.",
+                    timestamp: new Date()
+                }]);
+                return;
+            }
+
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const [bResponse, sResponse, cResponse] = await Promise.all([
-                supabase.from('biomarkers').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+            const [bResponse, lrResponse, sResponse, cResponse] = await Promise.all([
+                supabase
+                    .from('biomarkers')
+                    .select('*, lab_results!inner(user_id, uploaded_at, created_at)')
+                    .eq('lab_results.user_id', user.id)
+                    .order('created_at', { ascending: false }),
+                supabase
+                    .from('lab_results')
+                    .select('id, uploaded_at, created_at, raw_ai_json')
+                    .eq('user_id', user.id)
+                    .order('uploaded_at', { ascending: false })
+                    .limit(10),
                 supabase.from('symptoms').select('symptom').eq('user_id', user.id),
                 supabase.from('conversations').select('id, role, content, created_at').eq('user_id', user.id).order('created_at', { ascending: true }).limit(50)
             ]);
@@ -68,11 +105,11 @@ export function AssistantPageInner() {
             let fetchedBiomarkers: Biomarker[] = [];
             let fetchedSymptoms: string[] = [];
 
-            if (bResponse.data && bResponse.data.length > 0) {
-                fetchedBiomarkers = bResponse.data.map((b: Biomarker) => ({
-                    ...b,
-                    value: parseFloat(String(b.value)),
-                }));
+            fetchedBiomarkers = mergeBiomarkerSources(
+                bResponse.data as Biomarker[] | null,
+                lrResponse.data || []
+            );
+            if (fetchedBiomarkers.length > 0) {
                 setBiomarkers(fetchedBiomarkers);
             }
 
@@ -141,7 +178,7 @@ export function AssistantPageInner() {
             }
         };
         fetchData();
-    }, []);
+    }, [demoMode, getDemoBiomarkers]);
 
     // Set Context from Real Data
     useEffect(() => {
@@ -182,7 +219,7 @@ export function AssistantPageInner() {
         setIsProcessing(true);
 
         try {
-            const response = await fetch('/api/ask-ai', {
+            const response = await fetch(demoMode ? '/api/demo-ask-ai' : '/api/ask-ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -359,7 +396,8 @@ export function AssistantPageInner() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="whitespace-nowrap px-4 py-2.5 min-h-[44px] bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm"
+                                    className="whitespace-nowrap px-4 py-2.5 min-h-[44px] bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm disabled:opacity-60"
+                                    disabled={isProcessing}
                                 >
                                     {q}
                                 </button>
@@ -388,7 +426,7 @@ export function AssistantPageInner() {
                             opacity: isProcessing || !inputValue.trim() ? 0.7 : 1,
                             transition: 'all 0.15s ease'
                         }}
-                        className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px]"
+                        className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px] min-h-[44px]"
                     >
                         {isProcessing ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -481,7 +519,7 @@ export function AssistantPageInner() {
                     {/* Mobile Context Toggle Button */}
                     <button
                         onClick={() => setShowContextModal(true)}
-                        className="lg:hidden fixed bottom-20 right-4 z-40 w-12 h-12 bg-sky-500 rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center text-white"
+                        className="lg:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 w-12 h-12 bg-sky-500 rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center text-white"
                     >
                         <Activity className="w-5 h-5" />
                     </button>

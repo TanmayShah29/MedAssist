@@ -13,18 +13,29 @@ import { Biomarker } from '@/types/medical'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { RangeBar } from '@/components/ui/range-bar'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
+import { useStore } from '@/store/useStore'
+import { labResultSummary, mergeBiomarkerSources } from '@/lib/medical-data'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
     { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" /> }
 )
 
-const CATEGORIES = ['all', 'hematology', 'inflammation', 'metabolic', 'vitamins', 'other']
+const CATEGORIES = ['all', 'hematology', 'metabolic', 'lipids', 'thyroid', 'inflammation', 'vitamins', 'vitals', 'other']
+
+function getBiomarkerReportDate(b: Biomarker) {
+    const report = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+    return report?.uploaded_at || report?.created_at || b.created_at;
+}
 
 // ── Main UI Component ──────────────────────────────────────────────────────
 
 export default function ResultsPage() {
     const router = useRouter()
+    const demoMode = useStore(s => s.demoMode)
+    const setDemoMode = useStore(s => s.setDemoMode)
+    const getDemoLabResults = useStore(s => s.getDemoLabResults)
+    const getDemoBiomarkers = useStore(s => s.getDemoBiomarkers)
     const [loading, setLoading] = useState(true)
     const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,46 +103,52 @@ export default function ResultsPage() {
         const fetchBiomarkers = async () => {
             setLoading(true)
             const supabase = createClient()
+            const demoBiomarkers = demoMode ? getDemoBiomarkers() as Biomarker[] : []
+            const demoLabResults = demoMode ? getDemoLabResults() : []
             const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
+                if (demoMode) {
+                    setBiomarkers(demoBiomarkers)
+                    setLabResults(demoLabResults)
+                    setLoading(false)
+                    return
+                }
                 setLoading(false)
                 router.push('/auth?mode=login')
                 return
             }
 
-            let query = supabase
+            const biomarkerQuery = supabase
                 .from('biomarkers')
                 .select('*, lab_results!inner(user_id, uploaded_at, created_at)')
-                .eq('user_id', user.id)
+                .eq('lab_results.user_id', user.id)
                 .order('created_at', { ascending: false })
-
-            if (selectedCategory !== 'all') {
-                query = query.eq('category', selectedCategory)
-            }
-
-            const { data } = await query
-            setBiomarkers(((data as Biomarker[]) || []).map(b => ({
-                ...b,
-                value: parseFloat(String(b.value)),
-            })))
 
             const { data: lrData } = await supabase
                 .from('lab_results')
-                .select('id, file_name, uploaded_at, created_at, raw_ai_json, plain_summary')
+                .select('id, file_name, uploaded_at, created_at, raw_ai_json, plain_summary, health_score')
                 .eq('user_id', user.id)
                 .order('uploaded_at', { ascending: false })
-            setLabResults(lrData || [])
+
+            const { data } = await biomarkerQuery
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const realLabResults = (lrData as any[]) || []
+            const realBiomarkers = mergeBiomarkerSources(data as Biomarker[] | null, realLabResults)
+            setBiomarkers(demoMode ? [...demoBiomarkers, ...realBiomarkers] : realBiomarkers)
+            setLabResults(demoMode ? [...demoLabResults, ...realLabResults] : realLabResults)
             setLoading(false)
         }
         fetchBiomarkers()
-    }, [selectedCategory, router, refreshKey])
+    }, [selectedCategory, router, refreshKey, demoMode, getDemoBiomarkers, getDemoLabResults])
 
     // Derived counts for status summary
     const filteredBiomarkers = (selectedReportId === 'all'
         ? biomarkers
         : biomarkers.filter(b => b.lab_result_id?.toString() === selectedReportId)
-    ).filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+        .filter(b => selectedCategory === 'all' || (b.category || 'other').toLowerCase() === selectedCategory)
+        .filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
     // Bug 7 fix: Deduplicate for status counts only (show most recent per biomarker name)
     // The full list (filteredBiomarkers) is still shown in the UI for historical context
@@ -177,7 +194,7 @@ export default function ResultsPage() {
                         <div className="mb-4">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Clinical Interpretation</span>
                             <h2 className="text-xl font-bold text-slate-900 mt-1">
-                                {selectedReportId === 'all' ? labResults[0]?.plain_summary : labResults.find(r => r.id === selectedReportId)?.plain_summary || "No clinical summary available."}
+                                {labResultSummary(selectedReportId === 'all' ? labResults[0] : labResults.find(r => String(r.id) === selectedReportId)) || "No clinical summary available."}
                             </h2>
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
@@ -192,6 +209,21 @@ export default function ResultsPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Demo Mode Banner */}
+                {demoMode && (
+                    <div className="mb-6 flex flex-col gap-3 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="text-sm font-semibold text-amber-900">
+                            You&apos;re viewing <strong>sample data</strong> — not your personal results.
+                        </p>
+                        <button
+                            onClick={() => setDemoMode(false)}
+                            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors min-h-[44px]"
+                        >
+                            Show my data
+                        </button>
+                    </div>
+                )}
 
                 {/* ── Header ── */}
                 <div className="mb-6">
@@ -247,7 +279,7 @@ export default function ResultsPage() {
                                 </span>
                             </div>
                             <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
-                                {selectedReportId === 'all' ? labResults[0]?.plain_summary : labResults.find(r => String(r.id) === selectedReportId)?.plain_summary || "Select a report to see the bottom line interpretation."}
+                                {labResultSummary(selectedReportId === 'all' ? labResults[0] : labResults.find(r => String(r.id) === selectedReportId)) || "Select a report to see the bottom line interpretation."}
                             </h2>
                             <p className="text-xs text-slate-400 mt-4 italic">
                                 * This clinical interpretation is generated by AI based on your specific biomarkers and reference ranges.
@@ -286,7 +318,7 @@ export default function ResultsPage() {
                     >
                         <option value="all">All reports</option>
                         {labResults?.map(r => {
-                            const score = r.raw_ai_json?.healthScore;
+                            const score = r.health_score ?? (r.raw_ai_json as Record<string, unknown> | null)?.healthScore;
                             return (
                                 <option key={r.id} value={r.id.toString()}>
                                     {new Date(r.uploaded_at || r.created_at).toLocaleDateString('en-US', {
@@ -400,7 +432,7 @@ export default function ResultsPage() {
                                     <div
                                         key={b.id}
                                         onClick={() => handleBiomarkerClick(b)}
-                                        className={`flex items-center p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== biomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
+                                        className={`flex items-start p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== filteredBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
                                             } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
                                                 b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
                                             }`}
@@ -416,19 +448,19 @@ export default function ResultsPage() {
                                                     {b.category}
                                                 </span>
                                             </div>
-                                            <div className="text-[15px] text-[#57534E]">
+                                            <div className="text-[15px] text-[#57534E] leading-relaxed">
                                                 {b.value !== null && b.value !== undefined ? `${b.value} ${b.unit || ''}` : 'Value unavailable'}
                                                 {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) ? (
-                                                    <span className="text-[12px] text-[#A8A29E] ml-2">
+                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline">
                                                         (ref: {b.reference_range_min ?? 'N/A'}–{b.reference_range_max ?? 'N/A'})
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[12px] text-[#A8A29E] ml-2">(ref: N/A)</span>
+                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline">(ref: N/A)</span>
                                                 )}
                                             </div>
-                                            {b.lab_results && (b.lab_results.uploaded_at || b.lab_results.created_at) && (
+                                            {getBiomarkerReportDate(b) && (
                                                 <p className="text-[11px] text-[#A8A29E] mt-0.5">
-                                                    From report {mounted ? new Date(b.lab_results.uploaded_at || b.lab_results.created_at || '').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                                                    From report {mounted ? new Date(getBiomarkerReportDate(b)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                                 </p>
                                             )}
                                             <RangeBar
@@ -442,7 +474,7 @@ export default function ResultsPage() {
                                             />
                                         </div>
 
-                                        <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-4 ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                        <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-3 ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                             b.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                             }`}>
                                             {b.status === 'optimal' ? 'Optimal' :

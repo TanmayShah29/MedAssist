@@ -1,3 +1,6 @@
+// NOTE: The real LabResult type lives in @/types/medical.ts.
+// The types below are used exclusively for UI mock/demo data and charts.
+
 export interface HealthMetric {
     id: string;
     label: string;
@@ -10,26 +13,12 @@ export interface HealthMetric {
     subtitle?: string;
 }
 
-export interface LabResult {
-    id: string;
-    name: string;
-    value: number;
-    unit: string;
-    category: 'hematology' | 'inflammation' | 'vitamins' | 'metabolic';
-    range: { min: number; max: number };
-    status: 'critical' | 'warning' | 'optimal' | 'monitor';
-    date: Date;
-    trend?: 'up' | 'down' | 'stable';
-    ai_interpretation?: string;
-    confidence?: number;
-}
-
 export interface WellnessTrendDataPoint {
     date: string; // ISO format or display string
     score: number;
 }
 
-// --- MOCK DATA GENERATORS ---
+// ─── Mock / demo data only — not used by real Supabase queries ───────────────
 
 export const mockHealthMetrics: HealthMetric[] = [
     {
@@ -72,53 +61,6 @@ export const mockHealthMetrics: HealthMetric[] = [
         status: 'optimal',
         lastUpdated: new Date(),
         subtitle: 'Restorative'
-    }
-];
-
-export const mockLabResults: LabResult[] = [
-    {
-        id: 'l1',
-        name: 'Hemoglobin',
-        value: 12.8,
-        unit: 'g/dL',
-        range: { min: 13.5, max: 17.5 },
-        category: 'hematology',
-        date: new Date('2024-02-14'),
-        status: 'warning',
-        trend: 'down'
-    },
-    {
-        id: 'l2',
-        name: 'C-Reactive Protein',
-        value: 8.4,
-        unit: 'mg/L',
-        range: { min: 0, max: 10 },
-        category: 'inflammation',
-        date: new Date('2024-02-14'),
-        status: 'optimal',
-        trend: 'stable'
-    },
-    {
-        id: 'l3',
-        name: 'Vitamin D',
-        value: 45,
-        unit: 'ng/mL',
-        range: { min: 30, max: 100 },
-        category: 'vitamins',
-        date: new Date('2024-01-20'),
-        status: 'optimal',
-        trend: 'up'
-    },
-    {
-        id: 'l4',
-        name: 'Glucose (Fasting)',
-        value: 105,
-        unit: 'mg/dL',
-        range: { min: 70, max: 100 },
-        category: 'metabolic',
-        date: new Date('2024-02-14'),
-        status: 'monitor',
-        trend: 'up'
     }
 ];
 

@@ -56,6 +56,13 @@ async function readJsonWithRawBody(response: Response) {
     }
 }
 
+function patientSafeError(message: string) {
+    if (/missing required environment variables|supabase_service_role_key|environment variables|\.env\.local/i.test(message)) {
+        return 'We could not analyze this report right now. Please try again in a moment, or enter the values manually.';
+    }
+    return message;
+}
+
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [tab, setTab] = useState<Tab>('upload');
     const [isDragging, setIsDragging] = useState(false);
@@ -160,7 +167,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 else if (response.status === 429) errorMessage = 'Rate limit exceeded. Please try again later.';
                 else if (response.status === 504) errorMessage = 'Analysis timed out.';
                 setErrorCode(code);
-                setError(errorMessage);
+                setError(patientSafeError(errorMessage));
                 setIsProcessing(false);
                 setProcessStage(null);
                 return;
@@ -184,7 +191,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setProgress(0);
             }, 800);
         } catch (err: unknown) {
-            setError((err as Error).message || 'Something went wrong processing your report.');
+            setError(patientSafeError((err as Error).message || 'Something went wrong processing your report.'));
             setErrorCode(null);
             setIsProcessing(false);
             setProcessStage(null);
@@ -244,7 +251,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             const data = await readJsonWithRawBody(response);
 
             if (!response.ok) {
-                setError(data.error || 'Analysis failed');
+                setError(patientSafeError(data.error || 'Analysis failed'));
                 setIsProcessing(false);
                 setProcessStage(null);
                 setProgress(0);
@@ -269,7 +276,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setProgress(0);
             }, 800);
         } catch (err: unknown) {
-            setError((err as Error).message || 'Something went wrong.');
+            setError(patientSafeError((err as Error).message || 'Something went wrong.'));
             setIsProcessing(false);
             setProcessStage(null);
             setProgress(0);
@@ -298,10 +305,10 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         initial={{ opacity: 0.01, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0.01, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50 px-4"
+                        className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-2rem)] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto px-4"
                     >
                         <div className="bg-[#FAFAF7] rounded-[24px] shadow-2xl overflow-hidden border border-[#E8E6DF]">
-                            <div className="flex items-center justify-between p-6 border-b border-[#E8E6DF] bg-white">
+                            <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b border-[#E8E6DF] bg-white">
                                 <h2 className="text-xl font-bold font-display text-[#1C1917]">
                                     Add Lab Results
                                 </h2>
@@ -353,7 +360,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                             </div>
 
                             {/* Symptoms section common to both tabs */}
-                            <div className="px-6 pt-6 pb-2 border-b border-[#E8E6DF] bg-white">
+                            <div className="px-5 pt-5 pb-2 sm:px-6 sm:pt-6 border-b border-[#E8E6DF] bg-white">
                                 <p className="text-sm font-semibold text-[#1C1917] mb-3">Any current symptoms? (Optional)</p>
                                 <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto pr-2 pb-2">
                                     {COMMON_SYMPTOMS.map((symptom) => {
@@ -383,7 +390,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                 </div>
                             </div>
 
-                            <div className="p-6">
+                            <div className="p-5 sm:p-6">
                                 {error && (
                                     <div
                                         role="alert"
@@ -430,7 +437,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 onDrop={handleDrop}
                                                 onClick={() => document.getElementById('modal-file-upload')?.click()}
                                                 className={cn(
-                                                    "border-2 border-dashed rounded-[20px] p-10 text-center transition-all cursor-pointer relative overflow-hidden group bg-white",
+                                                    "border-2 border-dashed rounded-[20px] p-6 sm:p-10 text-center transition-all cursor-pointer relative overflow-hidden group bg-white",
                                                     isDragging ? "border-sky-500 bg-sky-50/50" : "border-[#D9D6CD] hover:border-sky-400 hover:bg-sky-50/30"
                                                 )}
                                             >
@@ -512,8 +519,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         </p>
                                         <div className="space-y-3 max-h-[280px] overflow-y-auto">
                                             {manualRows.map((row) => (
-                                                <div key={row.id} className="flex gap-2 items-center">
-                                                    <div className="grow shrink basis-0 min-w-0">
+                                                <div key={row.id} className="flex flex-wrap gap-2 items-center sm:flex-nowrap">
+                                                    <div className="min-w-[min(100%,12rem)] grow shrink basis-full sm:basis-0">
                                                         <label htmlFor={`name-${row.id}`} className="sr-only">Biomarker name</label>
                                                         <input
                                                             id={`name-${row.id}`}
@@ -525,7 +532,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                                                         />
                                                     </div>
-                                                    <div className="w-20">
+                                                    <div className="w-[calc(50%-2rem)] min-w-24 sm:w-20 sm:min-w-0">
                                                         <label htmlFor={`value-${row.id}`} className="sr-only">Value</label>
                                                         <input
                                                             id={`value-${row.id}`}
@@ -537,7 +544,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                                                         />
                                                     </div>
-                                                    <div className="w-20">
+                                                    <div className="w-[calc(50%-2rem)] min-w-24 sm:w-20 sm:min-w-0">
                                                         <label htmlFor={`unit-${row.id}`} className="sr-only">Unit</label>
                                                         <input
                                                             id={`unit-${row.id}`}

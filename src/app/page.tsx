@@ -46,14 +46,7 @@ function HeroMockCard() {
 
   return (
     <div className="relative w-full max-w-lg mx-auto">
-      {/* Glow blobs */}
-      <div className="absolute -top-16 -right-12 w-56 h-56 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-emerald-400/15 rounded-full blur-3xl pointer-events-none" />
-
-      <motion.div
-        initial={{ y: 24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      <div
         className="relative bg-white rounded-[24px] shadow-2xl shadow-slate-900/10 border border-[#E8E6DF] overflow-hidden"
       >
         {/* Card header */}
@@ -78,12 +71,9 @@ function HeroMockCard() {
 
         {/* Biomarker list */}
         <div className="divide-y divide-[#F5F4EF]">
-          {biomarkers.map((b, i) => (
-            <motion.div
+          {biomarkers.map((b) => (
+            <div
               key={b.name}
-              initial={{ x: 12, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5 + i * 0.07, duration: 0.4, ease: "easeOut" }}
               className="flex items-center gap-3 px-5 py-2.5"
             >
               <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColor(b.status)}`} />
@@ -100,7 +90,7 @@ function HeroMockCard() {
               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${statusStyle(b.status)}`}>
                 {b.status === "optimal" ? "OK" : "MON"}
               </span>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -111,7 +101,7 @@ function HeroMockCard() {
             Ask AI <ChevronRight size={10} />
           </span>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -178,7 +168,7 @@ export default function LandingPage() {
             )}
             <button
               onClick={() => router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup")}
-              className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-[10px] text-sm font-bold transition-all active:scale-95 shadow-md shadow-sky-500/20"
+              className="hidden sm:inline-flex bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-[10px] text-sm font-bold transition-all active:scale-95 shadow-md shadow-sky-500/20"
             >
               {isSignedIn ? "Dashboard" : "Get started"}
             </button>
@@ -208,6 +198,15 @@ export default function LandingPage() {
                 Sign in
               </Link>
             )}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup");
+              }}
+              className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded-[10px] bg-sky-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-sky-500/20"
+            >
+              {isSignedIn ? "Dashboard" : "Get started"}
+            </button>
           </div>
         )}
       </header>
@@ -218,18 +217,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {/* Left: copy */}
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
+            <div className="min-w-0 max-w-full">
               <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-6">
                 <Sparkles size={10} /> AI-powered health intelligence
               </Pill>
 
-              <h1 className="font-display text-5xl sm:text-6xl lg:text-[64px] text-[#1C1917] leading-[1.04] mb-6">
+              <h1 className="font-display text-[36px] sm:text-6xl lg:text-[64px] text-[#1C1917] leading-[1.04] mb-6 max-w-full">
                 Your lab results,{" "}
-                <span className="text-sky-500 relative">
+                <span className="text-sky-500 relative block sm:inline">
                   finally explained.
                   <svg className="absolute -bottom-1 left-0 w-full" height="4" viewBox="0 0 200 4" preserveAspectRatio="none">
                     <path d="M0 2 Q50 0 100 2 Q150 4 200 2" stroke="#0EA5E9" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
@@ -237,21 +232,21 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p className="text-lg text-[#57534E] leading-relaxed mb-8 max-w-lg">
+              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-lg overflow-wrap-anywhere">
                 Upload your blood work PDF. Get plain-language explanations of every number, spot trends across reports, and know exactly what to ask your doctor.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <Link
                   href="/demo"
-                  className="flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-7 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
+                  className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-7 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
                 >
                   Try interactive demo
                   <ArrowRight size={15} />
                 </Link>
                 <button
                   onClick={() => router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup")}
-                  className="flex items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
+                  className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
                 >
                   {isSignedIn ? "Go to dashboard" : "Create free account"}
                 </button>
@@ -262,19 +257,19 @@ export default function LandingPage() {
               </p>
 
               {/* Patient-facing trust signals */}
-              <div className="flex flex-wrap gap-3 mt-8">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-8">
                 {[
-                  { icon: "🔒", label: "HIPAA-Aligned" },
-                  { icon: "🚫", label: "No Data Training" },
-                  { icon: "🛡️", label: "AES-256 Encrypted" },
-                  { icon: "✅", label: "Free to Start" },
+                  { icon: Lock, label: "HIPAA-Aligned" },
+                  { icon: Trash2, label: "No Data Training" },
+                  { icon: Shield, label: "AES-256 Encrypted" },
+                  { icon: CheckCircle2, label: "Free to Start" },
                 ].map(t => (
-                  <span key={t.label} className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm">
-                    <span>{t.icon}</span> {t.label}
+                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm">
+                    <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Right: hero mock */}
             <div className="flex justify-center lg:justify-end">

@@ -11,7 +11,24 @@ export interface DemoLabResult {
         summary: string;
         longitudinalInsights: string[];
     };
+    symptom_connections?: Array<{
+        symptom: string;
+        relatedBiomarkers?: string[];
+        explanation?: string;
+    }> | null;
 }
+
+export const DEMO_PREVIOUS_LAB_RESULT: DemoLabResult = {
+    id: "demo-previous",
+    created_at: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+    uploaded_at: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+    raw_ai_json: {
+        healthScore: 74,
+        riskLevel: "moderate",
+        summary: "Previous sample report with lower Vitamin D and steadier glucose.",
+        longitudinalInsights: []
+    }
+};
 
 export const DEMO_HISTORY: Biomarker[] = [
     // Metabolic Profile - Glucose Trending Up
@@ -24,6 +41,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "metabolic",
         reference_range_min: 70,
         reference_range_max: 99,
+        lab_result_id: "demo-previous",
         created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Glucose is within optimal range."
     },
@@ -36,6 +54,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "metabolic",
         reference_range_min: 70,
         reference_range_max: 99,
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Glucose has risen 15% over the last quarter. This confirms a pre-diabetic trend that warrants dietary review."
     },
@@ -47,6 +66,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "ng/mL",
         status: "critical",
         category: "vitamins",
+        lab_result_id: "demo-previous",
         created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Severely low. Risk of bone density loss."
     },
@@ -57,6 +77,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "ng/mL",
         status: "optimal",
         category: "vitamins",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Excellent recovery. Supplementation protocol is highly effective."
     },
@@ -68,6 +89,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "mg/dL",
         status: "warning",
         category: "lipids",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Borderline high. Recommend increasing soluble fiber intake."
     },
@@ -78,6 +100,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "mg/dL",
         status: "optimal",
         category: "lipids",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     },
     // CBC
@@ -88,6 +111,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "g/dL",
         status: "optimal",
         category: "hematology",
+        lab_result_id: "demo-previous",
         created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
@@ -97,6 +121,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "g/dL",
         status: "warning",
         category: "hematology",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ai_interpretation: "Downward trend detected. Monitor for symptoms of fatigue."
     },
@@ -107,6 +132,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "bpm",
         status: "optimal",
         category: "vitals",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
@@ -116,6 +142,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "mg/dL",
         status: "optimal",
         category: "metabolic",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
@@ -125,6 +152,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         unit: "uIU/mL",
         status: "optimal",
         category: "thyroid",
+        lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     }
 ];

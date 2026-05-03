@@ -42,7 +42,7 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'ApoB': 'The primary protein in LDL cholesterol; a precise marker for heart disease risk.',
 };
 
-const CATEGORIES = ['hematology', 'metabolic', 'inflammation', 'vitamins', 'other'] as const;
+const CATEGORIES = ['hematology', 'metabolic', 'lipids', 'thyroid', 'inflammation', 'vitamins', 'vitals', 'other'] as const;
 
 function getDelta(current: number | string, previous: number | string | null | undefined) {
     if (previous === null || previous === undefined) return null;
@@ -103,7 +103,7 @@ export function BiomarkerGrid({
                         const catBiomarkers = latestBiomarkers.filter(b => {
                             const bCat = b.category?.toLowerCase() || 'other';
                             if (cat === 'other') {
-                                return !(['hematology', 'metabolic', 'inflammation', 'vitamins'] as string[]).includes(bCat);
+                                return !(['hematology', 'metabolic', 'lipids', 'thyroid', 'inflammation', 'vitamins', 'vitals'] as string[]).includes(bCat);
                             }
                             return bCat === cat;
                         });

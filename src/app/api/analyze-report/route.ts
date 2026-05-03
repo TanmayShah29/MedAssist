@@ -17,6 +17,7 @@ export const maxDuration = 60;
 export const runtime = "nodejs";
 
 const formSymptomsSchema = z.array(z.string().trim().min(1)).max(30).catch([]);
+const GENERIC_ANALYSIS_ERROR = 'We could not analyze this report right now. Please try again in a moment, or enter the values manually.';
 
 function toDebugPayload(error: unknown, stage: string, extra: Record<string, unknown> = {}) {
     const err = error as Error & { cause?: unknown; status?: number; code?: string };
@@ -42,6 +43,15 @@ function parseFormSymptoms(raw: FormDataEntryValue | null): string[] {
     } catch {
         return [];
     }
+}
+
+function isConfigurationError(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return /missing required environment variables|environment variables|supabase_service_role_key/i.test(message);
+}
+
+function includeDebug(debug: Record<string, unknown>) {
+    return process.env.NODE_ENV === 'production' ? undefined : debug;
 }
 
 export async function POST(req: NextRequest) {
@@ -215,7 +225,8 @@ export async function POST(req: NextRequest) {
                 rawOcrText: extractedText,
                 rawAiJson: analysisResult,
                 symptomConnections: analysisResult.symptomConnections,
-                plainSummary: analysisResult.plainSummary
+                plainSummary: analysisResult.plainSummary,
+                longitudinalInsights: analysisResult.longitudinalInsights,
             });
 
             if (!saveResult.success) {
@@ -223,13 +234,13 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json(
                     {
                         success: false,
-                        error: saveResult.error || 'Failed to save results. Please try again.',
-                        debug: {
+                        error: 'Analysis finished, but we could not save the results. Please try again.',
+                        debug: includeDebug({
                             stage: 'save-report',
                             saveResult,
                             biomarkerCount: analysisResult.biomarkers.length,
                             fileName: file.name,
-                        },
+                        }),
                     },
                     { status: 500 }
                 );
@@ -250,8 +261,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: 'AI analysis validation failed. The report format may be unsupported.',
-                details: error.issues,
-                debug: toDebugPayload(error, 'zod-validation', { issues: error.issues }),
+                details: process.env.NODE_ENV === 'production' ? undefined : error.issues,
+                debug: includeDebug(toDebugPayload(error, 'zod-validation', { issues: error.issues })),
             }, { status: 422 });
         }
         if (error instanceof ImageBasedPdfError) {
@@ -260,7 +271,7 @@ export async function POST(req: NextRequest) {
                     success: false,
                     error: error.message,
                     code: IMAGE_BASED_PDF_ERROR_CODE,
-                    debug: toDebugPayload(error, 'image-based-pdf'),
+                    debug: includeDebug(toDebugPayload(error, 'image-based-pdf')),
                 },
                 { status: 400 }
             );
@@ -270,8 +281,8 @@ export async function POST(req: NextRequest) {
         logger.error("Pipeline Error:", debug);
         return NextResponse.json({
             success: false,
-            error: (error as Error).message || 'Analysis failed',
-            debug,
+            error: isConfigurationError(error) ? GENERIC_ANALYSIS_ERROR : ((error as Error).message || GENERIC_ANALYSIS_ERROR),
+            debug: includeDebug(debug),
         }, { status: 500 });
     }
 }
@@ -342,7 +353,8 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
         rawOcrText: undefined,
         rawAiJson: analysisResult,
         symptomConnections: analysisResult.symptomConnections,
-        plainSummary: analysisResult.plainSummary
+        plainSummary: analysisResult.plainSummary,
+        longitudinalInsights: analysisResult.longitudinalInsights,
     });
 
     if (!saveResult.success) {

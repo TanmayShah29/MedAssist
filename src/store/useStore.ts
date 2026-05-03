@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { DEMO_HISTORY, DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT } from '@/lib/demo-data';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,9 @@ interface AppState {
     // App State
     hasData: boolean;
 
+    // Demo Mode — persists across all pages so demo data is shown site-wide
+    demoMode: boolean;
+
     // Clinical Data
     healthScore: number;
     healthTrend: { date: string; score: number; ideal: number }[];
@@ -56,9 +60,14 @@ interface AppState {
     // Actions
     updateUser: (profile: Partial<UserProfile>) => void;
     setHasData: (status: boolean) => void;
+    setDemoMode: (enabled: boolean) => void;
     updateHealthScore: (score: number) => void;
     uploadLab: (report: LabReport) => void;
     reset: () => void;
+
+    // Derived helpers (not stored, computed on access)
+    getDemoLabResults: () => typeof DEMO_LAB_RESULT[];
+    getDemoBiomarkers: () => typeof DEMO_HISTORY;
 }
 
 // ── Safe defaults (empty — real data comes from Supabase) ─────────────────────
@@ -81,6 +90,7 @@ export const useStore = create<AppState>()(
         (set) => ({
             user: EMPTY_USER,
             hasData: false,
+            demoMode: false,
             healthScore: 0,
             healthTrend: [],
             labs: [],
@@ -89,6 +99,10 @@ export const useStore = create<AppState>()(
             insightAnalysis: null,
 
             setHasData: (status) => set({ hasData: status }),
+            setDemoMode: (enabled) => set({ demoMode: enabled }),
+
+            getDemoLabResults: () => [DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT],
+            getDemoBiomarkers: () => DEMO_HISTORY,
 
             updateUser: (profile) => set((state) => ({
                 user: { ...state.user, ...profile }
@@ -108,6 +122,7 @@ export const useStore = create<AppState>()(
             reset: () => set({
                 user: EMPTY_USER,
                 hasData: false,
+                demoMode: false,
                 labs: [],
                 healthScore: 0,
                 healthTrend: [],

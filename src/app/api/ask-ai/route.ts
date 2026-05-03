@@ -5,6 +5,8 @@ import { checkRateLimit } from '@/services/rateLimitService'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
 import { MAX_SYMPTOMS_PER_REQUEST } from '@/lib/constants'
+import { mergeBiomarkerSources } from '@/lib/medical-data'
+import { Biomarker } from '@/types/medical'
 
 export const maxDuration = 30;
 export const runtime = 'nodejs';
@@ -65,18 +67,29 @@ export async function POST(request: NextRequest) {
 
     const { question, symptoms } = parseResult.data;
 
-    // Fetch biomarkers server-side for integrity
-    const { data: rawBiomarkers } = await supabase
-        .from('biomarkers')
-        .select('name, value, unit, status, reference_range_min, reference_range_max, ai_interpretation')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50)
+    // Fetch biomarkers server-side for integrity. Lab report JSON is included
+    // as a fallback so the assistant has context even if a biomarker row insert
+    // failed or an older account has report-only data.
+    const [{ data: rawBiomarkers }, { data: labResults }] = await Promise.all([
+        supabase
+            .from('biomarkers')
+            .select('name, value, unit, status, category, reference_range_min, reference_range_max, ai_interpretation, lab_result_id, created_at, lab_results!inner(user_id, uploaded_at, created_at)')
+            .eq('lab_results.user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(100),
+        supabase
+            .from('lab_results')
+            .select('id, uploaded_at, created_at, raw_ai_json')
+            .eq('user_id', user.id)
+            .order('uploaded_at', { ascending: false })
+            .limit(10)
+    ]);
 
     // Deduplicate by name — keep most recent per biomarker
     type BiomarkerRow = { name: string; value: string | number; unit: string; status: string; reference_range_min: number | null; reference_range_max: number | null; ai_interpretation: string };
+    const mergedBiomarkers = mergeBiomarkerSources(rawBiomarkers as Biomarker[] | null, labResults || []);
     const biomarkers = Array.from(
-        (rawBiomarkers || []).reduce((acc, b) => {
+        mergedBiomarkers.reduce((acc, b) => {
             if (!acc.has(b.name)) acc.set(b.name, b as BiomarkerRow);
             return acc;
         }, new Map<string, BiomarkerRow>()).values()

@@ -39,6 +39,7 @@ export function Sidebar({ className }: { className?: string }) {
     try {
       ["medassist-onboarding", "medassist_debug_mode",
        "medassist_cached_lab_results", "medassist_cached_biomarkers",
+       "medassist_cached_real_lab_results", "medassist_cached_real_biomarkers",
        "medassist_cached_demo_lab_results", "medassist_cached_demo_biomarkers",
        "medassist-storage-v2",
       ].forEach(k => localStorage.removeItem(k));
@@ -114,15 +115,15 @@ export function Sidebar({ className }: { className?: string }) {
       </nav>
 
       {/* ── AI Status ── */}
-      <div className="mx-3 mb-3 p-3 bg-[#0F172A] rounded-[12px] border border-[#1E293B]">
+      <div className="mx-3 mb-3 p-3 bg-[#1C1917] rounded-[12px] border border-[#2C2A27]">
         <div className="flex items-center gap-1.5 mb-2.5">
           <Zap className="w-3 h-3 text-sky-400" />
-          <p className="section-label text-[#475569]">AI Engine</p>
+          <p className="section-label text-[#78716C]">AI Engine</p>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-            <span className="text-[11px] text-[#94A3B8] font-mono">Groq · Llama 3.3</span>
+            <span className="text-[11px] text-[#A8A29E] font-mono">Groq · Llama 3.3</span>
           </div>
           <span className="text-[10px] text-emerald-500 font-semibold">LIVE</span>
         </div>
