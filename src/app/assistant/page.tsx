@@ -445,7 +445,7 @@ export function AssistantPageInner() {
     return (
         <ErrorBoundary>
             <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100 flex flex-col">
-                <div className="px-3 pt-3 pb-4 md:px-6 md:pt-8 md:pb-8 max-w-5xl mx-auto flex-1 flex flex-col w-full">
+                <div className="px-3 pt-3 pb-4 md:px-6 md:pt-8 md:pb-8 xl:px-8 max-w-none 2xl:max-w-7xl 2xl:mx-auto flex-1 flex flex-col w-full">
 
                     {/* HEADER - Hidden on mobile because MobileNavbar handles it */}
                     <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -496,7 +496,7 @@ export function AssistantPageInner() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(360px,0.9fr)] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
 
                         {/* FULL WIDTH CHAT ON MOBILE */}
                         <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1">

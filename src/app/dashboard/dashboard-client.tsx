@@ -302,7 +302,7 @@ export default function DashboardClient({
     // ── Render ─────────────────────────────────────────────────────────────
 
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 text-[#1C1917] font-sans" id="dashboard-content">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 xl:p-8 text-[#1C1917] font-sans" id="dashboard-content">
 
             {/* Print header */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
@@ -464,10 +464,10 @@ export default function DashboardClient({
                     onDemo={() => setDemoMode(true)}
                 />
             ) : (
-                <div className="flex flex-col xl:flex-row gap-6 mb-6">
+                <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.9fr)] 2xl:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]">
 
                     {/* ── LEFT: Main clinical column ── */}
-                    <div className="flex flex-col gap-6 xl:flex-[2]">
+                    <div className="flex flex-col gap-6 min-w-0">
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
                         {/* Symptom connections */}
@@ -561,7 +561,7 @@ export default function DashboardClient({
                     </div>
 
                     {/* ── RIGHT: Action & care column ── */}
-                    <div className="flex flex-col gap-6 xl:flex-[1]">
+                    <div className="flex flex-col gap-6 min-w-0">
                         <CarePlanSection latestBiomarkers={latestBiomarkers} />
                         <ActionItems biomarkers={latestBiomarkers} />
                         <DoctorQuestions biomarkers={latestBiomarkers} />

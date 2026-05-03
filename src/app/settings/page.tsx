@@ -161,7 +161,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8 md:py-12 space-y-8">
+    <div className="max-w-none 2xl:max-w-6xl 2xl:mx-auto px-4 py-8 md:px-6 md:py-12 xl:px-8 space-y-8">
 
       {/* Page heading */}
       <div>
@@ -170,6 +170,7 @@ export default function SettingsPage() {
       </div>
 
       {/* ── Security ── */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
       <section>
         <SectionHeader label="Security" className="mb-3" />
         <SettingsCard>
@@ -250,8 +251,10 @@ export default function SettingsPage() {
           </SettingsRow>
         </SettingsCard>
       </section>
+      </div>
 
       {/* ── Developer ── */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
       <section>
         <SectionHeader label="Developer" className="mb-3" />
         <SettingsCard>
@@ -320,6 +323,7 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
       </section>
+      </div>
 
       {/* About */}
       <section>
