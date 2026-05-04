@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { cn } from "@/lib/utils";
+import { signOutAndResetMedAssist } from "@/lib/account-session";
 import {
   LayoutDashboard,
   Brain,
@@ -34,22 +35,7 @@ export function Sidebar({ className }: { className?: string }) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    await supabase.auth.signOut();
-
-    try {
-      ["medassist-onboarding", "medassist_debug_mode",
-       "medassist_cached_lab_results", "medassist_cached_biomarkers",
-       "medassist_cached_real_lab_results", "medassist_cached_real_biomarkers",
-       "medassist_cached_demo_lab_results", "medassist_cached_demo_biomarkers",
-       "medassist-storage-v2",
-      ].forEach(k => localStorage.removeItem(k));
-    } catch { /* storage unavailable */ }
-    try {
-      Object.keys(sessionStorage)
-        .filter(key => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
-        .forEach(key => sessionStorage.removeItem(key));
-    } catch { /* storage unavailable */ }
-    document.cookie = "onboarding_complete=; max-age=0; path=/";
+    await signOutAndResetMedAssist(supabase);
     router.push("/");
   };
 

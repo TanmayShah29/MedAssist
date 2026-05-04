@@ -10,6 +10,7 @@ import {
 import { SectionHeader } from "@/components/ui/section-header";
 import { mergeBiomarkerSources } from "@/lib/medical-data";
 import { Biomarker } from "@/types/medical";
+import { signOutAndResetMedAssist } from "@/lib/account-session";
 
 // ── Toggle Switch ──────────────────────────────────────────────────────────
 function Toggle({ checked, onToggle, disabled }: { checked: boolean; onToggle: () => void; disabled?: boolean }) {
@@ -85,26 +86,6 @@ export default function SettingsPage() {
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const clearLocalAccountState = () => {
-    try {
-      [
-        "medassist-onboarding",
-        "medassist_debug_mode",
-        "medassist_cached_lab_results",
-        "medassist_cached_biomarkers",
-        "medassist_cached_real_lab_results",
-        "medassist_cached_real_biomarkers",
-        "medassist_cached_demo_lab_results",
-        "medassist_cached_demo_biomarkers",
-        "medassist-storage-v2",
-      ].forEach(key => localStorage.removeItem(key));
-      Object.keys(sessionStorage)
-        .filter(key => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
-        .forEach(key => sessionStorage.removeItem(key));
-      document.cookie = "onboarding_complete=; max-age=0; path=/";
-    } catch { /* storage unavailable */ }
-  };
-
   useEffect(() => {
     try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true"); } catch { /* */ }
   }, []);
@@ -177,8 +158,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/account/delete", { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete account");
-      await supabase.auth.signOut();
-      clearLocalAccountState();
+      await signOutAndResetMedAssist(supabase);
       toast.success("Account deleted.");
       window.location.href = "/auth?mode=signup";
     } catch (error: unknown) {

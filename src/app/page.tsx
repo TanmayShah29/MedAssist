@@ -5,10 +5,11 @@ import { motion, useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { createBrowserClient } from '@supabase/ssr';
+import { signOutAndResetMedAssist } from "@/lib/account-session";
 import {
   Shield, Upload, Brain, LineChart, CheckCircle2,
   Sparkles, Lock, Trash2, ArrowRight, Activity,
-  TrendingUp, TrendingDown, Minus, ChevronRight
+  TrendingUp, TrendingDown, Minus, ChevronRight, LogOut
 } from "lucide-react";
 
 // ── Tiny helpers ─────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ function HeroMockCard() {
 
 export default function LandingPage() {
   const router = useRouter();
-  const [accountState, setAccountState] = useState<"visitor" | "onboarding" | "dashboard">("visitor");
+  const [accountState, setAccountState] = useState<"visitor" | "stale" | "onboarding" | "dashboard">("visitor");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -128,30 +129,11 @@ export default function LandingPage() {
   );
 
   useEffect(() => {
-    const clearDeletedAccountState = async () => {
-      try {
-        [
-          "medassist-onboarding",
-          "medassist_cached_lab_results",
-          "medassist_cached_biomarkers",
-          "medassist_cached_real_lab_results",
-          "medassist_cached_real_biomarkers",
-          "medassist_cached_demo_lab_results",
-          "medassist_cached_demo_biomarkers",
-          "medassist-storage-v2",
-        ].forEach((key) => localStorage.removeItem(key));
-        Object.keys(sessionStorage)
-          .filter((key) => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
-          .forEach((key) => sessionStorage.removeItem(key));
-        document.cookie = "onboarding_complete=; max-age=0; path=/";
-      } catch { /* storage unavailable */ }
-      await supabaseRef.current.auth.signOut();
-    };
-
     const loadAccountState = async () => {
+      const { data: { session } } = await supabaseRef.current.auth.getSession();
       const { data: { user }, error } = await supabaseRef.current.auth.getUser();
       if (error || !user) {
-        setAccountState("visitor");
+        setAccountState(session ? "stale" : "visitor");
         return;
       }
 
@@ -162,8 +144,7 @@ export default function LandingPage() {
         .maybeSingle();
 
       if (profileError || !profile) {
-        await clearDeletedAccountState();
-        setAccountState("visitor");
+        setAccountState("stale");
         return;
       }
 
@@ -183,6 +164,15 @@ export default function LandingPage() {
   const appCtaPath = accountState === "dashboard" ? "/dashboard" : accountState === "onboarding" ? "/onboarding" : "/auth?mode=signup";
   const appCtaLabel = accountState === "dashboard" ? "Dashboard" : accountState === "onboarding" ? "Continue setup" : "Get started";
   const heroCtaLabel = accountState === "dashboard" ? "Go to dashboard" : accountState === "onboarding" ? "Continue setup" : "Create free account";
+  const showResetSession = accountState !== "visitor";
+
+  const handleResetSession = async () => {
+    await signOutAndResetMedAssist(supabaseRef.current);
+    setAccountState("visitor");
+    setMenuOpen(false);
+    router.replace("/");
+    router.refresh();
+  };
 
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
@@ -207,6 +197,16 @@ export default function LandingPage() {
             <Link href="/demo" className="hidden sm:flex text-sm font-semibold text-sky-600 hover:text-sky-700 px-4 py-2 rounded-lg hover:bg-sky-50 transition-all items-center gap-1.5">
               <Activity size={14} /> Live Demo
             </Link>
+            {showResetSession && (
+              <button
+                type="button"
+                onClick={handleResetSession}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-[#57534E] hover:text-red-600 transition-colors"
+              >
+                <LogOut size={14} />
+                Sign out
+              </button>
+            )}
             {!isSignedIn && (
               <Link href="/auth?mode=login" className="hidden sm:block text-sm font-semibold text-[#57534E] hover:text-[#1C1917] px-4 py-2 transition-colors">
                 Sign in
@@ -239,6 +239,15 @@ export default function LandingPage() {
             <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Features</Link>
             <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Security</Link>
             <Link href="/demo" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-sky-600 py-3 border-b border-[#F0EEE8]">Live Demo</Link>
+            {showResetSession && (
+              <button
+                type="button"
+                onClick={handleResetSession}
+                className="block w-full border-b border-[#F0EEE8] py-3 text-left text-sm font-semibold text-red-600"
+              >
+                Sign out and reset session
+              </button>
+            )}
             {!isSignedIn && (
               <Link href="/auth?mode=login" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-[#57534E] py-3">
                 Sign in
@@ -256,6 +265,24 @@ export default function LandingPage() {
           </div>
         )}
       </header>
+
+      {accountState === "stale" && (
+        <div className="fixed left-0 right-0 top-16 z-40 border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-medium text-amber-900">
+              Your previous account session looks expired or deleted. Sign out to start fresh.
+            </p>
+            <button
+              type="button"
+              onClick={handleResetSession}
+              className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-[10px] bg-amber-700 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-amber-800"
+            >
+              <LogOut size={15} />
+              Sign out and reset
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── HERO ── */}
       <section className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
