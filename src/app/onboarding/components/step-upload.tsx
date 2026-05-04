@@ -10,6 +10,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { logger } from "@/lib/logger";
 
+const GENERIC_ANALYSIS_ERROR = "We could not analyze these results right now. Please try again in a moment.";
+
 function nextId() {
     return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
@@ -23,6 +25,17 @@ async function readJsonWithRawBody(response: Response) {
             `Could not parse API response as JSON. Status ${response.status} ${response.statusText}. Body: ${rawText.slice(0, 1000)}. Parse error: ${(error as Error).message}`
         );
     }
+}
+
+function patientSafeError(message: string) {
+    if (/missing required environment variables|supabase_service_role_key|environment variables|\.env\.local/i.test(message)) {
+        return GENERIC_ANALYSIS_ERROR;
+    }
+    return message;
+}
+
+function isPdfFile(file: File) {
+    return file.name.toLowerCase().endsWith(".pdf") && (!file.type || file.type === "application/pdf" || file.type === "application/octet-stream");
 }
 
 interface ManualRow {
@@ -67,7 +80,7 @@ export function StepUpload() {
             toast.error(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 10MB.`);
             return;
         }
-        if (file.type !== 'application/pdf') {
+        if (!isPdfFile(file)) {
             toast.error('Only PDF files are supported.');
             return;
         }
@@ -122,24 +135,10 @@ export function StepUpload() {
             formData.append("manualPayload", JSON.stringify({ biomarkers }));
             formData.append("symptoms", JSON.stringify(selectedSymptoms));
 
-            try {
-                const { saveProfileFromSession } = await import("@/app/actions/user-data");
-                await saveProfileFromSession({
-                    first_name: basicInfo.firstName || undefined,
-                    last_name: basicInfo.lastName || undefined,
-                    age: basicInfo.age ? Number(basicInfo.age) : undefined,
-                    sex: basicInfo.sex || undefined,
-                    blood_type: basicInfo.bloodType || undefined,
-                    symptoms: selectedSymptoms,
-                });
-            } catch (err) {
-                logger.error("Failed to save profile before manual analysis:", err);
-            }
-
             const res = await fetch("/api/analyze-report", { method: "POST", body: formData });
             const data = await readJsonWithRawBody(res);
             if (!res.ok) {
-                toast.error(data.error || "Analysis failed");
+                toast.error(patientSafeError(data.error || "Analysis failed"));
                 setIsManualSubmitting(false);
                 return;
             }
@@ -184,7 +183,7 @@ export function StepUpload() {
             completeStep(3);
             setStep(5);
         } catch (err) {
-            toast.error((err as Error).message || "Something went wrong");
+            toast.error(patientSafeError((err as Error).message || "Something went wrong"));
         } finally {
             setIsManualSubmitting(false);
         }
@@ -235,15 +234,15 @@ export function StepUpload() {
                         No PDF? Add your results below. Use units from your report (e.g. mg/dL or mmol/L).
                     </p>
                 </div>
-                <div className="space-y-3 max-h-[280px] overflow-y-auto">
+                <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
                     {manualRows.map((row) => (
-                        <div key={row.id} className="flex gap-2 items-center">
+                        <div key={row.id} className="grid grid-cols-[minmax(0,1fr)_84px_84px_40px] gap-2 items-center max-[420px]:grid-cols-[minmax(0,1fr)_40px]">
                             <input
                                 type="text"
                                 placeholder="Name (e.g. Glucose)"
                                 value={row.name}
                                 onChange={(e) => updateManualRow(row.id, "name", e.target.value)}
-                                className="grow shrink basis-0 min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                className="min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 max-[420px]:col-span-2"
                             />
                             <input
                                 type="text"
@@ -251,19 +250,20 @@ export function StepUpload() {
                                 placeholder="Value"
                                 value={row.value}
                                 onChange={(e) => updateManualRow(row.id, "value", e.target.value)}
-                                className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                             />
                             <input
                                 type="text"
                                 placeholder="Unit"
                                 value={row.unit}
                                 onChange={(e) => updateManualRow(row.id, "unit", e.target.value)}
-                                className="w-20 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                             />
                             <button
+                                aria-label="Remove value"
                                 type="button"
                                 onClick={() => removeManualRow(row.id)}
-                                className="p-2 text-[#A8A29E] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#A8A29E] transition-colors hover:bg-red-50 hover:text-red-600"
                             >
                                 <Trash2 size={18} />
                             </button>
@@ -278,7 +278,7 @@ export function StepUpload() {
                     <Plus size={16} />
                     Add another value
                 </button>
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                     <button
                         onClick={() => setShowManualEntry(false)}
                         className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-sm font-medium text-[#57534E] hover:bg-[#E8E6DF] transition-colors"

@@ -85,6 +85,26 @@ export default function SettingsPage() {
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const clearLocalAccountState = () => {
+    try {
+      [
+        "medassist-onboarding",
+        "medassist_debug_mode",
+        "medassist_cached_lab_results",
+        "medassist_cached_biomarkers",
+        "medassist_cached_real_lab_results",
+        "medassist_cached_real_biomarkers",
+        "medassist_cached_demo_lab_results",
+        "medassist_cached_demo_biomarkers",
+        "medassist-storage-v2",
+      ].forEach(key => localStorage.removeItem(key));
+      Object.keys(sessionStorage)
+        .filter(key => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
+        .forEach(key => sessionStorage.removeItem(key));
+      document.cookie = "onboarding_complete=; max-age=0; path=/";
+    } catch { /* storage unavailable */ }
+  };
+
   useEffect(() => {
     try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true"); } catch { /* */ }
   }, []);
@@ -129,9 +149,14 @@ export default function SettingsPage() {
 
       const biomarkers = mergeBiomarkerSources(biomarkerRows as Biomarker[] | null, labResults || []);
 
+      const csvCell = (value: unknown) => {
+        const text = value == null ? "" : String(value);
+        return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+      };
+
       let csv = "Date,Biomarker,Value,Unit,Status\n";
       biomarkers.forEach(b => {
-        csv += [new Date(b.created_at).toLocaleDateString(), b.name, b.value, b.unit, b.status].join(",") + "\n";
+        csv += [new Date(b.created_at).toLocaleDateString(), b.name, b.value, b.unit, b.status].map(csvCell).join(",") + "\n";
       });
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -153,8 +178,9 @@ export default function SettingsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete account");
       await supabase.auth.signOut();
+      clearLocalAccountState();
       toast.success("Account deleted.");
-      window.location.href = "/";
+      window.location.href = "/auth?mode=signup";
     } catch (error: unknown) {
       toast.error((error as Error).message || "Failed to delete account");
     } finally { setIsDeleting(false); setShowDeleteConfirm(false); }

@@ -13,6 +13,7 @@ type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "
 type DebugPayload = Record<string, unknown> | string | null | undefined;
 
 const IMAGE_BASED_MSG = 'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
+const GENERIC_PROCESSING_MSG = 'We could not analyze this report right now. Please try again in a moment, or enter the values manually.';
 
 function deriveReviewedScore(biomarkers: ExtractedLabValue[]) {
     if (biomarkers.length === 0) return 0;
@@ -29,6 +30,8 @@ function deriveRiskLevel(biomarkers: ExtractedLabValue[]): "low" | "moderate" | 
 }
 
 const getErrorMessage = (error: string, debug?: DebugPayload) => {
+    if (/missing required environment variables|supabase_service_role_key|environment variables|\.env\.local/i.test(error))
+        return { title: 'Analysis unavailable', detail: GENERIC_PROCESSING_MSG, canRetry: true, debug }
     if (error.includes('Rate limit') || error.includes('429'))
         return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true, debug }
     if (error.includes('Unauthorized') || error.includes('401'))
@@ -38,6 +41,14 @@ const getErrorMessage = (error: string, debug?: DebugPayload) => {
     if (error.includes('image-based') || error === IMAGE_BASED_MSG)
         return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true, debug }
     return { title: 'Something went wrong', detail: error, canRetry: true, debug }
+}
+
+function shouldShowDebug() {
+    try {
+        return localStorage.getItem("medassist_debug_mode") === "true";
+    } catch {
+        return false;
+    }
 }
 
 function formatDebugPayload(debug: DebugPayload) {
@@ -92,6 +103,7 @@ function ReviewExtractedValues({
 }) {
     const { setAnalysisResult } = useOnboardingStore();
     const [rows, setRows] = useState<ExtractedLabValue[]>(analysisResult.biomarkers);
+    const [valueInputs, setValueInputs] = useState<string[]>(() => analysisResult.biomarkers.map((row) => String(row.value ?? "")));
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -122,19 +134,21 @@ function ReviewExtractedValues({
                 category: "other",
             },
         ]);
+        setValueInputs((prev) => [...prev, ""]);
     };
 
     const removeRow = (index: number) => {
         setRows((prev) => prev.filter((_, i) => i !== index));
+        setValueInputs((prev) => prev.filter((_, i) => i !== index));
     };
 
     const saveReviewed = async () => {
         const validRows = rows
-            .map((row) => ({
+            .map((row, index) => ({
                 ...row,
                 name: row.name.trim(),
                 unit: row.unit.trim() || "unit",
-                value: Number(row.value),
+                value: Number(valueInputs[index] ?? row.value),
                 referenceMin: row.referenceMin === null ? null : Number(row.referenceMin),
                 referenceMax: row.referenceMax === null ? null : Number(row.referenceMax),
             }))
@@ -230,8 +244,14 @@ function ReviewExtractedValues({
                                 className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             />
                             <input
-                                value={String(row.value)}
-                                onChange={(e) => updateRow(index, { value: Number(e.target.value) })}
+                                value={valueInputs[index] ?? ""}
+                                onChange={(e) => {
+                                    const nextValue = e.target.value;
+                                    setValueInputs((prev) => prev.map((value, i) => (i === index ? nextValue : value)));
+                                    if (nextValue.trim() !== "") {
+                                        updateRow(index, { value: Number(nextValue) });
+                                    }
+                                }}
                                 inputMode="decimal"
                                 placeholder="Value"
                                 className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
@@ -564,7 +584,7 @@ export function StepProcessing() {
                             You can go back and enter your lab values manually instead.
                         </p>
                     )}
-                    {errorData.debug && (
+                    {errorData.debug && shouldShowDebug() && (
                         <div className="mt-5 rounded-[10px] border border-red-200 bg-white/70 overflow-hidden">
                             <div className="border-b border-red-100 px-3 py-2">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#991B1B]">
@@ -583,7 +603,7 @@ export function StepProcessing() {
                                    text-sm font-semibold transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Upload a different file
+                        Upload or enter values manually
                     </button>
                 </motion.div>
             </div>

@@ -14,7 +14,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { RangeBar } from '@/components/ui/range-bar'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { useStore } from '@/store/useStore'
-import { labResultSummary, mergeBiomarkerSources } from '@/lib/medical-data'
+import { labResultSummary, latestUniqueBiomarkers, mergeBiomarkerSources } from '@/lib/medical-data'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -102,18 +102,20 @@ export default function ResultsPage() {
     useEffect(() => {
         const fetchBiomarkers = async () => {
             setLoading(true)
-            const supabase = createClient()
             const demoBiomarkers = demoMode ? getDemoBiomarkers() as Biomarker[] : []
             const demoLabResults = demoMode ? getDemoLabResults() : []
+
+            if (demoMode) {
+                setBiomarkers(demoBiomarkers)
+                setLabResults(demoLabResults)
+                setLoading(false)
+                return
+            }
+
+            const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
-                if (demoMode) {
-                    setBiomarkers(demoBiomarkers)
-                    setLabResults(demoLabResults)
-                    setLoading(false)
-                    return
-                }
                 setLoading(false)
                 router.push('/auth?mode=login')
                 return
@@ -135,12 +137,12 @@ export default function ResultsPage() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const realLabResults = (lrData as any[]) || []
             const realBiomarkers = mergeBiomarkerSources(data as Biomarker[] | null, realLabResults)
-            setBiomarkers(demoMode ? [...demoBiomarkers, ...realBiomarkers] : realBiomarkers)
-            setLabResults(demoMode ? [...demoLabResults, ...realLabResults] : realLabResults)
+            setBiomarkers(realBiomarkers)
+            setLabResults(realLabResults)
             setLoading(false)
         }
         fetchBiomarkers()
-    }, [selectedCategory, router, refreshKey, demoMode, getDemoBiomarkers, getDemoLabResults])
+    }, [router, refreshKey, demoMode, getDemoBiomarkers, getDemoLabResults])
 
     // Derived counts for status summary
     const filteredBiomarkers = (selectedReportId === 'all'
@@ -164,6 +166,10 @@ export default function ResultsPage() {
     const optimalCount = deduplicatedForCounts.filter(b => b.status === 'optimal').length
     const warningCount = deduplicatedForCounts.filter(b => b.status === 'warning').length
     const criticalCount = deduplicatedForCounts.filter(b => b.status === 'critical').length
+    const questionBiomarkers = (selectedReportId === 'all'
+        ? latestUniqueBiomarkers(biomarkers)
+        : biomarkers.filter(b => b.lab_result_id?.toString() === selectedReportId)
+    ).filter(b => selectedCategory === 'all' || (b.category || 'other').toLowerCase() === selectedCategory)
 
     const handleBiomarkerClick = (b: Biomarker) => {
         setSelectedBiomarker(b);
@@ -597,7 +603,7 @@ export default function ResultsPage() {
                 />
 
                 {/* ── Doctor Questions ── */}
-                <DoctorQuestions biomarkers={biomarkers} className="mt-8" />
+                <DoctorQuestions biomarkers={questionBiomarkers} className="mt-8" />
 
                 {/* ── Sticky Nudge Bar ── */}
                 <div style={{

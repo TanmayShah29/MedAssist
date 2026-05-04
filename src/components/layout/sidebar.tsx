@@ -44,7 +44,11 @@ export function Sidebar({ className }: { className?: string }) {
        "medassist-storage-v2",
       ].forEach(k => localStorage.removeItem(k));
     } catch { /* storage unavailable */ }
-    sessionStorage.removeItem("medassist_loaded");
+    try {
+      Object.keys(sessionStorage)
+        .filter(key => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
+        .forEach(key => sessionStorage.removeItem(key));
+    } catch { /* storage unavailable */ }
     document.cookie = "onboarding_complete=; max-age=0; path=/";
     router.push("/");
   };

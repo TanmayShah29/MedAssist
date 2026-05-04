@@ -110,7 +110,7 @@ function HeroMockCard() {
 
 export default function LandingPage() {
   const router = useRouter();
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [accountState, setAccountState] = useState<"visitor" | "onboarding" | "dashboard">("visitor");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -128,7 +128,49 @@ export default function LandingPage() {
   );
 
   useEffect(() => {
-    supabaseRef.current.auth.getUser().then(({ data: { user } }) => setIsSignedIn(!!user));
+    const clearDeletedAccountState = async () => {
+      try {
+        [
+          "medassist-onboarding",
+          "medassist_cached_lab_results",
+          "medassist_cached_biomarkers",
+          "medassist_cached_real_lab_results",
+          "medassist_cached_real_biomarkers",
+          "medassist_cached_demo_lab_results",
+          "medassist_cached_demo_biomarkers",
+          "medassist-storage-v2",
+        ].forEach((key) => localStorage.removeItem(key));
+        Object.keys(sessionStorage)
+          .filter((key) => key === "medassist_loaded" || key.startsWith("medassist_dq_"))
+          .forEach((key) => sessionStorage.removeItem(key));
+        document.cookie = "onboarding_complete=; max-age=0; path=/";
+      } catch { /* storage unavailable */ }
+      await supabaseRef.current.auth.signOut();
+    };
+
+    const loadAccountState = async () => {
+      const { data: { user }, error } = await supabaseRef.current.auth.getUser();
+      if (error || !user) {
+        setAccountState("visitor");
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabaseRef.current
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        await clearDeletedAccountState();
+        setAccountState("visitor");
+        return;
+      }
+
+      setAccountState(profile.onboarding_complete ? "dashboard" : "onboarding");
+    };
+
+    loadAccountState();
   }, []); // Safe: supabaseRef.current is stable for the component lifetime
 
   useEffect(() => {
@@ -137,6 +179,10 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const isSignedIn = accountState !== "visitor";
+  const appCtaPath = accountState === "dashboard" ? "/dashboard" : accountState === "onboarding" ? "/onboarding" : "/auth?mode=signup";
+  const appCtaLabel = accountState === "dashboard" ? "Dashboard" : accountState === "onboarding" ? "Continue setup" : "Get started";
+  const heroCtaLabel = accountState === "dashboard" ? "Go to dashboard" : accountState === "onboarding" ? "Continue setup" : "Create free account";
 
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
@@ -167,10 +213,10 @@ export default function LandingPage() {
               </Link>
             )}
             <button
-              onClick={() => router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup")}
+              onClick={() => router.push(appCtaPath)}
               className="hidden sm:inline-flex bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-[10px] text-sm font-bold transition-all active:scale-95 shadow-md shadow-sky-500/20"
             >
-              {isSignedIn ? "Dashboard" : "Get started"}
+              {appCtaLabel}
             </button>
             {/* Hamburger — mobile only */}
             <button
@@ -201,11 +247,11 @@ export default function LandingPage() {
             <button
               onClick={() => {
                 setMenuOpen(false);
-                router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup");
+                router.push(appCtaPath);
               }}
               className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded-[10px] bg-sky-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-sky-500/20"
             >
-              {isSignedIn ? "Dashboard" : "Get started"}
+              {appCtaLabel}
             </button>
           </div>
         )}
@@ -245,10 +291,10 @@ export default function LandingPage() {
                   <ArrowRight size={15} />
                 </Link>
                 <button
-                  onClick={() => router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup")}
+                  onClick={() => router.push(appCtaPath)}
                   className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
                 >
-                  {isSignedIn ? "Go to dashboard" : "Create free account"}
+                  {heroCtaLabel}
                 </button>
               </div>
 
@@ -705,10 +751,10 @@ export default function LandingPage() {
               <ArrowRight size={15} />
             </Link>
             <button
-              onClick={() => router.push(isSignedIn ? "/dashboard" : "/auth?mode=signup")}
+              onClick={() => router.push(appCtaPath)}
               className="flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 text-white px-8 py-3.5 rounded-[12px] text-[15px] font-bold transition-all hover:bg-white/5"
             >
-              {isSignedIn ? "Go to dashboard" : "Create free account"}
+              {heroCtaLabel}
             </button>
           </div>
           <p className="text-[12px] text-slate-600 mt-6">No login required for the demo · No credit card to sign up</p>

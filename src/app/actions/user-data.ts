@@ -204,14 +204,45 @@ export async function deleteLabResult(labResultId: number | string) {
   }
 
   try {
-    // Use authenticated client — RLS ensures the user can only delete their own rows
+    // Use authenticated client — RLS ensures the user can only delete their own rows.
+    // Delete biomarkers explicitly first because some deployed databases may not
+    // have ON DELETE CASCADE on biomarkers.lab_result_id even if the current
+    // schema does.
     const supabase = await getAuthClient();
-    const { error } = await supabase
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return { success: false, error: "User not authenticated." };
+    }
+
+    const db = supabaseAdmin ?? supabase;
+
+    const { data: report, error: reportLookupError } = await db
+      .from("lab_results")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (reportLookupError || !report?.id) {
+      logger.error("deleteLabResult report lookup failed:", reportLookupError);
+      return { success: false, error: "Report not found or already deleted." };
+    }
+
+    const { error: biomarkerError } = await db
+      .from("biomarkers")
+      .delete()
+      .eq("lab_result_id", id)
+      .eq("user_id", user.id);
+
+    if (biomarkerError) throw biomarkerError;
+
+    const { error: reportError } = await db
       .from("lab_results")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("user_id", user.id);
 
-    if (error) throw error;
+    if (reportError) throw reportError;
     return { success: true };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Unknown error";
@@ -235,14 +266,13 @@ export async function updateUserProfile(
     symptoms?: string[];
   }
 ) {
-  if (!supabaseAdmin)
-    return { success: false, error: "Database connection unavailable" };
-
   // SECURITY: Verify that the userId matches the authenticated session.
-  // updateUserProfile uses supabaseAdmin (service role, bypasses RLS),
-  // so we must enforce ownership here to prevent IDOR.
+  // Use the authenticated client by default so normal profile edits do not
+  // depend on the service role key. If the admin client is configured, it can
+  // still be used after this ownership check.
+  let supabase: Awaited<ReturnType<typeof getAuthClient>>;
   try {
-    const supabase = await getAuthClient();
+    supabase = await getAuthClient();
     const { data: { user: sessionUser } } = await supabase.auth.getUser();
     if (!sessionUser || sessionUser.id !== userId) {
       logger.error(`updateUserProfile: userId mismatch (payload=${userId}, session=${sessionUser?.id})`);
@@ -255,6 +285,7 @@ export async function updateUserProfile(
 
   try {
     const { first_name, last_name, age, sex, blood_type, symptoms } = data;
+    const db = supabaseAdmin ?? supabase;
 
     const profileUpdates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -265,7 +296,7 @@ export async function updateUserProfile(
     if (sex !== undefined) profileUpdates.sex = sex;
     if (blood_type !== undefined) profileUpdates.blood_type = blood_type;
 
-    const { error: profileError } = await supabaseAdmin
+    const { error: profileError } = await db
       .from("profiles")
       .update(profileUpdates)
       .eq("id", userId);
@@ -273,9 +304,9 @@ export async function updateUserProfile(
     if (profileError) throw profileError;
 
     if (symptoms !== undefined) {
-      await supabaseAdmin.from("symptoms").delete().eq("user_id", userId);
+      await db.from("symptoms").delete().eq("user_id", userId);
       if (symptoms.length > 0) {
-        const { error: sympError } = await supabaseAdmin
+        const { error: sympError } = await db
           .from("symptoms")
           .insert(symptoms.map((s) => ({ user_id: userId, symptom: s })));
         if (sympError) throw sympError;

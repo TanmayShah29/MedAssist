@@ -22,13 +22,23 @@ function AuthContent() {
     const [agreedToTerms, setAgreedToTerms] = useState(false)
     const supabase = createClient();
 
-    // Helper to clear stale onboarding state before signup
-    const clearOnboardingState = () => {
+    // Helper to clear stale app state before signup
+    const clearLocalSessionState = () => {
         if (typeof window !== 'undefined') {
             try {
-                // Clear state store
-                window.localStorage.removeItem('medassist-onboarding');
-                // Clear the cookie that middleware uses
+                [
+                    'medassist-onboarding',
+                    'medassist_cached_lab_results',
+                    'medassist_cached_biomarkers',
+                    'medassist_cached_real_lab_results',
+                    'medassist_cached_real_biomarkers',
+                    'medassist_cached_demo_lab_results',
+                    'medassist_cached_demo_biomarkers',
+                    'medassist-storage-v2',
+                ].forEach((key) => window.localStorage.removeItem(key));
+                Object.keys(window.sessionStorage)
+                    .filter((key) => key === 'medassist_loaded' || key.startsWith('medassist_dq_'))
+                    .forEach((key) => window.sessionStorage.removeItem(key));
                 document.cookie = "onboarding_complete=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             } catch (_e) { }
         }
@@ -47,7 +57,7 @@ function AuthContent() {
         try {
             if (mode === 'signup') {
                 // Clear any stale state before creating a new account
-                clearOnboardingState();
+                clearLocalSessionState();
 
                 const { data, error } = await supabase.auth.signUp({
                     email,

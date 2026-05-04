@@ -92,19 +92,21 @@ export interface OnboardingState {
     reset: () => void;
 }
 
+const EMPTY_BASIC_INFO: BasicInfo = {
+    firstName: "",
+    lastName: "",
+    age: "",
+    sex: "",
+    bloodType: "",
+    emergencyContact: "",
+};
+
 export const useOnboardingStore = create<OnboardingState>()(
     persist(
         (set) => ({
             currentStep: 1,
             completedSteps: [],
-            basicInfo: {
-                firstName: "",
-                lastName: "",
-                age: "", // Keep initial state as "" for empty input
-                sex: "",
-                bloodType: "",
-                emergencyContact: "",
-            },
+            basicInfo: EMPTY_BASIC_INFO,
             selectedSymptoms: [],
             customSymptom: "",
             uploadedFile: null,
@@ -145,10 +147,15 @@ export const useOnboardingStore = create<OnboardingState>()(
                 set({
                     currentStep: 1,
                     completedSteps: [],
+                    basicInfo: EMPTY_BASIC_INFO,
                     selectedSymptoms: [],
+                    customSymptom: "",
                     uploadedFile: null,
+                    uploadedFileName: "",
                     extractedLabValues: [],
                     extractedEntities: [],
+                    healthScore: 0,
+                    riskLevel: "low",
                     processingComplete: false,
                     analysisResult: null,
                 }),

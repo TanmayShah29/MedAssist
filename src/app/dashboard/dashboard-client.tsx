@@ -234,12 +234,12 @@ export default function DashboardClient({
     // ── Derived Data ───────────────────────────────────────────────────────
 
     const displayLabResults = useMemo(
-        () => (demoMode ? [...getDemoLabResults(), ...initialLabResults] : initialLabResults),
+        () => (demoMode ? getDemoLabResults() : initialLabResults),
         [demoMode, initialLabResults, getDemoLabResults]
     );
 
     const displayBiomarkers = useMemo(
-        () => (demoMode ? [...getDemoBiomarkers(), ...initialBiomarkers] : initialBiomarkers),
+        () => (demoMode ? getDemoBiomarkers() : initialBiomarkers),
         [demoMode, initialBiomarkers, getDemoBiomarkers]
     );
 
@@ -408,7 +408,7 @@ export default function DashboardClient({
                         </div>
                     )}
 
-                    {latestLabResult && initialLabResults.length > 0 && (
+                    {latestLabResult && !demoMode && initialLabResults.length > 0 && (
                         <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
@@ -492,7 +492,7 @@ export default function DashboardClient({
                         )}
 
                         {/* Symptom empty state nudge */}
-                        {initialSymptoms.length === 0 && totalCount > 0 && (
+                        {!demoMode && initialSymptoms.length === 0 && totalCount > 0 && (
                             <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3">
                                 <p className="text-[14px] text-[#57534E]">
                                     Add your symptoms to get more personalised insights.

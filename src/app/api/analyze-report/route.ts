@@ -61,10 +61,10 @@ export async function POST(req: NextRequest) {
         if (!rateLimitResult.success) {
             logger.warn(`Rate limit exceeded: ${rateLimitResult.message}`);
             return NextResponse.json(
-                {
-                    success: false,
-                    error: rateLimitResult.message,
-                    debug: { stage: 'rate-limit', ...rateLimitResult },
+                    {
+                        success: false,
+                        error: rateLimitResult.message,
+                        debug: includeDebug({ stage: 'rate-limit', ...rateLimitResult }),
                 },
                 { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
             );
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
                 {
                     success: false,
                     error: 'Sign in to analyze reports.',
-                    debug: { stage: 'auth', message: 'No Supabase auth user returned for request cookies.' },
+                    debug: includeDebug({ stage: 'auth', message: 'No Supabase auth user returned for request cookies.' }),
                 },
                 { status: 401 }
             );
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
                 {
                     success: false,
                     error: `Rate limit exceeded. You can analyze up to ${MAX_UPLOADS_PER_HOUR} reports per hour. Please try again later.`,
-                    debug: { stage: 'user-upload-limit', uploadCount, max: MAX_UPLOADS_PER_HOUR },
+                    debug: includeDebug({ stage: 'user-upload-limit', uploadCount, max: MAX_UPLOADS_PER_HOUR }),
                 },
                 { status: 429 }
             );
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: 'No file uploaded. Upload a PDF or use manual entry.',
-                debug: { stage: 'request-parse', fields: Array.from(formData.keys()) },
+                debug: includeDebug({ stage: 'request-parse', fields: Array.from(formData.keys()) }),
             }, { status: 400 });
         }
 
@@ -126,19 +126,20 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: `File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.`,
-                debug: { stage: 'file-validation', fileName: file.name, fileSize: file.size, max: MAX_FILE_SIZE_BYTES },
+                debug: includeDebug({ stage: 'file-validation', fileName: file.name, fileSize: file.size, max: MAX_FILE_SIZE_BYTES }),
             }, { status: 400 });
         }
 
-        // Section 1d — Server-side file type validation
-        const allowedMimeTypes = ['application/pdf'];
+        // Some mobile browsers upload PDFs with an empty or generic MIME type.
+        // The magic-byte check below is the authoritative content validation.
         const fileName = file.name.toLowerCase();
-        if (!allowedMimeTypes.includes(file.type) || !fileName.endsWith('.pdf')) {
+        const isAcceptableMime = !file.type || file.type === 'application/pdf' || file.type === 'application/octet-stream';
+        if (!fileName.endsWith('.pdf') || !isAcceptableMime) {
             return NextResponse.json(
                 {
                     success: false,
                     error: 'Invalid file type. Only PDF files are accepted.',
-                    debug: { stage: 'file-validation', fileName: file.name, fileType: file.type },
+                    debug: includeDebug({ stage: 'file-validation', fileName: file.name, fileType: file.type }),
                 },
                 { status: 400 }
             );
@@ -153,12 +154,12 @@ export async function POST(req: NextRequest) {
                 {
                     success: false,
                     error: 'Invalid file content. The file does not appear to be a valid PDF.',
-                    debug: {
+                    debug: includeDebug({
                         stage: 'pdf-magic-bytes',
                         fileName: file.name,
                         fileSize: file.size,
                         firstBytes: buffer.toString('utf8', 0, Math.min(12, buffer.length)),
-                    },
+                    }),
                 },
                 { status: 400 }
             );
@@ -176,7 +177,7 @@ export async function POST(req: NextRequest) {
                         success: false,
                         error: extractErr.message,
                         code: IMAGE_BASED_PDF_ERROR_CODE,
-                        debug: toDebugPayload(extractErr, 'text-extraction', { fileName: file.name, fileSize: file.size }),
+                        debug: includeDebug(toDebugPayload(extractErr, 'text-extraction', { fileName: file.name, fileSize: file.size })),
                     },
                     { status: 400 }
                 );
@@ -189,12 +190,12 @@ export async function POST(req: NextRequest) {
                 success: false,
                 error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
                 code: IMAGE_BASED_PDF_ERROR_CODE,
-                debug: {
+                debug: includeDebug({
                     stage: 'text-extraction-length',
                     fileName: file.name,
                     extractedLength: extractedText?.trim().length ?? 0,
                     preview: extractedText?.slice(0, 500) ?? '',
-                },
+                }),
             }, { status: 400 });
         }
         logger.info("Text extracted successfully.");
@@ -295,7 +296,7 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
         return NextResponse.json({
             success: false,
             error: 'You must be signed in to save results.',
-            debug: { stage: 'manual-auth', message: 'No Supabase auth user returned for manual entry request.' },
+            debug: includeDebug({ stage: 'manual-auth', message: 'No Supabase auth user returned for manual entry request.' }),
         }, { status: 401 });
     }
 
@@ -314,7 +315,7 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
         return NextResponse.json({
             success: false,
             error: 'Invalid manual entry data format.',
-            debug: toDebugPayload(error, 'manual-payload-json', { manualPayloadRaw }),
+            debug: includeDebug(toDebugPayload(error, 'manual-payload-json', { manualPayloadRaw })),
         }, { status: 400 });
     }
 
@@ -323,7 +324,7 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
         return NextResponse.json({
             success: false,
             error: parseResult.error.issues[0]?.message || 'Invalid data.',
-            debug: toDebugPayload(parseResult.error, 'manual-payload-validation', { issues: parseResult.error.issues }),
+            debug: includeDebug(toDebugPayload(parseResult.error, 'manual-payload-validation', { issues: parseResult.error.issues })),
         }, { status: 400 });
     }
 
@@ -361,8 +362,8 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
         logger.error("Failed to save manual report:", saveResult.error);
         return NextResponse.json({
             success: false,
-            error: saveResult.error || 'Failed to save.',
-            debug: { stage: 'manual-save-report', saveResult, biomarkerCount: analysisResult.biomarkers.length },
+            error: 'Analysis finished, but we could not save the results. Please try again.',
+            debug: includeDebug({ stage: 'manual-save-report', saveResult, biomarkerCount: analysisResult.biomarkers.length }),
         }, { status: 500 });
     }
 

@@ -63,6 +63,10 @@ function patientSafeError(message: string) {
     return message;
 }
 
+function isPdfFile(file: File) {
+    return file.name.toLowerCase().endsWith('.pdf') && (!file.type || file.type === 'application/pdf' || file.type === 'application/octet-stream');
+}
+
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [tab, setTab] = useState<Tab>('upload');
     const [isDragging, setIsDragging] = useState(false);
@@ -110,7 +114,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             toast.error(`File is too large (${(selectedFile.size / 1024 / 1024).toFixed(2)}MB). Max 10MB.`);
             return;
         }
-        if (selectedFile.type !== 'application/pdf') {
+        if (!isPdfFile(selectedFile)) {
             toast.error('Only PDF files are supported.');
             return;
         }

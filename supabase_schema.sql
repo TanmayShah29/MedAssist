@@ -158,12 +158,16 @@ DROP POLICY IF EXISTS "Users can view their own lab results" ON lab_results;
 DROP POLICY IF EXISTS "Users can insert their own lab results" ON lab_results;
 DROP POLICY IF EXISTS "lab_results_select" ON lab_results;
 DROP POLICY IF EXISTS "lab_results_insert" ON lab_results;
+DROP POLICY IF EXISTS "lab_results_delete" ON lab_results;
 
 CREATE POLICY "lab_results_select" ON lab_results
   FOR SELECT USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "lab_results_insert" ON lab_results
   FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
+
+CREATE POLICY "lab_results_delete" ON lab_results
+  FOR DELETE USING ((SELECT auth.uid()) = user_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- BIOMARKERS
@@ -405,15 +409,18 @@ RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $
+AS $$
 DECLARE
   v_deleted BOOLEAN;
 BEGIN
+  DELETE FROM biomarkers
+  WHERE lab_result_id = p_lab_result_id AND user_id = p_user_id;
+
   DELETE FROM lab_results
   WHERE id = p_lab_result_id AND user_id = p_user_id;
   GET DIAGNOSTICS v_deleted = ROW_COUNT;
   RETURN v_deleted > 0;
 END;
-$;
+$$;
 
-GRANT EXECUTE ON FUNCTION delete_lab_result(UUID, BIGINT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION delete_lab_result(UUID, UUID) TO anon, authenticated;

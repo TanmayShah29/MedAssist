@@ -31,7 +31,9 @@ export function useUserProfile(): UserProfile {
     );
 
     const fetchProfile = async () => {
-      // 1. Try localStorage first (fastest)
+      // 1. Try localStorage first for an optimistic first paint only.
+      // Do not return early: onboarding storage can be stale after profile
+      // edits, account deletion, or a new account on the same device.
       try {
         const stored = localStorage.getItem("medassist-onboarding");
         if (stored) {
@@ -44,12 +46,10 @@ export function useUserProfile(): UserProfile {
               initials: `${firstName[0]}${lastName?.[0] ?? ""}`.toUpperCase(),
               email: null,
             });
-            return;
           }
           // Legacy shape
-          if (parsed?.name) {
+          else if (parsed?.name) {
             setProfile({ name: parsed.name, initials: parsed.name[0].toUpperCase(), email: null });
-            return;
           }
         }
       } catch {

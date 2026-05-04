@@ -32,7 +32,8 @@ const requestSchema = z.object({
 
 // Type guard for cached doctor questions stored in raw_ai_json
 function parseCachedQuestions(
-    rawAiJson: unknown
+    rawAiJson: unknown,
+    cacheKey: string
 ): { question: string; context: string }[] | null {
     if (
         rawAiJson === null ||
@@ -41,6 +42,7 @@ function parseCachedQuestions(
     ) return null;
 
     const json = rawAiJson as Record<string, unknown>;
+    if (json.cached_doctor_questions_key !== cacheKey) return null;
     const cached = json.cached_doctor_questions;
     if (!Array.isArray(cached) || cached.length === 0) return null;
 
@@ -99,22 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        // 4. Check local cache (latest report's cached questions)
-        const { data: latestReport } = await supabase
-            .from('lab_results')
-            .select('id, raw_ai_json')
-            .eq('user_id', user.id)
-            .order('uploaded_at', { ascending: false })
-            .limit(1)
-            .single();
-
-        // Fix #11: type-safe cache read with validation
-        const cachedLocal = parseCachedQuestions(latestReport?.raw_ai_json);
-        if (cachedLocal) {
-            return NextResponse.json({ questions: cachedLocal, cached: true });
-        }
-
-        // 5. Only generate questions for flagged biomarkers
+        // 4. Only generate questions for flagged biomarkers
         const criticalBiomarkers = biomarkers.filter(
             (b: BiomarkerInput) => b.status === 'critical' || b.status === 'warning'
         );
@@ -128,13 +115,27 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // 6. Global AI response cache (keyed on name + status + value, cross-user)
+        // 5. Cache key is based on the exact flagged values shown to the user.
         const cacheKey = `questions_${criticalBiomarkers
             .sort((a: BiomarkerInput, b: BiomarkerInput) => a.name.localeCompare(b.name))
             .map((b: BiomarkerInput) => `${b.name.toLowerCase()}:${b.status}:${parseFloat(String(b.value)).toFixed(1)}`)
             .join('|')}`;
 
-        // Fix #1: null-guard supabaseAdmin before using it
+        // 6. Check local cache on the latest report, but only if it matches the current biomarker set.
+        const { data: latestReport } = await supabase
+            .from('lab_results')
+            .select('id, raw_ai_json')
+            .eq('user_id', user.id)
+            .order('uploaded_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        const cachedLocal = parseCachedQuestions(latestReport?.raw_ai_json, cacheKey);
+        if (cachedLocal) {
+            return NextResponse.json({ questions: cachedLocal, cached: true });
+        }
+
+        // 7. Global AI response cache (keyed on name + status + value, cross-user)
         if (supabaseAdmin) {
             const { data: globalCache } = await supabaseAdmin
                 .from('global_ai_cache')
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 7. Generate questions via Groq (with retry)
+        // 8. Generate questions via Groq (with retry)
         // Fix #8: Use a JSON object wrapper so response_format: json_object is valid.
         // The prompt asks for { "questions": [...] } and we unwrap below.
         const questionsPrompt = `Based on these specific lab results that need attention:
@@ -189,7 +190,7 @@ Return a JSON object with a "questions" key containing an array:
             { maxAttempts: 3, initialDelayMs: 600 }
         );
 
-        // 8. Parse AI response — always expect { questions: [...] } now (fix #8)
+        // 9. Parse AI response — always expect { questions: [...] } now (fix #8)
         const questionsSchema = z.object({
             questions: z.array(z.object({
                 question: z.string(),
@@ -222,7 +223,7 @@ Return a JSON object with a "questions" key containing an array:
             }];
         }
 
-        // 9. Write to both local and global cache (non-blocking)
+        // 10. Write to both local and global cache (non-blocking)
         if (questions.length > 0) {
             if (latestReport) {
                 const updatedAiJson = {
@@ -230,6 +231,7 @@ Return a JSON object with a "questions" key containing an array:
                         ? latestReport.raw_ai_json as Record<string, unknown>
                         : {}),
                     cached_doctor_questions: questions,
+                    cached_doctor_questions_key: cacheKey,
                 };
                 supabase.from('lab_results')
                     .update({ raw_ai_json: updatedAiJson })

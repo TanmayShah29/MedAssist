@@ -81,7 +81,14 @@ export default function ProfilePage() {
             const res = await deleteLabResult(id);
             if (res.success) {
                 setReports(prev => prev.filter(r => r.id !== id));
+                try {
+                    localStorage.removeItem('medassist_cached_real_lab_results');
+                    localStorage.removeItem('medassist_cached_real_biomarkers');
+                    localStorage.removeItem('medassist_cached_lab_results');
+                    localStorage.removeItem('medassist_cached_biomarkers');
+                } catch { /* storage unavailable */ }
                 toast.success("Report deleted successfully");
+                router.refresh();
             } else {
                 toast.error(res.error || "Failed to delete report");
             }
@@ -170,7 +177,10 @@ export default function ProfilePage() {
                                 <input
                                     type="number"
                                     value={profile?.age || ''}
-                                    onChange={(e) => setProfile(prev => prev ? { ...prev, age: parseInt(e.target.value) } : null)}
+                                    onChange={(e) => {
+                                        const nextAge = e.target.value === '' ? undefined : parseInt(e.target.value, 10);
+                                        setProfile(prev => prev ? { ...prev, age: Number.isFinite(nextAge) ? nextAge : undefined } : null);
+                                    }}
                                     className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                             </div>
