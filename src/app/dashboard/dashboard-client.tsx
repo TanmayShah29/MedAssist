@@ -87,37 +87,37 @@ function LongitudinalComparisonCard({
 
     return (
         <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 mb-6">
-            <div className="flex items-center justify-between mb-5">
-                <div>
+            <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                     <h3 className="text-[18px] font-bold text-[#1C1917]">Progress Report</h3>
-                    <p className="text-[12px] text-[#A8A29E] mt-0.5">
+                    <p className="text-[12px] text-[#A8A29E] mt-0.5 break-words">
                         Changes from{' '}
                         {new Date(previousReportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                         {' '}to{' '}
                         {new Date(reportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </p>
                 </div>
-                <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-[12px] font-semibold">
+                <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-[12px] font-semibold self-start shrink-0">
                     {changes.length} significant changes
                 </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
                 {topChanges.map((change, idx) => {
                     const isGood = change.status === 'optimal';
                     const color = isGood ? '#059669' : '#DC2626';
                     return (
-                        <div key={idx} className="bg-[#FAF9F6] border border-[#E8E6DF] rounded-[12px] p-4">
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="text-[14px] font-bold text-[#44403C]">{change.name}</span>
-                                <span className="text-[12px] font-bold flex items-center gap-1" style={{ color }}>
+                        <div key={idx} className="bg-[#FAF9F6] border border-[#E8E6DF] rounded-[12px] p-4 min-w-0">
+                            <div className="flex justify-between items-start gap-2 mb-2 min-w-0">
+                                <span className="text-[14px] font-bold text-[#44403C] break-words min-w-0">{change.name}</span>
+                                <span className="text-[12px] font-bold flex items-center gap-1 shrink-0" style={{ color }}>
                                     {change.percent > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                     {Math.abs(change.percent)}%
                                 </span>
                             </div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-[20px] font-extrabold text-[#1C1917]">{change.currentValue}</span>
-                                <span className="text-[12px] text-[#A8A29E]">{change.unit}</span>
+                            <div className="flex items-baseline gap-1 min-w-0">
+                                <span className="text-[20px] font-extrabold text-[#1C1917] break-words min-w-0">{change.currentValue}</span>
+                                <span className="text-[12px] text-[#A8A29E] break-words min-w-0">{change.unit}</span>
                             </div>
                             <p className="text-[11px] text-[#78716C] mt-1">Was {change.previousValue} {change.unit}</p>
                         </div>
@@ -384,7 +384,7 @@ export default function DashboardClient({
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
                                 </div>
-                                <div className="ml-3 sm:ml-4">
+                                <div className="min-w-0">
                                     <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
                                     <p className="text-xs text-[#57534E]">
                                         {criticalCount > 0
@@ -414,7 +414,7 @@ export default function DashboardClient({
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
                                 </div>
-                                <div className="ml-3 sm:ml-4">
+                                <div className="min-w-0">
                                     <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
                                     <p className="text-xs text-[#57534E]">
                                         Last test was{' '}
@@ -514,7 +514,7 @@ export default function DashboardClient({
                         )}
 
                         {/* Score + Trends */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 md:gap-6">
                             <HealthScoreOverview
                                 score={healthScore}
                                 optimalCount={optimalCount}

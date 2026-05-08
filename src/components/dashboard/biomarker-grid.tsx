@@ -115,7 +115,7 @@ export function BiomarkerGrid({
                                     <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
                                     <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
                                 </div>
-                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 md:gap-4">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
                                     {catBiomarkers.map(b => {
                                         const prev = displayBiomarkers.find(
                                             pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId
@@ -228,18 +228,18 @@ function BiomarkerCard({
             </div>
 
             {/* Top row: badge + value */}
-            <div className="flex justify-between items-start">
-                <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badge}`}>
+            <div className="flex justify-between items-start gap-3 min-w-0">
+                <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${style.badge}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                     {b.status.toUpperCase()}
                     <span className="sr-only">({b.status} status)</span>
                 </div>
-                <div className="text-right ml-auto">
-                    <div className="text-[15px] font-bold text-[#1C1917]">
-                        {b.value} <span className="text-[10px] font-normal text-gray-500">{b.unit}</span>
+                <div className="text-right ml-auto min-w-0 max-w-[58%]">
+                    <div className="text-[15px] font-bold text-[#1C1917] break-words leading-tight">
+                        {b.value} <span className="text-[10px] font-normal text-gray-500 break-words">{b.unit}</span>
                     </div>
                     {delta ? (
-                        <div className={`text-[10px] font-bold flex items-center justify-end gap-1 ${deltaColor}`}>
+                        <div className={`text-[10px] font-bold flex items-center justify-end gap-1 whitespace-nowrap ${deltaColor}`}>
                             {deltaPositive ? (
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="m18 15-6-6-6 6" />
@@ -258,18 +258,18 @@ function BiomarkerCard({
             </div>
 
             {/* Name + interpretation */}
-            <div className="grow shrink basis-0 flex flex-col">
-                <span className="text-[15px] font-bold text-[#1C1917] block mb-1">{b.name}</span>
-                <p className="text-[11px] text-[#A8A29E] line-clamp-2 leading-relaxed italic mb-auto">
+            <div className="grow shrink basis-0 flex flex-col min-w-0">
+                <span className="text-[15px] font-bold text-[#1C1917] block mb-1 break-words">{b.name}</span>
+                <p className="text-[11px] text-[#A8A29E] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
                     {b.ai_interpretation || 'Clinical data point extracted from report.'}
                 </p>
 
                 {/* Range bar */}
                 {showBar && (
                     <div className="mt-3">
-                        <div className="flex justify-between text-[10px] text-[#A8A29E] font-medium mb-1">
-                            <span>{rangeMin}</span>
-                            <span>{rangeMax} {b.unit}</span>
+                        <div className="flex justify-between gap-2 text-[10px] text-[#A8A29E] font-medium mb-1 min-w-0">
+                            <span className="min-w-0 break-words">{rangeMin}</span>
+                            <span className="min-w-0 break-words text-right">{rangeMax} {b.unit}</span>
                         </div>
                         <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
                             <div

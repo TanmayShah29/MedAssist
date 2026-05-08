@@ -95,14 +95,14 @@ export function MedicineCabinet() {
 
     return (
         <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-3 mb-6">
+                <div className="flex items-center gap-2 min-w-0">
                     <div className="p-2 bg-rose-50 rounded-lg">
                         <Pill className="w-5 h-5 text-rose-600" />
                     </div>
-                    <div>
-                        <h3 className="text-[18px] font-bold text-[#1C1917]">Medicine Cabinet</h3>
-                        <p className="text-[12px] text-[#A8A29E]">Track supplements & medications</p>
+                    <div className="min-w-0">
+                        <h3 className="text-[18px] font-bold text-[#1C1917] truncate">Medicine Cabinet</h3>
+                        <p className="text-[12px] text-[#A8A29E] truncate">Track supplements & medications</p>
                     </div>
                 </div>
                 <button
@@ -123,7 +123,7 @@ export function MedicineCabinet() {
                         onSubmit={handleAddSupplement}
                         className="mb-6 space-y-4 overflow-hidden"
                     >
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3">
                             <div className="col-span-2">
                                 <label className="text-[11px] font-bold text-[#A8A29E] uppercase mb-1 block">Supplement Name</label>
                                 <input
@@ -171,19 +171,19 @@ export function MedicineCabinet() {
                     [1, 2].map(i => <div key={i} className="h-16 bg-slate-50 animate-pulse rounded-xl" />)
                 ) : supplements.length > 0 ? (
                     supplements.map((supp) => (
-                        <div key={supp.id} className="group flex items-center justify-between p-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl hover:border-rose-200 transition-colors">
-                            <div className="flex items-center gap-3">
+                        <div key={supp.id} className="group flex items-center justify-between gap-3 p-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl hover:border-rose-200 transition-colors min-w-0">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <div className="w-10 h-10 bg-white rounded-lg border border-[#E8E6DF] flex items-center justify-center">
                                     <Activity size={18} className="text-rose-500" />
                                 </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-[#1C1917]">{supp.name}</h4>
-                                    <p className="text-[11px] text-[#57534E]">{supp.dosage || "No dosage"} · Started {new Date(supp.start_date).toLocaleDateString()}</p>
+                                <div className="min-w-0">
+                                    <h4 className="text-sm font-bold text-[#1C1917] truncate">{supp.name}</h4>
+                                    <p className="text-[11px] text-[#57534E] truncate">{supp.dosage || "No dosage"} · Started {new Date(supp.start_date).toLocaleDateString()}</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => handleDelete(supp.id)}
-                                className="p-2 text-[#A8A29E] hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 text-[#A8A29E] hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                                 aria-label={`Remove ${supp.name}`}
                             >
                                 <Trash2 size={16} />

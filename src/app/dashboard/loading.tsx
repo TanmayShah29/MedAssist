@@ -18,7 +18,7 @@ export default function DashboardLoading() {
 
             <div className="mt-8">
                 <Skeleton className="h-5 w-36 mb-4" />
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 md:gap-4">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
                     <BiomarkerCardSkeleton />
                     <BiomarkerCardSkeleton />
                     <BiomarkerCardSkeleton />

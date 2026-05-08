@@ -47,7 +47,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
                     </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     {nonOptimal.map((b, idx) => (
                         <PriorityCard key={String(b.id ?? b.name)} biomarker={b} priority={idx + 1} />
                     ))}
@@ -68,17 +68,17 @@ function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priori
         `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
 
     return (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group min-w-0">
             <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
                     {b.status.toUpperCase()}
                 </span>
                 <span className="text-[10px] text-white/40 font-mono">PRIORITY {priority}</span>
             </div>
-            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors">
+            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors break-words">
                 {b.name}
             </h4>
-            <p className="text-sm text-slate-400 leading-relaxed">{recommendation}</p>
+            <p className="text-sm text-slate-400 leading-relaxed break-words">{recommendation}</p>
         </div>
     );
 }

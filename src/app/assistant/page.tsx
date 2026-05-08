@@ -288,7 +288,7 @@ export function AssistantPageInner() {
             )}
 
             {/* Messages Area */}
-            <div className="grow shrink basis-0 overflow-y-auto p-5 space-y-6">
+            <div className="grow shrink basis-0 overflow-y-auto p-5 space-y-6 min-w-0">
                 {messages.map((msg) => (
                     <div key={msg.id} className={cn(
                         "flex w-full",
@@ -296,16 +296,16 @@ export function AssistantPageInner() {
                     )}>
                         {/* MESSAGE BUBBLES */}
                         {msg.role === "user" ? (
-                            <div className="bg-sky-500 text-white text-sm px-5 py-3.5 rounded-[14px] rounded-tr-sm max-w-[80%] shadow-md shadow-sky-500/10">
+                            <div className="bg-sky-500 text-white text-sm px-5 py-3.5 rounded-[14px] rounded-tr-sm max-w-[80%] shadow-md shadow-sky-500/10 break-words min-w-0">
                                 {msg.content}
                             </div>
                         ) : msg.role === "system_reasoning" ? (
-                            <div className="bg-[#0F172A] rounded-[12px] p-4 max-w-[90%] border border-slate-800 shadow-xl">
+                            <div className="bg-[#0F172A] rounded-[12px] p-4 max-w-[90%] border border-slate-800 shadow-xl min-w-0">
                                 <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 mb-2 flex items-center gap-1.5">
                                     <Sparkles className="w-3 h-3" />
                                     Clinical Pattern Analysis
                                 </p>
-                                <p className="text-slate-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+                                <p className="text-slate-400 text-xs leading-relaxed whitespace-pre-wrap break-words font-mono">
                                     {msg.content}
                                 </p>
                             </div>
@@ -321,7 +321,7 @@ export function AssistantPageInner() {
                                 </div>
                             </div>
                         ) : msg.isError ? (
-                            <div className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                            <div className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0">
                                 <p>{msg.content}</p>
                                 <button
                                     onClick={() => {
@@ -340,7 +340,7 @@ export function AssistantPageInner() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
+                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 [&_*]:break-words" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
                         )}
                     </div>
                 ))}
@@ -453,7 +453,7 @@ export function AssistantPageInner() {
                             <h1 className="font-display text-3xl text-[#1C1917]">
                                 AI Health Assistant
                             </h1>
-                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2">
+                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2 break-words">
                                 <Sparkles className="w-4 h-4 text-sky-500" />
                                 Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "General context"}
                             </p>
@@ -476,18 +476,18 @@ export function AssistantPageInner() {
                                 Current Context
                             </p>
 
-                            <div className="flex items-start justify-between gap-4">
-                                <div>
-                                    <p className="font-display text-xl text-sky-800">
+                            <div className="flex items-start justify-between gap-4 min-w-0">
+                                <div className="min-w-0">
+                                    <p className="font-display text-xl text-sky-800 break-words">
                                         {contextData.title} {contextData.value && `— ${contextData.value}`}
                                     </p>
-                                    <p className="text-sm text-sky-700 mt-1">
+                                    <p className="text-sm text-sky-700 mt-1 break-words">
                                         {contextData.trend} {contextData.status === "critical" && "· Below optimal range"}
                                     </p>
                                 </div>
 
                                 {contextData.status === "critical" && (
-                                    <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200">
+                                    <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200 shrink-0">
                                         Action Required
                                     </span>
                                 )}

@@ -18,15 +18,15 @@ export function ActionItems({ biomarkers }: ActionItemsProps) {
             <div className="space-y-3">
                 {criticalItems.length > 0 ? (
                     criticalItems.map((item, idx) => (
-                        <Link key={idx} href={`/assistant?context=${encodeURIComponent(item.name)}`}>
-                            <div className={`rounded-lg p-3 border mb-3 flex gap-3 items-start transition-colors ${item.status === 'critical' ? 'bg-red-50 border-red-100 hover:bg-red-100' : 'bg-amber-50 border-amber-100 hover:bg-amber-100'}`}>
+                        <Link key={idx} href={`/assistant?context=${encodeURIComponent(item.name)}`} className="block">
+                            <div className={`rounded-lg p-3 border flex gap-3 items-start transition-colors ${item.status === 'critical' ? 'bg-red-50 border-red-100 hover:bg-red-100' : 'bg-amber-50 border-amber-100 hover:bg-amber-100'}`}>
                                 <div className="mt-0.5 bg-white p-1.5 rounded-full shadow-sm">
                                     <Activity className={`w-4 h-4 ${item.status === 'critical' ? 'text-red-500' : 'text-amber-500'}`} />
                                 </div>
                                 <div className="grow shrink basis-0 min-w-0">
                                     <p className={`text-sm font-medium ${item.status === 'critical' ? 'text-red-900' : 'text-amber-900'}`}>{item.name}</p>
                                     <p className={`text-xs truncate ${item.status === 'critical' ? 'text-red-700/80' : 'text-amber-700/80'}`}>{item.value} {item.unit} (Outside range)</p>
-                                    <span className="text-[10px] font-bold uppercase mt-1 block flex items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase mt-1 inline-flex items-center gap-1">
                                         Ask AI assistant <ArrowRight className="w-2.5 h-2.5" />
                                     </span>
                                 </div>

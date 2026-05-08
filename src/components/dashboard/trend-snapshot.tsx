@@ -56,9 +56,9 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
                     if (!item) return null;
                     const Icon = item.icon;
                     return (
-                        <div key={idx} className="flex justify-between items-center py-2 border-b border-[#E8E6DF]/50 last:border-0">
-                            <span className="text-[14px] font-bold text-[#1C1917]">{item.name}</span>
-                            <div className={`flex items-center gap-1.5 text-[13px] font-bold ${item.color}`}>
+                        <div key={idx} className="flex justify-between items-center gap-3 py-2 border-b border-[#E8E6DF]/50 last:border-0 min-w-0">
+                            <span className="text-[14px] font-bold text-[#1C1917] truncate min-w-0">{item.name}</span>
+                            <div className={`flex items-center gap-1.5 text-[13px] font-bold shrink-0 ${item.color}`}>
                                 <Icon className="w-4 h-4" />
                                 {item.label}{item.pct > 0 ? ` ${item.pct}%` : ''}
                             </div>

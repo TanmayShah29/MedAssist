@@ -164,11 +164,15 @@ describe('POST /api/generate-questions', () => {
         const cachedQuestions = [
             { question: 'Cached question?', context: 'From cache.' },
         ];
+        const cacheKey = 'questions_iron:critical:40.0';
 
         mockFrom.mockReturnValue(chainWith({
             data: {
                 id: 'report-1',
-                raw_ai_json: { cached_doctor_questions: cachedQuestions },
+                raw_ai_json: {
+                    cached_doctor_questions: cachedQuestions,
+                    cached_doctor_questions_key: cacheKey,
+                },
             },
             error: null,
         }));

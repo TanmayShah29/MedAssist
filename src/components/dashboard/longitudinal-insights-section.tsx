@@ -17,14 +17,14 @@ export function LongitudinalInsightsSection({ insights }: LongitudinalInsightsSe
                 <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-auto">Beta</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {insights.map((insight, idx) => (
                     <div
                         key={idx}
-                        className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF]"
+                        className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF] min-w-0"
                     >
                         <div className="mt-1 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
-                        <p className="text-[14px] text-[#475569] leading-relaxed">{insight}</p>
+                        <p className="text-[14px] text-[#475569] leading-relaxed break-words min-w-0">{insight}</p>
                     </div>
                 ))}
             </div>

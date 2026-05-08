@@ -3,7 +3,7 @@ export default function ResultsLoading() {
         <div className="min-h-[100dvh] p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
             <div className="h-8 w-36 rounded-lg mb-2" style={{ background: '#E8E6DF' }} />
             <div className="h-4 w-48 rounded-lg mb-8" style={{ background: '#E8E6DF' }} />
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
                 <div className="h-24 rounded-[14px]" style={{ background: '#E8E6DF' }} />
                 <div className="h-24 rounded-[14px]" style={{ background: '#E8E6DF' }} />
                 <div className="h-24 rounded-[14px]" style={{ background: '#E8E6DF' }} />

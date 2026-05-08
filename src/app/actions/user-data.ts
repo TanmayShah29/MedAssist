@@ -245,7 +245,14 @@ export async function deleteLabResult(labResultId: number | string) {
     if (reportError) throw reportError;
     return { success: true };
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
+    const msg = error instanceof Error
+      ? error.message
+      : typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+        ? (error as { message: string }).message
+        : "Unknown error";
     logger.error("deleteLabResult failed:", msg);
     return { success: false, error: msg };
   }

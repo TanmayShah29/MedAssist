@@ -1,8 +1,8 @@
 /**
  * Tests for server action auth guards and input validation.
  *
- * deleteLabResult: relies on RLS (no explicit auth check in code — RLS does it).
- *   Tests verify input validation and correct DB call structure.
+ * deleteLabResult: verifies the authenticated session, scopes deletes by user,
+ *   and removes child biomarkers before the report for non-cascade deployments.
  *
  * updateUserProfile: has an explicit session ownership check (IDOR prevention).
  *   supabaseAdmin must be non-null for auth checks to be reached.
@@ -69,9 +69,22 @@ function buildProfileChain(result: unknown) {
     return chain;
 }
 
+function buildDeleteChain() {
+    const chain: Record<string, ReturnType<typeof vi.fn>> = {};
+    const methods = ['select', 'eq', 'single', 'delete'];
+    methods.forEach(m => { chain[m] = vi.fn().mockReturnValue(chain); });
+    chain.single.mockResolvedValue({ data: { id: 'report-1' }, error: null });
+    return chain;
+}
+
 // ── deleteLabResult tests ──────────────────────────────────────────────────────
 
 describe('deleteLabResult — input validation', () => {
+    let adminFrom: ReturnType<typeof vi.fn>;
+    let reportChain: Record<string, ReturnType<typeof vi.fn>>;
+    let biomarkerChain: Record<string, ReturnType<typeof vi.fn>>;
+    let deleteReportChain: Record<string, ReturnType<typeof vi.fn>>;
+
     beforeEach(() => {
         vi.clearAllMocks();
         mockGetUser = vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
@@ -84,6 +97,16 @@ describe('deleteLabResult — input validation', () => {
             auth: { getUser: mockGetUser },
             from: mockFrom,
         });
+
+        (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from.mockReset();
+        reportChain = buildDeleteChain();
+        biomarkerChain = buildDeleteChain();
+        deleteReportChain = buildDeleteChain();
+        adminFrom = (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from;
+        adminFrom
+            .mockReturnValueOnce(reportChain)
+            .mockReturnValueOnce(biomarkerChain)
+            .mockReturnValueOnce(deleteReportChain);
     });
 
     it('rejects empty string ID before touching the DB', async () => {
@@ -97,25 +120,39 @@ describe('deleteLabResult — input validation', () => {
     it('passes a UUID string through to the DB (RLS guards access)', async () => {
         const uuid = 'b534d94e-b7e0-4d21-962f-d62d8de7ed81';
         const result = await deleteLabResult(uuid);
-        expect(mockFrom).toHaveBeenCalledWith('lab_results');
-        expect(mockDelete).toHaveBeenCalled();
-        expect(mockEq).toHaveBeenCalledWith('id', uuid);
+        expect(adminFrom).toHaveBeenNthCalledWith(1, 'lab_results');
+        expect(adminFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
+        expect(adminFrom).toHaveBeenNthCalledWith(3, 'lab_results');
+        expect(reportChain.eq).toHaveBeenCalledWith('id', uuid);
+        expect(reportChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
+        expect(biomarkerChain.delete).toHaveBeenCalled();
+        expect(biomarkerChain.eq).toHaveBeenCalledWith('lab_result_id', uuid);
+        expect(biomarkerChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
+        expect(deleteReportChain.delete).toHaveBeenCalled();
+        expect(deleteReportChain.eq).toHaveBeenCalledWith('id', uuid);
+        expect(deleteReportChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
         expect(result.success).toBe(true);
     });
 
     it('calls .from("lab_results").delete().eq("id", ...) for a numeric string ID', async () => {
         const result = await deleteLabResult('42');
-        expect(mockFrom).toHaveBeenCalledWith('lab_results');
-        expect(mockDelete).toHaveBeenCalled();
-        expect(mockEq).toHaveBeenCalledWith('id', '42');
+        expect(adminFrom).toHaveBeenNthCalledWith(1, 'lab_results');
+        expect(adminFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
+        expect(adminFrom).toHaveBeenNthCalledWith(3, 'lab_results');
+        expect(reportChain.eq).toHaveBeenCalledWith('id', '42');
+        expect(biomarkerChain.eq).toHaveBeenCalledWith('lab_result_id', '42');
+        expect(deleteReportChain.eq).toHaveBeenCalledWith('id', '42');
         expect(result.success).toBe(true);
     });
 
     it('surfaces the DB error message on failure', async () => {
-        mockEq.mockResolvedValue({ data: null, error: { message: 'permission denied' } });
+        biomarkerChain.eq
+            .mockReturnValueOnce(biomarkerChain)
+            .mockResolvedValueOnce({ data: null, error: { message: 'permission denied' } });
         const result = await deleteLabResult('some-uuid-99');
         // Error is thrown and caught; message is surfaced
         expect(result.success).toBe(false);
+        expect(result.error).toBe('permission denied');
     });
 });
 
@@ -134,6 +171,8 @@ describe('updateUserProfile — IDOR prevention', () => {
             rpc: mockRpc,
         });
 
+        (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from.mockReset();
+        (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).rpc.mockReset();
         const profileChain = buildProfileChain({ data: { id: 'user-1' }, error: null });
         (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from
             .mockReturnValue(profileChain);
