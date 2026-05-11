@@ -27,7 +27,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
     ].slice(0, 8); // Limit for UI space
 
     return (
-        <div className="h-full overflow-y-auto p-6 space-y-8 bg-[#F5F4EF]">
+        <div className="h-full overflow-y-auto p-5 lg:p-6 space-y-8 bg-[#F5F4EF] min-w-0">
             {/* Detected Entities */}
             <div>
                 <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Entities Detected</h3>
@@ -37,7 +37,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                             <motion.div
                                 key={i}
                                 whileHover={{ scale: 1.02 }}
-                                className="flex min-w-0 items-center px-3 py-2 bg-white border border-[#E8E6DF] rounded-md text-[13px] text-[#1C1917] transition-colors"
+                                className="flex min-w-0 max-w-full items-center px-3 py-2 bg-white border border-[#E8E6DF] rounded-md text-[13px] text-[#1C1917] transition-colors"
                             >
                                 <span className={`w-2 h-2 rounded-full mr-2 ${e.type === 'Symptom' ? 'bg-blue-500' :
                                     e.status === 'critical' ? 'bg-red-500' : 'bg-amber-500'
@@ -61,7 +61,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                         </div>
                         <div className="min-w-0">
                             <p className="text-[13px] text-[#1C1917] leading-tight mb-1">Pattern recognition active</p>
-                            <p className="text-[11px] text-[#57534E]">Groq AI (Llama 3.3) processing...</p>
+                            <p className="text-[11px] text-[#57534E] text-wrap-safe">Groq AI (Llama 3.3) processing...</p>
                         </div>
                     </div>
                     {biomarkers.length > 0 && (

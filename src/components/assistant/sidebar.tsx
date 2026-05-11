@@ -10,17 +10,17 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
     return (
         <div className="space-y-6">
             {/* Recent Labs Context */}
-            <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
-                <h3 className="flex items-center gap-2 font-semibold text-slate-900 mb-4">
+            <div className="bg-white rounded-[14px] p-5 lg:p-6 border border-slate-200 shadow-sm min-w-0">
+                <h3 className="flex items-center gap-2 font-sans font-semibold text-slate-900 mb-4 text-wrap-safe">
                     <FileText className="w-4 h-4 text-sky-500" />
                     Recent Context
                 </h3>
                 {displayMarkers.length > 0 ? (
                     <div className="space-y-3">
                         {displayMarkers.map((b, i) => (
-                            <div key={i} className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
-                                <span className="text-slate-600 truncate mr-2">{b.name}</span>
-                                <span className={`font-semibold shrink-0 ${b.status === 'optimal' ? 'text-emerald-600' :
+                            <div key={i} className="flex flex-col gap-1 text-sm p-3 bg-slate-50 rounded-lg min-w-0 sm:flex-row sm:justify-between sm:items-center">
+                                <span className="text-slate-600 text-wrap-safe">{b.name}</span>
+                                <span className={`font-semibold sm:shrink-0 text-wrap-safe ${b.status === 'optimal' ? 'text-emerald-600' :
                                     b.status === 'critical' ? 'text-red-600' : 'text-amber-600'
                                     }`}>
                                     {b.value} {b.unit}
@@ -37,12 +37,12 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
             </div>
 
             {/* Suggested Questions */}
-            <div className="bg-[#F5F4EF] rounded-[14px] p-6 border border-[#E8E6DF]">
-                <h3 className="flex items-center gap-2 font-semibold text-[#1C1917] mb-4">
+            <div className="bg-[#F5F4EF] rounded-[14px] p-5 lg:p-6 border border-[#E8E6DF] min-w-0">
+                <h3 className="flex items-center gap-2 font-sans font-semibold text-[#1C1917] mb-4 text-wrap-safe">
                     <HelpCircle className="w-4 h-4 text-sky-500" />
                     Help & Guidance
                 </h3>
-                <div className="space-y-2 text-sm text-[#57534E] leading-relaxed">
+                <div className="space-y-2 text-sm text-[#57534E] leading-relaxed text-wrap-safe">
                     <p>You can ask things like:</p>
                     <ul className="list-disc ml-4 space-y-1">
                         <li>"What does my low Vitamin D mean?"</li>

@@ -366,7 +366,7 @@ export function AssistantPageInner() {
                  style={{ paddingBottom: 'max(1rem, calc(1rem + env(safe-area-inset-bottom, 0px)))' }}>
                 {/* Suggested Questions */}
                 {messages.filter(m => m.role === 'user').length === 0 && (
-                    <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-none mb-1">
+                    <div className="flex flex-wrap gap-2 pb-3 mb-1 max-h-28 overflow-y-auto lg:max-h-none lg:overflow-visible">
                         {(() => {
                             const criticalMarkers = biomarkers.filter(b => b.status === 'critical').map(b => b.name);
                             const warningMarkers = biomarkers.filter(b => b.status === 'warning').map(b => b.name);
@@ -396,7 +396,7 @@ export function AssistantPageInner() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="whitespace-nowrap px-4 py-2.5 min-h-[44px] bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm disabled:opacity-60"
+                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm disabled:opacity-60 text-left text-wrap-safe"
                                     disabled={isProcessing}
                                 >
                                     {q}
@@ -450,10 +450,10 @@ export function AssistantPageInner() {
                     {/* HEADER - Hidden on mobile because MobileNavbar handles it */}
                     <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="font-display text-3xl text-[#1C1917]">
+                            <h1 className="font-display text-3xl text-[#1C1917] text-wrap-safe">
                                 AI Health Assistant
                             </h1>
-                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2 break-words">
+                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2 text-wrap-safe">
                                 <Sparkles className="w-4 h-4 text-sky-500" />
                                 Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "General context"}
                             </p>
@@ -461,7 +461,7 @@ export function AssistantPageInner() {
 
                         <button
                             onClick={() => router.back()}
-                            className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center gap-2"
+                            className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center justify-center gap-2 shrink-0"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back
@@ -496,7 +496,7 @@ export function AssistantPageInner() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(360px,0.9fr)] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(280px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
 
                         {/* FULL WIDTH CHAT ON MOBILE */}
                         <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1">

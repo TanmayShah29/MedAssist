@@ -317,10 +317,10 @@ export default function DashboardClient({
             </div>
 
             {/* Header row */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 min-w-0">
                 <div className="hidden lg:block">
-                    <div className="flex items-center gap-3">
-                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917]">Clinical Overview</h1>
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917] text-wrap-safe">Clinical Overview</h1>
                         {isOffline && (
                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse">
                                 <WifiOff size={12} />
@@ -355,7 +355,7 @@ export default function DashboardClient({
                         </div>
                     )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0 print:hidden">
+                <div className="flex items-center gap-2 shrink-0 print:hidden sm:justify-end">
                     <button
                         onClick={() => window.print()}
                         className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -366,20 +366,21 @@ export default function DashboardClient({
                     </button>
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-4 py-2.5 text-sm font-semibold transition-colors flex items-center gap-2 min-h-[44px]"
+                        className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-3 sm:px-4 py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload size={16} />
-                        Upload Report
+                        <span className="hidden sm:inline">Upload Report</span>
+                        <span className="sm:hidden">Upload</span>
                     </button>
                 </div>
             </div>
 
             {/* Informational banners */}
             {totalCount > 0 && (
-                <div className="flex flex-col md:flex-row gap-4 mb-8">
+                <div className="flex flex-col xl:flex-row gap-4 mb-8">
                     {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0">
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
@@ -393,13 +394,13 @@ export default function DashboardClient({
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex gap-2 sm:ml-auto">
+                            <div className="flex gap-2 sm:ml-auto flex-wrap">
                                 {[
                                     { count: optimalCount, label: 'Opt', bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-700' },
                                     { count: warningCount, label: 'Mon', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-700' },
                                     { count: criticalCount, label: 'Act', bg: 'bg-red-50 border-red-100', text: 'text-red-700' },
                                 ].map(s => (
-                                    <div key={s.label} className={`text-center px-3 py-1 ${s.bg} rounded-lg border`}>
+                                    <div key={s.label} className={`text-center px-3 py-1 ${s.bg} rounded-lg border min-w-[58px]`}>
                                         <span className={`block text-xs font-bold ${s.text}`}>{s.count}</span>
                                         <span className={`text-[10px] ${s.text} uppercase font-semibold`}>{s.label}</span>
                                     </div>
@@ -409,14 +410,14 @@ export default function DashboardClient({
                     )}
 
                     {latestLabResult && !demoMode && initialLabResults.length > 0 && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0">
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
                                     <ClipboardList size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917]">Recency Tracking</h3>
-                                    <p className="text-xs text-[#57534E]">
+                                    <h3 className="text-sm font-bold text-[#1C1917] font-sans text-wrap-safe">Recency Tracking</h3>
+                                    <p className="text-xs text-[#57534E] text-wrap-safe">
                                         Last test was{' '}
                                         {Math.floor(
                                             (Date.now() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) /
@@ -426,7 +427,7 @@ export default function DashboardClient({
                                     </p>
                                 </div>
                             </div>
-                            <div className="sm:ml-auto">
+                            <div className="sm:ml-auto shrink-0">
                                 {Math.floor(
                                     (Date.now() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) /
                                         86_400_000

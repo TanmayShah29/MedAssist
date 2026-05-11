@@ -434,6 +434,17 @@
     overflow-wrap: anywhere;
   }
 
+  .text-wrap-safe {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+  }
+
+  .flex-wrap-safe {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
   /* Robust Safari backdrop-filter prefixes */
   .backdrop-blur-sm {
     -webkit-backdrop-filter: blur(4px) !important;

@@ -240,11 +240,11 @@ export default function ResultsPage() {
                             <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual.</p>
                             <TrustLayer variant="compact" className="mt-3" />
                         </div>
-                        <div className="flex flex-wrap gap-2 shrink-0 print:hidden">
+                        <div className="flex flex-wrap gap-2 shrink-0 print:hidden sm:justify-end">
                             <button
                                 onClick={() => setRefreshKey((k) => k + 1)}
                                 disabled={loading}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[44px] h-11"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[44px] h-11"
                                 title="Refresh results"
                                 style={{ WebkitAppearance: 'none' }}
                             >
@@ -253,7 +253,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[44px] h-11"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[44px] h-11"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 <Printer size={16} />
@@ -262,7 +262,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="text-white rounded-[10px] px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[44px] h-11 flex items-center gap-1.5"
+                                className="text-white rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[44px] h-11 flex items-center justify-center gap-1.5"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Upload
@@ -339,7 +339,7 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Status summary row ── */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6">
                     <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1">{optimalCount}</span>
                         <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">Optimal</span>
@@ -355,8 +355,8 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Category tabs & Search ── */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide scroll-smooth mask-fade-right -mx-3 px-3 sm:mx-0 sm:px-0">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-6 min-w-0">
+                    <div className="flex flex-wrap gap-2 pb-1 min-w-0 xl:flex-1 xl:flex-nowrap xl:overflow-x-auto xl:scrollbar-hide xl:scroll-smooth xl:mask-fade-right">
                         {CATEGORIES.map(category => (
                             <button
                                 key={category}
@@ -364,7 +364,7 @@ export default function ResultsPage() {
                                     setSelectedCategory(category)
                                     setSelectedBiomarker(null)
                                 }}
-                                className={`px-4 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 min-h-[44px] ${selectedCategory === category
+                                className={`px-3.5 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 min-h-[44px] ${selectedCategory === category
                                     ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
                                     : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF]'
                                     }`}
@@ -373,14 +373,14 @@ export default function ResultsPage() {
                             </button>
                         ))}
                     </div>
-                    <div className="relative">
+                    <div className="relative w-full xl:w-80 xl:shrink-0">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A8A29E]" />
                         <input
                             type="text"
                             placeholder="Search biomarkers..."
                             value={searchQuery}
                             onChange={(e) => setSearchValue(e.target.value)}
-                            className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full md:w-64 transition-all h-11"
+                            className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full transition-all h-11"
                         />
                     </div>
                 </div>
@@ -449,8 +449,8 @@ export default function ResultsPage() {
 
                                         <div className="grow shrink basis-0 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[15px] font-semibold text-[#1C1917] truncate" title={b.name}>{b.name}</span>
-                                                <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] truncate">
+                                                <span className="text-[15px] font-semibold text-[#1C1917] text-wrap-safe" title={b.name}>{b.name}</span>
+                                                <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] break-words">
                                                     {b.category}
                                                 </span>
                                             </div>
@@ -480,7 +480,7 @@ export default function ResultsPage() {
                                             />
                                         </div>
 
-                                        <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-3 ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                        <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-3 text-center ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                             b.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                             }`}>
                                             {b.status === 'optimal' ? 'Optimal' :

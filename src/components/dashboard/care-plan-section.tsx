@@ -30,19 +30,19 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
     return (
         <div
             id="personalized-care-plan"
-            className="bg-[#1C1917] rounded-[24px] p-8 mb-6 text-white shadow-xl relative overflow-hidden"
+            className="bg-[#1C1917] rounded-[18px] p-5 lg:p-6 mb-6 text-white shadow-xl relative overflow-hidden min-w-0"
         >
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none select-none">
-                <Sparkles size={120} />
+            <div className="absolute -top-3 -right-3 p-6 opacity-10 pointer-events-none select-none">
+                <Sparkles size={96} />
             </div>
 
             <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+                <div className="flex items-start gap-3 mb-5 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30 shrink-0">
                         <ArrowRight className="w-5 h-5 text-sky-400" />
                     </div>
-                    <h3 className="text-xl font-bold font-display" style={{ marginLeft: 12 }}>
+                    <h3 className="text-[20px] leading-tight font-bold font-display text-wrap-safe">
                         Personalized Care Plan
                     </h3>
                 </div>
@@ -68,12 +68,12 @@ function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priori
         `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
 
     return (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors group min-w-0">
-            <div className="flex items-center justify-between mb-3">
+        <div className="bg-white/5 border border-white/10 rounded-[14px] p-4 lg:p-5 hover:bg-white/10 transition-colors group min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
                     {b.status.toUpperCase()}
                 </span>
-                <span className="text-[10px] text-white/40 font-mono">PRIORITY {priority}</span>
+                <span className="text-[10px] text-white/40 font-mono shrink-0">PRIORITY {priority}</span>
             </div>
             <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors break-words">
                 {b.name}
