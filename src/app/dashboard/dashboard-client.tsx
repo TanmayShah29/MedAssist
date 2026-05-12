@@ -358,7 +358,7 @@ export default function DashboardClient({
                 <div className="flex items-center gap-2 shrink-0 print:hidden sm:justify-end">
                     <button
                         onClick={() => window.print()}
-                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 transition-all shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 active:scale-95 transition-all shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Print Report"
                         style={{ WebkitAppearance: 'none' }}
                     >
@@ -366,7 +366,7 @@ export default function DashboardClient({
                     </button>
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-3 sm:px-4 py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                        className="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[10px] px-3 sm:px-4 py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload size={16} />
@@ -386,8 +386,8 @@ export default function DashboardClient({
                                     <Activity size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917]">Risk Level Summary</h3>
-                                    <p className="text-xs text-[#57534E]">
+                                    <h3 className="text-sm font-bold text-[#1C1917] text-wrap-safe">Risk Level Summary</h3>
+                                    <p className="text-xs text-[#57534E] text-wrap-safe">
                                         {criticalCount > 0
                                             ? `${criticalCount} urgent markers need attention`
                                             : `${warningCount} markers to monitor closely`}
@@ -427,7 +427,7 @@ export default function DashboardClient({
                                     </p>
                                 </div>
                             </div>
-                            <div className="sm:ml-auto shrink-0">
+                            <div className="sm:ml-auto shrink-0 flex items-center">
                                 {Math.floor(
                                     (Date.now() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) /
                                         86_400_000
@@ -450,7 +450,7 @@ export default function DashboardClient({
                     </p>
                     <button
                         onClick={() => setDemoMode(false)}
-                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors min-h-[44px]"
+                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 active:scale-95 transition-colors min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         Show my data

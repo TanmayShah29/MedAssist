@@ -224,7 +224,7 @@ export default function ResultsPage() {
                         </p>
                         <button
                             onClick={() => setDemoMode(false)}
-                            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors min-h-[44px]"
+                            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 active:scale-95 transition-colors min-h-[44px]"
                         >
                             Show my data
                         </button>
@@ -235,16 +235,16 @@ export default function ResultsPage() {
                 <div className="mb-6">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917]">Lab Results</h1>
+                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917] text-wrap-safe">Lab Results</h1>
                             <p className="text-[14px] md:text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
-                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1">Reference ranges vary by lab and individual.</p>
+                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1 text-wrap-safe">Reference ranges vary by lab and individual.</p>
                             <TrustLayer variant="compact" className="mt-3" />
                         </div>
                         <div className="flex flex-wrap gap-2 shrink-0 print:hidden sm:justify-end">
                             <button
                                 onClick={() => setRefreshKey((k) => k + 1)}
                                 disabled={loading}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] transition-colors disabled:opacity-50 min-h-[44px] h-11"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px] h-11"
                                 title="Refresh results"
                                 style={{ WebkitAppearance: 'none' }}
                             >
@@ -253,7 +253,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] transition-colors min-h-[44px] h-11"
+                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] active:scale-95 transition-colors min-h-[44px] h-11"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 <Printer size={16} />
@@ -262,7 +262,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="text-white rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 transition-colors min-h-[44px] h-11 flex items-center justify-center gap-1.5"
+                                className="text-white rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 active:scale-95 transition-colors min-h-[44px] h-11 flex items-center justify-center gap-1.5"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Upload
@@ -274,7 +274,7 @@ export default function ResultsPage() {
 
                 {/* Feature 6: Plain English Summary */}
                 {labResults.length > 0 && (selectedReportId === 'all' || selectedReportId === labResults[0]?.id) && (
-                    <div className="mb-8 p-6 bg-white border border-sky-100 rounded-2xl shadow-sm relative overflow-hidden group">
+                    <div className="mb-8 p-5 lg:p-6 bg-white border border-sky-100 rounded-2xl shadow-sm relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
                             <Sparkles size={64} className="text-sky-500" />
                         </div>
@@ -284,10 +284,10 @@ export default function ResultsPage() {
                                     The Bottom Line
                                 </span>
                             </div>
-                            <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
+                            <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-tight text-wrap-safe">
                                 {labResultSummary(selectedReportId === 'all' ? labResults[0] : labResults.find(r => String(r.id) === selectedReportId)) || "Select a report to see the bottom line interpretation."}
                             </h2>
-                            <p className="text-xs text-slate-400 mt-4 italic">
+                            <p className="text-xs text-slate-400 mt-4 italic text-wrap-safe">
                                 * This clinical interpretation is generated by AI based on your specific biomarkers and reference ranges.
                             </p>
                         </div>
@@ -296,46 +296,33 @@ export default function ResultsPage() {
 
                 {/* ── Report Selector ── */}
                 <div style={{ marginBottom: 24 }} className="print:hidden">
-                    <label style={{
-                        fontSize: 11,
-                        color: '#A8A29E',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        display: 'block',
-                        marginBottom: 6
-                    }}>
+                    <label className="section-label mb-2 block">
                         VIEWING REPORT
                     </label>
-                    <select
-                        value={selectedReportId}
-                        onChange={e => setSelectedReportId(e.target.value)}
-                        style={{
-                            background: '#F5F4EF',
-                            border: '1px solid #E8E6DF',
-                            borderRadius: 8,
-                            padding: '8px 12px',
-                            fontSize: 14,
-                            color: '#1C1917',
-                            cursor: 'pointer',
-                            width: '100%',
-                            maxWidth: '280px'
-                        }}
-                    >
-                        <option value="all">All reports</option>
-                        {labResults?.map(r => {
-                            const score = r.health_score ?? (r.raw_ai_json as Record<string, unknown> | null)?.healthScore;
-                            return (
-                                <option key={r.id} value={r.id.toString()}>
-                                    {new Date(r.uploaded_at || r.created_at).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })} — Score: {score || 'N/A'}
-                                </option>
-                            );
-                        })}
-                    </select>
+                    <div className="relative max-w-[280px]">
+                        <select
+                            value={selectedReportId}
+                            onChange={e => setSelectedReportId(e.target.value)}
+                            className="input-base pr-10"
+                        >
+                            <option value="all">All reports</option>
+                            {labResults?.map(r => {
+                                const score = r.health_score ?? (r.raw_ai_json as Record<string, unknown> | null)?.healthScore;
+                                return (
+                                    <option key={r.id} value={r.id.toString()}>
+                                        {new Date(r.uploaded_at || r.created_at).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                        })} — Score: {score || 'N/A'}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#A8A29E]">
+                            <TrendingUp size={16} className="rotate-90" />
+                        </div>
+                    </div>
                 </div>
 
                 {/* ── Status summary row ── */}
@@ -380,7 +367,7 @@ export default function ResultsPage() {
                             placeholder="Search biomarkers..."
                             value={searchQuery}
                             onChange={(e) => setSearchValue(e.target.value)}
-                            className="pl-10 pr-4 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full transition-all h-11"
+                            className="input-base pl-10 h-11"
                         />
                     </div>
                 </div>
@@ -397,30 +384,18 @@ export default function ResultsPage() {
                                 ))}
                             </div>
                         ) : biomarkers.length === 0 && selectedCategory === 'all' ? (
-                            <div style={{ textAlign: 'center', padding: '64px 32px' }}>
-                                <div style={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: '50%',
-                                    background: '#E0F2FE',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 16px auto'
-                                }}>
+                            <div className="py-16 px-8 text-center flex flex-col items-center justify-center">
+                                <div className="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
                                     <ClipboardList size={24} color="#0EA5E9" />
                                 </div>
-                                <h3 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', margin: '0 0 8px 0' }}>
-                                    No results yet
-                                </h3>
-                                <p style={{ fontSize: 15, color: '#57534E', margin: '0 0 24px 0' }}>
+                                <h3 className="text-xl font-bold text-[#1C1917] mb-2">No results yet</h3>
+                                <p className="text-[15px] text-[#57534E] mb-6 max-w-xs mx-auto">
                                     Upload a lab report from your dashboard to see your biomarkers here.
                                 </p>
-                                <button onClick={() => router.push('/dashboard')} style={{
-                                    background: '#0EA5E9', color: 'white', border: 'none',
-                                    borderRadius: 10, padding: '10px 20px', fontSize: 14,
-                                    fontWeight: 600, cursor: 'pointer', minHeight: '44px'
-                                }}>
+                                <button 
+                                    onClick={() => router.push('/dashboard')} 
+                                    className="bg-sky-500 text-white rounded-[10px] px-6 py-2.5 text-[14px] font-bold active:scale-95 transition-transform min-h-[44px]"
+                                >
                                     Go to dashboard
                                 </button>
                             </div>
@@ -433,54 +408,55 @@ export default function ResultsPage() {
                                 <p className="text-[13px] text-[#A8A29E] mt-1">Try a different search or filter.</p>
                             </div>
                         ) : (
-                            <div>
+                            <div className="divide-y divide-[#E8E6DF]">
                                 {filteredBiomarkers.map((b, i) => (
                                     <div
                                         key={b.id}
                                         onClick={() => handleBiomarkerClick(b)}
-                                        className={`flex items-start p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors ${i !== filteredBiomarkers.length - 1 ? 'border-b border-[#E8E6DF]' : ''
-                                            } ${selectedBiomarker?.id === b.id ? 'border-l-[3px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'border-l-[3px] border-l-red-500 bg-red-50/30' :
-                                                b.status === 'warning' ? 'border-l-[3px] border-l-amber-500 bg-amber-50/20' : ''
+                                        className={`flex items-start p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors active:bg-[#E8E6DF]/50 ${selectedBiomarker?.id === b.id ? 'border-l-[4px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'bg-red-50/30' :
+                                                b.status === 'warning' ? 'bg-amber-50/20' : ''
                                             }`}
                                     >
-                                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mr-3 ${b.status === 'optimal' ? 'bg-emerald-500' :
+                                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1.5 mr-3 ${b.status === 'optimal' ? 'bg-emerald-500' :
                                             b.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
                                             }`} />
 
                                         <div className="grow shrink basis-0 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[15px] font-semibold text-[#1C1917] text-wrap-safe" title={b.name}>{b.name}</span>
-                                                <span className="text-[12px] bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] break-words">
+                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                <span className="text-[15px] font-bold text-[#1C1917] text-wrap-safe" title={b.name}>{b.name}</span>
+                                                <span className="text-[11px] font-bold bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider shrink-0">
                                                     {b.category}
                                                 </span>
                                             </div>
-                                            <div className="text-[15px] text-[#57534E] leading-relaxed">
+                                            <div className="text-[15px] font-medium text-[#57534E] leading-relaxed">
                                                 {b.value !== null && b.value !== undefined ? `${b.value} ${b.unit || ''}` : 'Value unavailable'}
                                                 {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) ? (
-                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline">
+                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline font-normal">
                                                         (ref: {b.reference_range_min ?? 'N/A'}–{b.reference_range_max ?? 'N/A'})
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline">(ref: N/A)</span>
+                                                    <span className="text-[12px] text-[#A8A29E] ml-0 block sm:ml-2 sm:inline font-normal">(ref: N/A)</span>
                                                 )}
                                             </div>
                                             {getBiomarkerReportDate(b) && (
-                                                <p className="text-[11px] text-[#A8A29E] mt-0.5">
+                                                <p className="text-[11px] text-[#A8A29E] mt-0.5 font-medium">
                                                     From report {mounted ? new Date(getBiomarkerReportDate(b)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                                 </p>
                                             )}
-                                            <RangeBar
-                                                value={parseFloat(String(b.value))}
-                                                min={b.reference_range_min || 0}
-                                                max={b.reference_range_max || 100}
-                                                referenceMin={b.reference_range_min || 0}
-                                                referenceMax={b.reference_range_max || 100}
-                                                unit={b.unit}
-                                                status={b.status as 'optimal' | 'warning' | 'critical'}
-                                            />
+                                            <div className="mt-3">
+                                                <RangeBar
+                                                    value={parseFloat(String(b.value))}
+                                                    min={b.reference_range_min || 0}
+                                                    max={b.reference_range_max || 100}
+                                                    referenceMin={b.reference_range_min || 0}
+                                                    referenceMax={b.reference_range_max || 100}
+                                                    unit={b.unit}
+                                                    status={b.status as 'optimal' | 'warning' | 'critical'}
+                                                />
+                                            </div>
                                         </div>
 
-                                        <div className={`px-2 py-1 rounded-[6px] text-[12px] font-semibold shrink-0 ml-3 text-center ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                        <div className={`px-2 py-1 rounded-[6px] text-[11px] font-bold shrink-0 ml-3 text-center uppercase tracking-wider ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                             b.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                             }`}>
                                             {b.status === 'optimal' ? 'Optimal' :
@@ -496,60 +472,60 @@ export default function ResultsPage() {
                     <div className="hidden lg:block lg:col-span-2">
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
-                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center">
-                                    <p className="text-[15px] text-[#A8A29E]">Select a result to see AI interpretation</p>
+                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center shadow-sm">
+                                    <p className="text-[15px] text-[#A8A29E] font-medium">Select a result to see AI interpretation</p>
                                 </div>
                             ) : (
-                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6 animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-sm">
                                     <div className="flex justify-between items-start mb-4">
-                                        <h2 className="text-[20px] font-semibold text-[#1C1917] leading-tight pr-4">{selectedBiomarker.name}</h2>
+                                        <h2 className="text-[20px] font-bold text-[#1C1917] leading-tight pr-4 text-wrap-safe">{selectedBiomarker.name}</h2>
                                         <button
                                             onClick={() => setSelectedBiomarker(null)}
-                                            className="text-[#A8A29E] hover:text-[#1C1917] transition-colors"
+                                            className="text-[#A8A29E] hover:text-[#1C1917] transition-colors p-1"
                                         >
                                             <X size={20} />
                                         </button>
                                     </div>
 
-                                    <div className={`bg-white border border-[#E8E6DF] rounded-[10px] p-4 mb-4 text-center ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
+                                    <div className={`bg-white border border-[#E8E6DF] rounded-[12px] p-5 mb-4 text-center shadow-sm ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
                                         selectedBiomarker.status === 'warning' ? 'text-amber-500' : 'text-red-500'
                                         }`}>
-                                        <div className="text-[32px] font-bold font-display leading-none mb-1">
+                                        <div className="text-[36px] font-bold font-display leading-none mb-1 text-wrap-safe">
                                             {selectedBiomarker.value !== null && selectedBiomarker.value !== undefined ? `${selectedBiomarker.value} ${selectedBiomarker.unit || ''}` : 'N/A'}
                                         </div>
                                         {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) ? (
-                                            <p className="text-[12px] text-[#A8A29E]">
+                                            <p className="text-[13px] text-[#A8A29E] font-medium">
                                                 Reference: {selectedBiomarker.reference_range_min ?? 'N/A'} – {selectedBiomarker.reference_range_max ?? 'N/A'}
                                             </p>
                                         ) : (
-                                            <p className="text-[12px] text-[#A8A29E]">Reference: N/A</p>
+                                            <p className="text-[13px] text-[#A8A29E] font-medium">Reference: N/A</p>
                                         )}
                                     </div>
 
-                                    <div className={`w-full text-center py-2 rounded-[6px] text-[15px] font-semibold mb-4 ${selectedBiomarker.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
+                                    <div className={`w-full text-center py-2.5 rounded-[8px] text-[14px] font-bold mb-6 uppercase tracking-widest ${selectedBiomarker.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                         selectedBiomarker.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                         }`}>
-                                        {selectedBiomarker.status === 'optimal' ? 'Optimal' :
-                                            selectedBiomarker.status === 'warning' ? 'Monitor' : 'Action Needed'}
+                                        {selectedBiomarker.status === 'optimal' ? 'Optimal Range' :
+                                            selectedBiomarker.status === 'warning' ? 'Needs Monitoring' : 'Requires Action'}
                                     </div>
 
-                                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-2 tracking-wider">AI INTERPRETATION</h3>
-                                    <p className="text-[15px] text-[#57534E] leading-relaxed mb-6">
+                                    <h3 className="text-[11px] font-bold uppercase text-[#A8A29E] mb-3 tracking-widest">AI INTERPRETATION</h3>
+                                    <p className="text-[15px] text-[#57534E] leading-relaxed mb-8 text-wrap-safe">
                                         {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
                                     </p>
 
-                                    <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-3 tracking-wider flex items-center gap-2">
-                                        <TrendingUp size={12} className="text-sky-500" />
+                                    <h3 className="text-[11px] font-bold uppercase text-[#A8A29E] mb-4 tracking-widest flex items-center gap-2">
+                                        <TrendingUp size={14} className="text-sky-500" />
                                         HISTORICAL TREND
                                     </h3>
 
-                                    <div className="mb-6 h-[200px]">
+                                    <div className="mb-8 h-[220px]">
                                         {loadingTrends ? (
                                             <div className="h-full w-full bg-white/50 rounded-lg flex items-center justify-center animate-pulse">
                                                 <span className="text-xs text-slate-400">Loading history...</span>
                                             </div>
                                         ) : biomarkerTrends.length > 1 ? (
-                                            <div className="h-full w-full scale-95 origin-top">
+                                            <div className="h-full w-full">
                                                 <WellnessTrendChart
                                                     data={biomarkerTrends}
                                                     supplements={supplements}
@@ -557,25 +533,25 @@ export default function ResultsPage() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-lg flex flex-col items-center justify-center p-4 text-center">
-                                                <Info size={24} className="text-[#A8A29E] mb-2 opacity-30" />
-                                                <p className="text-[11px] text-[#A8A29E]">Not enough data to show a trend line yet. Upload more reports to track progress.</p>
+                                            <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-xl flex flex-col items-center justify-center p-6 text-center bg-white/30">
+                                                <Info size={28} className="text-[#A8A29E] mb-3 opacity-30" />
+                                                <p className="text-[12px] text-[#A8A29E] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to track progress.</p>
                                             </div>
                                         )}
                                     </div>
 
-                                    <div className="flex justify-between items-center pt-4 border-t border-[#E8E6DF]">
-                                        <span className="text-[12px] text-[#A8A29E]">Confidence</span>
+                                    <div className="flex justify-between items-center py-4 border-t border-[#E8E6DF] mb-4">
+                                        <span className="text-[12px] text-[#A8A29E] font-bold uppercase tracking-wider">AI Confidence</span>
                                         <div className="flex items-center gap-4">
                                             {isDebugMode && (
                                                 <button
                                                     onClick={() => alert(JSON.stringify(selectedBiomarker, null, 2))}
-                                                    className="text-[10px] font-bold text-indigo-500 hover:underline"
+                                                    className="text-[10px] font-bold text-sky-500 hover:underline"
                                                 >
-                                                    RAW JSON
+                                                    RAW DATA
                                                 </button>
                                             )}
-                                            <span className="text-[12px] font-semibold text-[#1C1917]">
+                                            <span className="text-[13px] font-bold text-[#1C1917]">
                                                 {selectedBiomarker.confidence !== null && selectedBiomarker.confidence !== undefined ? `${Math.round(selectedBiomarker.confidence * 100)}%` : '—'}
                                             </span>
                                         </div>
@@ -583,9 +559,9 @@ export default function ResultsPage() {
 
                                     <button
                                         onClick={() => router.push('/assistant')}
-                                        className="w-full mt-4 bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] py-2.5 text-[15px] font-medium transition-colors"
+                                        className="w-full bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[12px] py-3 text-[15px] font-bold transition-all shadow-md shadow-sky-500/20"
                                     >
-                                        Ask AI about this
+                                        Discuss with AI Assistant
                                     </button>
                                 </div>
                             )}
@@ -606,43 +582,21 @@ export default function ResultsPage() {
                 <DoctorQuestions biomarkers={questionBiomarkers} className="mt-8" />
 
                 {/* ── Sticky Nudge Bar ── */}
-                <div style={{
-                    background: '#F5F4EF',
-                    border: '1px solid #E8E6DF',
-                    borderRadius: 14,
-                    padding: '16px 20px',
-                    marginTop: 32,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 16,
-                }} className="flex-col sm:flex-row text-center sm:text-left">
-                    <div style={{ minWidth: 0 }}>
-                        <p style={{ fontWeight: 600, fontSize: 15, color: '#1C1917', margin: 0 }}>
+                <div className="bg-white border border-[#E8E6DF] rounded-2xl p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-sm">
+                    <div className="min-w-0 flex-1 text-center sm:text-left">
+                        <p className="font-bold text-lg text-[#1C1917] mb-1">
                             Had a recent blood test?
                         </p>
-                        <p style={{ fontSize: 13, color: '#57534E', margin: '4px 0 0 0' }}>
-                            Upload it now so MedAssist can track how your values are changing over time.
+                        <p className="text-[14px] text-[#57534E] leading-relaxed">
+                            Upload it now so MedAssist can track how your values are changing over time and provide longitudinal insights.
                         </p>
                     </div>
                     <button
                         onClick={() => router.push('/dashboard?openUpload=1')}
-                        style={{
-                            background: '#0EA5E9',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 10,
-                            padding: '10px 20px',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0
-                        }}
-                        className="flex items-center gap-2 w-full sm:w-auto justify-center min-h-[44px]"
+                        className="bg-sky-500 text-white rounded-[12px] px-8 py-3 text-[15px] font-bold active:scale-95 transition-all shadow-md shadow-sky-500/10 flex items-center gap-2 w-full sm:w-auto justify-center min-h-[48px]"
                     >
                         Upload report
-                        <ArrowRight size={16} />
+                        <ArrowRight size={18} />
                     </button>
                 </div>
             </div >

@@ -396,7 +396,7 @@ export function AssistantPageInner() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm disabled:opacity-60 text-left text-wrap-safe"
+                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 active:scale-95 transition-all shadow-sm disabled:opacity-60 text-left text-wrap-safe shrink-0"
                                     disabled={isProcessing}
                                 >
                                     {q}
@@ -413,20 +413,19 @@ export function AssistantPageInner() {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onKeyDown={(e: any) => e.key === "Enter" && !isProcessing && handleSendMessage()}
                         disabled={isProcessing}
-                        className="grow shrink basis-0 px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[12px] text-sm text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="input-base grow shrink basis-0"
                         placeholder={isProcessing ? "AI is thinking..." : "Ask about your results..."}
                     />
                     <button
                         onClick={() => handleSendMessage()}
                         disabled={!inputValue.trim() || isProcessing}
                         aria-label="Send message"
-                        style={{
-                            background: isProcessing || !inputValue.trim() ? '#94A3B8' : '#0EA5E9',
-                            cursor: isProcessing || !inputValue.trim() ? 'not-allowed' : 'pointer',
-                            opacity: isProcessing || !inputValue.trim() ? 0.7 : 1,
-                            transition: 'all 0.15s ease'
-                        }}
-                        className="px-4 py-3 text-white rounded-[12px] shadow-md shadow-sky-500/20 flex items-center justify-center min-w-[50px] min-h-[44px]"
+                        className={cn(
+                            "px-4 py-3 text-white rounded-[12px] shadow-md flex items-center justify-center min-w-[50px] min-h-[44px] transition-all active:scale-95",
+                            isProcessing || !inputValue.trim() 
+                                ? "bg-slate-400 cursor-not-allowed opacity-70 shadow-none" 
+                                : "bg-sky-500 hover:bg-sky-600 shadow-sky-500/20"
+                        )}
                     >
                         {isProcessing ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
