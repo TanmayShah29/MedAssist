@@ -17,6 +17,59 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
   );
 }
 
+function HeroWorkspaceScene() {
+  return (
+    <div className="pointer-events-none absolute inset-0 hidden lg:block">
+      <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Monitor</p>
+          <span className="h-2 w-2 rounded-full bg-amber-400" />
+        </div>
+        <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-amber-100">
+          <div className="h-full w-2/3 rounded-full bg-amber-400" />
+        </div>
+        <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
+      </div>
+
+      <div className="absolute right-[7%] top-[33%] w-60 rounded-[14px] border border-emerald-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
+          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+        </div>
+        <p className="text-sm font-bold text-[#1C1917]">3 doctor questions drafted</p>
+        <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Bring a focused one-page brief to the appointment.</p>
+      </div>
+
+      <div className="absolute bottom-[27%] left-[23%] h-px w-[54%] origin-center bg-sky-300/70 landing-pulse-line" />
+    </div>
+  );
+}
+
+function MobileHeroPreview() {
+  return (
+    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Live preview</p>
+        <Brain className="h-4 w-4 text-violet-500" />
+      </div>
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E8E6DF]">
+        <div className="h-full rounded-full bg-sky-500 landing-progress" />
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-[12px] bg-amber-50 p-3">
+          <p className="text-[10px] font-bold uppercase text-amber-700">Monitor</p>
+          <p className="mt-1 text-sm font-bold text-[#1C1917]">Glucose +15%</p>
+        </div>
+        <div className="rounded-[12px] bg-emerald-50 p-3">
+          <p className="text-[10px] font-bold uppercase text-emerald-700">Ready</p>
+          <p className="mt-1 text-sm font-bold text-[#1C1917]">3 questions</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────
 
 export default function LandingPage() {
@@ -26,44 +79,29 @@ export default function LandingPage() {
       <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-[92dvh] pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden flex items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(14,165,233,0.16),transparent_28rem),linear-gradient(180deg,#FCFCF9_0%,#FAFAF7_58%,#F5F4EF_100%)]" />
-        <div className="absolute inset-x-4 -bottom-36 hidden lg:block opacity-80">
-          <div className="mx-auto grid max-w-6xl grid-cols-3 gap-4">
-            <div className="h-32 rounded-t-[14px] border border-[#E8E6DF] bg-white/70 p-4 shadow-sm">
-              <p className="section-label mb-2">Key Result</p>
-              <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
-              <p className="mt-1 text-xs font-semibold text-amber-600">+15% from prior</p>
-            </div>
-            <div className="h-40 rounded-t-[14px] border border-sky-100 bg-sky-50/80 p-4 shadow-sm">
-              <p className="section-label mb-2 text-sky-700">Visit Focus</p>
-              <p className="text-sm font-bold leading-snug text-[#1C1917]">Ask whether the glucose trend changes follow-up timing.</p>
-            </div>
-            <div className="h-32 rounded-t-[14px] border border-[#E8E6DF] bg-white/70 p-4 shadow-sm">
-              <p className="section-label mb-2">Next Step</p>
-              <p className="text-sm font-bold text-[#1C1917]">Bring a one-page brief</p>
-              <p className="mt-1 text-xs text-[#57534E]">Questions, trends, and key flags.</p>
-            </div>
-          </div>
-        </div>
-        <div className="relative max-w-6xl mx-auto w-full">
+      <section className="relative min-h-[100dvh] px-4 pb-16 pt-24 sm:px-6 sm:pt-28 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_42%,#EAF8FF_100%)]" />
+        <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent landing-pulse-line" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
+        <HeroWorkspaceScene />
+        <div className="relative mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-6xl flex-col justify-center">
           <div className="mx-auto max-w-3xl text-center">
 
             {/* Left: copy */}
             <div className="min-w-0 max-w-full">
-              <Pill className="bg-white/80 border border-sky-200 text-sky-700 mb-6 shadow-sm">
+              <Pill className="bg-white/86 border border-sky-200 text-sky-700 mb-6 shadow-sm landing-rise">
                 <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
-              <h1 className="font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance">
+              <h1 className="font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
                 Walk into your doctor visit prepared.
               </h1>
 
-              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-2xl mx-auto overflow-wrap-anywhere">
+              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-2xl mx-auto overflow-wrap-anywhere landing-rise" style={{ animationDelay: "110ms" }}>
                 Upload your blood work PDF. MedAssist explains the numbers, spots what changed, and creates a printable one-page brief with the exact questions to ask your doctor.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-8 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-center landing-rise" style={{ animationDelay: "160ms" }}>
                 <Link
                   href="/demo"
                   className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-7 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
@@ -79,12 +117,12 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              <p className="text-[12px] text-[#A8A29E]">
+              <p className="text-[12px] text-[#A8A29E] landing-rise" style={{ animationDelay: "210ms" }}>
                 No login to try the demo · Free account · No credit card
               </p>
 
               {/* Patient-facing trust signals */}
-              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-8 justify-center">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-6 justify-center landing-rise" style={{ animationDelay: "260ms" }}>
                 {[
                   { icon: Lock, label: "HIPAA-Aligned" },
                   { icon: Trash2, label: "No Data Training" },
@@ -96,6 +134,7 @@ export default function LandingPage() {
                   </span>
                 ))}
               </div>
+              <MobileHeroPreview />
             </div>
           </div>
         </div>

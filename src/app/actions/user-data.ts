@@ -376,6 +376,18 @@ export async function getUserBiomarkerHistory(userId: string) {
 // completeOnboarding — mark onboarding done and set the cookie
 // ─────────────────────────────────────────────────────────────────────────────
 
+export async function resetOnboardingCookie() {
+  const cookieStore = await cookies();
+
+  cookieStore.set("onboarding_complete", "", {
+    httpOnly: true,
+    maxAge: 0,
+    path: "/",
+  });
+
+  return { success: true };
+}
+
 export async function completeOnboarding() {
   const supabase = await getAuthClient();
   const cookieStore = await cookies();

@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Shield, Loader2, ArrowRight, Mail, RotateCcw, CheckCircle2 } from "lucide-react";
+import { Shield, Loader2, ArrowRight, Mail, RotateCcw, CheckCircle2, Check } from "lucide-react";
 import Link from "next/link";
 import { logger } from "@/lib/logger";
+import { resetOnboardingCookie } from "@/app/actions/user-data";
 
 function AuthContent() {
     const router = useRouter();
@@ -58,6 +59,7 @@ function AuthContent() {
             if (mode === 'signup') {
                 // Clear any stale state before creating a new account
                 clearLocalSessionState();
+                await resetOnboardingCookie();
 
                 const { data, error } = await supabase.auth.signUp({
                     email,
@@ -75,7 +77,8 @@ function AuthContent() {
 
                 // Stale state already cleared above for clarity
 
-                router.push('/onboarding');
+                router.replace('/onboarding');
+                router.refresh();
             } else {
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
@@ -219,26 +222,28 @@ function AuthContent() {
                 </div>
 
                 {mode === 'signup' && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 8 }}>
-                        <label htmlFor="terms" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', minHeight: 44, padding: '4px 0' }}>
+                    <div className="mt-2">
+                        <label htmlFor="terms" className="flex min-h-[44px] cursor-pointer items-start gap-3 py-1">
+                            <span className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
                             <input
                                 type="checkbox"
                                 id="terms"
                                 checked={agreedToTerms}
                                 onChange={e => setAgreedToTerms(e.target.checked)}
-                                className="w-4 h-4 rounded border-[#E8E6DF] text-sky-500 focus:ring-sky-500 cursor-pointer"
-                                style={{ marginTop: 2, accentColor: '#0EA5E9' }}
+                                className="peer h-5 w-5 cursor-pointer rounded-[6px] border-2 border-[#D9D6CD] bg-white shadow-sm transition-all checked:border-sky-500 checked:bg-sky-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30"
                             />
-                            <span style={{ fontSize: 13, color: '#57534E', lineHeight: 1.5 }}>
-                            I agree to the{' '}
-                            <a href="/terms" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
-                                Terms of Service
-                            </a>
-                            {' '}and{' '}
-                            <a href="/privacy" target="_blank" style={{ color: '#0EA5E9', textDecoration: 'none', fontWeight: 500 }}>
-                                Privacy Policy
-                            </a>
-                        </span>
+                                <Check className="pointer-events-none absolute h-3.5 w-3.5 text-white opacity-0 transition-opacity peer-checked:opacity-100" />
+                            </span>
+                            <span className="text-[13px] leading-relaxed text-[#57534E]">
+                                I agree to the{' '}
+                                <a href="/terms" target="_blank" className="font-medium text-sky-500 no-underline hover:text-sky-600">
+                                    Terms of Service
+                                </a>
+                                {' '}and{' '}
+                                <a href="/privacy" target="_blank" className="font-medium text-sky-500 no-underline hover:text-sky-600">
+                                    Privacy Policy
+                                </a>
+                            </span>
                         </label>
                     </div>
                 )}
