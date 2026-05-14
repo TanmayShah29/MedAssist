@@ -22,13 +22,10 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 function HeroWorkspaceScene() {
   return (
     <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      <div className="absolute left-[12%] top-[21%] h-36 w-64 rounded-[18px] border border-sky-100 bg-white/50 shadow-xl shadow-sky-900/5 backdrop-blur landing-float-slow" />
-      <div className="absolute right-[11%] top-[19%] h-28 w-56 rounded-[18px] border border-emerald-100 bg-white/48 shadow-xl shadow-emerald-900/5 backdrop-blur landing-float" style={{ animationDelay: "600ms" }} />
-
-      <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float landing-card-pop">
+      <div className="absolute left-[7%] top-[31%] w-56 rounded-[12px] border border-amber-100/90 bg-white/90 p-4 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Monitor</p>
-          <span className="h-2 w-2 rounded-full bg-amber-400 landing-dot-pulse" />
+          <span className="h-2 w-2 rounded-full bg-amber-400" />
         </div>
         <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-amber-100">
@@ -37,7 +34,7 @@ function HeroWorkspaceScene() {
         <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
       </div>
 
-      <div className="absolute right-[7%] top-[33%] w-60 rounded-[14px] border border-emerald-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "180ms, 900ms" }}>
+      <div className="absolute right-[7%] top-[35%] w-64 rounded-[12px] border border-emerald-100/90 bg-white/90 p-4 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop" style={{ animationDelay: "180ms" }}>
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -46,9 +43,7 @@ function HeroWorkspaceScene() {
         <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Bring a focused one-page brief to the appointment.</p>
       </div>
 
-      <div className="absolute bottom-[27%] left-[23%] h-px w-[54%] origin-center bg-sky-300/70 landing-pulse-line" />
-      <div className="absolute bottom-[26%] left-[23%] h-px w-[54%] origin-left bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-data-trace" />
-      <div className="absolute left-[18%] top-[58%] w-48 rounded-[14px] border border-violet-100 bg-white/84 p-3 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "300ms, 1400ms" }}>
+      <div className="absolute left-[16%] top-[62%] w-48 rounded-[12px] border border-violet-100/90 bg-white/88 p-3 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop" style={{ animationDelay: "300ms" }}>
         <div className="mb-2 flex items-center gap-2">
           <Brain className="h-4 w-4 text-violet-500" />
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyzing</p>
@@ -96,59 +91,56 @@ export default function LandingPage() {
       <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-[100dvh] px-4 pb-16 pt-24 sm:px-6 sm:pt-28 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_42%,#EAF8FF_100%)]" />
-        <div className="absolute inset-0 opacity-[0.28] landing-grid-drift" />
-        <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent landing-pulse-line" />
+      <section className="relative min-h-[92dvh] overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pt-28">
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_48%,#F1FAFE_100%)]" />
+        <div className="absolute inset-0 opacity-[0.11] landing-grid-drift" />
+        <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-100 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
         <HeroWorkspaceScene />
-        <div className="relative mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-6xl flex-col justify-center">
-          <div className="mx-auto max-w-3xl text-center">
+        <div className="relative mx-auto flex min-h-[calc(92dvh-7rem)] w-full max-w-6xl flex-col justify-center">
+          <div className="mx-auto max-w-[820px] text-center">
 
             {/* Left: copy */}
             <div className="min-w-0 max-w-full">
-              <Pill className="bg-white/86 border border-sky-200 text-sky-700 mb-6 shadow-sm landing-rise">
+              <Pill className="mb-5 border border-sky-200 bg-white/86 text-sky-700 shadow-sm landing-rise">
                 <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
-              <h1 className="relative isolate font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
-                <span className="absolute left-1/2 top-1/2 -z-10 h-44 w-[min(42rem,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/20 blur-3xl landing-headline-glow" />
+              <h1 className="relative isolate mx-auto mb-6 max-w-[760px] font-display text-[40px] leading-[1.03] text-[#1C1917] text-balance landing-rise sm:text-[56px] lg:text-[64px]" style={{ animationDelay: "60ms" }}>
+                <span className="absolute left-1/2 top-1/2 -z-10 h-32 w-[min(34rem,86vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-200/18 blur-3xl landing-headline-glow" />
                 Walk into your doctor visit prepared.
               </h1>
 
-              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-2xl mx-auto overflow-wrap-anywhere landing-rise" style={{ animationDelay: "110ms" }}>
+              <p className="mx-auto mb-7 max-w-2xl overflow-wrap-anywhere text-[16px] leading-relaxed text-[#57534E] landing-rise sm:text-[17px]" style={{ animationDelay: "110ms" }}>
                 Upload your blood work PDF. MedAssist explains the numbers, spots what changed, and creates a printable one-page brief with the exact questions to ask your doctor.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-center landing-rise" style={{ animationDelay: "160ms" }}>
+              <div className="flex flex-col justify-center gap-3 landing-rise sm:flex-row" style={{ animationDelay: "160ms" }}>
                 <Link
                   href="/demo"
-                  className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-7 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
+                  className="flex w-[calc(100vw-2rem)] max-w-full items-center justify-center gap-2 rounded-[10px] bg-sky-500 px-6 py-3.5 text-[15px] font-bold text-white shadow-md shadow-sky-500/20 transition-all hover:bg-sky-600 active:scale-95 sm:w-auto"
                 >
                   Try interactive demo
                   <ArrowRight size={15} />
                 </Link>
                 <Link
                   href="/auth?mode=signup"
-                  className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
+                  className="flex w-[calc(100vw-2rem)] max-w-full items-center justify-center gap-2 rounded-[10px] border border-[#D9D6CD] bg-white/65 px-6 py-3.5 text-[15px] font-bold text-[#1C1917] transition-all hover:border-sky-200 hover:bg-white active:scale-95 sm:w-auto"
                 >
                   Create free account
                 </Link>
               </div>
 
-              <p className="text-[12px] text-[#A8A29E] landing-rise" style={{ animationDelay: "210ms" }}>
-                No login to try the demo · Free account · No credit card
-              </p>
-
               {/* Patient-facing trust signals */}
-              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-6 justify-center landing-rise" style={{ animationDelay: "260ms" }}>
+              <div className="mt-5 grid grid-cols-1 justify-center gap-2 landing-rise sm:flex sm:flex-wrap sm:gap-2.5" style={{ animationDelay: "210ms" }}>
                 {[
-                  { icon: Lock, label: "HIPAA-Aligned" },
+                  { icon: CheckCircle2, label: "No login demo" },
+                  { icon: CheckCircle2, label: "No credit card" },
+                  { icon: Lock, label: "HIPAA aligned" },
                   { icon: Trash2, label: "No Data Training" },
-                  { icon: Shield, label: "AES-256 Encrypted" },
-                  { icon: CheckCircle2, label: "Free to Start" },
+                  { icon: Shield, label: "AES-256 encrypted" },
                 ].map(t => (
-                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm landing-chip">
+                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full items-center justify-center gap-1.5 truncate rounded-full border border-[#E8E6DF] bg-white/72 px-3 py-1.5 text-[12px] font-semibold text-[#57534E] sm:w-auto">
                     <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                   </span>
                 ))}
