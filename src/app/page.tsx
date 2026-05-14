@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 import {
   Shield, Upload, Brain, LineChart, CheckCircle2,
   Sparkles, Lock, Trash2, ArrowRight,
-  TrendingUp, ClipboardList
+  TrendingUp, ClipboardList, AlertTriangle,
+  Database, FileText, Layers3, Stethoscope, Zap
 } from "lucide-react";
 import { LandingHeader } from "@/components/landing/landing-header";
+import { StatsCounter } from "@/components/landing/stats-counter";
 
 // ── Tiny helpers ─────────────────────────────────────────────────────────
 
@@ -20,12 +22,8 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 function HeroWorkspaceScene() {
   return (
     <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      <div className="absolute left-[11%] top-[19%] h-72 w-72 rounded-full border border-sky-200/55 landing-orbit-ring">
-        <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-sky-400 shadow-lg shadow-sky-400/30" />
-      </div>
-      <div className="absolute right-[13%] top-[20%] h-56 w-56 rounded-full border border-emerald-200/55 landing-orbit-ring landing-orbit-ring-slow">
-        <span className="absolute bottom-6 right-4 h-2 w-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/30" />
-      </div>
+      <div className="absolute left-[12%] top-[21%] h-36 w-64 rounded-[18px] border border-sky-100 bg-white/50 shadow-xl shadow-sky-900/5 backdrop-blur landing-float-slow" />
+      <div className="absolute right-[11%] top-[19%] h-28 w-56 rounded-[18px] border border-emerald-100 bg-white/48 shadow-xl shadow-emerald-900/5 backdrop-blur landing-float" style={{ animationDelay: "600ms" }} />
 
       <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float landing-card-pop">
         <div className="mb-3 flex items-center justify-between">
@@ -113,7 +111,8 @@ export default function LandingPage() {
                 <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
-              <h1 className="font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
+              <h1 className="relative isolate font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
+                <span className="absolute left-1/2 top-1/2 -z-10 h-44 w-[min(42rem,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/20 blur-3xl landing-headline-glow" />
                 Walk into your doctor visit prepared.
               </h1>
 
@@ -163,23 +162,7 @@ export default function LandingPage() {
       {/* ── STATS BAR ── */}
       <section className="py-10 border-y border-[#E8E6DF] bg-white">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { number: "35+", label: "Biomarkers tracked", color: "text-sky-500" },
-              { number: "20s", label: "Analysis time", color: "text-emerald-500" },
-              { number: "100%", label: "Private & encrypted", color: "text-violet-500" },
-              { number: "0", label: "Cost to start", color: "text-amber-500" },
-            ].map((s, i) => (
-              <div
-                key={s.label}
-                className="text-center landing-reveal"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div className={`font-display text-4xl font-bold ${s.color} mb-1 landing-breathe`}>{s.number}</div>
-                <div className="text-[12px] font-medium text-[#A8A29E] uppercase tracking-wider">{s.label}</div>
-              </div>
-            ))}
-          </div>
+          <StatsCounter />
         </div>
       </section>
 
@@ -204,13 +187,19 @@ export default function LandingPage() {
                 ].map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 p-4 bg-white border border-[#E8E6DF] rounded-xl shadow-sm landing-reveal landing-tilt-card"
+                    className="group relative overflow-hidden rounded-[16px] border border-red-100/80 bg-gradient-to-br from-white via-red-50/40 to-white p-4 shadow-sm landing-reveal landing-tilt-card"
                     style={{ animationDelay: `${i * 70}ms` }}
                   >
-                    <div className="w-5 h-5 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-300 to-transparent" />
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[10px] border border-red-100 bg-white text-red-500 shadow-sm">
+                        <AlertTriangle className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-red-400">Friction {i + 1}</p>
+                        <p className="mt-1 text-[14px] text-[#57534E] leading-relaxed">{p}</p>
+                      </div>
                     </div>
-                    <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
                   </div>
                 ))}
               </div>
@@ -233,11 +222,19 @@ export default function LandingPage() {
                 ].map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm landing-reveal landing-tilt-card"
+                    className="relative overflow-hidden rounded-[16px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/50 to-white p-4 shadow-sm landing-reveal landing-tilt-card"
                     style={{ animationDelay: `${i * 70}ms` }}
                   >
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent" />
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[10px] border border-emerald-100 bg-white text-emerald-500 shadow-sm">
+                        <CheckCircle2 className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-500">Clarity {i + 1}</p>
+                        <p className="mt-1 text-[14px] text-[#57534E] leading-relaxed">{p}</p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -255,7 +252,10 @@ export default function LandingPage() {
             <p className="text-lg text-[#57534E] max-w-xl mx-auto">No setup. No medical jargon. Just upload and walk in prepared.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+            <div className="pointer-events-none absolute left-[16%] right-[16%] top-8 hidden h-px bg-gradient-to-r from-sky-200 via-violet-200 to-emerald-200 md:block">
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-flow-line" />
+            </div>
             {[
               {
                 step: "01",
@@ -287,10 +287,12 @@ export default function LandingPage() {
             ].map((item) => (
               <div
                 key={item.step}
-                className={`relative bg-white border ${item.border} rounded-[20px] p-7 shadow-sm transition-shadow landing-reveal landing-tilt-card`}
+                className={`relative overflow-hidden bg-white border ${item.border} rounded-[20px] p-7 shadow-sm transition-shadow landing-reveal landing-tilt-card`}
                 style={{ animationDelay: `${Number(item.step) * 90}ms` }}
               >
-                <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mb-5`}>
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
+                <div className={`relative z-10 w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mb-5 shadow-sm`}>
+                  <span className="absolute inset-0 rounded-xl border border-current opacity-20 landing-ping" />
                   {item.icon}
                 </div>
                 <div className="absolute top-6 right-6 text-[11px] font-black text-[#D9D6CD] font-mono">{item.step}</div>
@@ -312,24 +314,44 @@ export default function LandingPage() {
             <p className="text-lg text-[#57534E] max-w-xl mx-auto">One place for everything your health reports tell you.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
             {[
-              { icon: ClipboardList, color: "text-sky-500", bg: "bg-sky-50", title: "Doctor Visit Prep", desc: "A printable one-page brief with key results, notable changes, and appointment questions." },
-              { icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50", title: "Trend Tracking", desc: "Charts and comparisons showing how your values change with each upload." },
-              { icon: Brain, color: "text-violet-500", bg: "bg-violet-50", title: "AI Explanations", desc: "Every biomarker explained in plain English. No medical degree required." },
-              { icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50", title: "Streaming Prep Assistant", desc: "Ask follow-up questions and see context-aware answers appear as the AI thinks." },
-              { icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50", title: "Doctor Questions", desc: "AI-generated questions tailored to your results, ready to bring to your next appointment." },
-              { icon: Shield, color: "text-indigo-500", bg: "bg-indigo-50", title: "Health Memory", desc: "Recent conversations and uploaded reports stay in context so answers get more personal over time." },
-            ].map((f) => (
+              { icon: ClipboardList, color: "text-sky-500", bg: "bg-sky-50", title: "Doctor Visit Prep", desc: "A printable one-page brief with key results, notable changes, and appointment questions.", span: "md:col-span-4 md:row-span-2", visual: "brief" },
+              { icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50", title: "Trend Tracking", desc: "Charts and comparisons showing how your values change with each upload.", span: "md:col-span-2", visual: "chart" },
+              { icon: Brain, color: "text-violet-500", bg: "bg-violet-50", title: "AI Explanations", desc: "Every biomarker explained in plain English. No medical degree required.", span: "md:col-span-2", visual: "pulse" },
+              { icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50", title: "Streaming Prep Assistant", desc: "Ask follow-up questions and see context-aware answers appear as the AI thinks.", span: "md:col-span-2", visual: "stream" },
+              { icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50", title: "Doctor Questions", desc: "AI-generated questions tailored to your results, ready to bring to your next appointment.", span: "md:col-span-2", visual: "checks" },
+              { icon: Shield, color: "text-indigo-500", bg: "bg-indigo-50", title: "Health Memory", desc: "Recent conversations and uploaded reports stay in context so answers get more personal over time.", span: "md:col-span-2", visual: "memory" },
+            ].map((f, i) => (
               <div
                 key={f.title}
-                className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm hover:border-sky-200 transition-all group landing-reveal landing-tilt-card"
+                className={`group relative min-h-[220px] overflow-hidden rounded-[20px] border border-[#E8E6DF] bg-white p-6 shadow-sm transition-all hover:border-sky-200 landing-reveal landing-tilt-card ${f.span}`}
+                style={{ animationDelay: `${i * 65}ms` }}
               >
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
+                <div className="absolute bottom-0 right-0 h-28 w-28 translate-x-8 translate-y-8 rounded-full bg-sky-100/60 blur-2xl transition-transform group-hover:scale-125" />
                 <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <f.icon className={`w-5 h-5 ${f.color}`} />
                 </div>
                 <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">{f.title}</h3>
                 <p className="text-[13px] text-[#57534E] leading-relaxed">{f.desc}</p>
+                <div className="mt-6 grid gap-2">
+                  {f.visual === "brief" && (
+                    <div className="grid grid-cols-[1fr_0.7fr] gap-3">
+                      <span className="h-2 rounded-full bg-sky-100 landing-shimmer" />
+                      <span className="h-2 rounded-full bg-emerald-100 landing-shimmer" style={{ animationDelay: "220ms" }} />
+                      <span className="h-2 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "440ms" }} />
+                      <span className="h-2 rounded-full bg-amber-100 landing-shimmer" style={{ animationDelay: "660ms" }} />
+                    </div>
+                  )}
+                  {f.visual !== "brief" && [0, 1, 2].map((bar) => (
+                    <span
+                      key={bar}
+                      className={`h-1.5 rounded-full ${f.bg} landing-shimmer`}
+                      style={{ width: `${92 - bar * 18}%`, animationDelay: `${bar * 180}ms` }}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -376,17 +398,17 @@ export default function LandingPage() {
             {/* Floating cards */}
             <div className="relative h-80 lg:h-full flex items-center justify-center">
               <div
-                className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full -top-4 right-0"
+                className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full -top-4 right-0 landing-float"
               >
                 <p className="text-[9px] text-indigo-400 font-black uppercase tracking-widest mb-2">CORRELATION DETECTED</p>
-                <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D ↑ 133% after starting D3 supplement on Feb 12. Fatigue symptoms resolved 6 days later.</p>
+                <p className="text-sm font-medium text-slate-200 leading-relaxed landing-typewriter">Vitamin D ↑ 133% after starting D3 supplement on Feb 12. Fatigue symptoms resolved 6 days later.</p>
               </div>
 
               <div
                 className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full bottom-4 left-0 landing-float-slow"
               >
                 <p className="text-[9px] text-amber-400 font-black uppercase tracking-widest mb-2">TREND ALERT</p>
-                <p className="text-sm font-medium text-slate-200 leading-relaxed">Glucose has increased 15% across 3 consecutive reports. Pre-diabetic range approaching — dietary review recommended.</p>
+                <p className="text-sm font-medium text-slate-200 leading-relaxed landing-typewriter" style={{ animationDelay: "900ms" }}>Glucose has increased 15% across 3 consecutive reports. Pre-diabetic range approaching — dietary review recommended.</p>
               </div>
             </div>
           </div>
@@ -402,17 +424,25 @@ export default function LandingPage() {
             <p className="text-lg text-[#57534E] max-w-2xl mx-auto">Multi-stage processing that extracts, structures, and turns lab data into a visit-ready brief.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 border border-[#E8E6DF] rounded-[20px] overflow-hidden bg-white shadow-sm">
+          <div className="relative overflow-hidden rounded-[24px] border border-[#E8E6DF] bg-white p-4 shadow-sm md:p-6">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(14,165,233,0.08),transparent_26rem),radial-gradient(circle_at_80%_30%,rgba(16,185,129,0.07),transparent_24rem)]" />
+            <div className="relative grid grid-cols-1 gap-4 md:grid-cols-5">
+              <div className="pointer-events-none absolute left-[9%] right-[9%] top-9 hidden h-px bg-gradient-to-r from-sky-200 via-violet-200 via-emerald-200 to-rose-200 md:block">
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-flow-line" />
+              </div>
             {[
-              { step: "01", title: "PDF Upload", tech: "Next.js 16", desc: "Secure binary file handler for digital lab reports.", color: "text-sky-500", dot: "bg-sky-500" },
-              { step: "02", title: "Report Parsing", tech: "pdf-parse", desc: "Native text extraction with the existing scanned-report fallback when needed.", color: "text-violet-500", dot: "bg-violet-500" },
-              { step: "03", title: "Visit Brief", tech: "Llama 3.3", desc: "Structured clinical schema generation with doctor questions and a concise summary.", color: "text-emerald-500", dot: "bg-emerald-500" },
-              { step: "04", title: "Persistence", tech: "Supabase", desc: "Encrypted storage with row-level security. Only you can read your data.", color: "text-amber-500", dot: "bg-amber-500" },
-              { step: "05", title: "Visualisation", tech: "Recharts", desc: "Longitudinal trends, category balance charts, and readiness score ring.", color: "text-rose-500", dot: "bg-rose-500" },
+              { step: "01", title: "PDF Upload", tech: "Next.js 16", desc: "Secure binary file handler for digital lab reports.", color: "text-sky-500", dot: "bg-sky-500", Icon: Upload },
+              { step: "02", title: "Report Parsing", tech: "pdf-parse", desc: "Native text extraction with the existing scanned-report fallback when needed.", color: "text-violet-500", dot: "bg-violet-500", Icon: FileText },
+              { step: "03", title: "Visit Brief", tech: "Llama 3.3", desc: "Structured clinical schema generation with doctor questions and a concise summary.", color: "text-emerald-500", dot: "bg-emerald-500", Icon: Brain },
+              { step: "04", title: "Persistence", tech: "Supabase", desc: "Encrypted storage with row-level security. Only you can read your data.", color: "text-amber-500", dot: "bg-amber-500", Icon: Database },
+              { step: "05", title: "Visualisation", tech: "Recharts", desc: "Longitudinal trends, category balance charts, and readiness score ring.", color: "text-rose-500", dot: "bg-rose-500", Icon: LineChart },
             ].map((item, i) => (
-              <div key={item.step} className={`p-6 landing-reveal ${i < 4 ? "border-b md:border-b-0 md:border-r border-[#E8E6DF]" : ""}`} style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className={`w-1.5 h-1.5 rounded-full ${item.dot}`} />
+              <div key={item.step} className="relative rounded-[18px] border border-[#E8E6DF] bg-white/82 p-5 shadow-sm backdrop-blur landing-reveal landing-tilt-card" style={{ animationDelay: `${i * 80}ms` }}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className={`relative flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F5F4EF] ${item.color}`}>
+                    <span className={`absolute inset-0 rounded-[12px] ${item.dot} opacity-10 landing-ping`} />
+                    <item.Icon className="h-5 w-5" />
+                  </div>
                   <span className={`text-[10px] font-black ${item.color} tracking-widest`}>{item.step}</span>
                 </div>
                 <h3 className="text-[15px] font-bold text-[#1C1917] mb-1.5">{item.title}</h3>
@@ -420,6 +450,7 @@ export default function LandingPage() {
                 <p className="text-[12px] text-[#57534E] leading-relaxed">{item.desc}</p>
               </div>
             ))}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
@@ -503,18 +534,25 @@ export default function LandingPage() {
             One report tells you where you are. A timeline tells you where you&apos;re going.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="relative grid grid-cols-1 gap-5 text-left sm:grid-cols-3">
+            <div className="pointer-events-none absolute left-[15%] right-[15%] top-8 hidden h-px bg-gradient-to-r from-sky-200 via-violet-200 to-emerald-200 sm:block">
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-violet-500 to-transparent landing-flow-line" />
+            </div>
             {[
-              { n: "1st Report", color: "bg-sky-100 text-sky-600", title: "Clinical Baseline", desc: "Establish your starting point. Immediately flag what needs attention." },
-              { n: "2nd Report", color: "bg-violet-100 text-violet-600", title: "Trend Correlation", desc: "See if supplements or lifestyle changes are moving your markers." },
-              { n: "3rd Report +", color: "bg-emerald-100 text-emerald-700", title: "True Health IQ", desc: "Understand patterns, predict outcomes, and track progress with confidence." },
+              { n: "1st Report", color: "bg-sky-100 text-sky-600", title: "Clinical Baseline", desc: "Establish your starting point. Immediately flag what needs attention.", Icon: Stethoscope },
+              { n: "2nd Report", color: "bg-violet-100 text-violet-600", title: "Trend Correlation", desc: "See if supplements or lifestyle changes are moving your markers.", Icon: Layers3 },
+              { n: "3rd Report +", color: "bg-emerald-100 text-emerald-700", title: "True Health IQ", desc: "Understand patterns, predict outcomes, and track progress with confidence.", Icon: Zap },
             ].map((s, i) => (
               <div
                 key={s.n}
-                className="bg-white border border-[#E8E6DF] rounded-[20px] p-7 text-center shadow-sm transition-shadow landing-reveal landing-tilt-card"
+                className="relative overflow-hidden rounded-[20px] border border-[#E8E6DF] bg-white p-7 shadow-sm transition-shadow landing-reveal landing-tilt-card"
                 style={{ animationDelay: `${i * 90}ms` }}
               >
-                <div className={`inline-block text-[11px] font-black px-3 py-1 rounded-full ${s.color} mb-5 uppercase tracking-wider`}>{s.n}</div>
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
+                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-[16px] ${s.color}`}>
+                  <s.Icon className="h-6 w-6" />
+                </div>
+                <div className={`mb-4 inline-block text-[11px] font-black px-3 py-1 rounded-full ${s.color} uppercase tracking-wider`}>{s.n}</div>
                 <h3 className="text-[17px] font-bold text-[#1C1917] mb-3">{s.title}</h3>
                 <p className="text-[13px] text-[#57534E] leading-relaxed">{s.desc}</p>
               </div>
@@ -524,10 +562,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── DISCLAIMER ── */}
-      <section className="py-16 px-6 bg-[#FFFBEB] border-y border-amber-100">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-[20px] border border-amber-100 p-8 shadow-sm">
-            <h3 className="text-[15px] font-bold text-[#1C1917] mb-4">Medical Disclaimer</h3>
+      <section className="px-6 py-14 bg-[#FFFBEB] border-y border-amber-100">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-6 md:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Pill className="bg-white/75 border border-amber-200 text-amber-700 mb-4">Clinical guardrail</Pill>
+            <h3 className="font-display text-3xl text-[#1C1917]">Use it to prepare, not self-diagnose.</h3>
+          </div>
+          <div className="relative overflow-hidden rounded-[20px] border border-amber-200 bg-white/78 p-7 shadow-sm">
+            <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
             <div className="space-y-3 text-[13px] text-[#57534E] leading-relaxed">
               <p><strong className="text-[#1C1917]">Not a doctor.</strong> MedAssist is a clinical education tool, not a diagnostic platform.</p>
               <p><strong className="text-[#1C1917]">No medical advice.</strong> We do not provide treatment plans, prescriptions, or clinical guidance.</p>
@@ -539,6 +581,7 @@ export default function LandingPage() {
 
       {/* ── FINAL CTA ── */}
       <section className="py-28 px-6 bg-[#0F172A] text-white relative overflow-hidden">
+        <div className="absolute inset-0 landing-cta-aurora pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-2xl mx-auto text-center relative z-10">
           <Pill className="bg-sky-500/10 border border-sky-500/20 text-sky-400 mb-6">Get started today</Pill>
@@ -549,10 +592,11 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/demo"
-              className="flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white px-8 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
+              className="relative flex items-center justify-center gap-2 overflow-hidden bg-sky-500 hover:bg-sky-400 text-white px-8 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25 landing-cta-button"
             >
-              Try interactive demo
-              <ArrowRight size={15} />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent landing-button-shine" />
+              <span className="relative">Try interactive demo</span>
+              <ArrowRight className="relative" size={15} />
             </Link>
             <Link
               href="/auth?mode=signup"
