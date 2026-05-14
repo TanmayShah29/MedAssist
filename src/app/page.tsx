@@ -22,7 +22,7 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 function HeroWorkspaceScene() {
   return (
     <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      <div className="absolute left-[7%] top-[31%] w-56 rounded-[12px] border border-amber-100/90 bg-white/90 p-4 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop">
+      <div className="absolute left-[7%] top-[31%] w-56 rounded-[12px] border border-amber-100/90 bg-white/90 p-4 shadow-md shadow-stone-900/5 landing-card-pop">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Monitor</p>
           <span className="h-2 w-2 rounded-full bg-amber-400" />
@@ -34,7 +34,7 @@ function HeroWorkspaceScene() {
         <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
       </div>
 
-      <div className="absolute right-[7%] top-[35%] w-64 rounded-[12px] border border-emerald-100/90 bg-white/90 p-4 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop" style={{ animationDelay: "180ms" }}>
+      <div className="absolute right-[7%] top-[35%] w-64 rounded-[12px] border border-emerald-100/90 bg-white/90 p-4 shadow-md shadow-stone-900/5 landing-card-pop" style={{ animationDelay: "180ms" }}>
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -43,7 +43,7 @@ function HeroWorkspaceScene() {
         <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Bring a focused one-page brief to the appointment.</p>
       </div>
 
-      <div className="absolute left-[16%] top-[62%] w-48 rounded-[12px] border border-violet-100/90 bg-white/88 p-3 shadow-lg shadow-stone-900/5 backdrop-blur landing-card-pop" style={{ animationDelay: "300ms" }}>
+      <div className="absolute left-[16%] top-[62%] w-48 rounded-[12px] border border-violet-100/90 bg-white/88 p-3 shadow-md shadow-stone-900/5 landing-card-pop" style={{ animationDelay: "300ms" }}>
         <div className="mb-2 flex items-center gap-2">
           <Brain className="h-4 w-4 text-violet-500" />
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyzing</p>
@@ -60,7 +60,7 @@ function HeroWorkspaceScene() {
 
 function MobileHeroPreview() {
   return (
-    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden landing-card-pop" style={{ animationDelay: "320ms" }}>
+    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-md shadow-stone-900/5 lg:hidden landing-card-pop" style={{ animationDelay: "320ms" }}>
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Live preview</p>
         <Brain className="h-4 w-4 text-violet-500" />

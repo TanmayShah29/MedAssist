@@ -39,10 +39,10 @@ export function LandingHeader() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#E8E6DF]/90 bg-[#FAFAF7]/[0.98] shadow-sm shadow-stone-900/[0.04] backdrop-blur-xl transition-all duration-300 ${
+        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#E8E6DF]/90 bg-[#FAFAF7]/[0.98] shadow-sm shadow-stone-900/[0.04] transition-shadow duration-200 ${
           scrolled
-            ? "supports-[backdrop-filter]:bg-[#FAFAF7]/[0.94]"
-            : "supports-[backdrop-filter]:bg-[#FAFAF7]/[0.96]"
+            ? "shadow-stone-900/[0.06]"
+            : "shadow-stone-900/[0.03]"
         }`}
       >
         <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -100,7 +100,7 @@ export function LandingHeader() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden bg-[#FAFAF7]/95 backdrop-blur-xl border-t border-[#E8E6DF] px-6 py-4 space-y-1">
+          <div className="md:hidden bg-[#FAFAF7] border-t border-[#E8E6DF] px-6 py-4 space-y-1">
             <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">How it works</Link>
             <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Features</Link>
             <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Security</Link>
