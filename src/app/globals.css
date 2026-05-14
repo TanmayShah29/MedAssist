@@ -66,7 +66,9 @@
   }
 
   body {
-    background-color: var(--color-page);
+    background:
+      radial-gradient(circle at 20% 0%, rgba(14, 165, 233, 0.08), transparent 28rem),
+      linear-gradient(180deg, #FCFCF9 0%, var(--color-page) 34rem);
     color: var(--color-text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -127,8 +129,121 @@
   .card {
     background-color: var(--color-card);
     border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
+  }
+
+  /* ── App frame ── */
+  .app-page {
+    width: 100%;
+    min-height: 100dvh;
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    padding: 18px 12px 96px;
+  }
+
+  @media (min-width: 768px) {
+    .app-page {
+      padding: 28px 24px 40px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .app-page {
+      padding: 32px;
+    }
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+  }
+
+  .app-container-narrow {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
+  }
+
+  .app-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  @media (min-width: 768px) {
+    .app-header {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  .app-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.02;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+
+  .app-subtitle {
+    margin-top: 6px;
+    max-width: 640px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .app-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .app-panel {
+    background: rgba(245, 244, 239, 0.82);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .app-panel-white {
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .app-section-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    .app-section-grid {
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
+      gap: 24px;
+      align-items: start;
+    }
+  }
+
+  .metric-tile {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    background: rgba(255, 255, 255, 0.64);
+    padding: 16px;
+  }
+
+  .landing-band {
+    width: 100%;
+    padding: 72px 24px;
   }
 
   .card-hover {

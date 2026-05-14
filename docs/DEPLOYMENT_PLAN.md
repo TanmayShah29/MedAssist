@@ -16,7 +16,8 @@ Before any code changes, ensure:
   - `GROQ_API_KEY`
   - `OCR_SPACE_API_KEY`
 - [ ] **Supabase** — `supabase_schema.sql` fully run (tables, RLS, RPCs, `check_rate_limit`, `save_complete_report`)
-- [ ] **Auth callback URL** — Add `https://your-domain.vercel.app/auth/callback` to Supabase Auth redirect URLs
+- [ ] **Canonical URL** — Use `https://medassist-app.vercel.app` as the main production URL
+- [ ] **Auth callback URL** — Add `https://medassist-app.vercel.app/auth/callback` to Supabase Auth redirect URLs
 
 ---
 

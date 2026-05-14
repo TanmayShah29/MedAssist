@@ -313,9 +313,14 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                     >
                         <div className="bg-[#FAFAF7] rounded-[24px] shadow-2xl overflow-hidden border border-[#E8E6DF]">
                             <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b border-[#E8E6DF] bg-white">
-                                <h2 className="text-xl font-bold font-display text-[#1C1917]">
-                                    Add Results for Visit Prep
-                                </h2>
+                                <div>
+                                    <h2 className="text-xl font-bold font-display text-[#1C1917]">
+                                        Add results for visit prep
+                                    </h2>
+                                    <p className="mt-1 text-xs leading-relaxed text-[#57534E]">
+                                        Add results, include symptoms if useful, then review your new prep sheet.
+                                    </p>
+                                </div>
                                 {!isProcessing && (
                                     <button
                                         onClick={() => {
@@ -331,6 +336,23 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         <X size={20} />
                                     </button>
                                 )}
+                            </div>
+
+                            <div className="grid grid-cols-3 border-b border-[#E8E6DF] bg-[#FAFAF7] px-5 py-3 text-center sm:px-6">
+                                {[
+                                    ["1", "Add results"],
+                                    ["2", "AI interprets"],
+                                    ["3", "Prep sheet"],
+                                ].map(([num, label]) => (
+                                    <div key={label} className="flex items-center justify-center gap-2">
+                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-50 text-[10px] font-bold text-sky-600 ring-1 ring-sky-100">
+                                            {num}
+                                        </span>
+                                        <span className="hidden text-[11px] font-semibold text-[#57534E] sm:inline">
+                                            {label}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Tabs: Upload PDF | Enter manually */}
@@ -365,7 +387,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
                             {/* Symptoms section common to both tabs */}
                             <div className="px-5 pt-5 pb-2 sm:px-6 sm:pt-6 border-b border-[#E8E6DF] bg-white">
-                                <p className="text-sm font-semibold text-[#1C1917] mb-3">Any current symptoms? (Optional)</p>
+                                <p className="text-sm font-semibold text-[#1C1917] mb-1">Any current symptoms? <span className="font-normal text-[#A8A29E]">(optional)</span></p>
+                                <p className="mb-3 text-xs leading-relaxed text-[#57534E]">Symptoms help the prep sheet suggest more specific doctor questions.</p>
                                 <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto pr-2 pb-2">
                                     {COMMON_SYMPTOMS.map((symptom) => {
                                         const isSelected = selectedSymptoms.includes(symptom);
@@ -461,7 +484,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-[16px] font-semibold text-[#1C1917] mb-1">Click or drag PDF here</p>
-                                                        <p className="text-[14px] text-[#A8A29E] mb-4">Maximum file size 10MB</p>
+                                                        <p className="text-[14px] text-[#A8A29E] mb-4">Digital PDFs work best · Maximum file size 10MB</p>
                                                         <a
                                                             href="/samples/sample-report.pdf"
                                                             download
@@ -503,7 +526,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             </span>
                                                         </div>
                                                     ) : (
-                                                        'Create prep sheet'
+                                                        'Analyze and save'
                                                     )}
                                                 </button>
                                                 {!isProcessing && (
@@ -518,8 +541,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
                                 {tab === 'manual' && (
                                     <div className="space-y-4">
-                                        <p className="text-sm text-[#57534E]">
-                                            Add your lab values below. Use the units from your report (e.g. mg/dL or mmol/L for glucose). AI will interpret and save.
+                                        <p className="text-sm leading-relaxed text-[#57534E]">
+                                            Add the values you want interpreted. You can enter a full panel or just the markers you want help preparing for.
                                         </p>
                                         <div className="space-y-3 max-h-[280px] overflow-y-auto">
                                             {manualRows.map((row) => (
@@ -604,7 +627,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     </span>
                                                 </div>
                                             ) : (
-                                                'Create prep sheet'
+                                                'Analyze and save'
                                             )}
                                         </button>
                                     </div>

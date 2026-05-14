@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import {
   Shield, Upload, Brain, LineChart, CheckCircle2,
   Sparkles, Lock, Trash2, ArrowRight,
-  TrendingUp, ChevronRight, ClipboardList
+  TrendingUp, ClipboardList
 } from "lucide-react";
 import { LandingHeader } from "@/components/landing/landing-header";
 
@@ -17,68 +17,6 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
   );
 }
 
-// ── Hero appointment-prep preview (static, no deps) ─────────────────────
-
-function HeroMockCard() {
-  return (
-    <div className="relative w-full max-w-lg mx-auto">
-      <div
-        className="relative bg-white rounded-[24px] shadow-2xl shadow-slate-900/10 border border-[#E8E6DF] overflow-hidden"
-      >
-        <div className="px-5 pt-5 pb-4 border-b border-[#F0EEE8] flex items-center justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">Doctor Visit Prep</p>
-            <p className="text-[13px] font-bold text-[#1C1917] mt-0.5">Printable one-page visit brief</p>
-          </div>
-          <span className="shrink-0 rounded-full bg-sky-50 border border-sky-100 px-3 py-1 text-[10px] font-bold text-sky-700">READY</span>
-        </div>
-
-        <div className="p-5">
-          <p className="text-[15px] font-semibold text-[#1C1917] leading-snug mb-4">
-            Focus the appointment on rising glucose, lower hemoglobin, and whether follow-up testing is needed.
-          </p>
-
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded-[14px] bg-[#FAFAF7] border border-[#E8E6DF] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#A8A29E] mb-1">Key result</p>
-              <p className="text-[13px] font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
-              <p className="text-[11px] font-semibold text-amber-600 mt-1">+15% from prior</p>
-            </div>
-            <div className="rounded-[14px] bg-[#FAFAF7] border border-[#E8E6DF] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#A8A29E] mb-1">Key result</p>
-              <p className="text-[13px] font-bold text-[#1C1917]">Hemoglobin 11.8</p>
-              <p className="text-[11px] font-semibold text-amber-600 mt-1">Down from 13.5</p>
-            </div>
-          </div>
-
-          <div className="rounded-[14px] bg-sky-50 border border-sky-100 p-4">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700 mb-2">Questions to ask</p>
-            <ol className="space-y-2">
-              {[
-                "Could this glucose trend suggest insulin resistance?",
-                "Should we check iron, ferritin, or B12 for the hemoglobin drop?",
-                "When should these markers be re-tested?",
-              ].map((q, i) => (
-                <li key={q} className="flex gap-2 text-[12px] text-[#57534E] leading-snug">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white text-[9px] font-bold text-sky-600">{i + 1}</span>
-                  {q}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-
-        <div className="px-5 py-3 bg-[#FAFAF7] border-t border-[#F0EEE8] flex items-center justify-between">
-          <span className="text-[11px] text-[#A8A29E]">Generated from your latest report</span>
-          <span className="text-[11px] font-semibold text-sky-500 flex items-center gap-1">
-            Print prep sheet <ChevronRight size={10} />
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Main Component ────────────────────────────────────────────────────────
 
 export default function LandingPage() {
@@ -88,31 +26,44 @@ export default function LandingPage() {
       <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <section className="relative min-h-[92dvh] pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden flex items-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(14,165,233,0.16),transparent_28rem),linear-gradient(180deg,#FCFCF9_0%,#FAFAF7_58%,#F5F4EF_100%)]" />
+        <div className="absolute inset-x-4 -bottom-36 hidden lg:block opacity-80">
+          <div className="mx-auto grid max-w-6xl grid-cols-3 gap-4">
+            <div className="h-32 rounded-t-[14px] border border-[#E8E6DF] bg-white/70 p-4 shadow-sm">
+              <p className="section-label mb-2">Key Result</p>
+              <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
+              <p className="mt-1 text-xs font-semibold text-amber-600">+15% from prior</p>
+            </div>
+            <div className="h-40 rounded-t-[14px] border border-sky-100 bg-sky-50/80 p-4 shadow-sm">
+              <p className="section-label mb-2 text-sky-700">Visit Focus</p>
+              <p className="text-sm font-bold leading-snug text-[#1C1917]">Ask whether the glucose trend changes follow-up timing.</p>
+            </div>
+            <div className="h-32 rounded-t-[14px] border border-[#E8E6DF] bg-white/70 p-4 shadow-sm">
+              <p className="section-label mb-2">Next Step</p>
+              <p className="text-sm font-bold text-[#1C1917]">Bring a one-page brief</p>
+              <p className="mt-1 text-xs text-[#57534E]">Questions, trends, and key flags.</p>
+            </div>
+          </div>
+        </div>
+        <div className="relative max-w-6xl mx-auto w-full">
+          <div className="mx-auto max-w-3xl text-center">
 
             {/* Left: copy */}
             <div className="min-w-0 max-w-full">
-              <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-6">
+              <Pill className="bg-white/80 border border-sky-200 text-sky-700 mb-6 shadow-sm">
                 <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
-              <h1 className="font-display text-[36px] sm:text-6xl lg:text-[64px] text-[#1C1917] leading-[1.04] mb-6 max-w-full">
-                Walk into your doctor visit{" "}
-                <span className="text-sky-500 relative block sm:inline">
-                  prepared.
-                  <svg className="absolute -bottom-1 left-0 w-full" height="4" viewBox="0 0 200 4" preserveAspectRatio="none">
-                    <path d="M0 2 Q50 0 100 2 Q150 4 200 2" stroke="#0EA5E9" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
-                  </svg>
-                </span>
+              <h1 className="font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance">
+                Walk into your doctor visit prepared.
               </h1>
 
-              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-lg overflow-wrap-anywhere">
+              <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-2xl mx-auto overflow-wrap-anywhere">
                 Upload your blood work PDF. MedAssist explains the numbers, spots what changed, and creates a printable one-page brief with the exact questions to ask your doctor.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 mb-8 justify-center">
                 <Link
                   href="/demo"
                   className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-7 py-3.5 rounded-[12px] text-[15px] font-bold transition-all active:scale-95 shadow-lg shadow-sky-500/25"
@@ -133,7 +84,7 @@ export default function LandingPage() {
               </p>
 
               {/* Patient-facing trust signals */}
-              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-8">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-8 justify-center">
                 {[
                   { icon: Lock, label: "HIPAA-Aligned" },
                   { icon: Trash2, label: "No Data Training" },
@@ -145,11 +96,6 @@ export default function LandingPage() {
                   </span>
                 ))}
               </div>
-            </div>
-
-            {/* Right: hero mock */}
-            <div className="flex justify-center lg:justify-end">
-              <HeroMockCard />
             </div>
           </div>
         </div>

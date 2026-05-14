@@ -25,9 +25,8 @@ export function StepSymptoms() {
                 <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                     How are you feeling?
                 </h2>
-                <p className="text-[#57534E] text-sm">
-                    Select all symptoms you are currently experiencing.
-                    MedAssist will use them to make your visit prep more specific.
+                <p className="text-[#57534E] text-sm leading-relaxed">
+                    Pick anything you would naturally mention to your doctor. Leaving this blank is fine.
                 </p>
             </div>
 
@@ -42,9 +41,8 @@ export function StepSymptoms() {
                         How symptoms shape your prep sheet
                     </p>
                     <p className="text-xs text-sky-700 leading-relaxed">
-                        Symptoms give your doctor questions useful context.
-                        For example, fatigue plus lower hemoglobin can become
-                        a focused question about iron, B12, or follow-up testing.
+                        Symptoms help connect the dots. Fatigue plus low hemoglobin, for example,
+                        can become a focused question about iron, B12, or follow-up testing.
                     </p>
                 </div>
             </div>
@@ -91,8 +89,7 @@ export function StepSymptoms() {
                         {selectedSymptoms.length > 1 ? "s" : ""} selected
                     </p>
                     <p className="text-xs text-[#57534E]">
-                        MedAssist will use these alongside your lab report
-                        when generating your appointment summary.
+                        These will be used as context, not as a diagnosis.
                     </p>
                 </motion.div>
             )}
@@ -121,8 +118,8 @@ export function StepSymptoms() {
                      transition-all shadow-sm shadow-sky-500/20"
                 >
                     {selectedSymptoms.length === 0
-                        ? "Skip for now"
-                        : "Upload lab report"}
+                        ? "Skip symptoms"
+                        : "Continue"}
                     <ChevronRight className="w-4 h-4" />
                 </motion.button>
             </div>

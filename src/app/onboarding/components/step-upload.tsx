@@ -230,8 +230,8 @@ export function StepUpload() {
                 <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">Step 3 of 5</p>
                     <h2 className="font-display text-3xl text-[#1C1917] mb-2">Enter lab values manually</h2>
-                    <p className="text-[#57534E] text-sm">
-                        No PDF? Add your results below. Use units from your report (e.g. mg/dL or mmol/L).
+                    <p className="text-[#57534E] text-sm leading-relaxed">
+                        Add the values you want help interpreting. Start with the abnormal or confusing ones if you do not want to enter the whole report.
                     </p>
                 </div>
                 <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
@@ -304,7 +304,7 @@ export function StepUpload() {
                             </>
                         ) : (
                             <>
-                        Build prep sheet
+                        Analyze these values
                                 <ChevronRight className="w-4 h-4" />
                             </>
                         )}
@@ -324,12 +324,12 @@ export function StepUpload() {
                     <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                         Upload your lab report
                     </h2>
-                    <p className="text-[#57534E] text-sm">
-                        Upload now to build your doctor-visit prep sheet, enter values manually, or explore the app first.
+                    <p className="text-[#57534E] text-sm leading-relaxed">
+                        The fastest path is a digital PDF. If your report is scanned or you do not have it yet, you still have a route forward.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                     {/* Option 1 — Upload now */}
                     <div
                         onClick={() => setShowOptions(false)}
@@ -342,7 +342,7 @@ export function StepUpload() {
                             Upload my report now
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            Generate key results, trend context, and questions for your next appointment
+                            Best for digital reports. Takes about 20-40 seconds after upload.
                         </p>
                         <span className="inline-block bg-sky-500 text-white rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-600 transition-colors shadow-sm shadow-sky-500/20">
                             Upload PDF
@@ -361,7 +361,7 @@ export function StepUpload() {
                             Enter values manually
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            No PDF? Type in your lab values and still get appointment-ready questions
+                            Best for screenshots, scanned PDFs, or a few values from a portal.
                         </p>
                         <span className="inline-block bg-sky-100 text-sky-700 rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-200 transition-colors">
                             Add values
@@ -380,7 +380,7 @@ export function StepUpload() {
                             I don&apos;t have one yet
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            No problem — explore the app first and upload when you want to prep for a visit
+                            Finish setup now. The dashboard will prompt you to upload later.
                         </p>
                         <span 
                             className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors"
@@ -417,8 +417,8 @@ export function StepUpload() {
                 <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                     Upload your lab report
                 </h2>
-                <p className="text-[#57534E] text-sm">
-                    Upload your digital lab report to create an appointment-ready summary.
+                <p className="text-[#57534E] text-sm leading-relaxed">
+                    We will read the PDF, show you the extracted values for review, then build your prep dashboard.
                 </p>
             </div>
 
@@ -547,7 +547,7 @@ export function StepUpload() {
                             : "bg-[#E8E6DF] text-[#A8A29E] cursor-not-allowed"
                     )}
                 >
-                    Build prep sheet
+                    Review extracted values
                     <ChevronRight className="w-4 h-4" />
                 </motion.button>
             </div>

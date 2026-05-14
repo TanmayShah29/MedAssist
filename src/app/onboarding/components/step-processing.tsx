@@ -206,7 +206,7 @@ function ReviewExtractedValues({
                     Confirm what we found
                 </h2>
                 <p className="text-sm text-[#57534E] max-w-2xl">
-                    AI can misread PDFs. Check the names, values, units, and statuses before we build your dashboard.
+                    AI can misread PDFs. Confirm the values now so the dashboard starts from data you trust.
                 </p>
             </div>
 
@@ -316,7 +316,7 @@ function ReviewExtractedValues({
                         </>
                     ) : (
                         <>
-                            Save and build prep sheet
+                            Save and continue
                             <ArrowRight className="w-4 h-4" />
                         </>
                     )}
@@ -335,11 +335,11 @@ export function StepProcessing() {
 
     // New stages configuration with durations
     const stages = useMemo(() => [
-        { step: 1, label: 'Scanning your lab report...', detail: 'Reading every value on the page', duration: 8000 },
-        { step: 2, label: 'Identifying biomarkers...', detail: 'Finding hemoglobin, glucose, vitamins and more', duration: 6000 },
-        { step: 3, label: 'Comparing reference ranges...', detail: 'Checking what\'s optimal, what needs attention', duration: 5000 },
-        { step: 4, label: 'Generating appointment questions...', detail: 'Turning lab values into doctor-ready talking points', duration: 5000 },
-        { step: 5, label: 'Building your prep sheet...', detail: 'Creating your personal visit overview', duration: 4000 },
+        { step: 1, label: 'Reading the report', detail: 'Extracting the values from your PDF', duration: 8000 },
+        { step: 2, label: 'Identifying biomarkers', detail: 'Finding hemoglobin, glucose, vitamins, lipids, and more', duration: 6000 },
+        { step: 3, label: 'Checking ranges', detail: 'Separating optimal results from items to monitor', duration: 5000 },
+        { step: 4, label: 'Drafting doctor questions', detail: 'Turning findings into appointment talking points', duration: 5000 },
+        { step: 5, label: 'Preparing your review screen', detail: 'Getting extracted values ready for your confirmation', duration: 4000 },
     ], []);
 
     // Cycle through stages based on duration
@@ -621,7 +621,7 @@ export function StepProcessing() {
             {/* Warning Banner */}
             <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 32 }}>
                 <p style={{ color: '#92400E', fontSize: 14, margin: 0, fontWeight: 500 }} className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-600" /> Please don't close or refresh this page while we analyze your report
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-600" /> Keep this tab open. You will review the extracted values before anything is saved.
                 </p>
             </div>
 

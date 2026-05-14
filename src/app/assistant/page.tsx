@@ -478,16 +478,16 @@ export function AssistantPageInner() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans selection:bg-sky-100 flex flex-col">
-                <div className="px-3 pt-3 pb-4 md:px-6 md:pt-8 md:pb-8 xl:px-8 max-w-none 2xl:max-w-7xl 2xl:mx-auto flex-1 flex flex-col w-full">
+            <div className="app-page selection:bg-sky-100 flex flex-col">
+                <div className="app-container flex-1 flex flex-col w-full">
 
                     {/* HEADER - Hidden on mobile because MobileNavbar handles it */}
-                    <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <header className="app-header hidden lg:flex">
                         <div>
-                            <h1 className="font-display text-3xl text-[#1C1917] text-wrap-safe">
+                            <h1 className="app-title text-wrap-safe">
                                 Prep Assistant
                             </h1>
-                            <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2 text-wrap-safe">
+                            <p className="app-subtitle flex items-center gap-2 text-wrap-safe">
                                 <Sparkles className="w-4 h-4 text-sky-500" />
                                 Context: {contextData?.title || "Latest labs"} · remembers recent chat history
                             </p>
@@ -495,7 +495,7 @@ export function AssistantPageInner() {
 
                         <button
                             onClick={() => router.back()}
-                            className="px-4 py-2.5 bg-[#F5F4EF] hover:bg-[#EFEDE6] text-[#57534E] text-sm font-medium rounded-[10px] border border-[#E8E6DF] transition-colors flex items-center justify-center gap-2 shrink-0"
+                            className="btn btn-secondary btn-sm shrink-0"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back
@@ -530,17 +530,17 @@ export function AssistantPageInner() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(280px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)] gap-4 lg:gap-5 items-stretch flex-1 min-h-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(340px,0.9fr)] gap-5 lg:gap-6 items-stretch flex-1 min-h-0">
 
                         {/* FULL WIDTH CHAT ON MOBILE */}
-                        <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] flex flex-col overflow-hidden shadow-sm flex-1">
+                        <div className="app-panel flex flex-col overflow-hidden flex-1">
                             {renderChatPanel()}
                         </div>
 
                         {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL - Modal on mobile */}
                         <div className="hidden lg:block space-y-5 overflow-y-auto">
                             <AssistantSidebar biomarkers={biomarkers} />
-                            <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden h-[300px]">
+                            <div className="app-panel overflow-hidden h-[300px]">
                                 <AnalysisPanel
                                     biomarkers={biomarkers}
                                     symptoms={symptoms}

@@ -12,4 +12,4 @@ Disallow: /onboarding
 Disallow: /auth
 Disallow: /api/
 
-Sitemap: https://medassist.health/sitemap.xml
+Sitemap: https://medassist-app.vercel.app/sitemap.xml

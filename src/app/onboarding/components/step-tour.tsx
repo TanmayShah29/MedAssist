@@ -1,7 +1,7 @@
 "use client";
 
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardList, MessageSquareText, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { completeOnboarding } from "@/app/actions/user-data";
 import { toast } from "sonner";
@@ -35,47 +35,35 @@ export function StepTour() {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '48px 24px' }}>
-            <div style={{
-                width: 64,
-                height: 64,
-                borderRadius: '50%',
-                background: '#D1FAE5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 24px auto'
-            }}>
-                <CheckCircle2 size={32} color="#10B981" />
+        <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-6 py-12 text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
+                <CheckCircle2 size={32} />
             </div>
-            <h2 style={{
-                fontFamily: 'Instrument Serif',
-                fontSize: 32,
-                color: '#1C1917',
-                margin: '0 0 12px 0'
-            }}>
-                Your prep sheet is ready
+            <h2 className="font-display text-4xl leading-tight text-[#1C1917]">
+                {analysisResult ? "Your first prep sheet is ready" : "Your workspace is ready"}
             </h2>
-            <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32, maxWidth: 360, margin: '0 auto 32px auto' }}>
+            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-[#57534E]">
                 {analysisResult
-                    ? `We found ${analysisResult.biomarkers.length} biomarkers in your report. Your dashboard now has a one-page visit brief and doctor questions.`
-                    : 'Your profile is set up. Upload your first lab report when you want to prep for a visit.'}
+                    ? `We found ${analysisResult.biomarkers.length} biomarkers. Start with the one-page brief, then review trends and ask follow-up questions.`
+                    : 'Your profile is set up. The dashboard will guide you to upload your first report when you are ready.'}
             </p>
+            <div className="my-8 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+                {[
+                    { icon: ClipboardList, title: "Brief", text: "Key results and visit focus" },
+                    { icon: TrendingUp, title: "Trends", text: "What changed over time" },
+                    { icon: MessageSquareText, title: "Questions", text: "What to ask your doctor" },
+                ].map((item) => (
+                    <div key={item.title} className="rounded-[14px] border border-[#E8E6DF] bg-white/70 p-4 text-left">
+                        <item.icon className="mb-3 h-5 w-5 text-sky-500" />
+                        <p className="text-sm font-bold text-[#1C1917]">{item.title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[#57534E]">{item.text}</p>
+                    </div>
+                ))}
+            </div>
             <button
                 onClick={() => handleFinish()}
                 disabled={isLoading}
-                style={{
-                    background: '#0EA5E9',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 10,
-                    padding: '14px 36px',
-                    fontSize: 16,
-                    fontWeight: 600,
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    opacity: isLoading ? 0.7 : 1
-                }}
-                className="flex items-center gap-2 mx-auto"
+                className="btn btn-primary btn-lg mx-auto"
             >
                 {isLoading ? 'Saving...' : 'Go to my prep dashboard'}
                 {!isLoading && <ArrowRight size={18} />}

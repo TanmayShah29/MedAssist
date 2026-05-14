@@ -22,9 +22,8 @@ export function StepBasicInfo() {
                 <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                     Tell us about yourself
                 </h2>
-                <p className="text-[#57534E] text-sm">
-                    This lets Groq AI personalise its analysis for your
-                    age, sex and biology.
+                <p className="text-[#57534E] text-sm leading-relaxed">
+                    Start with the details that affect reference ranges. You can update this later from your profile.
                 </p>
             </div>
 
@@ -40,9 +39,8 @@ export function StepBasicInfo() {
                         How this data is used
                     </p>
                     <p className="text-xs text-sky-700 leading-relaxed">
-                        Your age and sex are used to calculate personalised reference
-                        ranges. For example, Hemoglobin optimal range differs by sex.
-                        Blood type appears on your profile and emergency card.
+                        Age and biological sex help interpret markers like hemoglobin and creatinine more accurately.
+                        Blood type is optional and only appears in your profile.
                     </p>
                 </div>
             </div>
@@ -177,7 +175,7 @@ export function StepBasicInfo() {
                             : "bg-[#E8E6DF] text-[#A8A29E] cursor-not-allowed"
                     )}
                 >
-                    Continue to symptoms
+                    Continue
                     <ChevronRight className="w-4 h-4" />
                 </motion.button>
             </div>

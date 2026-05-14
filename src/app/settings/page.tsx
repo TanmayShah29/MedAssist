@@ -38,7 +38,7 @@ function Toggle({ checked, onToggle, disabled }: { checked: boolean; onToggle: (
 // ── Section card ───────────────────────────────────────────────────────────
 function SettingsCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] overflow-hidden shadow-sm ${className}`}>
+    <div className={`app-panel overflow-hidden ${className}`}>
       {children}
     </div>
   );
@@ -167,12 +167,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-none 2xl:max-w-6xl 2xl:mx-auto px-4 py-8 md:px-6 md:py-12 xl:px-8 space-y-8">
+    <div className="app-page">
+      <div className="app-container-narrow space-y-8">
 
       {/* Page heading */}
-      <div>
-        <h1 className="font-display text-3xl text-[#1C1917]">Settings</h1>
-        <p className="text-[14px] text-[#A8A29E] mt-1">Manage your account, security, and data.</p>
+      <div className="app-header">
+        <div>
+          <h1 className="app-title">Settings</h1>
+          <p className="app-subtitle">Manage your account, security, and data.</p>
+        </div>
       </div>
 
       {/* ── Security ── */}
@@ -349,6 +352,7 @@ export default function SettingsPage() {
           </div>
         </SettingsCard>
       </section>
+      </div>
     </div>
   );
 }

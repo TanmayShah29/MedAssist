@@ -101,7 +101,7 @@ In your Vercel project → **Settings → Environment Variables**, add:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key | ✅ |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | ✅ |
 | `GROQ_API_KEY` | Groq API key | ✅ |
-| `NEXT_PUBLIC_SITE_URL` | `https://yourdomain.com` | Recommended |
+| `NEXT_PUBLIC_SITE_URL` | `https://medassist-app.vercel.app` | Recommended |
 | `OCR_SPACE_API_KEY` | [ocr.space](https://ocr.space/ocrapi) free key | Optional |
 | `SENTRY_DSN` | Sentry project DSN | Optional |
 
@@ -109,8 +109,8 @@ In your Vercel project → **Settings → Environment Variables**, add:
 
 In Supabase → **Authentication → URL Configuration**:
 
-- **Site URL:** `https://yourdomain.com`
-- **Redirect URLs:** `https://yourdomain.com/auth/callback`
+- **Site URL:** `https://medassist-app.vercel.app`
+- **Redirect URLs:** `https://medassist-app.vercel.app/auth/callback`
 
 ### 5. Deploy
 

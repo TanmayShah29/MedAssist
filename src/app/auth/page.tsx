@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Shield, Loader2, ArrowRight, Mail, RotateCcw } from "lucide-react";
+import { Shield, Loader2, ArrowRight, Mail, RotateCcw, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { logger } from "@/lib/logger";
 
@@ -133,7 +133,7 @@ function AuthContent() {
 
     if (confirmationEmail) {
         return (
-            <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-stone-200/50 p-8 border border-[#E8E6DF]">
+            <div className="w-full max-w-md app-panel-white p-8">
                 <div className="w-12 h-12 rounded-[14px] bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-6">
                     <Mail className="w-6 h-6" />
                 </div>
@@ -169,7 +169,7 @@ function AuthContent() {
     }
 
     return (
-        <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-stone-200/50 p-8 border border-[#E8E6DF]">
+        <div className="w-full max-w-md app-panel-white p-8">
             <div className="text-center mb-8">
                 <h1 className="font-display text-3xl text-[#1C1917] mb-2">
                     {mode === 'login' ? 'Welcome Back' : 'Create Account'}
@@ -291,7 +291,8 @@ function AuthContent() {
 
 export default function AuthPage() {
     return (
-        <div className="min-h-[100dvh] bg-[#F0EFE9] flex flex-col justify-center items-center p-4">
+        <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col justify-center items-center p-4 relative overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.16),transparent_34rem)]" />
             <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 flex items-center gap-2 z-10">
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
                     <Shield className="w-4 h-4 text-white" />
@@ -299,13 +300,36 @@ export default function AuthPage() {
                 <span className="font-display text-xl text-[#1C1917]">MedAssist</span>
             </Link>
 
-            <Suspense fallback={
-                <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-stone-200/50 p-8 border border-[#E8E6DF] flex justify-center items-center h-[400px]">
-                    <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                </div>
-            }>
-                <AuthContent />
-            </Suspense>
+            <div className="relative grid w-full max-w-5xl grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1fr)]">
+                <aside className="hidden lg:block">
+                    <p className="section-label mb-3 text-sky-600">What happens next</p>
+                    <h2 className="font-display text-5xl leading-tight text-[#1C1917]">
+                        From account to visit prep in a few minutes.
+                    </h2>
+                    <div className="mt-8 space-y-4">
+                        {[
+                            "Set the basics that affect reference ranges.",
+                            "Upload a PDF or type values manually.",
+                            "Review extracted biomarkers before saving.",
+                            "Open a dashboard built around doctor questions.",
+                        ].map((item) => (
+                            <div key={item} className="flex items-start gap-3">
+                                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+                                <p className="text-sm leading-relaxed text-[#57534E]">{item}</p>
+                            </div>
+                        ))}
+                    </div>
+                </aside>
+                <Suspense fallback={
+                    <div className="w-full max-w-md app-panel-white p-8 flex justify-center items-center h-[400px] justify-self-center">
+                        <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
+                    </div>
+                }>
+                    <div className="justify-self-center w-full max-w-md">
+                        <AuthContent />
+                    </div>
+                </Suspense>
+            </div>
         </div>
     );
 }

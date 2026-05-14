@@ -89,12 +89,12 @@ export function ClientLayout({
           <MobileNavbar />
 
           <div
-            className="flex min-h-[100dvh]"
+            className="flex min-h-[100dvh] bg-transparent"
             style={{ visibility: loading ? "hidden" : "visible" }}
           >
             <aside className="
                 hidden lg:flex
-                w-60 min-h-[100dvh]
+                w-[17rem] min-h-[100dvh]
                 fixed left-0 top-0 z-40
                 flex-col
               ">
@@ -102,7 +102,7 @@ export function ClientLayout({
             </aside>
             <main className="
                 grow shrink basis-0
-                lg:ml-60
+                lg:ml-[17rem]
                 min-h-[100dvh]
                 flex flex-col
                 overflow-x-hidden

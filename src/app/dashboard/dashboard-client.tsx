@@ -318,7 +318,8 @@ export default function DashboardClient({
     // ── Render ─────────────────────────────────────────────────────────────
 
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 xl:p-8 text-[#1C1917] font-sans" id="dashboard-content">
+        <div className="app-page" id="dashboard-content">
+            <div className="app-container">
 
             {/* Print header */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-6 mb-8">
@@ -333,10 +334,10 @@ export default function DashboardClient({
             </div>
 
             {/* Header row */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 min-w-0">
+            <div className="app-header min-w-0">
                 <div className="hidden lg:block">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917] text-wrap-safe">Visit Prep Dashboard</h1>
+                        <h1 className="app-title text-wrap-safe">Visit Prep Dashboard</h1>
                         {isOffline && (
                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse">
                                 <WifiOff size={12} />
@@ -345,9 +346,9 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated ? (
-                        <p className="text-[13px] text-[#A8A29E] mt-1">Last report: {lastUpdated}</p>
+                        <p className="app-subtitle">Last report: {lastUpdated}</p>
                     ) : (
-                        <p className="text-[14px] text-[#57534E] mt-1">
+                        <p className="app-subtitle">
                             {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
                             {profile?.first_name || 'Patient'}
                         </p>
@@ -371,10 +372,10 @@ export default function DashboardClient({
                         </div>
                     )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0 print:hidden sm:justify-end">
+                <div className="app-actions shrink-0 print:hidden sm:justify-end">
                     <button
                         onClick={() => window.print()}
-                        className="p-2.5 bg-white border border-[#E8E6DF] rounded-[12px] text-[#57534E] hover:bg-gray-50 active:scale-95 transition-all shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="btn btn-secondary btn-icon"
                         title="Print Report"
                         style={{ WebkitAppearance: 'none' }}
                     >
@@ -382,7 +383,7 @@ export default function DashboardClient({
                     </button>
                     <button
                         onClick={() => setShowUploadModal(true)}
-                        className="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[10px] px-3 sm:px-4 py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                        className="btn btn-primary"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         <Upload size={16} />
@@ -481,7 +482,7 @@ export default function DashboardClient({
                     onDemo={() => setDemoMode(true)}
                 />
             ) : (
-                <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.9fr)] 2xl:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]">
+                <div className="app-section-grid mb-6">
 
                     {/* ── LEFT: Main clinical column ── */}
                     <div className="flex flex-col gap-6 min-w-0">
@@ -713,6 +714,7 @@ export default function DashboardClient({
                         &copy; {new Date().getFullYear()} MedAssist. All rights reserved.
                     </p>
                 </div>
+            </div>
             </div>
         </div>
     );

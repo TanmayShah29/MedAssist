@@ -10,7 +10,7 @@ Use this before every production release. Check each item before merging to `mai
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` set in Vercel env (all environments)
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` set in Vercel env (**Production only** — never Preview)
 - [ ] `GROQ_API_KEY` set in Vercel env (Production + Preview)
-- [ ] `NEXT_PUBLIC_SITE_URL` set to production domain (e.g. `https://medassist.health`)
+- [ ] `NEXT_PUBLIC_SITE_URL` set to canonical production URL: `https://medassist-app.vercel.app`
 - [ ] `DISABLE_RATE_LIMIT` is **not** set (or explicitly `false`) in Production
 - [ ] `ENABLE_VERBOSE_LOGGING` is **not** set in Production (or set to `false`)
 - [ ] No `.env.local` or `.env.production` file accidentally committed
@@ -25,8 +25,8 @@ Use this before every production release. Check each item before merging to `mai
 - [ ] RLS is **enabled** on all tables: `lab_results`, `biomarkers`, `profiles`, `symptoms`, `supplements`, `conversations`, `feedback`, `rate_limits`, `global_ai_cache`
 - [ ] `global_ai_cache` has deny-all RLS (direct access forbidden — accessed via service role only)
 - [ ] `feedback` INSERT policy scoped to own user_id (not `WITH CHECK (true)`)
-- [ ] Auth → URL Configuration → **Site URL** = production domain
-- [ ] Auth → URL Configuration → **Redirect URLs** includes `https://yourdomain.com/auth/callback`
+- [ ] Auth → URL Configuration → **Site URL** = `https://medassist-app.vercel.app`
+- [ ] Auth → URL Configuration → **Redirect URLs** includes `https://medassist-app.vercel.app/auth/callback`
 - [ ] Email templates configured (confirmation, password reset)
 
 ---
@@ -73,6 +73,7 @@ npm test
   - `assistant`: 30s
   - `generate-questions`: 30s
   - `demo-ask-ai`: 30s
+  - `doctor-prep`: 30s
   - `supplements`: 15s
   - `feedback`: 15s
 - [ ] Vercel project is on **Pro plan** (Hobby plan has 10s timeout — insufficient for AI analysis)
@@ -82,7 +83,7 @@ npm test
 
 ## 7. PWA / SEO
 
-- [ ] `manifest.json` has `shortcuts` for Dashboard and AI Assistant
+- [ ] `manifest.json` has `shortcuts` for Visit Prep and Prep Assistant
 - [ ] `sitemap.xml` includes `/`, `/demo`, `/privacy`, `/terms`
 - [ ] `robots.txt` allows `/demo`, `/privacy`, `/terms`
 - [ ] `og-image.png` exists at `/public/og-image.png` (1200×630px)
@@ -122,9 +123,9 @@ After deploying, manually verify:
 - [ ] Custom domain added in Vercel → Settings → Domains
 - [ ] DNS records pointed to Vercel (A/CNAME per Vercel instructions)
 - [ ] SSL certificate issued (automatic via Vercel)
-- [ ] `NEXT_PUBLIC_SITE_URL` updated to custom domain
-- [ ] `sitemap.xml` accessible at `https://yourdomain.com/sitemap.xml`
-- [ ] `robots.txt` accessible at `https://yourdomain.com/robots.txt`
+- [ ] `NEXT_PUBLIC_SITE_URL` updated to custom domain if/when one replaces `https://medassist-app.vercel.app`
+- [ ] `sitemap.xml` accessible at `https://medassist-app.vercel.app/sitemap.xml`
+- [ ] `robots.txt` accessible at `https://medassist-app.vercel.app/robots.txt`
 
 ---
 

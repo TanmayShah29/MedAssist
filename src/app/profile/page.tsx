@@ -103,20 +103,23 @@ export default function ProfilePage() {
         );
     };
 
-    if (loading) return <div className="p-8 text-center text-[#A8A29E]">Loading...</div>;
+    if (loading) return <div className="app-page"><div className="app-container-narrow p-8 text-center text-[#A8A29E]">Loading...</div></div>;
 
     const reportCount = reports.length;
 
     return (
-        <div className="max-w-none 2xl:max-w-6xl 2xl:mx-auto px-3 py-4 md:px-6 md:py-8 xl:px-8 space-y-5 md:space-y-6 pb-24 md:pb-8">
+        <div className="app-page">
+            <div className="app-container-narrow space-y-5 md:space-y-6">
 
-            <div>
-                <h1 className="font-display text-3xl text-[#1C1917]">Clinical Profile</h1>
-                <p className="text-sm text-[#A8A29E] mt-1">{profile?.first_name} {profile?.last_name} · Patient</p>
+            <div className="app-header">
+                <div>
+                    <h1 className="app-title">Clinical Profile</h1>
+                    <p className="app-subtitle">{profile?.first_name} {profile?.last_name} · Patient</p>
+                </div>
             </div>
 
             {/* Completion card */}
-            <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-6">
+            <div className="rounded-[14px] border border-[#BAE6FD] bg-[#E0F2FE]/75 p-6">
                 <div className="flex items-start gap-4">
                     <div className="p-3 bg-sky-100 rounded-lg text-sky-600">
                         <FileText size={24} />
@@ -140,7 +143,7 @@ export default function ProfilePage() {
                 {/* Left Column */}
                 <div className="flex flex-col gap-5">
                     {/* Personal Information */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col">
+                    <div className="app-panel p-5 flex flex-col">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Personal Information
@@ -211,7 +214,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Report List */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
+                    <div className="app-panel p-5 flex flex-col grow shrink basis-0">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Uploaded Reports
@@ -267,7 +270,7 @@ export default function ProfilePage() {
                 {/* Right Column */}
                 <div className="flex flex-col gap-5">
                     {/* Health Summary - Only showing real symptoms */}
-                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] p-5 flex flex-col grow shrink basis-0">
+                    <div className="app-panel p-5 flex flex-col grow shrink basis-0">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <p className="text-base font-semibold text-[#1C1917]">
                                 Health Context
@@ -322,6 +325,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+            </div>
             </div>
         </div>
     );

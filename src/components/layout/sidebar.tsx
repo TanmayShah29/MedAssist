@@ -42,13 +42,13 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "hidden lg:flex w-60 min-h-[100dvh] fixed left-0 top-0 z-40",
-        "bg-[#F0EFE9] border-r border-[#E8E6DF] flex-col",
+        "hidden lg:flex min-h-[100dvh] fixed left-0 top-0 z-40",
+        "w-[17rem] bg-[#F0EFE9]/95 border-r border-[#E8E6DF] flex-col shadow-[8px_0_32px_rgba(28,25,23,0.04)]",
         className
       )}
     >
       {/* ── Logo ── */}
-      <div className="h-16 flex items-center justify-between px-5 border-b border-[#E8E6DF]">
+      <div className="h-20 flex items-center justify-between px-5 border-b border-[#E8E6DF]">
         <Link href="/dashboard" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
             <Shield className="w-4 h-4 text-white" />
@@ -63,7 +63,7 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       {/* ── Navigation ── */}
-      <nav className="grow shrink basis-0 px-3 py-4 space-y-0.5">
+      <nav className="grow shrink basis-0 px-3 py-5 space-y-1">
         <p className="section-label px-3 mb-3">Navigation</p>
 
         {navItems.map(item => {
@@ -73,7 +73,7 @@ export function Sidebar({ className }: { className?: string }) {
               key={item.id}
               href={item.path}
               className={cn(
-                "flex items-center justify-between px-3 py-2.5 rounded-[10px] min-h-[44px]",
+                "flex items-center justify-between px-3.5 py-3 rounded-[12px] min-h-[46px]",
                 "text-sm font-medium transition-all duration-150 group",
                 "border-l-2",
                 isActive
@@ -105,7 +105,7 @@ export function Sidebar({ className }: { className?: string }) {
       </nav>
 
       {/* ── AI Status ── */}
-      <div className="mx-3 mb-3 p-3 bg-[#1C1917] rounded-[12px] border border-[#2C2A27]">
+      <div className="mx-3 mb-3 p-4 bg-[#1C1917] rounded-[14px] border border-[#2C2A27]">
         <div className="flex items-center gap-1.5 mb-2.5">
           <Zap className="w-3 h-3 text-sky-400" />
           <p className="section-label text-[#78716C]">Prep Engine</p>
@@ -120,7 +120,7 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       {/* ── User footer ── */}
-      <div className="p-4 border-t border-[#E8E6DF] flex items-center gap-3">
+      <div className="p-4 border-t border-[#E8E6DF] flex items-center gap-3 bg-[#F5F4EF]/70">
         {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center flex-shrink-0">
           <span className="text-xs font-bold text-sky-700">

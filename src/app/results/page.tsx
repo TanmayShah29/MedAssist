@@ -183,7 +183,8 @@ export default function ResultsPage() {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-[100dvh] bg-[#FAFAF7] px-3 py-4 md:p-6 text-[#1C1917] font-sans">
+            <div className="app-page">
+                <div className="app-container">
 
                 {/* ── Print-only Header ── */}
                 <div className="hidden print:block mb-8">
@@ -235,19 +236,18 @@ export default function ResultsPage() {
                 )}
 
                 {/* ── Header ── */}
-                <div className="mb-6">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                <div className="app-header">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 w-full">
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917] text-wrap-safe">Lab Details</h1>
-                            <p className="text-[14px] md:text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
-                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1 text-wrap-safe">Review the numbers, then bring the one-page prep sheet to your appointment.</p>
+                            <h1 className="app-title text-wrap-safe">Lab Details</h1>
+                            <p className="app-subtitle">{biomarkers.length} biomarkers found. Review the numbers, then bring the one-page prep sheet to your appointment.</p>
                             <TrustLayer variant="compact" className="mt-3" />
                         </div>
-                        <div className="flex flex-wrap gap-2 shrink-0 print:hidden sm:justify-end">
+                        <div className="app-actions shrink-0 print:hidden sm:justify-end">
                             <button
                                 onClick={() => setRefreshKey((k) => k + 1)}
                                 disabled={loading}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px] h-11"
+                                className="btn btn-secondary btn-sm disabled:opacity-50"
                                 title="Refresh results"
                                 style={{ WebkitAppearance: 'none' }}
                             >
@@ -256,7 +256,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="bg-white border border-[#E8E6DF] text-[#57534E] rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-[#F5F4EF] active:scale-95 transition-colors min-h-[44px] h-11"
+                                className="btn btn-secondary btn-sm"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 <Printer size={16} />
@@ -265,7 +265,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="text-white rounded-[10px] px-3 sm:px-4 py-2 text-sm font-medium bg-sky-500 hover:bg-sky-600 active:scale-95 transition-colors min-h-[44px] h-11 flex items-center justify-center gap-1.5"
+                                className="btn btn-primary btn-sm"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Upload
@@ -378,10 +378,10 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Two column layout ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-6">
 
                     {/* Left column: List - full width on mobile */}
-                    <div className="col-span-1 lg:col-span-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] overflow-hidden">
+                    <div className="col-span-1 lg:col-span-3 app-panel overflow-hidden">
                         {loading ? (
                             <div className="p-4 space-y-4">
                                 {[...Array(5)].map((_, i) => (
@@ -477,11 +477,11 @@ export default function ResultsPage() {
                     <div className="hidden lg:block lg:col-span-2">
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
-                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-8 text-center h-[200px] flex items-center justify-center shadow-sm">
+                                <div className="app-panel p-8 text-center h-[200px] flex items-center justify-center">
                                     <p className="text-[15px] text-[#A8A29E] font-medium">Select a result to see AI interpretation</p>
                                 </div>
                             ) : (
-                                <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-6 animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-sm">
+                                <div className="app-panel p-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
                                     <div className="flex justify-between items-start mb-4">
                                         <h2 className="text-[20px] font-bold text-[#1C1917] leading-tight pr-4 text-wrap-safe">{selectedBiomarker.name}</h2>
                                         <button
@@ -587,7 +587,7 @@ export default function ResultsPage() {
                 <DoctorQuestions biomarkers={questionBiomarkers} className="mt-8" />
 
                 {/* ── Sticky Nudge Bar ── */}
-                <div className="bg-white border border-[#E8E6DF] rounded-2xl p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-sm">
+                <div className="app-panel-white p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
                     <div className="min-w-0 flex-1 text-center sm:text-left">
                         <p className="font-bold text-lg text-[#1C1917] mb-1">
                             Had a recent blood test?
@@ -603,6 +603,7 @@ export default function ResultsPage() {
                         Upload report
                         <ArrowRight size={18} />
                     </button>
+                </div>
                 </div>
             </div >
         </ErrorBoundary >

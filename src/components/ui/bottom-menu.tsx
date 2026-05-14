@@ -23,9 +23,9 @@ export interface MenuItem {
 }
 
 const DEFAULT_ITEMS: MenuItem[] = [
-    { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { id: "results",   label: "Results",   href: "/results",   icon: FlaskConical },
-    { id: "assistant", label: "AI",        href: "/assistant", icon: MessageSquare },
+    { id: "dashboard", label: "Prep", href: "/dashboard", icon: LayoutDashboard },
+    { id: "results",   label: "Labs",   href: "/results",   icon: FlaskConical },
+    { id: "assistant", label: "Ask",        href: "/assistant", icon: MessageSquare },
     { id: "profile",   label: "Profile",   href: "/profile",   icon: User },
     { id: "settings",  label: "Settings",  href: "/settings",  icon: Settings },
 ];
@@ -43,14 +43,14 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
-                "bg-[#FAFAF7]/95 backdrop-blur-2xl border-t border-[#E8E6DF]",
+                "bg-[#FAFAF7]/96 backdrop-blur-2xl border-t border-[#E8E6DF]",
                 "pb-[env(safe-area-inset-bottom)]",
                 "gpu-accelerate shadow-[0_-4px_24px_rgba(28,25,23,0.06)]",
                 className
             )}
             aria-label="Main navigation"
         >
-            <div className="flex justify-between items-center px-2 pt-2 pb-2 relative px-safe">
+            <div className="flex justify-between items-center px-3 pt-2 pb-2 relative px-safe">
                 {items.map((item) => {
                     const isActive = pathname?.startsWith(item.href);
                     const Icon = item.icon;
@@ -61,7 +61,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             aria-label={item.label}
                             aria-current={isActive ? "page" : undefined}
                             className={cn(
-                                "flex flex-col items-center gap-1 group relative flex-1 min-h-[52px] justify-center",
+                                "flex flex-col items-center gap-1 group relative flex-1 min-h-[54px] justify-center",
                                 "transition-all duration-150 active:scale-90",
                                 isActive ? "text-sky-500" : "text-[#A8A29E]"
                             )}
@@ -71,7 +71,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                                 {isActive && (
                                     <motion.div
                                         layoutId="bottom-nav-active"
-                                        className="absolute inset-0 -inset-x-3 rounded-[10px] bg-sky-50 border border-sky-100"
+                                        className="absolute inset-0 -inset-x-3 rounded-[12px] bg-sky-50 border border-sky-100"
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}
@@ -91,7 +91,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             </div>
 
                             <span className={cn(
-                                "text-[9px] font-bold uppercase tracking-[0.1em] transition-colors leading-none",
+                                "text-[10px] font-bold transition-colors leading-none",
                                 isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#A8A29E]"
                             )}>
                                 {item.label}

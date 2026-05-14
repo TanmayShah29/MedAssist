@@ -13,11 +13,34 @@ import { StepTour } from "./components/step-tour";
 import { ExtractionErrorBoundary } from "@/components/pipeline/ExtractionErrorBoundary";
 
 const STEP_LABELS = [
-    "Your Profile",
-    "Symptoms",
-    "Lab Report",
-    "AI Analysis",
-    "Your Results",
+    "Profile",
+    "Context",
+    "Report",
+    "Review",
+    "Ready",
+];
+
+const STEP_CONTEXT = [
+    {
+        title: "Set your clinical baseline",
+        detail: "Reference ranges can depend on age and biological sex. This makes the first analysis less generic.",
+    },
+    {
+        title: "Add the symptoms worth connecting",
+        detail: "Symptoms are optional, but they help turn lab values into useful doctor questions.",
+    },
+    {
+        title: "Choose how to bring in results",
+        detail: "Upload a PDF, enter values manually, or skip and add a report later from the dashboard.",
+    },
+    {
+        title: "Check the extraction before saving",
+        detail: "AI reads the report, then you confirm the values before the dashboard is built.",
+    },
+    {
+        title: "Head into your prep dashboard",
+        detail: "Your next screen organizes the report into talking points, trends, and doctor questions.",
+    },
 ];
 
 export default function OnboardingPage() {
@@ -41,18 +64,31 @@ export default function OnboardingPage() {
         <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">
 
             {/* Header */}
-            <div className="border-b border-[#E8E6DF] bg-[#F5F4EF]">
-                <div className="max-w-2xl mx-auto px-6 py-4">
+            <div className="border-b border-[#E8E6DF] bg-[#F5F4EF]/92">
+                <div className="max-w-4xl mx-auto px-6 py-4">
 
                     {/* Logo */}
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="w-7 h-7 rounded-lg bg-sky-500 
+                    <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-sky-500 
                             flex items-center justify-center">
-                            <Shield className="w-3.5 h-3.5 text-white" />
+                                <Shield className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <span className="font-display text-lg text-[#1C1917]">
+                                MedAssist
+                            </span>
                         </div>
-                        <span className="font-display text-lg text-[#1C1917]">
-                            MedAssist
-                        </span>
+                        <div className="max-w-md sm:text-right">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-sky-600">
+                                Step {currentStep} of {STEP_LABELS.length}
+                            </p>
+                            <p className="text-sm font-semibold text-[#1C1917] mt-1">
+                                {STEP_CONTEXT[currentStep - 1]?.title}
+                            </p>
+                            <p className="text-xs leading-relaxed text-[#57534E] mt-1">
+                                {STEP_CONTEXT[currentStep - 1]?.detail}
+                            </p>
+                        </div>
                     </div>
 
                     {/* Progress steps */}
