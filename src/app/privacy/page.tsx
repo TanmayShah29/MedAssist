@@ -27,7 +27,7 @@ export default function PrivacyPage() {
             {[
                 {
                     title: 'Data we collect',
-                    content: 'Email address (required for account), first name, last name, age, sex, blood type (provided during onboarding), symptoms you report, biomarker values extracted from your lab reports, and your chat messages with the AI assistant.'
+                    content: 'Email address (required for account), first name, last name, age, sex, blood type (provided during onboarding), symptoms you report, biomarker values extracted from your lab reports, appointment-prep outputs, and your chat messages with the prep assistant.'
                 },
                 {
                     title: 'Data we do NOT collect',
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                 },
                 {
                     title: 'Third party services',
-                    content: 'We use OCR.space to extract text from your PDF (the PDF content is sent to their servers for processing). We use Groq AI to interpret biomarker values (extracted text is sent to their servers). We use Vercel to host the application. None of these services receive your personal information beyond what is necessary to process your request.'
+                    content: 'We use OCR.space as the existing fallback for scanned PDF text extraction. We use Groq AI to interpret biomarker values, stream assistant responses, and generate doctor-visit prep summaries. We use Vercel to host the application. None of these services receive your personal information beyond what is necessary to process your request.'
                 },
                 {
                     title: 'Your rights',

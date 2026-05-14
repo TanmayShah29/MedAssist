@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { DEMO_HISTORY, DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT } from '@/lib/demo-data';
+import type { DemoLabResult } from '@/lib/demo-data';
+import type { Biomarker as DemoBiomarker } from '@/types/medical';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -66,8 +67,8 @@ interface AppState {
     reset: () => void;
 
     // Derived helpers (not stored, computed on access)
-    getDemoLabResults: () => typeof DEMO_LAB_RESULT[];
-    getDemoBiomarkers: () => typeof DEMO_HISTORY;
+    getDemoLabResults: () => Promise<DemoLabResult[]>;
+    getDemoBiomarkers: () => Promise<DemoBiomarker[]>;
 }
 
 // ── Safe defaults (empty — real data comes from Supabase) ─────────────────────
@@ -101,8 +102,14 @@ export const useStore = create<AppState>()(
             setHasData: (status) => set({ hasData: status }),
             setDemoMode: (enabled) => set({ demoMode: enabled }),
 
-            getDemoLabResults: () => [DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT],
-            getDemoBiomarkers: () => DEMO_HISTORY,
+            getDemoLabResults: async () => {
+                const { DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT } = await import('@/lib/demo-data');
+                return [DEMO_LAB_RESULT, DEMO_PREVIOUS_LAB_RESULT];
+            },
+            getDemoBiomarkers: async () => {
+                const { DEMO_HISTORY } = await import('@/lib/demo-data');
+                return DEMO_HISTORY;
+            },
 
             updateUser: (profile) => set((state) => ({
                 user: { ...state.user, ...profile }
@@ -133,6 +140,19 @@ export const useStore = create<AppState>()(
         }),
         {
             name: 'medassist-storage-v2', // Bumped version to bust stale mock data from old key
+            version: 3,
+            partialize: (state) => ({
+                demoMode: state.demoMode,
+            }),
+            migrate: (persistedState) => {
+                if (!persistedState || typeof persistedState !== 'object') {
+                    return { demoMode: false };
+                }
+
+                return {
+                    demoMode: Boolean((persistedState as { demoMode?: unknown }).demoMode),
+                };
+            },
             storage: createJSONStorage(() => {
                 try {
                     // Test if localStorage is actually accessible

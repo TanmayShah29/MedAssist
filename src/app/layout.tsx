@@ -1,5 +1,5 @@
 import React from "react";
-import { headers } from "next/headers";
+import { DM_Sans, Instrument_Serif } from "next/font/google";
 import { ClientLayout } from "@/components/layout/ClientLayout";
 import "./globals.css";
 
@@ -19,14 +19,25 @@ const STANDALONE_ROUTES = [
   "/onboarding",
 ];
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://medassist.vercel.app';
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument",
+});
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://medassist-app.vercel.app";
 
 export const metadata = {
-  title: "MedAssist — Understand Your Lab Results",
-  description: "Transform your confusing blood work PDFs into plain-English insights with AI-powered lab report analysis.",
+  title: "MedAssist — Walk Into Your Doctor Visit Prepared",
+  description: "Turn lab reports into plain-English insights, trend context, and a printable doctor-visit prep sheet.",
   openGraph: {
-    title: "MedAssist — Understand Your Lab Results",
-    description: "AI-powered clinical intelligence for your lab reports.",
+    title: "MedAssist — Walk Into Your Doctor Visit Prepared",
+    description: "AI-powered appointment prep for your lab reports.",
     url: SITE_URL,
     siteName: "MedAssist",
     images: [
@@ -41,8 +52,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MedAssist — Understand Your Lab Results",
-    description: "AI-powered clinical intelligence for your lab reports.",
+    title: "MedAssist — Walk Into Your Doctor Visit Prepared",
+    description: "AI-powered appointment prep for your lab reports.",
     images: [`${SITE_URL}/og-image.png`],
   },
   alternates: {
@@ -50,16 +61,13 @@ export const metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname");
-
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${dmSans.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
       <head>
         <meta
           name="viewport"
@@ -70,11 +78,11 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0EA5E9" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/og-image.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
       </head>
       <body className="bg-[#FAFAF7] font-sans overflow-x-hidden">
         <ClientLayout 
-          initialPathname={pathname}
+          initialPathname={null}
           appShellRoutes={APP_SHELL_ROUTES}
           standaloneRoutes={STANDALONE_ROUTES}
         >

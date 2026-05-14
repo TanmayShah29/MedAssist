@@ -167,7 +167,8 @@ ${criticalBiomarkers.map((b: BiomarkerInput) =>
 ).join('\n')}
 
 Generate 3-5 specific questions this person should ask their doctor at their next appointment.
-For each question, reference the actual numeric value. Provide a brief "Why ask this" context.
+For each question, reference the actual numeric value and frame it as a practical appointment talking point.
+Provide a brief "Why ask this" context that explains what decision, follow-up test, or monitoring plan the question could clarify.
 
 Return a JSON object with a "questions" key containing an array:
 {

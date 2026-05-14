@@ -16,6 +16,7 @@ import {
     WifiOff,
     TrendingUp,
     TrendingDown,
+    MessageSquareText,
 } from 'lucide-react'
 
 import { UploadModal } from '@/components/upload-modal'
@@ -30,6 +31,7 @@ import { MedicineCabinet } from '@/components/dashboard/medicine-cabinet'
 import { BiomarkerGrid } from '@/components/dashboard/biomarker-grid'
 import { CarePlanSection } from '@/components/dashboard/care-plan-section'
 import { LongitudinalInsightsSection } from '@/components/dashboard/longitudinal-insights-section'
+import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
 
 import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
@@ -138,7 +140,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
             </div>
             <h2 className="font-display text-[28px] text-[#1C1917] mb-3">Ready when you are</h2>
             <p className="text-[15px] text-[#57534E] max-w-sm mx-auto mb-6 leading-relaxed">
-                Upload your first lab report and MedAssist will extract every biomarker, explain each value in plain English, and show you what needs attention.
+                Upload your first lab report and MedAssist will turn it into an appointment-ready brief: key results, trends, and questions to bring to your doctor.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
@@ -158,7 +160,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
                 </button>
             </div>
             <p className="text-[12px] text-[#A8A29E] mt-3">
-                Supports digital PDF lab reports · Takes 20–40 seconds
+                Supports digital PDF lab reports · Prep sheet generated in under a minute
             </p>
         </div>
     );
@@ -188,6 +190,8 @@ export default function DashboardClient({
     const setDemoMode = useStore(s => s.setDemoMode);
     const getDemoLabResults = useStore(s => s.getDemoLabResults);
     const getDemoBiomarkers = useStore(s => s.getDemoBiomarkers);
+    const [demoLabResults, setDemoLabResults] = useState<LabResult[]>([]);
+    const [demoBiomarkers, setDemoBiomarkers] = useState<Biomarker[]>([]);
     const [showScoreModal, setShowScoreModal] = useState(false);
     const [_supplements, setSupplements] = useState<Record<string, unknown>[]>([]);
 
@@ -219,6 +223,30 @@ export default function DashboardClient({
     }, []);
 
     useEffect(() => {
+        let cancelled = false;
+
+        const loadDemoData = async () => {
+            if (!demoMode) return;
+
+            const [nextLabResults, nextBiomarkers] = await Promise.all([
+                getDemoLabResults(),
+                getDemoBiomarkers(),
+            ]);
+
+            if (!cancelled) {
+                setDemoLabResults(nextLabResults as LabResult[]);
+                setDemoBiomarkers(nextBiomarkers);
+            }
+        };
+
+        loadDemoData();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [demoMode, getDemoLabResults, getDemoBiomarkers]);
+
+    useEffect(() => {
         if (typeof window === 'undefined') return;
         const handleOnline = () => setIsOffline(false);
         const handleOffline = () => setIsOffline(true);
@@ -234,26 +262,14 @@ export default function DashboardClient({
     // ── Derived Data ───────────────────────────────────────────────────────
 
     const displayLabResults = useMemo(
-        () => (demoMode ? getDemoLabResults() : initialLabResults),
-        [demoMode, initialLabResults, getDemoLabResults]
+        () => (demoMode ? demoLabResults : initialLabResults),
+        [demoMode, demoLabResults, initialLabResults]
     );
 
     const displayBiomarkers = useMemo(
-        () => (demoMode ? getDemoBiomarkers() : initialBiomarkers),
-        [demoMode, initialBiomarkers, getDemoBiomarkers]
+        () => (demoMode ? demoBiomarkers : initialBiomarkers),
+        [demoMode, demoBiomarkers, initialBiomarkers]
     );
-
-    // Cache to localStorage
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const key = demoMode ? 'demo' : 'real';
-        if (displayLabResults.length > 0) {
-            try {
-                localStorage.setItem(`medassist_cached_${key}_lab_results`, JSON.stringify(displayLabResults));
-                localStorage.setItem(`medassist_cached_${key}_biomarkers`, JSON.stringify(displayBiomarkers));
-            } catch (_e) { /* storage full — non-critical */ }
-        }
-    }, [displayLabResults, displayBiomarkers, demoMode]);
 
     // Latest entry per biomarker name
     const latestBiomarkers = useMemo(
@@ -320,7 +336,7 @@ export default function DashboardClient({
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 min-w-0">
                 <div className="hidden lg:block">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917] text-wrap-safe">Clinical Overview</h1>
+                        <h1 className="font-display text-[28px] md:text-[32px] text-[#1C1917] text-wrap-safe">Visit Prep Dashboard</h1>
                         {isOffline && (
                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse">
                                 <WifiOff size={12} />
@@ -386,11 +402,11 @@ export default function DashboardClient({
                                     <Activity size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917] text-wrap-safe">Risk Level Summary</h3>
+                                    <h3 className="text-sm font-bold text-[#1C1917] text-wrap-safe">Appointment Focus</h3>
                                     <p className="text-xs text-[#57534E] text-wrap-safe">
                                         {criticalCount > 0
-                                            ? `${criticalCount} urgent markers need attention`
-                                            : `${warningCount} markers to monitor closely`}
+                                            ? `${criticalCount} urgent markers to review with your clinician`
+                                            : `${warningCount} markers to discuss or monitor`}
                                     </p>
                                 </div>
                             </div>
@@ -416,7 +432,7 @@ export default function DashboardClient({
                                     <ClipboardList size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917] font-sans text-wrap-safe">Recency Tracking</h3>
+                                    <h3 className="text-sm font-bold text-[#1C1917] font-sans text-wrap-safe">Visit Context</h3>
                                     <p className="text-xs text-[#57534E] text-wrap-safe">
                                         Last test was{' '}
                                         {Math.floor(
@@ -469,6 +485,7 @@ export default function DashboardClient({
 
                     {/* ── LEFT: Main clinical column ── */}
                     <div className="flex flex-col gap-6 min-w-0">
+                        <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
                         {/* Symptom connections */}
@@ -533,7 +550,7 @@ export default function DashboardClient({
 
                         {/* AI Insights */}
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">PERSONALIZED INSIGHTS</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
                             <AIInsightsFeed analysis={{ summary: latestSummary }} />
                         </div>
 
@@ -552,10 +569,10 @@ export default function DashboardClient({
                         {/* Single-report nudge */}
                         {!demoMode && labResults.length === 1 && (
                             <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4">
-                                <p className="font-semibold text-[#0369A1] text-[15px]">Your AI gets smarter with every report</p>
+                                <p className="font-semibold text-[#0369A1] text-[15px]">Your prep sheet gets sharper with every report</p>
                                 <p className="text-[#0284C7] text-[13px] mt-1 leading-relaxed">
                                     Upload your next report after your upcoming blood test and MedAssist
-                                    will start showing trends — like whether your hemoglobin is improving.
+                                    will turn it into trend-aware questions — like whether your hemoglobin is improving.
                                 </p>
                             </div>
                         )}
@@ -567,6 +584,25 @@ export default function DashboardClient({
                         <ActionItems biomarkers={latestBiomarkers} />
                         <DoctorQuestions biomarkers={latestBiomarkers} />
                         <LongitudinalInsightsSection insights={longitudinalInsights} />
+                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 shadow-sm">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
+                                    <MessageSquareText className="w-5 h-5 text-sky-500" />
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="text-[16px] font-bold text-[#1C1917] leading-tight">Need to rehearse the visit?</h3>
+                                    <p className="text-[13px] text-[#57534E] mt-1 leading-relaxed">
+                                        Ask the prep assistant to turn your results into a 30-second doctor summary.
+                                    </p>
+                                    <button
+                                        onClick={() => router.push('/assistant')}
+                                        className="mt-3 min-h-[40px] rounded-[10px] bg-sky-500 px-4 py-2 text-[13px] font-semibold text-white hover:bg-sky-600 active:scale-95 transition-all"
+                                    >
+                                        Open prep assistant
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <div>
                             <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
                             <MedicineCabinet />
@@ -608,9 +644,9 @@ export default function DashboardClient({
                             className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
-                            <h3 className="font-display text-2xl text-[#1C1917] mb-3 relative">Score Breakdown</h3>
+                            <h3 className="font-display text-2xl text-[#1C1917] mb-3 relative">Readiness Breakdown</h3>
                             <p className="text-sm text-[#57534E] mb-6 relative">
-                                Your health score is weighted across clinical categories.
+                                Your readiness score highlights which clinical categories may need discussion.
                             </p>
                             <div className="space-y-3 mb-6 relative">
                                 {[

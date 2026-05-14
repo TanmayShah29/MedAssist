@@ -1,6 +1,6 @@
 import { getAuthClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { answerHealthQuestion } from '@/lib/groq-medical'
+import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical'
 import { checkRateLimit } from '@/services/rateLimitService'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
@@ -109,6 +109,45 @@ export async function POST(request: NextRequest) {
         .single()
 
     try {
+        const wantsStream = request.headers.get('accept')?.includes('text/plain')
+        if (wantsStream) {
+            const encoder = new TextEncoder()
+            const stream = await streamHealthQuestion(question, biomarkers || [], symptoms, previousMessages || [], profile)
+            let answer = ''
+
+            const responseStream = new ReadableStream({
+                async start(controller) {
+                    try {
+                        for await (const chunk of stream) {
+                            const text = chunk.choices[0]?.delta?.content || ''
+                            if (!text) continue
+                            answer += text
+                            controller.enqueue(encoder.encode(text))
+                        }
+
+                        const { error: insertError } = await supabase.from('conversations').insert([
+                            { user_id: user.id, role: 'user', content: question },
+                            { user_id: user.id, role: 'assistant', content: answer }
+                        ]);
+                        if (insertError) logger.error('[ask-ai] Failed to save streamed conversation history:', insertError);
+                    } catch (error) {
+                        logger.error('[ask-ai] Stream failed:', error)
+                        controller.error(error)
+                        return
+                    }
+                    controller.close()
+                }
+            })
+
+            return new Response(responseStream, {
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8',
+                    'Cache-Control': 'no-cache, no-transform',
+                    'X-Accel-Buffering': 'no',
+                },
+            })
+        }
+
         const answer = await answerHealthQuestion(question, biomarkers || [], symptoms, previousMessages || [], profile)
 
         // Save history (awaited to prevent serverless function termination)

@@ -9,8 +9,8 @@ import { mergeBiomarkerSources } from '@/lib/medical-data'
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-    title: 'Dashboard | MedAssist',
-    description: 'Your health overview and clinical insights.'
+    title: 'Visit Prep Dashboard | MedAssist',
+    description: 'Your appointment-ready lab summary, trends, and doctor questions.'
 };
 
 async function DashboardContent({ user }: { user: { id: string } }) {

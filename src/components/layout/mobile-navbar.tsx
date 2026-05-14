@@ -7,9 +7,9 @@ import { Shield } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/results": "Lab Results",
-  "/assistant": "AI Assistant",
+  "/dashboard": "Visit Prep",
+  "/results": "Lab Details",
+  "/assistant": "Prep Assistant",
   "/profile": "Your Profile",
   "/settings": "Settings",
 };

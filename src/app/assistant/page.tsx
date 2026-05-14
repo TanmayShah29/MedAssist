@@ -60,7 +60,7 @@ export function AssistantPageInner() {
     useEffect(() => {
         const fetchData = async () => {
             if (demoMode) {
-                const demoBiomarkers = latestUniqueBiomarkers(getDemoBiomarkers() as Biomarker[]);
+                const demoBiomarkers = latestUniqueBiomarkers(await getDemoBiomarkers());
                 setBiomarkers(demoBiomarkers);
                 setSymptoms(["Fatigue", "Low Energy"]);
                 setDoctorQuestions([
@@ -156,7 +156,7 @@ export function AssistantPageInner() {
                     setMessages([{
                         id: "1",
                         role: "assistant",
-                        content: `Hello! I'm here to help you understand your health data. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}. What would you like to know?`,
+                        content: `Hello! I'm here to help you prepare for your next doctor visit. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}; I can help turn that into clear questions for your clinician.`,
                         timestamp: new Date()
                     }]);
                 }
@@ -219,9 +219,13 @@ export function AssistantPageInner() {
         setIsProcessing(true);
 
         try {
+            const assistantId = (Date.now() + 1).toString();
             const response = await fetch(demoMode ? '/api/demo-ask-ai' : '/api/ask-ai', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/plain',
+                },
                 body: JSON.stringify({
                     question: messageToSend,
                     symptoms: symptoms
@@ -230,24 +234,55 @@ export function AssistantPageInner() {
                 })
             });
 
-            const data = await response.json();
+            if (!response.ok) {
+                let errorText = 'Failed to get answer. Please try again.';
+                try {
+                    const data = await response.json();
+                    errorText = data.error || errorText;
+                } catch {
+                    errorText = await response.text();
+                }
+                throw new Error(errorText);
+            }
 
-            if (data.error) throw new Error(data.error);
+            if (!response.body) throw new Error("Streaming is not available in this browser.");
 
-            const aiContent = data.answer || "I'm sorry, I couldn't process that.";
-
-            const showNudge = false; // Removed engagement nudge — it felt patronising and broke the AI's tone
-            const finalContent = showNudge
-                ? `${aiContent}\n\nThe more reports you upload, the more personalized my analysis becomes.`
-                : aiContent;
-
-            const newAiMsg: Message = {
-                id: (Date.now() + 1).toString(),
+            setMessages(prev => [...prev, {
+                id: assistantId,
                 role: "assistant",
-                content: finalContent,
+                content: "",
                 timestamp: new Date()
-            };
-            setMessages(prev => [...prev, newAiMsg]);
+            }]);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                fullText += chunk;
+                setMessages(prev => prev.map(msg =>
+                    msg.id === assistantId ? { ...msg, content: fullText } : msg
+                ));
+            }
+
+            const finalChunk = decoder.decode();
+            if (finalChunk) {
+                fullText += finalChunk;
+                setMessages(prev => prev.map(msg =>
+                    msg.id === assistantId ? { ...msg, content: fullText } : msg
+                ));
+            }
+
+            if (!fullText.trim()) {
+                setMessages(prev => prev.map(msg =>
+                    msg.id === assistantId
+                        ? { ...msg, content: "I'm sorry, I couldn't process that.", isError: true }
+                        : msg
+                ));
+            }
         } catch (error) {
             let errorText = "I'm having trouble connecting to the server. Please try again later.";
             if (error instanceof Error && error.message) {
@@ -263,7 +298,7 @@ export function AssistantPageInner() {
                 timestamp: new Date(),
                 isError: true
             };
-            setMessages(prev => [...prev, errorMsg]);
+            setMessages(prev => prev.filter(msg => msg.content.trim() || msg.role !== "assistant").concat(errorMsg));
         } finally {
             setIsProcessing(false);
         }
@@ -340,7 +375,7 @@ export function AssistantPageInner() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 [&_*]:break-words" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
+                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 whitespace-pre-wrap [&_*]:break-words" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
                         )}
                     </div>
                 ))}
@@ -374,7 +409,7 @@ export function AssistantPageInner() {
                             
                             if (criticalMarkers.length > 0) {
                                 dynamicQuestions.push(`Explain my flagged ${criticalMarkers[0]}`);
-                                dynamicQuestions.push(`How do I fix my ${criticalMarkers[0]}?`);
+                                dynamicQuestions.push(`What should I ask my doctor about ${criticalMarkers[0]}?`);
                             }
                             if (warningMarkers.length > 0) {
                                 dynamicQuestions.push(`What should I eat to improve ${warningMarkers[0]}?`);
@@ -383,7 +418,7 @@ export function AssistantPageInner() {
                                 dynamicQuestions.push(
                                     "What do my latest results mean?",
                                     "Are there any hidden risks?",
-                                    "How can I improve my health score?",
+                                    "What changed since my last report?",
                                     "What should I ask my doctor?"
                                 );
                             } else {
@@ -450,11 +485,11 @@ export function AssistantPageInner() {
                     <header className="hidden lg:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                         <div>
                             <h1 className="font-display text-3xl text-[#1C1917] text-wrap-safe">
-                                AI Health Assistant
+                                Prep Assistant
                             </h1>
                             <p className="text-sm text-[#A8A29E] mt-1 flex items-center gap-2 text-wrap-safe">
                                 <Sparkles className="w-4 h-4 text-sky-500" />
-                                Context: {contextData?.title || "General"} · {contextData?.status === "critical" ? "Critical" : "General context"}
+                                Context: {contextData?.title || "Latest labs"} · remembers recent chat history
                             </p>
                         </div>
 

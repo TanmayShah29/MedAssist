@@ -18,9 +18,9 @@ import {
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
-  { id: "results",   label: "Lab Results", path: "/results",   icon: FlaskConical,    shortcut: "⌘R" },
-  { id: "assistant", label: "AI Assistant",path: "/assistant", icon: Brain,            shortcut: "⌘A" },
+  { id: "dashboard", label: "Visit Prep", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
+  { id: "results",   label: "Lab Details", path: "/results",   icon: FlaskConical,    shortcut: "⌘R" },
+  { id: "assistant", label: "Prep Assistant",path: "/assistant", icon: Brain,            shortcut: "⌘A" },
   { id: "profile",   label: "Profile",     path: "/profile",   icon: User,            shortcut: "⌘P" },
   { id: "settings",  label: "Settings",    path: "/settings",  icon: Settings,        shortcut: "⌘," },
 ];
@@ -108,7 +108,7 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="mx-3 mb-3 p-3 bg-[#1C1917] rounded-[12px] border border-[#2C2A27]">
         <div className="flex items-center gap-1.5 mb-2.5">
           <Zap className="w-3 h-3 text-sky-400" />
-          <p className="section-label text-[#78716C]">AI Engine</p>
+          <p className="section-label text-[#78716C]">Prep Engine</p>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

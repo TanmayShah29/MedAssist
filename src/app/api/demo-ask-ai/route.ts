@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/services/rateLimitService';
-import { answerHealthQuestion } from '@/lib/groq-medical';
+import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical';
 import { z } from 'zod';
 
 export const maxDuration = 30;
@@ -54,6 +54,41 @@ export async function POST(request: NextRequest) {
     const { question, symptoms } = parseResult.data;
 
     try {
+        const wantsStream = request.headers.get('accept')?.includes('text/plain');
+        if (wantsStream) {
+            const encoder = new TextEncoder();
+            const stream = await streamHealthQuestion(
+                question,
+                DEMO_BIOMARKERS,
+                symptoms.length > 0 ? symptoms : ['Fatigue', 'Low Energy'],
+                [],
+                DEMO_PROFILE
+            );
+
+            const responseStream = new ReadableStream({
+                async start(controller) {
+                    try {
+                        for await (const chunk of stream) {
+                            const text = chunk.choices[0]?.delta?.content || '';
+                            if (text) controller.enqueue(encoder.encode(text));
+                        }
+                    } catch (error) {
+                        controller.error(error);
+                        return;
+                    }
+                    controller.close();
+                }
+            });
+
+            return new Response(responseStream, {
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8',
+                    'Cache-Control': 'no-cache, no-transform',
+                    'X-Accel-Buffering': 'no',
+                },
+            });
+        }
+
         const answer = await answerHealthQuestion(
             question,
             DEMO_BIOMARKERS,

@@ -18,7 +18,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                 </div>
                 <div className="min-w-0">
                     <h3 className="text-lg font-display font-bold text-[#1C1917] mb-1 break-words">Everything looks stable.</h3>
-                    <p className="text-sm text-[#57534E] break-words">Continue your current monitoring routine. No immediate clinical action is required.</p>
+                    <p className="text-sm text-[#57534E] break-words">Your one-pager is still useful for confirming what to monitor next at your visit.</p>
                 </div>
             </div>
         );
@@ -38,7 +38,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                     </div>
 
                     <p className="text-sm text-[#57534E] mb-4 break-words">
-                        The following biomarkers are out of optimal range and require clinical review:
+                        The following biomarkers are out of optimal range and should be part of your appointment agenda:
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-4 xl:mb-0">
@@ -56,17 +56,16 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1C1917] text-white rounded-[12px] text-sm font-bold hover:bg-black transition-all shadow-md active:scale-[0.98]"
                     >
                         <MessageSquare className="w-4 h-4" />
-                        Discuss With Assistant
+                        Rehearse Visit Summary
                     </Link>
                     <button
                         onClick={() => {
-                            // Scroll to Doctor Questions section smoothly
-                            document.getElementById('doctor-questions-section')?.scrollIntoView({ behavior: 'smooth' });
+                            document.getElementById('doctor-prep-sheet')?.scrollIntoView({ behavior: 'smooth' });
                         }}
                         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#E8E6DF] text-[#1C1917] rounded-[12px] text-sm font-bold hover:bg-[#F5F4EF] transition-all active:scale-[0.98]"
                     >
                         <ClipboardList className="w-4 h-4" />
-                        Prepare Doctor Questions
+                        View Prep Sheet
                     </button>
                 </div>
             </div>

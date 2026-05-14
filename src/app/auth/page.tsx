@@ -176,8 +176,8 @@ function AuthContent() {
                 </h1>
                 <p className="text-[#57534E]">
                     {mode === 'login'
-                        ? 'Enter your details to access your health dashboard'
-                        : 'Start your journey to better health intelligence'}
+                        ? 'Enter your details to access your visit prep dashboard'
+                        : 'Start preparing for clearer doctor conversations'}
                 </p>
             </div>
 

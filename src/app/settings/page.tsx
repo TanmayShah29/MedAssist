@@ -243,7 +243,7 @@ export default function SettingsPage() {
             iconColor="text-emerald-600"
             iconBg="bg-emerald-50"
             title="Export Health Data"
-            description="Download a CSV of all your biomarkers and health scores. Your data belongs to you."
+            description="Download a CSV of your biomarkers and report history. Your data belongs to you."
           >
             <button
               onClick={handleExportData}
@@ -269,7 +269,7 @@ export default function SettingsPage() {
             iconColor="text-indigo-500"
             iconBg="bg-indigo-50"
             title="Debug Mode"
-            description="Show raw AI/OCR data and diagnostic overlays. Useful for demos and presentations."
+            description="Show raw AI/extraction data and diagnostic overlays. Useful for demos and presentations."
           >
             <div className="flex items-center gap-3">
               <Toggle checked={isDebugMode} onToggle={toggleDebugMode} />

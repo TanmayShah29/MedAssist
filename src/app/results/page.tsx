@@ -8,6 +8,7 @@ import { X, ClipboardList, Search, TrendingUp, Info, Printer, ArrowRight, Refres
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 import { DoctorQuestions } from '@/components/dashboard/doctor-questions'
+import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
 import { TrustLayer } from '@/components/trust-layer'
 import { Biomarker } from '@/types/medical'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
@@ -102,10 +103,12 @@ export default function ResultsPage() {
     useEffect(() => {
         const fetchBiomarkers = async () => {
             setLoading(true)
-            const demoBiomarkers = demoMode ? getDemoBiomarkers() as Biomarker[] : []
-            const demoLabResults = demoMode ? getDemoLabResults() : []
 
             if (demoMode) {
+                const [demoBiomarkers, demoLabResults] = await Promise.all([
+                    getDemoBiomarkers(),
+                    getDemoLabResults(),
+                ])
                 setBiomarkers(demoBiomarkers)
                 setLabResults(demoLabResults)
                 setLoading(false)
@@ -235,9 +238,9 @@ export default function ResultsPage() {
                 <div className="mb-6">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917] text-wrap-safe">Lab Results</h1>
+                            <h1 className="text-[28px] md:text-[32px] font-bold font-display text-[#1C1917] text-wrap-safe">Lab Details</h1>
                             <p className="text-[14px] md:text-[15px] text-[#57534E]">{biomarkers.length} biomarkers found</p>
-                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1 text-wrap-safe">Reference ranges vary by lab and individual.</p>
+                            <p className="text-[12px] md:text-[13px] text-[#A8A29E] mt-1 text-wrap-safe">Review the numbers, then bring the one-page prep sheet to your appointment.</p>
                             <TrustLayer variant="compact" className="mt-3" />
                         </div>
                         <div className="flex flex-wrap gap-2 shrink-0 print:hidden sm:justify-end">
@@ -293,6 +296,8 @@ export default function ResultsPage() {
                         </div>
                     </div>
                 )}
+
+                <DoctorVisitPrep biomarkers={questionBiomarkers} demoMode={demoMode} className="mb-8" />
 
                 {/* ── Report Selector ── */}
                 <div style={{ marginBottom: 24 }} className="print:hidden">
@@ -409,7 +414,7 @@ export default function ResultsPage() {
                             </div>
                         ) : (
                             <div className="divide-y divide-[#E8E6DF]">
-                                {filteredBiomarkers.map((b, i) => (
+                                {filteredBiomarkers.map((b) => (
                                     <div
                                         key={b.id}
                                         onClick={() => handleBiomarkerClick(b)}
@@ -561,7 +566,7 @@ export default function ResultsPage() {
                                         onClick={() => router.push('/assistant')}
                                         className="w-full bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[12px] py-3 text-[15px] font-bold transition-all shadow-md shadow-sky-500/20"
                                     >
-                                        Discuss with AI Assistant
+                                        Prepare doctor talking point
                                     </button>
                                 </div>
                             )}
@@ -588,7 +593,7 @@ export default function ResultsPage() {
                             Had a recent blood test?
                         </p>
                         <p className="text-[14px] text-[#57534E] leading-relaxed">
-                            Upload it now so MedAssist can track how your values are changing over time and provide longitudinal insights.
+                            Upload it now so MedAssist can compare changes and sharpen your next appointment prep sheet.
                         </p>
                     </div>
                     <button

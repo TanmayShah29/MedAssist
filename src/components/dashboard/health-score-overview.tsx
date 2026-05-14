@@ -67,18 +67,18 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
-            aria-label={onClick ? "Health score details" : undefined}
+            aria-label={onClick ? "Visit readiness score details" : undefined}
         >
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2">
-                    Health Stability Score
+                    Visit Readiness Score
                     <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">
                         <Info className="w-3.5 h-3.5" />
                         <div className={cn(
                             "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-opacity z-10 normal-case leading-relaxed font-normal",
                             (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 pointer-events-none md:pointer-events-none'
                         )}>
-                            Simplified stability estimate based on your lab ranges. Click to see breakdown.
+                            A quick readiness estimate based on how many markers need discussion. Click to see breakdown.
                         </div>
                     </div>
                 </h3>

@@ -16,7 +16,7 @@ export function DebugTraceView({ labResult }: DebugTraceViewProps) {
     const pipelineSteps = [
         {
             icon: <Terminal className="w-4 h-4 text-emerald-500" />,
-            title: "Step 1: OCR & Text Extraction",
+            title: "Step 1: Text Extraction",
             status: labResult.raw_ocr_text ? "Complete" : "Not Available",
             content: labResult.raw_ocr_text || "No raw text available for this report.",
             type: "text"

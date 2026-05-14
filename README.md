@@ -1,6 +1,6 @@
 # MedAssist
 
-AI-powered lab report analysis. Upload a blood work PDF, get plain-English explanations of every biomarker, track trends over time, and know exactly what to ask your doctor.
+AI-powered doctor visit prep for lab reports. Upload a blood work PDF, get plain-English explanations, trend context, and a printable one-page brief with exactly what to ask your doctor.
 
 **Stack:** Next.js 16 · Supabase · Groq AI (Llama 3.3 70B) · Tailwind CSS 4 · TypeScript
 
@@ -8,11 +8,12 @@ AI-powered lab report analysis. Upload a blood work PDF, get plain-English expla
 
 ## Features
 
+- **Doctor Visit Prep** — Generate a printable one-page appointment brief from your latest report
 - **PDF Analysis** — Extract every biomarker from a digital lab report PDF in 20–40 seconds
 - **Manual Entry** — Type in values directly if you don't have a PDF
-- **Health Score** — 0–100 score calculated from your biomarker statuses
+- **Readiness Score** — 0–100 score calculated from your biomarker statuses
 - **Trend Charts** — Longitudinal charts showing each biomarker across all uploads
-- **AI Assistant** — Ask questions about your results in plain language
+- **Streaming Prep Assistant** — Ask questions about your results and rehearse what to say at the visit
 - **Supplement Tracking** — Log supplements and see correlation markers on trend charts
 - **Doctor Questions** — AI-generated, value-specific questions for your next appointment
 - **Symptom Connections** — Link your reported symptoms to related biomarkers
@@ -139,17 +140,18 @@ src/
 ├── app/
 │   ├── api/
 │   │   ├── analyze-report/   # PDF → AI extraction → DB save
-│   │   ├── ask-ai/           # AI health assistant Q&A
+│   │   ├── ask-ai/           # Streaming appointment-prep assistant Q&A
 │   │   ├── assistant/        # Clinical insight generation
 │   │   ├── biomarker-trends/ # Trend data for charts (Edge runtime)
+│   │   ├── doctor-prep/      # Printable appointment prep sheet generation
 │   │   ├── generate-questions/ # AI doctor question generation
 │   │   ├── supplements/      # CRUD for supplement tracking
 │   │   ├── feedback/         # User feedback collection
 │   │   └── account/delete/   # Permanent account deletion
 │   ├── actions/              # Next.js Server Actions (DB writes via supabaseAdmin)
-│   ├── dashboard/            # Main health dashboard
+│   ├── dashboard/            # Visit prep dashboard
 │   ├── results/              # Per-report detail view
-│   ├── assistant/            # AI chat interface
+│   ├── assistant/            # Streaming prep assistant chat interface
 │   ├── profile/              # User profile management
 │   ├── settings/             # App settings
 │   ├── onboarding/           # First-run onboarding flow

@@ -54,12 +54,12 @@ export function StepTour() {
                 color: '#1C1917',
                 margin: '0 0 12px 0'
             }}>
-                Your dashboard is ready
+                Your prep sheet is ready
             </h2>
             <p style={{ fontSize: 15, color: '#57534E', marginBottom: 32, maxWidth: 360, margin: '0 auto 32px auto' }}>
                 {analysisResult
-                    ? `We found ${analysisResult.biomarkers.length} biomarkers in your report. Your health data is loaded and waiting.`
-                    : 'Your profile is set up. Upload your first lab report to see your health overview.'}
+                    ? `We found ${analysisResult.biomarkers.length} biomarkers in your report. Your dashboard now has a one-page visit brief and doctor questions.`
+                    : 'Your profile is set up. Upload your first lab report when you want to prep for a visit.'}
             </p>
             <button
                 onClick={() => handleFinish()}
@@ -77,7 +77,7 @@ export function StepTour() {
                 }}
                 className="flex items-center gap-2 mx-auto"
             >
-                {isLoading ? 'Saving...' : 'Go to my dashboard'}
+                {isLoading ? 'Saving...' : 'Go to my prep dashboard'}
                 {!isLoading && <ArrowRight size={18} />}
             </button>
         </div>

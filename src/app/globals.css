@@ -349,21 +349,6 @@
     cursor: not-allowed;
   }
 
-
-  .input-base::placeholder {
-    color: var(--color-text-muted);
-  }
-
-  .input-base:focus {
-    border-color: var(--color-brand-primary);
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
-  }
-
-  .input-base:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   /* ── Divider ── */
   .divider {
     height: 1px;

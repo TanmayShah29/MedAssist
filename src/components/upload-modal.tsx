@@ -186,7 +186,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             }, 300);
 
             setTimeout(() => {
-                toast.success('Report analyzed and saved successfully!');
+                toast.success('Report saved. Your visit prep sheet is ready.');
                 onSuccess();
                 onClose();
                 setFile(null);
@@ -271,7 +271,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
             }, 300);
 
             setTimeout(() => {
-                toast.success('Results saved successfully!');
+                toast.success('Results saved. Your visit prep sheet is ready.');
                 onSuccess();
                 onClose();
                 setManualRows([{ id: nextId(), name: '', value: '', unit: 'mg/dL' }]);
@@ -314,7 +314,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         <div className="bg-[#FAFAF7] rounded-[24px] shadow-2xl overflow-hidden border border-[#E8E6DF]">
                             <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b border-[#E8E6DF] bg-white">
                                 <h2 className="text-xl font-bold font-display text-[#1C1917]">
-                                    Add Lab Results
+                                    Add Results for Visit Prep
                                 </h2>
                                 {!isProcessing && (
                                     <button
@@ -503,7 +503,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             </span>
                                                         </div>
                                                     ) : (
-                                                        'Analyze with AI'
+                                                        'Create prep sheet'
                                                     )}
                                                 </button>
                                                 {!isProcessing && (
@@ -604,7 +604,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     </span>
                                                 </div>
                                             ) : (
-                                                'Analyze & save'
+                                                'Create prep sheet'
                                             )}
                                         </button>
                                     </div>

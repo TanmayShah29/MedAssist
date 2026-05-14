@@ -5,12 +5,12 @@ import { Biomarker } from '@/types/medical'
 
 const RECOMMENDATIONS: Record<string, string> = {
     'Vitamin D': 'Consider 15 min daily sunlight or discuss D3 supplementation with your doctor.',
-    'Glucose': 'Monitor carbohydrate intake and consider a 10-minute walk after meals.',
-    'Hemoglobin A1c': 'Focus on high-fiber foods and regular cardiovascular exercise.',
-    'LDL Cholesterol': 'Increase intake of Omega-3 rich foods and soluble fiber (oats, beans).',
-    'CRP': 'Focus on anti-inflammatory foods and prioritize 7–8 hours of quality sleep.',
-    'Iron': 'Incorporate iron-rich foods (spinach, red meat) with Vitamin C for absorption.',
-    'Hemoglobin': 'Monitor dietary iron intake. Pair iron-rich foods with Vitamin C to aid absorption.',
+    'Glucose': 'Ask whether this trend changes your follow-up testing or meal-timing recommendations.',
+    'Hemoglobin A1c': 'Ask what target range and re-test timeline make sense for you.',
+    'LDL Cholesterol': 'Ask whether lifestyle changes are enough for now or if medication should be discussed.',
+    'CRP': 'Ask whether this needs repeat testing or symptom context.',
+    'Iron': 'Ask whether ferritin, B12, or dietary intake should be reviewed together.',
+    'Hemoglobin': 'Ask whether iron, ferritin, B12, or bleeding risk should be checked.',
     'TSH': 'Consult your endocrinologist if TSH remains outside range on repeat testing.',
     'Triglycerides': 'Reduce added sugar intake and increase aerobic activity to 150 min/week.',
 };
@@ -43,7 +43,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
                         <ArrowRight className="w-5 h-5 text-sky-400" />
                     </div>
                     <h3 className="text-[20px] leading-tight font-bold font-display text-wrap-safe">
-                        Personalized Care Plan
+                        Appointment Talking Points
                     </h3>
                 </div>
 
@@ -65,7 +65,7 @@ function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priori
 
     const recommendation =
         RECOMMENDATIONS[b.name] ??
-        `Your ${b.name} is ${b.status} — consult your doctor about targeted ${b.category} improvements.`;
+        `Your ${b.name} is ${b.status} — ask your doctor what could explain it and when it should be rechecked.`;
 
     return (
         <div className="bg-white/5 border border-white/10 rounded-[14px] p-4 lg:p-5 hover:bg-white/10 transition-colors group min-w-0">

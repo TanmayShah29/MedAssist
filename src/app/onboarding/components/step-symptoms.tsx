@@ -27,7 +27,7 @@ export function StepSymptoms() {
                 </h2>
                 <p className="text-[#57534E] text-sm">
                     Select all symptoms you are currently experiencing.
-                    Groq AI will cross-reference these with your lab values.
+                    MedAssist will use them to make your visit prep more specific.
                 </p>
             </div>
 
@@ -39,13 +39,12 @@ export function StepSymptoms() {
                 </div>
                 <div>
                     <p className="text-xs font-semibold text-sky-800 mb-1">
-                        How symptoms power the AI
+                        How symptoms shape your prep sheet
                     </p>
                     <p className="text-xs text-sky-700 leading-relaxed">
-                        Your symptoms appear as highlighted entities in the
-                        AI Assistant. Groq AI correlates them with your
-                        lab values — for example, fatigue + low hemoglobin =
-                        flagged as potentially significant.
+                        Symptoms give your doctor questions useful context.
+                        For example, fatigue plus lower hemoglobin can become
+                        a focused question about iron, B12, or follow-up testing.
                     </p>
                 </div>
             </div>
@@ -92,8 +91,8 @@ export function StepSymptoms() {
                         {selectedSymptoms.length > 1 ? "s" : ""} selected
                     </p>
                     <p className="text-xs text-[#57534E]">
-                        Groq AI will analyse these against your lab report
-                        and flag correlations in your dashboard.
+                        MedAssist will use these alongside your lab report
+                        when generating your appointment summary.
                     </p>
                 </motion.div>
             )}

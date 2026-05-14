@@ -12,7 +12,7 @@ export function ActionItems({ biomarkers }: ActionItemsProps) {
         <div className="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow h-full">
             <h3 className="font-semibold text-slate-900 flex items-center gap-2 mb-4">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
-                Action Required
+                Visit Agenda
             </h3>
 
             <div className="space-y-3">
@@ -27,7 +27,7 @@ export function ActionItems({ biomarkers }: ActionItemsProps) {
                                     <p className={`text-sm font-medium ${item.status === 'critical' ? 'text-red-900' : 'text-amber-900'}`}>{item.name}</p>
                                     <p className={`text-xs truncate ${item.status === 'critical' ? 'text-red-700/80' : 'text-amber-700/80'}`}>{item.value} {item.unit} (Outside range)</p>
                                     <span className="text-[10px] font-bold uppercase mt-1 inline-flex items-center gap-1">
-                                        Ask AI assistant <ArrowRight className="w-2.5 h-2.5" />
+                                        Prepare talking point <ArrowRight className="w-2.5 h-2.5" />
                                     </span>
                                 </div>
                             </div>
@@ -35,8 +35,8 @@ export function ActionItems({ biomarkers }: ActionItemsProps) {
                     ))
                 ) : (
                     <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100 text-center">
-                        <p className="text-sm font-medium text-emerald-900">All clear!</p>
-                        <p className="text-xs text-emerald-700/80">No critical biomarkers detected in your latest report.</p>
+                        <p className="text-sm font-medium text-emerald-900">No urgent agenda items</p>
+                        <p className="text-xs text-emerald-700/80">Use your visit to confirm what should be monitored next.</p>
                     </div>
                 )}
             </div>

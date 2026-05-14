@@ -317,7 +317,7 @@ export async function answerHealthQuestion(
           .join("\n")}`
       : "The user has not uploaded a lab report yet.";
 
-  const systemPrompt = `You are a personal health assistant for MedAssist. You help users understand their lab results in plain English.
+  const systemPrompt = `You are MedAssist's appointment-prep assistant. You help users understand lab results in plain English and prepare for a more productive doctor visit.
 
 User Profile:
 - Name: ${profile?.first_name || "Not provided"}
@@ -333,6 +333,8 @@ Rules:
 - Reference the user's specific values when answering
 - Be warm, clear, and educational
 - Keep responses concise and actionable
+- When useful, end with 1-3 concrete questions the user can ask their doctor
+- Prefer "what to clarify with your doctor" over treatment instructions
 - Do not use any emojis in your response`;
 
   const runOnce = async () => {
@@ -369,6 +371,61 @@ Rules:
     }
     throw new Error(`AI question failed: ${(error as Error).message || "Unknown error"}`);
   }
+}
+
+export async function streamHealthQuestion(
+  question: string,
+  biomarkers: BiomarkerContext[],
+  symptoms: string[],
+  previousMessages: { role: "user" | "assistant"; content: string }[] = [],
+  profile?: {
+    first_name?: string;
+    age?: number;
+    sex?: string;
+    blood_type?: string;
+  } | null
+) {
+  const biomarkerContextStr =
+    biomarkers?.length > 0
+      ? `The user has the following biomarkers from their lab report:\n${biomarkers
+          .map(
+            (b) =>
+              `- ${b.name}: ${b.value} ${b.unit} (status: ${b.status}, reference: ${b.reference_range_min}–${b.reference_range_max})`
+          )
+          .join("\n")}`
+      : "The user has not uploaded a lab report yet.";
+
+  const systemPrompt = `You are MedAssist's appointment-prep assistant. You help users understand lab results in plain English and prepare for a more productive doctor visit.
+
+User Profile:
+- Name: ${profile?.first_name || "Not provided"}
+- Age: ${profile?.age || "Not provided"}
+- Sex: ${profile?.sex || "Not provided"}
+- Blood Type: ${profile?.blood_type || "Not provided"}
+
+${biomarkerContextStr}
+${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` : ""}
+Rules:
+- Never diagnose or prescribe
+- Always recommend consulting a physician
+- Reference the user's specific values when answering
+- Be warm, clear, and educational
+- Keep responses concise and actionable
+- When useful, end with 1-3 concrete questions the user can ask their doctor
+- Prefer "what to clarify with your doctor" over treatment instructions
+- Do not use any emojis in your response`;
+
+  return groq.chat.completions.create({
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...previousMessages,
+      { role: "user", content: question },
+    ],
+    model: MODEL,
+    temperature: 0.3,
+    max_tokens: 400,
+    stream: true,
+  });
 }
 
 // ── AI Greeting ─────────────────────────────────────────────────────────────
@@ -533,10 +590,15 @@ export async function getAppointmentPrep(
           messages: [
             {
               role: "system",
-              content: `You are a medical appointment preparation assistant. Generate a concise prep guide with:
-- summary: 1-2 sentence overview of what to expect
-- checklist: 3 items to bring/prepare
-- questions: 2 important questions to ask the doctor
+              content: `You are a medical appointment preparation assistant for MedAssist. Generate a concise, printable one-page visit guide with:
+- summary: 1-2 sentence overview of the appointment focus
+- checklist: 3 practical items to bring/prepare
+- questions: 3-5 specific questions to ask the doctor
+
+Rules:
+- Never diagnose, prescribe, or imply the user has a condition
+- Reference the user's provided values or trends when helpful
+- Keep wording short enough for a patient to print and scan in the waiting room
 
 Return ONLY valid JSON with keys: summary, checklist (string array), questions (string array). No markdown.`,
             },
@@ -567,8 +629,9 @@ Return ONLY valid JSON with keys: summary, checklist (string array), questions (
         "Note any new symptoms",
       ],
       questions: result.questions || [
-        "What do my findings indicate?",
-        "What are the next steps?",
+        "What do these results mean in the context of my history?",
+        "Which markers should we re-test, and when?",
+        "Are there symptoms, medications, or supplements that could explain these changes?",
       ],
     };
   } catch (err: unknown) {
@@ -576,7 +639,11 @@ Return ONLY valid JSON with keys: summary, checklist (string array), questions (
     return {
       summary: "Please bring your recent lab results and a list of questions.",
       checklist: ["Lab results", "Medication list", "Symptom log"],
-      questions: ["What do these results mean?", "Do I need to change my routine?"],
+      questions: [
+        "What do these results mean in the context of my history?",
+        "Which markers should we re-test, and when?",
+        "Are there symptoms, medications, or supplements that could explain these changes?",
+      ],
     };
   }
 }

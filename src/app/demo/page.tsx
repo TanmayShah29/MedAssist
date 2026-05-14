@@ -57,7 +57,7 @@ const LONGITUDINAL_INSIGHTS = [
 ];
 
 const DEMO_MESSAGES_INITIAL: DemoMessage[] = [
-  { id: "1", role: "assistant", content: "Hello Tanmay! I've reviewed your latest lab results. Your Vitamin D recovery is genuinely impressive — up 133% to optimal range. However, I'm keeping a close eye on your rising Glucose trend and declining Hemoglobin. Would you like me to explain what these mean for you?" }
+  { id: "1", role: "assistant", content: "Hello Tanmay. I built your appointment brief from the demo report: Vitamin D has recovered well, while Glucose, Hemoglobin, and LDL are the main talking points to bring to your doctor." }
 ];
 
 const SYMPTOM_OPTIONS = ["Fatigue", "Brain Fog", "Joint Pain", "Headaches", "Sleep Issues", "Low Energy", "Anxiety", "Digestive Issues"];
@@ -146,9 +146,9 @@ const RangeBar = ({ value, min, max, status }: { value: number; min: number; max
 /* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
 const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: string; currentPage: string; onNavigate: (page: string) => void }) => {
   const nav = [
-    { id: "dashboard", label: "Dashboard", icon: Icons.dashboard },
-    { id: "results", label: "Lab Results", icon: Icons.fileText },
-    { id: "assistant", label: "AI Assistant", icon: Icons.sparkles },
+    { id: "dashboard", label: "Visit Prep", icon: Icons.dashboard },
+    { id: "results", label: "Lab Details", icon: Icons.fileText },
+    { id: "assistant", label: "Prep Assistant", icon: Icons.sparkles },
     { id: "profile", label: "Profile", icon: Icons.user },
     { id: "settings", label: "Settings", icon: Icons.settings },
   ];
@@ -212,7 +212,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
 
       {/* AI Status mini-card */}
       <div style={{ margin: "0 10px 10px", padding: "12px 14px", background: "#0F172A", borderRadius: 12, border: "1px solid #1E293B" }}>
-        <p style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8 }}>AI Status</p>
+        <p style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8 }}>Prep Engine</p>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0 }} />
           <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "monospace" }}>Groq · Llama 3.3</span>
@@ -278,7 +278,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <h1 className="font-display" style={{ fontSize: 34, color: T.text, lineHeight: 1.1 }}>Clinical Overview</h1>
+          <h1 className="font-display" style={{ fontSize: 34, color: T.text, lineHeight: 1.1 }}>Visit Prep Dashboard</h1>
           <p style={{ fontSize: 13, color: T.textMuted, marginTop: 4 }}>Last report: October 24, 2024 · Demo Data</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -287,7 +287,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           </button>
           <button onClick={() => onNavigate("results")} style={{ background: T.brand, color: "white", border: "none", borderRadius: 12, padding: "10px 18px", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
             <Icon path={Icons.fileText} size={16} color="white" />
-            View Results
+            View Lab Details
           </button>
         </div>
       </div>
@@ -297,22 +297,53 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ background: "#DC2626", color: "white", padding: 8, borderRadius: 10 }}><Icon path={Icons.alertCircle} size={18} color="white" /></div>
           <div>
-            <h4 style={{ color: "#991B1B", fontWeight: 700, fontSize: 15 }}>3 Biomarkers Need Attention</h4>
+            <h4 style={{ color: "#991B1B", fontWeight: 700, fontSize: 15 }}>3 Appointment Talking Points</h4>
             <p style={{ color: "#B91C1C", fontSize: 13, marginTop: 2 }}>Glucose (+15%), Hemoglobin (declining), LDL Cholesterol elevated</p>
           </div>
         </div>
-        <button onClick={() => document.getElementById("care-plan")?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#DC2626", color: "white", padding: "8px 16px", borderRadius: 10, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
-          Review Plan
+        <button onClick={() => document.getElementById("demo-prep-sheet")?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#DC2626", color: "white", padding: "8px 16px", borderRadius: 10, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
+          View Prep Sheet
         </button>
+      </div>
+
+      {/* Doctor Visit Prep */}
+      <div id="demo-prep-sheet" style={{ background: "white", border: "1px solid #BAE6FD", borderRadius: 18, padding: 24, marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 800, color: T.brand, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 }}>Doctor Visit Prep</p>
+            <h2 className="font-display" style={{ fontSize: 26, color: T.text, lineHeight: 1.15 }}>Your appointment one-pager</h2>
+            <p style={{ fontSize: 13, color: T.textMuted, marginTop: 4 }}>Generated from the latest report and prior trend history.</p>
+          </div>
+          <button style={{ background: T.brand, color: "white", border: "none", borderRadius: 10, padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <Icon path={Icons.printer} size={15} color="white" />Print
+          </button>
+        </div>
+        <p style={{ fontSize: 14, color: T.textSec, lineHeight: 1.7, marginBottom: 16 }}>
+          Focus the visit on the glucose increase, hemoglobin decline, and whether LDL needs lifestyle-only follow-up or medication discussion.
+        </p>
+        <div className="demo-care-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 16 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Key results</p>
+            {["Glucose 106 mg/dL", "Hemoglobin 11.8 g/dL", "LDL Cholesterol 145 mg/dL"].map(item => (
+              <p key={item} style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 8 }}>{item}</p>
+            ))}
+          </div>
+          <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 16 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Ask your doctor</p>
+            {["Could this glucose trend suggest insulin resistance?", "Should we check iron, ferritin, or B12?", "When should these markers be re-tested?"].map((item, i) => (
+              <p key={item} style={{ fontSize: 13, color: T.textSec, lineHeight: 1.55, marginBottom: 8 }}>{i + 1}. {item}</p>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Top Cards */}
       <div className="demo-top-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
-        {/* Health Score */}
+        {/* Readiness Score */}
         <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: 24, cursor: "pointer" }} onClick={() => setShowScoreModal(true)}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Health Score</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Readiness Score</p>
               <p style={{ fontSize: 13, color: T.textSec, marginBottom: 16 }}>Click to see breakdown →</p>
               <div style={{ display: "flex", gap: 12 }}>
                 <div style={{ textAlign: "center" }}>
@@ -362,7 +393,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
       <div style={{ background: "#FBFCFE", border: "1px solid #E0E7FF", borderRadius: 18, padding: 24, marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
           <Icon path={Icons.activity} size={18} color="#6366F1" />
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Longitudinal Insights</h3>
+          <h3 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Trend Context for Your Visit</h3>
           <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#A5B4FC", textTransform: "uppercase", letterSpacing: "0.1em" }}>Beta</span>
         </div>
         <div className="demo-insights-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -375,7 +406,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
         </div>
       </div>
 
-      {/* Personalized Care Plan */}
+      {/* Appointment Talking Points */}
       <div id="care-plan" style={{ background: "#0F172A", borderRadius: 24, padding: 32, marginBottom: 24, color: "white", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, padding: 24, opacity: 0.05 }}>
           <Icon path={Icons.sparkles} size={100} color="white" />
@@ -384,7 +415,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(14,165,233,0.2)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(14,165,233,0.3)" }}>
             <Icon path={Icons.arrowRight} size={18} color="#38BDF8" />
           </div>
-          <h3 className="font-display" style={{ fontSize: 22 }}>Personalized Care Plan</h3>
+          <h3 className="font-display" style={{ fontSize: 22 }}>Appointment Talking Points</h3>
         </div>
         <div className="demo-care-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {warning.map((b, i) => (
@@ -395,7 +426,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
               </div>
               <h4 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, color: "white" }}>{b.name}</h4>
               <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6 }}>
-                {b.name === "Glucose" ? "Monitor carbohydrate intake and consider a 10-min walk after meals." : b.name === "Hemoglobin" ? "Increase iron-rich foods (spinach, red meat) with Vitamin C for absorption." : "Increase soluble fiber (oats, beans) and Omega-3 rich foods."}
+                {b.name === "Glucose" ? "Ask whether this trend changes follow-up testing or meal-timing recommendations." : b.name === "Hemoglobin" ? "Ask whether iron, ferritin, B12, or bleeding risk should be checked." : "Ask whether lifestyle changes are enough for now or medication should be discussed."}
               </p>
             </div>
           ))}
@@ -456,8 +487,8 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
       {showScoreModal && (
         <div onClick={() => setShowScoreModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 24, padding: 36, maxWidth: 420, width: "100%", animation: "scoreCount 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            <h3 className="font-display" style={{ fontSize: 26, color: T.text, marginBottom: 8 }}>Score Breakdown</h3>
-            <p style={{ fontSize: 14, color: T.textSec, marginBottom: 24 }}>Your health score is calculated from clinical categories weighted by their systemic impact.</p>
+            <h3 className="font-display" style={{ fontSize: 26, color: T.text, marginBottom: 8 }}>Readiness Breakdown</h3>
+            <p style={{ fontSize: 14, color: T.textSec, marginBottom: 24 }}>Your readiness score highlights which clinical categories may need discussion.</p>
             {[
               { name: "Hematology", weight: 20, markers: DEMO_BIOMARKERS.filter(b => b.category === "hematology") },
               { name: "Metabolic", weight: 25, markers: DEMO_BIOMARKERS.filter(b => b.category === "metabolic") },
@@ -572,7 +603,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
     <div style={{ padding: "28px 32px", minHeight: "100vh", background: T.page }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <h1 className="font-display" style={{ fontSize: 34, color: T.text }}>Lab Results</h1>
+          <h1 className="font-display" style={{ fontSize: 34, color: T.text }}>Lab Details</h1>
           <p style={{ fontSize: 14, color: T.textSec, marginTop: 4 }}>{DEMO_BIOMARKERS.length} biomarkers · Demo Report · October 24, 2024</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -586,7 +617,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
       <div style={{ background: "white", border: `1px solid #BAE6FD`, borderRadius: 18, padding: 24, marginBottom: 24, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, padding: 16, opacity: 0.05 }}><Icon path={Icons.sparkles} size={56} color={T.brand} /></div>
         <div style={{ fontSize: 10, fontWeight: 700, background: "#EFF6FF", color: T.brand, padding: "3px 10px", borderRadius: 6, border: "1px solid #BFDBFE", display: "inline-block", marginBottom: 10 }}>THE BOTTOM LINE</div>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1E293B", lineHeight: 1.4 }}>Overall health is good with 5 optimal biomarkers, but rising Glucose and declining Hemoglobin require monitoring over the next quarter.</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1E293B", lineHeight: 1.4 }}>Overall health is good with 5 optimal biomarkers, but rising Glucose and declining Hemoglobin should be discussed at the next appointment.</h2>
         <p style={{ fontSize: 12, color: T.textMuted, marginTop: 12, fontStyle: "italic" }}>* AI-generated interpretation based on your specific biomarkers and reference ranges.</p>
       </div>
 
@@ -641,7 +672,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
         <div style={{ position: "sticky", top: 24, alignSelf: "start" }}>
           {!selectedBiomarker ? (
             <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 40, textAlign: "center", height: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <p style={{ color: T.textMuted, fontSize: 14 }}>Select a result to see AI interpretation</p>
+              <p style={{ color: T.textMuted, fontSize: 14 }}>Select a result to prepare a doctor talking point</p>
             </div>
           ) : (
             <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 24 }}>
@@ -654,7 +685,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
                 <p style={{ fontSize: 12, color: T.textMuted, marginTop: 6 }}>Ref: {selectedBiomarker.ref_min} – {selectedBiomarker.ref_max}</p>
               </div>
               <div style={{ textAlign: "center", padding: "8px 0", borderRadius: 8, background: statusBg(selectedBiomarker.status), color: statusText(selectedBiomarker.status), fontSize: 14, fontWeight: 700, marginBottom: 16 }}>{statusLabel(selectedBiomarker.status)}</div>
-              <h3 style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>AI Interpretation</h3>
+              <h3 style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Visit Context</h3>
               <p style={{ fontSize: 14, color: T.textSec, lineHeight: 1.7, marginBottom: 16 }}>{selectedBiomarker.ai_interpretation}</p>
               {TREND_DATA[selectedBiomarker.name] && (
                 <div style={{ height: 150, marginBottom: 16 }}>
@@ -672,7 +703,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: T.textMuted, borderTop: `1px solid ${T.border}`, paddingTop: 12, marginBottom: 14 }}>
                 <span>AI Confidence</span><span style={{ fontWeight: 700, color: T.text }}>{Math.round(selectedBiomarker.confidence * 100)}%</span>
               </div>
-              <button onClick={() => onNavigate("assistant")} style={{ width: "100%", background: T.brand, color: "white", border: "none", borderRadius: 10, padding: 12, fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Ask AI about this →</button>
+              <button onClick={() => onNavigate("assistant")} style={{ width: "100%", background: T.brand, color: "white", border: "none", borderRadius: 10, padding: 12, fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Prepare question →</button>
             </div>
           )}
         </div>
@@ -681,7 +712,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
       {/* Doctor Questions */}
       <div style={{ marginTop: 32, background: "white", border: `1px solid ${T.border}`, borderRadius: 18, padding: 24 }}>
         <h3 className="font-display" style={{ fontSize: 22, color: T.text, marginBottom: 6 }}>Questions to ask your doctor</h3>
-        <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 20 }}>Based on your current results</p>
+        <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 20 }}>Based on your current results and trend changes</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             "What dietary changes can help lower my Glucose to optimal range?",
@@ -722,15 +753,35 @@ const AssistantPage = () => {
     try {
       const response = await fetch("/api/demo-ask-ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Accept": "text/plain" },
         body: JSON.stringify({
           question: text,
           symptoms: DEMO_SYMPTOMS,
         })
       });
-      const data = await response.json();
-      const aiText = data.answer || data.error || "I'm sorry, I couldn't process that request right now.";
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: aiText, timestamp: new Date() }]);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "I'm sorry, I couldn't process that request right now.");
+      }
+      if (!response.body) throw new Error("Streaming is not available.");
+
+      const assistantId = (Date.now() + 1).toString();
+      setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", timestamp: new Date() }]);
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        fullText += decoder.decode(value, { stream: true });
+        setMessages(prev => prev.map(message => message.id === assistantId ? { ...message, content: fullText } : message));
+      }
+      const finalChunk = decoder.decode();
+      if (finalChunk) {
+        fullText += finalChunk;
+        setMessages(prev => prev.map(message => message.id === assistantId ? { ...message, content: fullText } : message));
+      }
     } catch {
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: "I'm having trouble connecting. Please try again in a moment.", timestamp: new Date() }]);
     } finally {
@@ -741,19 +792,19 @@ const AssistantPage = () => {
   const suggestedQuestions = [
     "Explain my Glucose trend",
     "Why is my Hemoglobin declining?",
-    "Is my Vitamin D recovery good?",
+    "Create a 30-second doctor summary",
     "What should I ask my doctor?",
-    "How can I improve my health score?",
+    "What changed since my last report?",
   ];
 
   return (
     <div className="demo-assistant-page" style={{ height: "100vh", display: "flex", flexDirection: "column", background: T.page }}>
       {/* Header */}
       <div style={{ padding: "20px 32px", borderBottom: `1px solid ${T.border}`, background: "white", flexShrink: 0 }}>
-        <h1 className="font-display" style={{ fontSize: 28, color: T.text }}>AI Health Assistant</h1>
+        <h1 className="font-display" style={{ fontSize: 28, color: T.text }}>Prep Assistant</h1>
         <p style={{ fontSize: 13, color: T.textMuted, marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
           <Icon path={Icons.sparkles} size={13} color={T.brand} />
-          Context: {DEMO_BIOMARKERS.length} biomarkers loaded · Demo mode active
+          Context: {DEMO_BIOMARKERS.length} biomarkers loaded · visit prep mode
         </p>
       </div>
 
@@ -971,7 +1022,7 @@ const ProfilePage = () => {
           <div style={{ marginTop: 24, padding: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Clinical Summary</p>
             {[
-              { label: "Health Score", value: "82 / 100", color: T.optimal },
+              { label: "Readiness Score", value: "82 / 100", color: T.optimal },
               { label: "Reports Uploaded", value: "3 reports", color: T.brand },
               { label: "Biomarkers Tracked", value: "8 values", color: "#8B5CF6" },
               { label: "Last Report", value: "Oct 24, 2024", color: T.textSec },
@@ -1031,7 +1082,7 @@ const SettingsPage = () => {
           <Icon path={Icons.download} size={20} color={T.optimal} />
           <h2 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Export Health Data</h2>
         </div>
-        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Download a CSV spreadsheet of all your extracted biomarkers and health scores.</p>
+        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Download a CSV spreadsheet of all your extracted biomarkers and report history.</p>
         <button onClick={() => showToast("Demo: CSV export would download here")} style={{ background: T.page, border: `1px solid ${T.border}`, color: T.text, borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Export to CSV</button>
       </div>
 
@@ -1041,7 +1092,7 @@ const SettingsPage = () => {
           <Icon path={Icons.terminal} size={20} color="#8B5CF6" />
           <h2 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Developer Settings</h2>
         </div>
-        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Enable extra diagnostic information and view raw AI/OCR data. Useful for project presentations.</p>
+        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Enable extra diagnostic information and view raw AI/extraction data. Useful for project presentations.</p>
         <button onClick={() => { setDebugMode(d => !d); showToast(`Debug mode ${debugMode ? "disabled" : "enabled"}`); }} style={{ background: debugMode ? "#8B5CF6" : T.page, border: `1px solid ${debugMode ? "#8B5CF6" : T.border}`, color: debugMode ? "white" : T.text, borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
           {debugMode ? "Debug Mode: ON" : "Debug Mode: OFF"}
         </button>
@@ -1067,9 +1118,9 @@ export default function DemoPage() {
   const mainRef = useRef<HTMLElement | null>(null);
 
   const pageLabels: Record<string, string> = {
-    dashboard: "Clinical Overview",
-    results: "Lab Results",
-    assistant: "AI Assistant",
+    dashboard: "Visit Prep",
+    results: "Lab Details",
+    assistant: "Prep Assistant",
     profile: "Clinical Profile",
     settings: "Account Settings",
   };
@@ -1185,7 +1236,7 @@ export default function DemoPage() {
           }}>
             {["dashboard", "results", "assistant", "profile", "settings"].map(id => {
               const active = currentPage === id;
-              const labels: Record<string, string> = { dashboard: "Home", results: "Labs", assistant: "AI", profile: "Profile", settings: "Settings" };
+              const labels: Record<string, string> = { dashboard: "Prep", results: "Labs", assistant: "AI", profile: "Profile", settings: "Settings" };
               const iconPaths: Record<string, string> = { dashboard: Icons.dashboard as string, results: Icons.fileText as string, assistant: Icons.sparkles as string, profile: Icons.user as string, settings: Icons.settings as string };
               const iconPath = iconPaths[id];
               return (

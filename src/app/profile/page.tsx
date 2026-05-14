@@ -125,10 +125,10 @@ export default function ProfilePage() {
                         <h3 className="font-semibold text-sky-900 text-lg">Report History</h3>
                         <p className="text-sky-700 max-w-xl mt-1 text-sm leading-relaxed">
                             {reportCount === 0
-                                ? "You haven't uploaded any reports yet. Uploading consistently helps the AI track your health trends."
+                                ? "You haven't uploaded any reports yet. Upload one when you want a doctor-ready prep sheet."
                                 : reportCount < 2
-                                    ? "You're just getting started. Doctors recommend getting a full blood panel every 6–12 months to build a reliable health baseline."
-                                    : "Great job keeping your health records up to date. Consistent tracking allows for more accurate trend analysis."}
+                                    ? "You're just getting started. A second report lets MedAssist add trend context to your appointment questions."
+                                    : "Great job keeping your records up to date. Consistent tracking makes your visit prep more specific."}
                         </p>
                     </div>
                 </div>

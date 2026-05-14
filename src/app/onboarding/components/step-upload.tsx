@@ -304,7 +304,7 @@ export function StepUpload() {
                             </>
                         ) : (
                             <>
-                                Analyze & continue
+                        Build prep sheet
                                 <ChevronRight className="w-4 h-4" />
                             </>
                         )}
@@ -325,7 +325,7 @@ export function StepUpload() {
                         Upload your lab report
                     </h2>
                     <p className="text-[#57534E] text-sm">
-                        Choice is yours: upload now for instant analysis, enter values manually, or explore the app first.
+                        Upload now to build your doctor-visit prep sheet, enter values manually, or explore the app first.
                     </p>
                 </div>
 
@@ -342,7 +342,7 @@ export function StepUpload() {
                             Upload my report now
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            Get instant AI analysis, health score, and personalized insights from your latest lab results
+                            Generate key results, trend context, and questions for your next appointment
                         </p>
                         <span className="inline-block bg-sky-500 text-white rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-600 transition-colors shadow-sm shadow-sky-500/20">
                             Upload PDF
@@ -361,7 +361,7 @@ export function StepUpload() {
                             Enter values manually
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            No PDF? Type in your lab values and get the same AI analysis and health score
+                            No PDF? Type in your lab values and still get appointment-ready questions
                         </p>
                         <span className="inline-block bg-sky-100 text-sky-700 rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-200 transition-colors">
                             Add values
@@ -380,7 +380,7 @@ export function StepUpload() {
                             I don&apos;t have one yet
                         </h3>
                         <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
-                            No problem — explore the app first and upload when you get your next lab results
+                            No problem — explore the app first and upload when you want to prep for a visit
                         </p>
                         <span 
                             className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors"
@@ -418,7 +418,7 @@ export function StepUpload() {
                     Upload your lab report
                 </h2>
                 <p className="text-[#57534E] text-sm">
-                    Upload your digital lab report for instant AI analysis.
+                    Upload your digital lab report to create an appointment-ready summary.
                 </p>
             </div>
 
@@ -547,7 +547,7 @@ export function StepUpload() {
                             : "bg-[#E8E6DF] text-[#A8A29E] cursor-not-allowed"
                     )}
                 >
-                    Analyze with AI
+                    Build prep sheet
                     <ChevronRight className="w-4 h-4" />
                 </motion.button>
             </div>

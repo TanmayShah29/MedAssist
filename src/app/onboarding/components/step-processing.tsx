@@ -301,7 +301,7 @@ function ReviewExtractedValues({
 
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Reviewed health score</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Reviewed readiness score</p>
                     <p className="font-display text-3xl text-[#1C1917]">{reviewedScore}<span className="text-sm text-[#57534E] font-sans"> / 100</span></p>
                 </div>
                 <button
@@ -316,7 +316,7 @@ function ReviewExtractedValues({
                         </>
                     ) : (
                         <>
-                            Save and build dashboard
+                            Save and build prep sheet
                             <ArrowRight className="w-4 h-4" />
                         </>
                     )}
@@ -335,11 +335,11 @@ export function StepProcessing() {
 
     // New stages configuration with durations
     const stages = useMemo(() => [
-        { step: 1, label: 'Scanning your lab report...', detail: 'OCR reading every value on the page', duration: 8000 },
+        { step: 1, label: 'Scanning your lab report...', detail: 'Reading every value on the page', duration: 8000 },
         { step: 2, label: 'Identifying biomarkers...', detail: 'Finding hemoglobin, glucose, vitamins and more', duration: 6000 },
         { step: 3, label: 'Comparing reference ranges...', detail: 'Checking what\'s optimal, what needs attention', duration: 5000 },
-        { step: 4, label: 'Generating plain English explanations...', detail: 'Making medical jargon actually understandable', duration: 5000 },
-        { step: 5, label: 'Calculating your health score...', detail: 'Building your personal health overview', duration: 4000 },
+        { step: 4, label: 'Generating appointment questions...', detail: 'Turning lab values into doctor-ready talking points', duration: 5000 },
+        { step: 5, label: 'Building your prep sheet...', detail: 'Creating your personal visit overview', duration: 4000 },
     ], []);
 
     // Cycle through stages based on duration

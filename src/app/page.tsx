@@ -1,20 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { useRef, useEffect, useState } from "react";
-import { createBrowserClient } from '@supabase/ssr';
-import { signOutAndResetMedAssist } from "@/lib/account-session";
+import type { ReactNode } from "react";
 import {
   Shield, Upload, Brain, LineChart, CheckCircle2,
-  Sparkles, Lock, Trash2, ArrowRight, Activity,
-  TrendingUp, TrendingDown, Minus, ChevronRight, LogOut
+  Sparkles, Lock, Trash2, ArrowRight,
+  TrendingUp, ChevronRight, ClipboardList
 } from "lucide-react";
+import { LandingHeader } from "@/components/landing/landing-header";
 
 // ── Tiny helpers ─────────────────────────────────────────────────────────
 
-function Pill({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function Pill({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${className}`}>
       {children}
@@ -22,84 +17,61 @@ function Pill({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
-// ── Hero mock card (static, no deps) ─────────────────────────────────────
+// ── Hero appointment-prep preview (static, no deps) ─────────────────────
 
 function HeroMockCard() {
-  const biomarkers = [
-    { name: "Vitamin D", val: 42, unit: "ng/mL", status: "optimal", prev: 18, pct: 133 },
-    { name: "Glucose", val: 106, unit: "mg/dL", status: "warning", prev: 92, pct: 15 },
-    { name: "Hemoglobin", val: 11.8, unit: "g/dL", status: "warning", prev: 13.5, pct: -13 },
-    { name: "TSH", val: 2.4, unit: "uIU/mL", status: "optimal", prev: null, pct: 0 },
-    { name: "CRP", val: 1.2, unit: "mg/L", status: "optimal", prev: null, pct: 0 },
-    { name: "LDL", val: 145, unit: "mg/dL", status: "warning", prev: null, pct: 0 },
-  ];
-
-  const statusStyle = (s: string) => ({
-    optimal: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    warning: "bg-amber-50 text-amber-700 border border-amber-200",
-    critical: "bg-red-50 text-red-700 border border-red-200",
-  }[s] ?? "bg-emerald-50 text-emerald-700 border border-emerald-200");
-
-  const dotColor = (s: string) => ({ optimal: "bg-emerald-500", warning: "bg-amber-500", critical: "bg-red-500" }[s] ?? "bg-emerald-500");
-
-  const r = 42; const circ = 2 * Math.PI * r;
-  const dash = (82 / 100) * circ;
-
   return (
     <div className="relative w-full max-w-lg mx-auto">
       <div
         className="relative bg-white rounded-[24px] shadow-2xl shadow-slate-900/10 border border-[#E8E6DF] overflow-hidden"
       >
-        {/* Card header */}
-        <div className="px-5 pt-5 pb-4 border-b border-[#F0EEE8] flex items-center justify-between">
+        <div className="px-5 pt-5 pb-4 border-b border-[#F0EEE8] flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-bold text-[#A8A29E] uppercase tracking-widest">Clinical Overview</p>
-            <p className="text-[13px] font-bold text-[#1C1917] mt-0.5">Tanmay Shah · Demo Data</p>
+            <p className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">Doctor Visit Prep</p>
+            <p className="text-[13px] font-bold text-[#1C1917] mt-0.5">Printable one-page visit brief</p>
           </div>
-          {/* Score ring */}
-          <div className="relative" style={{ width: 68, height: 68 }}>
-            <svg width={68} height={68} style={{ transform: "rotate(-90deg)" }}>
-              <circle cx={34} cy={34} r={r} fill="none" stroke="#E8E6DF" strokeWidth={7} />
-              <circle cx={34} cy={34} r={r} fill="none" stroke="#10B981" strokeWidth={7}
-                strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[17px] font-extrabold text-[#1C1917] leading-none">82</span>
-              <span className="text-[8px] font-bold text-emerald-600">GOOD</span>
+          <span className="shrink-0 rounded-full bg-sky-50 border border-sky-100 px-3 py-1 text-[10px] font-bold text-sky-700">READY</span>
+        </div>
+
+        <div className="p-5">
+          <p className="text-[15px] font-semibold text-[#1C1917] leading-snug mb-4">
+            Focus the appointment on rising glucose, lower hemoglobin, and whether follow-up testing is needed.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="rounded-[14px] bg-[#FAFAF7] border border-[#E8E6DF] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#A8A29E] mb-1">Key result</p>
+              <p className="text-[13px] font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
+              <p className="text-[11px] font-semibold text-amber-600 mt-1">+15% from prior</p>
             </div>
+            <div className="rounded-[14px] bg-[#FAFAF7] border border-[#E8E6DF] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#A8A29E] mb-1">Key result</p>
+              <p className="text-[13px] font-bold text-[#1C1917]">Hemoglobin 11.8</p>
+              <p className="text-[11px] font-semibold text-amber-600 mt-1">Down from 13.5</p>
+            </div>
+          </div>
+
+          <div className="rounded-[14px] bg-sky-50 border border-sky-100 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700 mb-2">Questions to ask</p>
+            <ol className="space-y-2">
+              {[
+                "Could this glucose trend suggest insulin resistance?",
+                "Should we check iron, ferritin, or B12 for the hemoglobin drop?",
+                "When should these markers be re-tested?",
+              ].map((q, i) => (
+                <li key={q} className="flex gap-2 text-[12px] text-[#57534E] leading-snug">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white text-[9px] font-bold text-sky-600">{i + 1}</span>
+                  {q}
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
 
-        {/* Biomarker list */}
-        <div className="divide-y divide-[#F5F4EF]">
-          {biomarkers.map((b) => (
-            <div
-              key={b.name}
-              className="flex items-center gap-3 px-5 py-2.5"
-            >
-              <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColor(b.status)}`} />
-              <span className="text-[13px] font-semibold text-[#1C1917] flex-1 truncate">{b.name}</span>
-              <span className="text-[12px] text-[#57534E] font-mono">{b.val} <span className="text-[10px] text-[#A8A29E]">{b.unit}</span></span>
-              {b.prev !== null && b.pct !== 0 ? (
-                <span className={`text-[10px] font-bold flex items-center gap-0.5 ${b.pct > 0 && b.status === "optimal" ? "text-emerald-600" : b.pct < 0 && b.status === "warning" ? "text-amber-600" : b.pct > 0 ? "text-red-500" : "text-emerald-600"}`}>
-                  {b.pct > 0 ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
-                  {Math.abs(b.pct)}%
-                </span>
-              ) : (
-                <span className="text-[10px] text-[#D9D6CD]"><Minus size={9} /></span>
-              )}
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${statusStyle(b.status)}`}>
-                {b.status === "optimal" ? "OK" : "MON"}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Card footer */}
         <div className="px-5 py-3 bg-[#FAFAF7] border-t border-[#F0EEE8] flex items-center justify-between">
-          <span className="text-[11px] text-[#A8A29E]">Last updated Oct 24, 2024</span>
+          <span className="text-[11px] text-[#A8A29E]">Generated from your latest report</span>
           <span className="text-[11px] font-semibold text-sky-500 flex items-center gap-1">
-            Ask AI <ChevronRight size={10} />
+            Print prep sheet <ChevronRight size={10} />
           </span>
         </div>
       </div>
@@ -110,179 +82,10 @@ function HeroMockCard() {
 // ── Main Component ────────────────────────────────────────────────────────
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [accountState, setAccountState] = useState<"visitor" | "stale" | "onboarding" | "dashboard">("visitor");
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const featuresRef = useRef(null);
-  const isFeaturesInView = useInView(featuresRef, { once: true, margin: "-80px" });
-
-  // Create the browser client once and keep a stable reference across renders.
-  // Using useRef prevents a new SDK instance (and potential duplicate listeners)
-  // from being created on every state change / scroll event.
-  const supabaseRef = useRef(
-    createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  );
-
-  useEffect(() => {
-    const loadAccountState = async () => {
-      const { data: { session } } = await supabaseRef.current.auth.getSession();
-      const { data: { user }, error } = await supabaseRef.current.auth.getUser();
-      if (error || !user) {
-        setAccountState(session ? "stale" : "visitor");
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabaseRef.current
-        .from("profiles")
-        .select("onboarding_complete")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError || !profile) {
-        setAccountState("stale");
-        return;
-      }
-
-      setAccountState(profile.onboarding_complete ? "dashboard" : "onboarding");
-    };
-
-    loadAccountState();
-  }, []); // Safe: supabaseRef.current is stable for the component lifetime
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const isSignedIn = accountState !== "visitor";
-  const appCtaPath = accountState === "dashboard" ? "/dashboard" : accountState === "onboarding" ? "/onboarding" : "/auth?mode=signup";
-  const appCtaLabel = accountState === "dashboard" ? "Dashboard" : accountState === "onboarding" ? "Continue setup" : "Get started";
-  const heroCtaLabel = accountState === "dashboard" ? "Go to dashboard" : accountState === "onboarding" ? "Continue setup" : "Create free account";
-  const showResetSession = accountState !== "visitor";
-
-  const handleResetSession = async () => {
-    await signOutAndResetMedAssist(supabaseRef.current);
-    setAccountState("visitor");
-    setMenuOpen(false);
-    router.replace("/");
-    router.refresh();
-  };
-
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
 
-      {/* ── HEADER ── */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#FAFAF7]/90 backdrop-blur-md border-b border-[#E8E6DF] shadow-sm shadow-slate-900/[0.04]" : "bg-transparent"}`}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-display text-[22px] text-[#1C1917]">MedAssist</span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-1">
-            <Link href="#how-it-works" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">How it works</Link>
-            <Link href="#features" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Features</Link>
-            <Link href="#security" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Security</Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <Link href="/demo" className="hidden sm:flex text-sm font-semibold text-sky-600 hover:text-sky-700 px-4 py-2 rounded-lg hover:bg-sky-50 transition-all items-center gap-1.5">
-              <Activity size={14} /> Live Demo
-            </Link>
-            {showResetSession && (
-              <button
-                type="button"
-                onClick={handleResetSession}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-[#57534E] hover:text-red-600 transition-colors"
-              >
-                <LogOut size={14} />
-                Sign out
-              </button>
-            )}
-            {!isSignedIn && (
-              <Link href="/auth?mode=login" className="hidden sm:block text-sm font-semibold text-[#57534E] hover:text-[#1C1917] px-4 py-2 transition-colors">
-                Sign in
-              </Link>
-            )}
-            <button
-              onClick={() => router.push(appCtaPath)}
-              className="hidden sm:inline-flex bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-[10px] text-sm font-bold transition-all active:scale-95 shadow-md shadow-sky-500/20"
-            >
-              {appCtaLabel}
-            </button>
-            {/* Hamburger — mobile only */}
-            <button
-              onClick={() => setMenuOpen(o => !o)}
-              aria-label="Toggle navigation menu"
-              aria-expanded={menuOpen}
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-lg hover:bg-[#F5F4EF] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/30"
-            >
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-opacity duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile dropdown menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-[#FAFAF7]/95 backdrop-blur-xl border-t border-[#E8E6DF] px-6 py-4 space-y-1">
-            <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">How it works</Link>
-            <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Features</Link>
-            <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Security</Link>
-            <Link href="/demo" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-sky-600 py-3 border-b border-[#F0EEE8]">Live Demo</Link>
-            {showResetSession && (
-              <button
-                type="button"
-                onClick={handleResetSession}
-                className="block w-full border-b border-[#F0EEE8] py-3 text-left text-sm font-semibold text-red-600"
-              >
-                Sign out and reset session
-              </button>
-            )}
-            {!isSignedIn && (
-              <Link href="/auth?mode=login" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-[#57534E] py-3">
-                Sign in
-              </Link>
-            )}
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                router.push(appCtaPath);
-              }}
-              className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded-[10px] bg-sky-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-sky-500/20"
-            >
-              {appCtaLabel}
-            </button>
-          </div>
-        )}
-      </header>
-
-      {accountState === "stale" && (
-        <div className="fixed left-0 right-0 top-16 z-40 border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-amber-900">
-              Your previous account session looks expired or deleted. Sign out to start fresh.
-            </p>
-            <button
-              type="button"
-              onClick={handleResetSession}
-              className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-[10px] bg-amber-700 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-amber-800"
-            >
-              <LogOut size={15} />
-              Sign out and reset
-            </button>
-          </div>
-        </div>
-      )}
+      <LandingHeader />
 
       {/* ── HERO ── */}
       <section className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
@@ -292,13 +95,13 @@ export default function LandingPage() {
             {/* Left: copy */}
             <div className="min-w-0 max-w-full">
               <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-6">
-                <Sparkles size={10} /> AI-powered health intelligence
+                <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
               <h1 className="font-display text-[36px] sm:text-6xl lg:text-[64px] text-[#1C1917] leading-[1.04] mb-6 max-w-full">
-                Your lab results,{" "}
+                Walk into your doctor visit{" "}
                 <span className="text-sky-500 relative block sm:inline">
-                  finally explained.
+                  prepared.
                   <svg className="absolute -bottom-1 left-0 w-full" height="4" viewBox="0 0 200 4" preserveAspectRatio="none">
                     <path d="M0 2 Q50 0 100 2 Q150 4 200 2" stroke="#0EA5E9" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
                   </svg>
@@ -306,7 +109,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-lg overflow-wrap-anywhere">
-                Upload your blood work PDF. Get plain-language explanations of every number, spot trends across reports, and know exactly what to ask your doctor.
+                Upload your blood work PDF. MedAssist explains the numbers, spots what changed, and creates a printable one-page brief with the exact questions to ask your doctor.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -317,12 +120,12 @@ export default function LandingPage() {
                   Try interactive demo
                   <ArrowRight size={15} />
                 </Link>
-                <button
-                  onClick={() => router.push(appCtaPath)}
+                <Link
+                  href="/auth?mode=signup"
                   className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
                 >
-                  {heroCtaLabel}
-                </button>
+                  Create free account
+                </Link>
               </div>
 
               <p className="text-[12px] text-[#A8A29E]">
@@ -361,18 +164,14 @@ export default function LandingPage() {
               { number: "20s", label: "Analysis time", color: "text-emerald-500" },
               { number: "100%", label: "Private & encrypted", color: "text-violet-500" },
               { number: "0", label: "Cost to start", color: "text-amber-500" },
-            ].map((s, i) => (
-              <motion.div
+            ].map((s) => (
+              <div
                 key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
                 className="text-center"
               >
                 <div className={`font-display text-4xl font-bold ${s.color} mb-1`}>{s.number}</div>
                 <div className="text-[12px] font-medium text-[#A8A29E] uppercase tracking-wider">{s.label}</div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -382,11 +181,7 @@ export default function LandingPage() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+            <div
             >
               <Pill className="bg-red-50 border border-red-100 text-red-600 mb-6">Without MedAssist</Pill>
               <h2 className="font-display text-4xl text-[#1C1917] mb-6">
@@ -401,28 +196,20 @@ export default function LandingPage() {
                   "Days of waiting to speak to a doctor",
                   "No idea what to ask, or what's actually urgent",
                 ].map((p, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.08 }}
                     className="flex items-start gap-3 p-4 bg-white border border-[#E8E6DF] rounded-xl shadow-sm"
                   >
                     <div className="w-5 h-5 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
                     </div>
                     <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+            <div
             >
               <Pill className="bg-emerald-50 border border-emerald-100 text-emerald-700 mb-6">With MedAssist</Pill>
               <h2 className="font-display text-4xl text-[#1C1917] mb-6">
@@ -432,25 +219,21 @@ export default function LandingPage() {
               </h2>
               <div className="space-y-3">
                 {[
-                  "Every biomarker explained in language you actually understand",
-                  "AI-generated insights tailored to your specific results",
-                  "Know what's urgent and what's fine before leaving the lab",
+                  "Every biomarker explained in language you can repeat back",
+                  "AI-generated visit summaries tailored to your specific results",
+                  "Know what's urgent, what's changed, and what can wait",
                   "Ready with the right questions when you see your doctor",
                 ].map((p, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, x: 12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.08 }}
                     className="flex items-start gap-3 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm"
                   >
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -460,8 +243,8 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-4">How it works</Pill>
-            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">From PDF to insights in 3 steps</h2>
-            <p className="text-lg text-[#57534E] max-w-xl mx-auto">No setup. No medical jargon. Just upload and understand.</p>
+            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">From PDF to appointment prep in 3 steps</h2>
+            <p className="text-lg text-[#57534E] max-w-xl mx-auto">No setup. No medical jargon. Just upload and walk in prepared.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -478,8 +261,8 @@ export default function LandingPage() {
               {
                 step: "02",
                 icon: <Brain className="w-6 h-6 text-violet-500" />,
-                title: "AI reads every value",
-                desc: "Llama 3.3 via Groq extracts every biomarker, compares them to clinical ranges, and generates plain-English interpretations.",
+                title: "AI finds what matters",
+                desc: "Llama 3.3 via Groq extracts biomarkers, compares them to reference ranges, and spots changes worth discussing.",
                 detail: "Takes 20 – 40 seconds",
                 bg: "bg-violet-50",
                 border: "border-violet-100",
@@ -487,19 +270,15 @@ export default function LandingPage() {
               {
                 step: "03",
                 icon: <LineChart className="w-6 h-6 text-emerald-500" />,
-                title: "Understand your health",
-                desc: "Your dashboard shows your health score, what needs attention, trend charts, and questions to ask your doctor.",
-                detail: "Updated with every report",
+                title: "Bring the right questions",
+                desc: "Your dashboard turns the results into an appointment prep sheet, trend review, and doctor-ready questions.",
+                detail: "Printable in one click",
                 bg: "bg-emerald-50",
                 border: "border-emerald-100",
               },
-            ].map((item, idx) => (
-              <motion.div
+            ].map((item) => (
+              <div
                 key={item.step}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className={`relative bg-white border ${item.border} rounded-[20px] p-7 shadow-sm hover:shadow-md transition-shadow`}
               >
                 <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mb-5`}>
@@ -509,14 +288,14 @@ export default function LandingPage() {
                 <h3 className="text-[18px] font-bold text-[#1C1917] mb-3">{item.title}</h3>
                 <p className="text-[14px] text-[#57534E] leading-relaxed mb-4">{item.desc}</p>
                 <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-wider">{item.detail}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="py-24 px-6" ref={featuresRef}>
+      <section id="features" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <Pill className="bg-[#F5F4EF] border border-[#E8E6DF] text-[#57534E] mb-4">Everything included</Pill>
@@ -526,18 +305,15 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: Activity, color: "text-sky-500", bg: "bg-sky-50", title: "Health Score", desc: "A single 0–100 score based on every biomarker, with a breakdown by clinical category." },
-              { icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50", title: "Trend Tracking", desc: "Charts showing how your values change with each upload — see if you're improving." },
+              { icon: ClipboardList, color: "text-sky-500", bg: "bg-sky-50", title: "Doctor Visit Prep", desc: "A printable one-page brief with key results, notable changes, and appointment questions." },
+              { icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50", title: "Trend Tracking", desc: "Charts and comparisons showing how your values change with each upload." },
               { icon: Brain, color: "text-violet-500", bg: "bg-violet-50", title: "AI Explanations", desc: "Every biomarker explained in plain English. No medical degree required." },
-              { icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50", title: "AI Assistant", desc: "Ask follow-up questions about your results and get intelligent, context-aware answers." },
+              { icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50", title: "Streaming Prep Assistant", desc: "Ask follow-up questions and see context-aware answers appear as the AI thinks." },
               { icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50", title: "Doctor Questions", desc: "AI-generated questions tailored to your results, ready to bring to your next appointment." },
-              { icon: Shield, color: "text-indigo-500", bg: "bg-indigo-50", title: "Supplement Tracking", desc: "Log supplements and see how they correlate with biomarker changes over time." },
-            ].map((f, i) => (
-              <motion.div
+              { icon: Shield, color: "text-indigo-500", bg: "bg-indigo-50", title: "Health Memory", desc: "Recent conversations and uploaded reports stay in context so answers get more personal over time." },
+            ].map((f) => (
+              <div
                 key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isFeaturesInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: i * 0.07, duration: 0.45 }}
                 className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm hover:shadow-md hover:border-sky-200 transition-all group"
               >
                 <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
@@ -545,7 +321,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">{f.title}</h3>
                 <p className="text-[13px] text-[#57534E] leading-relaxed">{f.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -590,24 +366,19 @@ export default function LandingPage() {
 
             {/* Floating cards */}
             <div className="relative h-80 lg:h-full flex items-center justify-center">
-              <motion.div
-                initial={{ x: 20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
+              <div
                 className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full -top-4 right-0"
               >
                 <p className="text-[9px] text-indigo-400 font-black uppercase tracking-widest mb-2">CORRELATION DETECTED</p>
                 <p className="text-sm font-medium text-slate-200 leading-relaxed">Vitamin D ↑ 133% after starting D3 supplement on Feb 12. Fatigue symptoms resolved 6 days later.</p>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.15 }}
+              <div
                 className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full bottom-4 left-0"
               >
                 <p className="text-[9px] text-amber-400 font-black uppercase tracking-widest mb-2">TREND ALERT</p>
                 <p className="text-sm font-medium text-slate-200 leading-relaxed">Glucose has increased 15% across 3 consecutive reports. Pre-diabetic range approaching — dietary review recommended.</p>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -618,17 +389,17 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <Pill className="bg-[#F5F4EF] border border-[#E8E6DF] text-[#57534E] mb-4">Technical Architecture</Pill>
-            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">Clinical-grade AI pipeline</h2>
-            <p className="text-lg text-[#57534E] max-w-2xl mx-auto">Multi-stage processing that extracts, interprets, and structures your lab data with high accuracy.</p>
+            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">Appointment-ready AI pipeline</h2>
+            <p className="text-lg text-[#57534E] max-w-2xl mx-auto">Multi-stage processing that extracts, structures, and turns lab data into a visit-ready brief.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 border border-[#E8E6DF] rounded-[20px] overflow-hidden bg-white shadow-sm">
             {[
               { step: "01", title: "PDF Upload", tech: "Next.js 16", desc: "Secure binary file handler for digital lab reports.", color: "text-sky-500", dot: "bg-sky-500" },
-              { step: "02", title: "Text Extraction", tech: "pdf-parse", desc: "Native extraction with OCR.space fallback for scanned reports.", color: "text-violet-500", dot: "bg-violet-500" },
-              { step: "03", title: "AI Analysis", tech: "Llama 3.3", desc: "Structured clinical schema generation with plain-English insights.", color: "text-emerald-500", dot: "bg-emerald-500" },
+              { step: "02", title: "Report Parsing", tech: "pdf-parse", desc: "Native text extraction with the existing scanned-report fallback when needed.", color: "text-violet-500", dot: "bg-violet-500" },
+              { step: "03", title: "Visit Brief", tech: "Llama 3.3", desc: "Structured clinical schema generation with doctor questions and a concise summary.", color: "text-emerald-500", dot: "bg-emerald-500" },
               { step: "04", title: "Persistence", tech: "Supabase", desc: "Encrypted storage with row-level security. Only you can read your data.", color: "text-amber-500", dot: "bg-amber-500" },
-              { step: "05", title: "Visualisation", tech: "Recharts", desc: "Longitudinal trends, category balance charts, and health score ring.", color: "text-rose-500", dot: "bg-rose-500" },
+              { step: "05", title: "Visualisation", tech: "Recharts", desc: "Longitudinal trends, category balance charts, and readiness score ring.", color: "text-rose-500", dot: "bg-rose-500" },
             ].map((item, i) => (
               <div key={item.step} className={`p-6 ${i < 4 ? "border-b md:border-b-0 md:border-r border-[#E8E6DF]" : ""}`}>
                 <div className="flex items-center gap-2 mb-4">
@@ -728,19 +499,15 @@ export default function LandingPage() {
               { n: "1st Report", color: "bg-sky-100 text-sky-600", title: "Clinical Baseline", desc: "Establish your starting point. Immediately flag what needs attention." },
               { n: "2nd Report", color: "bg-violet-100 text-violet-600", title: "Trend Correlation", desc: "See if supplements or lifestyle changes are moving your markers." },
               { n: "3rd Report +", color: "bg-emerald-100 text-emerald-700", title: "True Health IQ", desc: "Understand patterns, predict outcomes, and track progress with confidence." },
-            ].map((s, i) => (
-              <motion.div
+            ].map((s) => (
+              <div
                 key={s.n}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
                 className="bg-white border border-[#E8E6DF] rounded-[20px] p-7 text-center shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className={`inline-block text-[11px] font-black px-3 py-1 rounded-full ${s.color} mb-5 uppercase tracking-wider`}>{s.n}</div>
                 <h3 className="text-[17px] font-bold text-[#1C1917] mb-3">{s.title}</h3>
                 <p className="text-[13px] text-[#57534E] leading-relaxed">{s.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -765,9 +532,9 @@ export default function LandingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-2xl mx-auto text-center relative z-10">
           <Pill className="bg-sky-500/10 border border-sky-500/20 text-sky-400 mb-6">Get started today</Pill>
-          <h2 className="font-display text-4xl lg:text-5xl text-white mb-6">Ready to understand your health?</h2>
+          <h2 className="font-display text-4xl lg:text-5xl text-white mb-6">Ready for your next appointment?</h2>
           <p className="text-lg text-slate-400 mb-10 leading-relaxed">
-            Upload your first lab report and get your health score, plain-English explanations, and personalized insights in under a minute. Free to start.
+            Upload your first lab report and get a plain-English summary, trend context, and doctor-ready questions in under a minute. Free to start.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -777,12 +544,12 @@ export default function LandingPage() {
               Try interactive demo
               <ArrowRight size={15} />
             </Link>
-            <button
-              onClick={() => router.push(appCtaPath)}
+            <Link
+              href="/auth?mode=signup"
               className="flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 text-white px-8 py-3.5 rounded-[12px] text-[15px] font-bold transition-all hover:bg-white/5"
             >
-              {heroCtaLabel}
-            </button>
+              Create free account
+            </Link>
           </div>
           <p className="text-[12px] text-slate-600 mt-6">No login required for the demo · No credit card to sign up</p>
         </div>
@@ -801,7 +568,7 @@ export default function LandingPage() {
                 <span className="font-display text-[22px] text-white">MedAssist</span>
               </div>
               <p className="text-[13px] text-slate-500 leading-relaxed max-w-xs">
-                AI-powered clinical intelligence that transforms your lab reports into plain-English health insights. Built for people, not doctors.
+                AI-powered appointment prep that transforms lab reports into plain-English summaries, trend context, and doctor-ready questions.
               </p>
               <div className="flex gap-3 mt-6 flex-wrap">
                 {["HIPAA-Aligned", "AES-256", "No Data Training"].map(t => (
@@ -817,8 +584,8 @@ export default function LandingPage() {
                 {[
                   { label: "Interactive Demo", href: "/demo" },
                   { label: "Dashboard", href: "/dashboard" },
-                  { label: "Lab Results", href: "/results" },
-                  { label: "AI Assistant", href: "/assistant" },
+                  { label: "Lab Details", href: "/results" },
+                  { label: "Prep Assistant", href: "/assistant" },
                 ].map(l => (
                   <li key={l.label}>
                     <Link href={l.href} className="text-[13px] text-slate-400 hover:text-white transition-colors">{l.label}</Link>

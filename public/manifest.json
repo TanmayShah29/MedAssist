@@ -1,7 +1,7 @@
 {
   "name": "MedAssist",
   "short_name": "MedAssist",
-  "description": "AI-powered health insights and lab report analysis. Understand your blood work in plain English.",
+  "description": "AI-powered doctor visit prep for lab reports. Turn blood work into clear summaries, trends, and appointment questions.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -39,13 +39,13 @@
   ],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
+      "name": "Visit Prep",
+      "short_name": "Prep",
       "url": "/dashboard",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "AI Assistant",
+      "name": "Prep Assistant",
       "short_name": "Assistant",
       "url": "/assistant",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
