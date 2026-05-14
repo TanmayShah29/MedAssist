@@ -530,15 +530,15 @@ export function AssistantPageInner() {
                     )}
 
                     {/* MAIN GRID Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(340px,0.9fr)] gap-5 lg:gap-6 items-stretch flex-1 min-h-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,0.85fr)] xl:grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)] gap-5 lg:gap-6 items-stretch flex-1 min-h-0">
 
                         {/* FULL WIDTH CHAT ON MOBILE */}
-                        <div className="app-panel flex flex-col overflow-hidden flex-1">
+                        <div className="app-panel flex flex-col overflow-hidden flex-1 min-w-0">
                             {renderChatPanel()}
                         </div>
 
                         {/* RIGHT: CONTEXTUAL INTELLIGENCE PANEL - Modal on mobile */}
-                        <div className="hidden lg:block space-y-5 overflow-y-auto">
+                        <div className="hidden min-w-0 lg:block space-y-5 overflow-y-auto">
                             <AssistantSidebar biomarkers={biomarkers} />
                             <div className="app-panel overflow-hidden h-[300px]">
                                 <AnalysisPanel

@@ -124,7 +124,7 @@ export function MedicineCabinet() {
                         className="mb-6 space-y-4 overflow-hidden"
                     >
                         <div className="grid grid-cols-1 gap-3">
-                            <div className="col-span-2">
+                            <div>
                                 <label className="text-[11px] font-bold text-[#A8A29E] uppercase mb-1 block">Supplement Name</label>
                                 <input
                                     type="text"

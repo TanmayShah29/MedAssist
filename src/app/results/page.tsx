@@ -378,10 +378,10 @@ export default function ResultsPage() {
                 </div>
 
                 {/* ── Two column layout ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-5 lg:gap-6">
 
                     {/* Left column: List - full width on mobile */}
-                    <div className="col-span-1 lg:col-span-3 app-panel overflow-hidden">
+                    <div className="app-panel overflow-hidden">
                         {loading ? (
                             <div className="p-4 space-y-4">
                                 {[...Array(5)].map((_, i) => (
@@ -474,7 +474,7 @@ export default function ResultsPage() {
                     </div>
 
                     {/* Right column: Detail */}
-                    <div className="hidden lg:block lg:col-span-2">
+                    <div className="hidden min-w-0 lg:block">
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
                                 <div className="app-panel p-8 text-center h-[200px] flex items-center justify-center">
@@ -492,10 +492,10 @@ export default function ResultsPage() {
                                         </button>
                                     </div>
 
-                                    <div className={`bg-white border border-[#E8E6DF] rounded-[12px] p-5 mb-4 text-center shadow-sm ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
+                                    <div className={`bg-white border border-[#E8E6DF] rounded-[12px] p-5 mb-4 text-center shadow-sm min-w-0 ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
                                         selectedBiomarker.status === 'warning' ? 'text-amber-500' : 'text-red-500'
                                         }`}>
-                                        <div className="text-[36px] font-bold font-display leading-none mb-1 text-wrap-safe">
+                                        <div className="text-[30px] sm:text-[36px] font-bold font-display leading-none mb-1 text-wrap-safe">
                                             {selectedBiomarker.value !== null && selectedBiomarker.value !== undefined ? `${selectedBiomarker.value} ${selectedBiomarker.unit || ''}` : 'N/A'}
                                         </div>
                                         {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) ? (

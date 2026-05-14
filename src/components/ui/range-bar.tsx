@@ -22,13 +22,17 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
 
     // Calculate display range with 20% padding on each side
     const range = max - min
+    if (range <= 0) return null
+
     const displayMin = Math.min(min, value) - range * 0.2
     const displayMax = Math.max(max, value) + range * 0.2
     const displayRange = displayMax - displayMin
+    if (displayRange <= 0) return null
 
     // Calculate positions as percentages
-    const refMinPos = ((referenceMin - displayMin) / displayRange) * 100
-    const refMaxPos = ((referenceMax - displayMin) / displayRange) * 100
+    const clamp = (next: number, lower = 4, upper = 96) => Math.min(Math.max(next, lower), upper)
+    const refMinPos = clamp(((referenceMin - displayMin) / displayRange) * 100)
+    const refMaxPos = clamp(((referenceMax - displayMin) / displayRange) * 100)
     const valuePos = ((value - displayMin) / displayRange) * 100
 
     const statusColor = {
@@ -38,7 +42,7 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
     }[status]
 
     return (
-        <div style={{ padding: '8px 0' }}>
+        <div style={{ padding: '8px 0', minWidth: 0, overflow: 'hidden' }}>
             {/* Bar container */}
             <div style={{ position: 'relative', height: 8, borderRadius: 4, background: '#E8E6DF', margin: '20px 0 24px 0' }}>
 
@@ -81,7 +85,10 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                     fontSize: 10,
                     color: '#10B981',
                     fontWeight: 600,
-                    whiteSpace: 'nowrap'
+                    maxWidth: 72,
+                    overflowWrap: 'anywhere',
+                    textAlign: 'center',
+                    lineHeight: 1.15
                 }}>
                     {referenceMin}
                 </div>
@@ -95,7 +102,10 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                     fontSize: 10,
                     color: '#10B981',
                     fontWeight: 600,
-                    whiteSpace: 'nowrap'
+                    maxWidth: 72,
+                    overflowWrap: 'anywhere',
+                    textAlign: 'center',
+                    lineHeight: 1.15
                 }}>
                     {referenceMax}
                 </div>
@@ -124,12 +134,15 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                     fontSize: 11,
                     fontWeight: 700,
                     color: statusColor,
-                    whiteSpace: 'nowrap',
                     background: 'white',
                     padding: '2px 6px',
                     borderRadius: 4,
                     border: `1px solid ${statusColor}`,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    maxWidth: 104,
+                    overflowWrap: 'anywhere',
+                    textAlign: 'center',
+                    lineHeight: 1.15
                 }}>
                     {value} {unit}
                 </div>
@@ -141,7 +154,10 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                 justifyContent: 'center',
                 fontSize: 11,
                 color: '#A8A29E',
-                marginTop: 8
+                marginTop: 8,
+                minWidth: 0,
+                overflowWrap: 'anywhere',
+                textAlign: 'center'
             }}>
                 Normal range: {referenceMin}–{referenceMax} {unit}
             </div>

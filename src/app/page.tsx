@@ -20,19 +20,26 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 function HeroWorkspaceScene() {
   return (
     <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float">
+      <div className="absolute left-[11%] top-[19%] h-72 w-72 rounded-full border border-sky-200/55 landing-orbit-ring">
+        <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-sky-400 shadow-lg shadow-sky-400/30" />
+      </div>
+      <div className="absolute right-[13%] top-[20%] h-56 w-56 rounded-full border border-emerald-200/55 landing-orbit-ring landing-orbit-ring-slow">
+        <span className="absolute bottom-6 right-4 h-2 w-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/30" />
+      </div>
+
+      <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float landing-card-pop">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Monitor</p>
-          <span className="h-2 w-2 rounded-full bg-amber-400" />
+          <span className="h-2 w-2 rounded-full bg-amber-400 landing-dot-pulse" />
         </div>
         <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-amber-100">
-          <div className="h-full w-2/3 rounded-full bg-amber-400" />
+          <div className="h-full rounded-full bg-amber-400 landing-meter-fill" />
         </div>
         <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
       </div>
 
-      <div className="absolute right-[7%] top-[33%] w-60 rounded-[14px] border border-emerald-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow">
+      <div className="absolute right-[7%] top-[33%] w-60 rounded-[14px] border border-emerald-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "180ms, 900ms" }}>
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -42,13 +49,25 @@ function HeroWorkspaceScene() {
       </div>
 
       <div className="absolute bottom-[27%] left-[23%] h-px w-[54%] origin-center bg-sky-300/70 landing-pulse-line" />
+      <div className="absolute bottom-[26%] left-[23%] h-px w-[54%] origin-left bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-data-trace" />
+      <div className="absolute left-[18%] top-[58%] w-48 rounded-[14px] border border-violet-100 bg-white/84 p-3 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "300ms, 1400ms" }}>
+        <div className="mb-2 flex items-center gap-2">
+          <Brain className="h-4 w-4 text-violet-500" />
+          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyzing</p>
+        </div>
+        <div className="space-y-1.5">
+          <span className="block h-1.5 w-full rounded-full bg-violet-100 landing-shimmer" />
+          <span className="block h-1.5 w-4/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "280ms" }} />
+          <span className="block h-1.5 w-3/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "560ms" }} />
+        </div>
+      </div>
     </div>
   );
 }
 
 function MobileHeroPreview() {
   return (
-    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden">
+    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden landing-card-pop" style={{ animationDelay: "320ms" }}>
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Live preview</p>
         <Brain className="h-4 w-4 text-violet-500" />
@@ -81,6 +100,7 @@ export default function LandingPage() {
       {/* ── HERO ── */}
       <section className="relative min-h-[100dvh] px-4 pb-16 pt-24 sm:px-6 sm:pt-28 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_42%,#EAF8FF_100%)]" />
+        <div className="absolute inset-0 opacity-[0.28] landing-grid-drift" />
         <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent landing-pulse-line" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
         <HeroWorkspaceScene />
@@ -129,7 +149,7 @@ export default function LandingPage() {
                   { icon: Shield, label: "AES-256 Encrypted" },
                   { icon: CheckCircle2, label: "Free to Start" },
                 ].map(t => (
-                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm">
+                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm landing-chip">
                     <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                   </span>
                 ))}
@@ -149,12 +169,13 @@ export default function LandingPage() {
               { number: "20s", label: "Analysis time", color: "text-emerald-500" },
               { number: "100%", label: "Private & encrypted", color: "text-violet-500" },
               { number: "0", label: "Cost to start", color: "text-amber-500" },
-            ].map((s) => (
+            ].map((s, i) => (
               <div
                 key={s.label}
-                className="text-center"
+                className="text-center landing-reveal"
+                style={{ animationDelay: `${i * 80}ms` }}
               >
-                <div className={`font-display text-4xl font-bold ${s.color} mb-1`}>{s.number}</div>
+                <div className={`font-display text-4xl font-bold ${s.color} mb-1 landing-breathe`}>{s.number}</div>
                 <div className="text-[12px] font-medium text-[#A8A29E] uppercase tracking-wider">{s.label}</div>
               </div>
             ))}
@@ -183,7 +204,8 @@ export default function LandingPage() {
                 ].map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 p-4 bg-white border border-[#E8E6DF] rounded-xl shadow-sm"
+                    className="flex items-start gap-3 p-4 bg-white border border-[#E8E6DF] rounded-xl shadow-sm landing-reveal landing-tilt-card"
+                    style={{ animationDelay: `${i * 70}ms` }}
                   >
                     <div className="w-5 h-5 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
@@ -211,7 +233,8 @@ export default function LandingPage() {
                 ].map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm"
+                    className="flex items-start gap-3 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm landing-reveal landing-tilt-card"
+                    style={{ animationDelay: `${i * 70}ms` }}
                   >
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
@@ -264,7 +287,8 @@ export default function LandingPage() {
             ].map((item) => (
               <div
                 key={item.step}
-                className={`relative bg-white border ${item.border} rounded-[20px] p-7 shadow-sm hover:shadow-md transition-shadow`}
+                className={`relative bg-white border ${item.border} rounded-[20px] p-7 shadow-sm transition-shadow landing-reveal landing-tilt-card`}
+                style={{ animationDelay: `${Number(item.step) * 90}ms` }}
               >
                 <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mb-5`}>
                   {item.icon}
@@ -299,7 +323,7 @@ export default function LandingPage() {
             ].map((f) => (
               <div
                 key={f.title}
-                className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm hover:shadow-md hover:border-sky-200 transition-all group"
+                className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm hover:border-sky-200 transition-all group landing-reveal landing-tilt-card"
               >
                 <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <f.icon className={`w-5 h-5 ${f.color}`} />
@@ -359,7 +383,7 @@ export default function LandingPage() {
               </div>
 
               <div
-                className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full bottom-4 left-0"
+                className="absolute bg-slate-800/90 border border-white/10 p-5 rounded-2xl shadow-2xl max-w-xs w-full bottom-4 left-0 landing-float-slow"
               >
                 <p className="text-[9px] text-amber-400 font-black uppercase tracking-widest mb-2">TREND ALERT</p>
                 <p className="text-sm font-medium text-slate-200 leading-relaxed">Glucose has increased 15% across 3 consecutive reports. Pre-diabetic range approaching — dietary review recommended.</p>
@@ -386,7 +410,7 @@ export default function LandingPage() {
               { step: "04", title: "Persistence", tech: "Supabase", desc: "Encrypted storage with row-level security. Only you can read your data.", color: "text-amber-500", dot: "bg-amber-500" },
               { step: "05", title: "Visualisation", tech: "Recharts", desc: "Longitudinal trends, category balance charts, and readiness score ring.", color: "text-rose-500", dot: "bg-rose-500" },
             ].map((item, i) => (
-              <div key={item.step} className={`p-6 ${i < 4 ? "border-b md:border-b-0 md:border-r border-[#E8E6DF]" : ""}`}>
+              <div key={item.step} className={`p-6 landing-reveal ${i < 4 ? "border-b md:border-b-0 md:border-r border-[#E8E6DF]" : ""}`} style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="flex items-center gap-2 mb-4">
                   <div className={`w-1.5 h-1.5 rounded-full ${item.dot}`} />
                   <span className={`text-[10px] font-black ${item.color} tracking-widest`}>{item.step}</span>
@@ -484,10 +508,11 @@ export default function LandingPage() {
               { n: "1st Report", color: "bg-sky-100 text-sky-600", title: "Clinical Baseline", desc: "Establish your starting point. Immediately flag what needs attention." },
               { n: "2nd Report", color: "bg-violet-100 text-violet-600", title: "Trend Correlation", desc: "See if supplements or lifestyle changes are moving your markers." },
               { n: "3rd Report +", color: "bg-emerald-100 text-emerald-700", title: "True Health IQ", desc: "Understand patterns, predict outcomes, and track progress with confidence." },
-            ].map((s) => (
+            ].map((s, i) => (
               <div
                 key={s.n}
-                className="bg-white border border-[#E8E6DF] rounded-[20px] p-7 text-center shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white border border-[#E8E6DF] rounded-[20px] p-7 text-center shadow-sm transition-shadow landing-reveal landing-tilt-card"
+                style={{ animationDelay: `${i * 90}ms` }}
               >
                 <div className={`inline-block text-[11px] font-black px-3 py-1 rounded-full ${s.color} mb-5 uppercase tracking-wider`}>{s.n}</div>
                 <h3 className="text-[17px] font-bold text-[#1C1917] mb-3">{s.title}</h3>

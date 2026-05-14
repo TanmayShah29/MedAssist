@@ -38,7 +38,7 @@ function Toggle({ checked, onToggle, disabled }: { checked: boolean; onToggle: (
 // ── Section card ───────────────────────────────────────────────────────────
 function SettingsCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`app-panel overflow-hidden ${className}`}>
+    <div className={`app-panel overflow-hidden min-w-0 ${className}`}>
       {children}
     </div>
   );
@@ -62,13 +62,13 @@ function SettingsRow({
   danger?: boolean;
 }) {
   return (
-    <div className={`flex items-start gap-4 p-5 ${danger ? "bg-red-50/50" : ""}`}>
+    <div className={`flex items-start gap-4 p-5 min-w-0 ${danger ? "bg-red-50/50" : ""}`}>
       <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0 ${iconBg}`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold ${danger ? "text-red-700" : "text-[#1C1917]"}`}>{title}</p>
-        {description && <p className="text-[12px] text-[#A8A29E] mt-0.5 leading-relaxed">{description}</p>}
+        <p className={`text-sm font-semibold break-words ${danger ? "text-red-700" : "text-[#1C1917]"}`}>{title}</p>
+        {description && <p className="text-[12px] text-[#A8A29E] mt-0.5 leading-relaxed break-words">{description}</p>}
         {children && <div className="mt-3">{children}</div>}
       </div>
     </div>
@@ -180,7 +180,7 @@ export default function SettingsPage() {
 
       {/* ── Security ── */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
-      <section>
+      <section className="min-w-0">
         <SectionHeader label="Security" className="mb-3" />
         <SettingsCard>
           <SettingsRow
@@ -238,7 +238,7 @@ export default function SettingsPage() {
       </section>
 
       {/* ── Data ── */}
-      <section>
+      <section className="min-w-0">
         <SectionHeader label="Privacy & Data" className="mb-3" />
         <SettingsCard>
           <SettingsRow
@@ -264,7 +264,7 @@ export default function SettingsPage() {
 
       {/* ── Developer ── */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
-      <section>
+      <section className="min-w-0">
         <SectionHeader label="Developer" className="mb-3" />
         <SettingsCard>
           <SettingsRow
@@ -285,7 +285,7 @@ export default function SettingsPage() {
       </section>
 
       {/* ── Danger Zone ── */}
-      <section>
+      <section className="min-w-0">
         <SectionHeader label="Danger Zone" className="mb-3" />
         <div className="bg-[#FEF2F2] border-2 border-red-100 rounded-[18px] overflow-hidden">
           <SettingsRow

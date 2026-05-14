@@ -39,27 +39,27 @@ export function LandingHeader() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#E8E6DF]/90 bg-[#FAFAF7]/[0.98] shadow-sm shadow-stone-900/[0.04] backdrop-blur-xl transition-all duration-300 ${
           scrolled
-            ? "bg-[#FAFAF7]/90 backdrop-blur-md border-b border-[#E8E6DF] shadow-sm shadow-slate-900/[0.04]"
-            : "bg-transparent"
+            ? "supports-[backdrop-filter]:bg-[#FAFAF7]/[0.94]"
+            : "supports-[backdrop-filter]:bg-[#FAFAF7]/[0.96]"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
               <Shield className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display text-[22px] text-[#1C1917]">MedAssist</span>
+            <span className="font-display text-[22px] text-[#1C1917] whitespace-nowrap">MedAssist</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1 rounded-full border border-[#E8E6DF]/80 bg-white/80 p-1 shadow-sm shadow-stone-900/[0.03]">
             <Link href="#how-it-works" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">How it works</Link>
             <Link href="#features" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Features</Link>
             <Link href="#security" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-4 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Security</Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-full border border-[#E8E6DF]/80 bg-white/80 p-1 shadow-sm shadow-stone-900/[0.03]">
             <Link href="/demo" className="hidden sm:flex text-sm font-semibold text-sky-600 hover:text-sky-700 px-4 py-2 rounded-lg hover:bg-sky-50 transition-all items-center gap-1.5">
               <Activity size={14} /> Live Demo
             </Link>
@@ -134,7 +134,7 @@ export function LandingHeader() {
       </header>
 
       {accountState === "stale" && (
-        <div className="fixed left-0 right-0 top-16 z-40 border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+        <div className="fixed left-0 right-0 top-[72px] z-[70] border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-amber-900">
               Your previous account session looks expired or deleted. Sign out to start fresh.

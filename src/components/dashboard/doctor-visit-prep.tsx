@@ -168,10 +168,10 @@ export function DoctorVisitPrep({
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Key results to discuss</h3>
                     <div className="space-y-2">
                         {prep.flagged.length > 0 ? prep.flagged.map(b => (
-                            <div key={b.id} className="flex items-center justify-between gap-3 rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2">
-                                <span className="text-[13px] font-semibold text-[#1C1917] break-words">{b.name}</span>
+                            <div key={b.id} className="flex flex-col items-start gap-2 rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2 min-w-0 sm:flex-row sm:justify-between">
+                                <span className="min-w-0 text-[13px] font-semibold text-[#1C1917] break-words">{b.name}</span>
                                 <span className={cn(
-                                    "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                                    "max-w-full rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-wrap-safe sm:shrink-0",
                                     b.status === "critical" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"
                                 )}>
                                     {b.value} {b.unit}
@@ -188,13 +188,13 @@ export function DoctorVisitPrep({
                     <div className="space-y-2">
                         {prep.changes.length > 0 ? prep.changes.map(change => (
                             <div key={change.name} className="rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2">
-                                <div className="flex items-center justify-between gap-3">
-                                    <span className="text-[13px] font-semibold text-[#1C1917]">{change.name}</span>
-                                    <span className={cn("text-[12px] font-bold", change.percent > 0 ? "text-amber-600" : "text-emerald-600")}>
+                                <div className="flex flex-col gap-1 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+                                    <span className="min-w-0 text-[13px] font-semibold text-[#1C1917] break-words">{change.name}</span>
+                                    <span className={cn("text-[12px] font-bold sm:shrink-0", change.percent > 0 ? "text-amber-600" : "text-emerald-600")}>
                                         {change.percent > 0 ? "+" : ""}{change.percent}%
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-[#A8A29E] mt-0.5">{change.previous} to {change.current}</p>
+                                <p className="text-[11px] text-[#A8A29E] mt-0.5 break-words">{change.previous} to {change.current}</p>
                             </div>
                         )) : (
                             <p className="text-[13px] text-[#A8A29E]">Upload another report to turn this into a trend review.</p>

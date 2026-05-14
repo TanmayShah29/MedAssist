@@ -204,7 +204,7 @@ function BiomarkerCard({
 
     return (
         <div
-            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px]"
+            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0"
             onClick={onClick}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }}}
             onTouchStart={(e) => {
@@ -228,18 +228,18 @@ function BiomarkerCard({
             </div>
 
             {/* Top row: badge + value */}
-            <div className="flex justify-between items-start gap-3 min-w-0">
-                <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${style.badge}`}>
+            <div className="flex flex-col items-start gap-2 min-w-0">
+                <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badge}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-                    {b.status.toUpperCase()}
+                    <span className="truncate">{b.status.toUpperCase()}</span>
                     <span className="sr-only">({b.status} status)</span>
                 </div>
-                <div className="text-right ml-auto min-w-0 max-w-[58%]">
+                <div className="min-w-0 max-w-full">
                     <div className="text-[15px] font-bold text-[#1C1917] break-words leading-tight">
                         {b.value} <span className="text-[10px] font-normal text-gray-500 break-words">{b.unit}</span>
                     </div>
                     {delta ? (
-                        <div className={`text-[10px] font-bold flex items-center justify-end gap-1 whitespace-nowrap ${deltaColor}`}>
+                        <div className={`text-[10px] font-bold flex items-center gap-1 text-wrap-safe ${deltaColor}`}>
                             {deltaPositive ? (
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="m18 15-6-6-6 6" />

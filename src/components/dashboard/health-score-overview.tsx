@@ -69,8 +69,8 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             tabIndex={onClick ? 0 : undefined}
             aria-label={onClick ? "Visit readiness score details" : undefined}
         >
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2">
+            <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
+                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
                     Visit Readiness Score
                     <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">
                         <Info className="w-3.5 h-3.5" />
@@ -89,7 +89,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                 )}
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col items-start gap-5 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-6">
                 {/* SVG Ring Gauge */}
                 <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
                     <svg width={120} height={120} style={{ transform: 'rotate(-90deg)' }}>
@@ -111,7 +111,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                 </div>
 
                 {/* Stats */}
-                <div className="flex flex-col gap-2 grow shrink basis-0">
+                <div className="flex w-full flex-col gap-2 grow shrink basis-0 min-w-0">
                     <span
                         className="inline-block self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold mb-1"
                         style={{ color: scoreInfo.color, background: scoreInfo.bg }}
