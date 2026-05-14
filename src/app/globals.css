@@ -284,48 +284,6 @@
     animation: landingRise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .landing-scan {
-    animation: landingScan 4.5s ease-in-out infinite;
-  }
-
-  .landing-pulse-line {
-    animation: landingPulseLine 2.8s ease-in-out infinite;
-  }
-
-  .landing-progress {
-    animation: landingProgress 5s ease-in-out infinite;
-  }
-
-  .landing-grid-drift {
-    background-image:
-      linear-gradient(rgba(14, 165, 233, 0.10) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(14, 165, 233, 0.08) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(circle at 50% 36%, black 0%, transparent 66%);
-    -webkit-mask-image: radial-gradient(circle at 50% 36%, black 0%, transparent 66%);
-  }
-
-  .landing-orbit-ring {
-    animation: landingOrbit 18s linear infinite;
-  }
-
-  .landing-orbit-ring-slow {
-    animation-duration: 26s;
-    animation-direction: reverse;
-  }
-
-  .landing-dot-pulse {
-    animation: landingDotPulse 1.5s ease-in-out infinite;
-  }
-
-  .landing-data-trace {
-    animation: landingDataTrace 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  }
-
-  .landing-meter-fill {
-    animation: landingMeterFill 3.8s ease-in-out infinite;
-  }
-
   .landing-shimmer {
     background-image: linear-gradient(90deg, rgba(237, 233, 254, 0.55), rgba(139, 92, 246, 0.35), rgba(237, 233, 254, 0.55));
     background-size: 220% 100%;
@@ -353,10 +311,6 @@
 
   .landing-breathe {
     animation: landingBreathe 3.5s ease-in-out infinite;
-  }
-
-  .landing-headline-glow {
-    animation: landingHeadlineGlow 5.5s ease-in-out infinite;
   }
 
   .landing-ping {
@@ -865,92 +819,6 @@
   }
 }
 
-@keyframes landingGridDrift {
-  from {
-    background-position: 0 0, 0 0;
-  }
-  to {
-    background-position: 46px 46px, 46px 46px;
-  }
-}
-
-@keyframes landingOrbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes landingDotPulse {
-  0%, 100% {
-    opacity: 0.45;
-    transform: scale(0.86);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.18);
-  }
-}
-
-@keyframes landingScan {
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 0.35;
-  }
-  50% {
-    transform: translateY(168px);
-    opacity: 0.9;
-  }
-}
-
-@keyframes landingPulseLine {
-  0%, 100% {
-    opacity: 0.42;
-    transform: scaleX(0.86);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes landingDataTrace {
-  0% {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  22% {
-    opacity: 0.9;
-  }
-  78% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes landingProgress {
-  0%, 100% {
-    width: 42%;
-  }
-  50% {
-    width: 88%;
-  }
-}
-
-@keyframes landingMeterFill {
-  0%, 100% {
-    width: 48%;
-  }
-  50% {
-    width: 72%;
-  }
-}
-
 @keyframes landingShimmer {
   0%, 100% {
     background-position: 160% 0;
@@ -966,17 +834,6 @@
   }
   50% {
     transform: translateY(-1px) scale(1.025);
-  }
-}
-
-@keyframes landingHeadlineGlow {
-  0%, 100% {
-    opacity: 0.55;
-    transform: translate(-50%, -50%) scale(0.94);
-  }
-  50% {
-    opacity: 0.95;
-    transform: translate(-50%, -50%) scale(1.08);
   }
 }
 
@@ -1043,17 +900,8 @@
   .landing-card-pop,
   .landing-rise,
   .landing-reveal,
-  .landing-scan,
-  .landing-pulse-line,
-  .landing-progress,
-  .landing-grid-drift,
-  .landing-orbit-ring,
-  .landing-dot-pulse,
-  .landing-data-trace,
-  .landing-meter-fill,
   .landing-shimmer,
   .landing-breathe,
-  .landing-headline-glow,
   .landing-ping,
   .landing-flow-line,
   .landing-typewriter,

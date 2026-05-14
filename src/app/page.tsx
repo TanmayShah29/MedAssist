@@ -21,61 +21,61 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 
 function HeroWorkspaceScene() {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      <div className="absolute left-[7%] top-[31%] w-56 rounded-[12px] border border-amber-100/90 bg-white/90 p-4 shadow-md shadow-stone-900/5 landing-card-pop">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Monitor</p>
-          <span className="h-2 w-2 rounded-full bg-amber-400" />
+    <div className="mx-auto mt-7 w-full max-w-5xl rounded-[18px] border border-[#E8E6DF] bg-white/88 p-2 shadow-lg shadow-stone-900/[0.06] landing-rise" style={{ animationDelay: "240ms" }}>
+      <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FCFCF9] p-3 sm:p-4">
+        <div className="mb-3 flex flex-col gap-3 border-b border-[#E8E6DF] pb-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-sky-50 text-sky-600">
+              <Upload className="h-5 w-5" />
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#A8A29E]">Uploaded report</p>
+              <p className="mt-0.5 text-sm font-bold text-[#1C1917]">Quest Diagnostics · CBC + metabolic panel</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Visit brief ready
+            </span>
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-sky-100 bg-white px-3 py-1.5 text-[11px] font-bold text-[#57534E]">
+              <Shield className="h-3.5 w-3.5 text-sky-500" />
+              Private + encrypted
+            </span>
+          </div>
         </div>
-        <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-amber-100">
-          <div className="h-full rounded-full bg-amber-400 landing-meter-fill" />
-        </div>
-        <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
-      </div>
 
-      <div className="absolute right-[7%] top-[35%] w-64 rounded-[12px] border border-emerald-100/90 bg-white/90 p-4 shadow-md shadow-stone-900/5 landing-card-pop" style={{ animationDelay: "180ms" }}>
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-        </div>
-        <p className="text-sm font-bold text-[#1C1917]">3 doctor questions drafted</p>
-        <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Bring a focused one-page brief to the appointment.</p>
-      </div>
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="rounded-[12px] border border-amber-100 bg-white p-3 text-left">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Key change</p>
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">Discuss</span>
+            </div>
+            <p className="text-lg font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
+            <p className="mt-1 text-sm text-[#57534E]">Up 15% across your last 3 reports.</p>
+            <div className="mt-3 h-2 rounded-full bg-[#F5F4EF]">
+              <div className="h-full w-[64%] rounded-full bg-amber-400" />
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Flagged for discussion, not as an emergency.</p>
+          </div>
 
-      <div className="absolute left-[16%] top-[62%] w-48 rounded-[12px] border border-violet-100/90 bg-white/88 p-3 shadow-md shadow-stone-900/5 landing-card-pop" style={{ animationDelay: "300ms" }}>
-        <div className="mb-2 flex items-center gap-2">
-          <Brain className="h-4 w-4 text-violet-500" />
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyzing</p>
-        </div>
-        <div className="space-y-1.5">
-          <span className="block h-1.5 w-full rounded-full bg-violet-100 landing-shimmer" />
-          <span className="block h-1.5 w-4/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "280ms" }} />
-          <span className="block h-1.5 w-3/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "560ms" }} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MobileHeroPreview() {
-  return (
-    <div className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-md shadow-stone-900/5 lg:hidden landing-card-pop" style={{ animationDelay: "320ms" }}>
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Live preview</p>
-        <Brain className="h-4 w-4 text-violet-500" />
-      </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E8E6DF]">
-        <div className="h-full rounded-full bg-sky-500 landing-progress" />
-      </div>
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-[12px] bg-amber-50 p-3">
-          <p className="text-[10px] font-bold uppercase text-amber-700">Monitor</p>
-          <p className="mt-1 text-sm font-bold text-[#1C1917]">Glucose +15%</p>
-        </div>
-        <div className="rounded-[12px] bg-emerald-50 p-3">
-          <p className="text-[10px] font-bold uppercase text-emerald-700">Ready</p>
-          <p className="mt-1 text-sm font-bold text-[#1C1917]">3 questions</p>
+          <div className="rounded-[12px] border border-[#E8E6DF] bg-white p-3 text-left">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Doctor visit prep</p>
+              <ClipboardList className="h-4 w-4 text-sky-500" />
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                "Ask whether the upward glucose trend needs an A1C follow-up.",
+                "Review whether fasting status or recent diet could explain the change.",
+              ].map((question) => (
+                <div key={question} className="flex gap-2 rounded-[10px] bg-[#FAFAF7] p-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
+                  <p className="text-sm leading-relaxed text-[#57534E]">{question}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -91,27 +91,24 @@ export default function LandingPage() {
       <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-[92dvh] overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pt-28">
+      <section className="relative min-h-[100dvh] overflow-hidden px-4 pb-12 pt-[88px] sm:px-6">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_48%,#F1FAFE_100%)]" />
-        <div className="absolute inset-0 opacity-[0.11] landing-grid-drift" />
         <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-100 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
-        <HeroWorkspaceScene />
-        <div className="relative mx-auto flex min-h-[calc(92dvh-7rem)] w-full max-w-6xl flex-col justify-center">
+        <div className="relative mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-6xl flex-col justify-center">
           <div className="mx-auto max-w-[820px] text-center">
 
             {/* Left: copy */}
             <div className="min-w-0 max-w-full">
-              <Pill className="mb-5 border border-sky-200 bg-white/86 text-sky-700 shadow-sm landing-rise">
+              <Pill className="mb-4 border border-sky-200 bg-white/86 text-sky-700 shadow-sm landing-rise">
                 <ClipboardList size={10} /> Appointment-ready lab insights
               </Pill>
 
-              <h1 className="relative isolate mx-auto mb-6 max-w-[760px] font-display text-[40px] leading-[1.03] text-[#1C1917] text-balance landing-rise sm:text-[56px] lg:text-[64px]" style={{ animationDelay: "60ms" }}>
-                <span className="absolute left-1/2 top-1/2 -z-10 h-32 w-[min(34rem,86vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-200/18 blur-3xl landing-headline-glow" />
+              <h1 className="mx-auto mb-4 max-w-[720px] font-display text-[38px] leading-[1.04] text-[#1C1917] text-balance landing-rise sm:text-[50px] lg:text-[58px]" style={{ animationDelay: "60ms" }}>
                 Walk into your doctor visit prepared.
               </h1>
 
-              <p className="mx-auto mb-7 max-w-2xl overflow-wrap-anywhere text-[16px] leading-relaxed text-[#57534E] landing-rise sm:text-[17px]" style={{ animationDelay: "110ms" }}>
+              <p className="mx-auto mb-5 max-w-[660px] overflow-wrap-anywhere text-[16px] leading-relaxed text-[#57534E] landing-rise sm:text-[17px]" style={{ animationDelay: "110ms" }}>
                 Upload your blood work PDF. MedAssist explains the numbers, spots what changed, and creates a printable one-page brief with the exact questions to ask your doctor.
               </p>
 
@@ -132,22 +129,21 @@ export default function LandingPage() {
               </div>
 
               {/* Patient-facing trust signals */}
-              <div className="mt-5 grid grid-cols-1 justify-center gap-2 landing-rise sm:flex sm:flex-wrap sm:gap-2.5" style={{ animationDelay: "210ms" }}>
+              <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-2 justify-center gap-2 landing-rise sm:flex sm:flex-wrap sm:gap-2.5" style={{ animationDelay: "210ms" }}>
                 {[
                   { icon: CheckCircle2, label: "No login demo" },
                   { icon: CheckCircle2, label: "No credit card" },
                   { icon: Lock, label: "HIPAA aligned" },
-                  { icon: Trash2, label: "No Data Training" },
                   { icon: Shield, label: "AES-256 encrypted" },
                 ].map(t => (
-                  <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full items-center justify-center gap-1.5 truncate rounded-full border border-[#E8E6DF] bg-white/72 px-3 py-1.5 text-[12px] font-semibold text-[#57534E] sm:w-auto">
+                  <span key={t.label} className="inline-flex max-w-full items-center justify-center gap-1.5 truncate rounded-full border border-[#E8E6DF] bg-white/72 px-3 py-1.5 text-[12px] font-semibold text-[#57534E] sm:w-auto">
                     <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                   </span>
                 ))}
               </div>
-              <MobileHeroPreview />
             </div>
           </div>
+          <HeroWorkspaceScene />
         </div>
       </section>
 
