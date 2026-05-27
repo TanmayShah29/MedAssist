@@ -12,10 +12,10 @@ import {
   User,
   Settings,
   LogOut,
-  Shield,
   Zap,
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { BrandLockup } from "@/components/branding/brand-lockup";
 
 const navItems = [
   { id: "dashboard", label: "Visit Prep", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
@@ -49,11 +49,8 @@ export function Sidebar({ className }: { className?: string }) {
     >
       {/* ── Logo ── */}
       <div className="h-20 flex items-center justify-between px-5 border-b border-[#E8E6DF]">
-        <Link href="/dashboard" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-display text-xl text-[#1C1917] tracking-tight">MedAssist</span>
+        <Link href="/dashboard" className="group">
+          <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
         </Link>
         {/* Live system indicator */}
         <span className="flex h-2 w-2 relative" title="System online">
@@ -113,7 +110,7 @@ export function Sidebar({ className }: { className?: string }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-            <span className="text-[11px] text-[#A8A29E] font-mono">Groq · Llama 3.3</span>
+            <span className="text-[11px] text-[#A8A29E]">Private prep active</span>
           </div>
           <span className="text-[10px] text-emerald-500 font-semibold">LIVE</span>
         </div>

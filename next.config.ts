@@ -49,6 +49,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
+
   // ── External packages ───────────────────────────────────────────────────
   // pdf-parse v2 tries to load @napi-rs/canvas (browser-only). Externalizing
   // prevents Turbopack from bundling these unresolvable deps server-side.

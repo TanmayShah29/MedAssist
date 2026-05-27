@@ -1,6 +1,7 @@
 'use client'
 
 import { Biomarker } from '@/types/medical'
+import { getPatientStatus, PATIENT_STATUS } from '@/lib/patient-status';
 
 const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'Glucose': 'Main sugar found in your blood; primary energy source.',
@@ -80,9 +81,9 @@ export function BiomarkerGrid({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter">
-                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />Optimal: {optimalCount}</span>
-                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" />Monitor: {warningCount}</span>
-                    <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-500" />Action: {criticalCount}</span>
+                    <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} />{PATIENT_STATUS.optimal.label}: {optimalCount}</span>
+                    <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} />{PATIENT_STATUS.warning.label}: {warningCount}</span>
+                    <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} />{PATIENT_STATUS.critical.label}: {criticalCount}</span>
                 </div>
             </div>
 
@@ -158,7 +159,7 @@ function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
             </div>
             <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
             <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
-                Upload your first lab report to see your health overview.
+                Upload your first lab report to build a doctor-ready visit brief.
             </p>
             <button
                 onClick={onUploadClick}
@@ -180,12 +181,7 @@ function BiomarkerCard({
     delta: { diff: number; percent: number } | null;
     onClick: () => void;
 }) {
-    const statusStyles = {
-        optimal: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-100', dot: 'bg-emerald-500', bar: 'bg-emerald-500' },
-        warning: { badge: 'bg-amber-50 text-amber-700 border-amber-100', dot: 'bg-amber-500', bar: 'bg-amber-500' },
-        critical: { badge: 'bg-red-50 text-red-700 border-red-100', dot: 'bg-red-500', bar: 'bg-red-500' },
-    };
-    const style = statusStyles[b.status] ?? statusStyles.optimal;
+    const style = getPatientStatus(b.status);
 
     const deltaPositive = delta && delta.diff > 0;
     const deltaGood = deltaPositive ? b.status === 'optimal' : b.status !== 'optimal';
@@ -215,7 +211,7 @@ function BiomarkerCard({
             }}
             tabIndex={0}
             role="button"
-            aria-label={`${b.name}: ${b.value} ${b.unit}, status ${b.status}. ${delta ? `${delta.percent} change from last result` : 'No previous data'}`}
+            aria-label={`${b.name}: ${b.value} ${b.unit}, ${style.label}. ${delta ? `${delta.percent} change from last result` : 'No previous data'}`}
         >
             {/* Plain-English hover overlay */}
             <div
@@ -229,10 +225,10 @@ function BiomarkerCard({
 
             {/* Top row: badge + value */}
             <div className="flex flex-col items-start gap-2 min-w-0">
-                <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badge}`}>
-                    <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-                    <span className="truncate">{b.status.toUpperCase()}</span>
-                    <span className="sr-only">({b.status} status)</span>
+                <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badgeClass}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
+                    <span className="truncate">{style.label.toUpperCase()}</span>
+                    <span className="sr-only">({style.description})</span>
                 </div>
                 <div className="min-w-0 max-w-full">
                     <div className="text-[15px] font-bold text-[#1C1917] break-words leading-tight">
@@ -273,7 +269,7 @@ function BiomarkerCard({
                         </div>
                         <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
                             <div
-                                className={`absolute top-0 bottom-0 left-0 rounded-full ${style.bar}`}
+                                className={`absolute top-0 bottom-0 left-0 rounded-full ${style.barClass}`}
                                 style={{ width: `${barPct}%`, minWidth: '4px' }}
                             />
                         </div>

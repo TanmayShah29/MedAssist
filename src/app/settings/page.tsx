@@ -1,39 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
-  Download, Trash2, KeyRound, Terminal, Eye, EyeOff,
+  Download, Trash2, KeyRound, Eye, EyeOff,
   Shield, ChevronRight, Lock
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/section-header";
 import { mergeBiomarkerSources } from "@/lib/medical-data";
 import { Biomarker } from "@/types/medical";
 import { signOutAndResetMedAssist } from "@/lib/account-session";
-
-// ── Toggle Switch ──────────────────────────────────────────────────────────
-function Toggle({ checked, onToggle, disabled }: { checked: boolean; onToggle: () => void; disabled?: boolean }) {
-  return (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={onToggle}
-      disabled={disabled}
-      className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-      style={{
-        backgroundColor: checked ? "#0EA5E9" : "#E8E6DF",
-        borderColor: checked ? "#0EA5E9" : "#E8E6DF",
-        WebkitAppearance: "none",
-      }}
-    >
-      <span
-        className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
-        style={{ transform: checked ? "translateX(20px)" : "translateX(0px)" }}
-      />
-    </button>
-  );
-}
 
 // ── Section card ───────────────────────────────────────────────────────────
 function SettingsCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -83,19 +60,7 @@ export default function SettingsPage() {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isDebugMode, setIsDebugMode] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  useEffect(() => {
-    try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true"); } catch { /* */ }
-  }, []);
-
-  const toggleDebugMode = () => {
-    const next = !isDebugMode;
-    setIsDebugMode(next);
-    try { localStorage.setItem("medassist_debug_mode", next.toString()); } catch { /* */ }
-    toast.info(next ? "Debug mode enabled" : "Debug mode disabled");
-  };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -226,12 +191,12 @@ export default function SettingsPage() {
             icon={Lock}
             iconColor="text-emerald-600"
             iconBg="bg-emerald-50"
-            title="Data Encryption"
-            description="All health data is encrypted at rest with AES-256 and in transit with TLS 1.3. We never share or sell your data."
+            title="Private Account Controls"
+            description="Export your data, delete individual reports, or delete your account. Your reports are not used to train foundation models."
           >
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Protected
+              User controlled
             </span>
           </SettingsRow>
         </SettingsCard>
@@ -262,29 +227,8 @@ export default function SettingsPage() {
       </section>
       </div>
 
-      {/* ── Developer ── */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
-      <section className="min-w-0">
-        <SectionHeader label="Developer" className="mb-3" />
-        <SettingsCard>
-          <SettingsRow
-            icon={Terminal}
-            iconColor="text-indigo-500"
-            iconBg="bg-indigo-50"
-            title="Debug Mode"
-            description="Show raw AI/extraction data and diagnostic overlays. Useful for demos and presentations."
-          >
-            <div className="flex items-center gap-3">
-              <Toggle checked={isDebugMode} onToggle={toggleDebugMode} />
-              <span className="text-sm font-medium text-[#57534E]">
-                {isDebugMode ? "Debug mode is ON" : "Debug mode is off"}
-              </span>
-            </div>
-          </SettingsRow>
-        </SettingsCard>
-      </section>
-
       {/* ── Danger Zone ── */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
       <section className="min-w-0">
         <SectionHeader label="Danger Zone" className="mb-3" />
         <div className="bg-[#FEF2F2] border-2 border-red-100 rounded-[18px] overflow-hidden">

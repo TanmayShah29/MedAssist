@@ -149,7 +149,7 @@ describe('POST /api/generate-questions', () => {
         expect(json.questions).toEqual([]);
     });
 
-    it('returns a "maintain health" question when all biomarkers are optimal', async () => {
+    it('returns an in-range monitoring question when all biomarkers are optimal', async () => {
         const res = await POST(makeRequest({
             biomarkers: [
                 { name: 'Iron', value: 90, unit: 'µg/dL', status: 'optimal' },
@@ -157,7 +157,7 @@ describe('POST /api/generate-questions', () => {
         }));
         expect(res.status).toBe(200);
         const json = await res.json();
-        expect(json.questions[0].question).toMatch(/maintain|healthy|optimal/i);
+        expect(json.questions[0].question).toMatch(/in-range|monitoring|monitor/i);
     });
 
     it('returns cached questions when local cache exists and is valid', async () => {

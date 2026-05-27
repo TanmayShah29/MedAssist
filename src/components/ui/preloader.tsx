@@ -3,6 +3,7 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { BrandLockup, BrandMark } from "@/components/branding/brand-lockup";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 export interface PreloaderProps {
@@ -17,11 +18,11 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
     const [progress, setProgress] = React.useState(0);
 
     const loadingSteps = [
-        "Connecting to Groq AI...",
-        "Loading medical ontology...",
-        "Fetching your health data...",
-        "Initializing AI pipeline...",
-        "Ready.",
+        "Preparing your workspace",
+        "Reviewing lab context",
+        "Building visit priorities",
+        "Drafting doctor questions",
+        "Ready for your appointment",
     ];
     const [stepIdx, setStepIdx] = React.useState(0);
 
@@ -66,24 +67,7 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
                 transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                 className="flex flex-col items-center gap-3"
             >
-                {/* Shield/pulse icon */}
-                <div className="relative w-16 h-16">
-                    <motion.div
-                        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute inset-0 rounded-2xl bg-sky-500"
-                    />
-                    <div className="relative w-16 h-16 rounded-2xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
-                        <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-white" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-white tracking-tight">MedAssist</h1>
-                    <p className="text-sky-300 text-sm mt-0.5">Clinical Intelligence Platform</p>
-                </div>
+                <BrandLockup inverse showTagline markClassName="h-16 w-16 rounded-[18px]" textClassName="text-center" />
             </motion.div>
 
             {/* Loading section */}
@@ -111,17 +95,16 @@ function ClinicalPreloader({ onComplete }: { onComplete?: () => void }) {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0.01, y: -4 }}
                                 transition={{ duration: 0.2 }}
-                                className="text-center text-sm text-slate-400 font-mono"
+                                className="text-center text-sm font-semibold text-slate-300"
                             >
                                 {loadingSteps[stepIdx]}
                             </motion.p>
                         </AnimatePresence>
 
-                        {/* Groq AI badge */}
                         <div className="flex items-center justify-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-xs text-slate-500 font-mono">
-                                Groq AI (Llama 3.3) · {progress}%
+                            <span className="text-xs font-medium text-slate-500">
+                                Visit prep intelligence · {progress}%
                             </span>
                         </div>
                     </motion.div>
@@ -140,11 +123,7 @@ function MinimalPreloader({ onComplete }: { onComplete?: () => void }) {
 
     return (
         <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-sky-500 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-            </div>
+            <BrandMark />
             <div className="flex gap-1.5">
                 {[0, 1, 2].map(i => (
                     <motion.div
@@ -162,11 +141,11 @@ function MinimalPreloader({ onComplete }: { onComplete?: () => void }) {
 // ── Pipeline Preloader ─────────────────────────────────────────────────────
 function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
     const steps = React.useMemo(() => [
-        { label: "Groq Medical NLP", ms: 700 },
-        { label: "Entity Extraction", ms: 500 },
-        { label: "Risk Scoring", ms: 600 },
-        { label: "Groq AI Layer", ms: 800 },
-        { label: "Ready", ms: 300 },
+        { label: "Reading health context", ms: 700 },
+        { label: "Finding key changes", ms: 500 },
+        { label: "Ranking visit priorities", ms: 600 },
+        { label: "Drafting doctor questions", ms: 800 },
+        { label: "Brief ready", ms: 300 },
     ], []);
     const [done, setDone] = React.useState(0);
 
@@ -187,13 +166,9 @@ function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
     return (
         <div className="space-y-6">
             <div className="text-center">
-                <div className="w-12 h-12 rounded-lg bg-sky-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-sky-500/30">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-white" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <h2 className="text-white font-bold text-lg">MedAssist</h2>
-                <p className="text-slate-400 text-xs mt-0.5">Initializing clinical AI pipeline</p>
+                <BrandMark className="mx-auto mb-3 h-12 w-12 rounded-[14px]" />
+                <h2 className="font-display text-xl text-white">MedAssist</h2>
+                <p className="mt-0.5 text-xs font-medium text-slate-400">Preparing your visit brief</p>
             </div>
 
             <div className="w-64 space-y-2.5">
@@ -226,7 +201,7 @@ function PipelinePreloader({ onComplete }: { onComplete?: () => void }) {
                                 )}
                             </div>
                             <span className={cn(
-                                "text-sm font-mono",
+                                "text-sm font-medium",
                                 isComplete ? "text-emerald-400" : isActive ? "text-sky-400" : "text-slate-500"
                             )}>
                                 {step.label}
@@ -252,7 +227,7 @@ export function Preloader({
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0.01 }}
                     transition={{ duration: 0.4 }}
-                    className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950 min-h-[100dvh]"
+                    className="fixed inset-0 z-[200] flex min-h-[100dvh] items-center justify-center bg-[#0B1220]"
                 >
                     {variant === "clinical" && (
                         <ClinicalPreloader onComplete={onComplete} />

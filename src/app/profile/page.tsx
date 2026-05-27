@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { deleteLabResult, updateUserProfile } from "@/app/actions/user-data";
 import { SYMPTOM_OPTIONS } from "@/lib/constants";
+import { BrandedLoading } from "@/components/ui/branded-loading";
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -103,7 +104,15 @@ export default function ProfilePage() {
         );
     };
 
-    if (loading) return <div className="app-page"><div className="app-container-narrow p-8 text-center text-[#A8A29E]">Loading...</div></div>;
+    if (loading) {
+        return (
+            <BrandedLoading
+                title="Loading Profile"
+                subtitle="Preparing your report history and health details."
+                variant="profile"
+            />
+        );
+    }
 
     const reportCount = reports.length;
 

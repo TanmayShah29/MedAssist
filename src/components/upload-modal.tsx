@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, FileText, AlertCircle, PenLine, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
+import { TrustLayer } from '@/components/trust-layer';
 
 const IMAGE_BASED_PDF_CODE = 'IMAGE_BASED_PDF';
 
@@ -341,7 +342,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                             <div className="grid grid-cols-3 border-b border-[#E8E6DF] bg-[#FAFAF7] px-5 py-3 text-center sm:px-6">
                                 {[
                                     ["1", "Add results"],
-                                    ["2", "AI interprets"],
+                                    ["2", "AI explains"],
                                     ["3", "Prep sheet"],
                                 ].map(([num, label]) => (
                                     <div key={label} className="flex items-center justify-center gap-2">
@@ -418,6 +419,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                             </div>
 
                             <div className="p-5 sm:p-6">
+                                <TrustLayer variant="compact" className="mb-4" />
                                 {error && (
                                     <div
                                         role="alert"

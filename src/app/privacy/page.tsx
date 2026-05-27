@@ -35,11 +35,11 @@ export default function PrivacyPage() {
                 },
                 {
                     title: 'How your data is stored',
-                    content: 'Your data is stored in Supabase (PostgreSQL database) hosted on servers in the United States. All data is encrypted in transit (HTTPS) and at rest. Row-level security ensures only you can access your records.'
+                    content: 'Your data is stored securely on encrypted servers in the United States. All data is encrypted in transit (HTTPS) and at rest. Account-level access controls ensure only you can access your records.'
                 },
                 {
                     title: 'Third party services',
-                    content: 'We use OCR.space as the existing fallback for scanned PDF text extraction. We use Groq AI to interpret biomarker values, stream assistant responses, and generate doctor-visit prep summaries. We use Vercel to host the application. None of these services receive your personal information beyond what is necessary to process your request.'
+                    content: 'We use an optical character recognition (OCR) service as a fallback for scanned lab reports. We use AI to interpret biomarker values, stream assistant responses, and generate doctor-visit prep summaries. We use Vercel to host the application. None of these services receive your personal information beyond what is necessary to process your request.'
                 },
                 {
                     title: 'Your rights',

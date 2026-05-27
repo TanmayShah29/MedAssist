@@ -20,11 +20,11 @@ export function TrustLayer({ variant = 'full', className }: TrustLayerProps) {
             >
                 <span className="flex items-center gap-1.5">
                     <Shield size={12} className="text-emerald-600" />
-                    Your data is not stored unless you save a report.
+                    Delete reports and export your data anytime.
                 </span>
                 <span className="flex items-center gap-1.5">
                     <AlertTriangle size={12} className="text-amber-600" />
-                    For educational use only. Not a substitute for medical advice.
+                    Educational only. AI can make mistakes; use urgent care for urgent symptoms.
                 </span>
             </div>
         );
@@ -44,19 +44,19 @@ export function TrustLayer({ variant = 'full', className }: TrustLayerProps) {
                 <li className="flex items-start gap-2">
                     <Shield size={16} className="shrink-0 mt-0.5 text-emerald-600" />
                     <span>
-                        <strong className="text-[#1C1917]">Privacy:</strong> No data is stored unless you explicitly save a lab result to your account.
+                        <strong className="text-[#1C1917]">Privacy:</strong> Your reports are saved only to your account, with controls to export data, delete reports, or delete your account.
                     </span>
                 </li>
                 <li className="flex items-start gap-2">
                     <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-600" />
                     <span>
-                        <strong className="text-[#1C1917]">AI limitations:</strong> This tool uses AI to interpret lab values. It can make mistakes and does not replace a doctor’s diagnosis or advice.
+                        <strong className="text-[#1C1917]">AI limitations:</strong> AI can make mistakes. MedAssist explains values and prepares questions; it does not diagnose, prescribe, or replace your clinician.
                     </span>
                 </li>
                 <li className="flex items-start gap-2">
                     <BookOpen size={16} className="shrink-0 mt-0.5 text-sky-600" />
                     <span>
-                        <strong className="text-[#1C1917]">Educational use only:</strong> MedAssist is for learning and tracking. Always discuss your results with a qualified healthcare provider.
+                        <strong className="text-[#1C1917]">Urgent symptoms:</strong> For chest pain, severe shortness of breath, fainting, confusion, stroke symptoms, or severe weakness, seek urgent or emergency care.
                     </span>
                 </li>
             </ul>

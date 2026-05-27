@@ -13,14 +13,14 @@ const requestSchema = z.object({
 
 // Demo biomarkers — matches the static demo data on the /demo page
 const DEMO_BIOMARKERS = [
-    { name: 'Glucose', value: 106, unit: 'mg/dL', status: 'warning', reference_range_min: 70, reference_range_max: 99, ai_interpretation: 'Glucose has risen 15% over the last quarter, indicating a pre-diabetic trend.' },
-    { name: 'Vitamin D', value: 42, unit: 'ng/mL', status: 'optimal', reference_range_min: 30, reference_range_max: 80, ai_interpretation: 'Excellent recovery from deficiency. D3 supplementation has been highly effective.' },
-    { name: 'LDL Cholesterol', value: 145, unit: 'mg/dL', status: 'warning', reference_range_min: 0, reference_range_max: 100, ai_interpretation: 'Borderline high. Increase soluble fiber and Omega-3 intake.' },
-    { name: 'HDL Cholesterol', value: 58, unit: 'mg/dL', status: 'optimal', reference_range_min: 40, reference_range_max: 100, ai_interpretation: 'Good protective cholesterol level from regular aerobic exercise.' },
-    { name: 'Hemoglobin', value: 11.8, unit: 'g/dL', status: 'warning', reference_range_min: 13.5, reference_range_max: 17.5, ai_interpretation: 'Downward trend detected — a drop of 12.6% since last report. Monitor for fatigue symptoms.' },
-    { name: 'TSH', value: 2.4, unit: 'uIU/mL', status: 'optimal', reference_range_min: 0.4, reference_range_max: 4.0, ai_interpretation: 'Thyroid Stimulating Hormone is well within range. Stable thyroid function.' },
-    { name: 'Magnesium', value: 2.1, unit: 'mg/dL', status: 'optimal', reference_range_min: 1.7, reference_range_max: 2.3, ai_interpretation: 'Magnesium is in optimal range, supporting healthy muscle and nerve function.' },
-    { name: 'C-Reactive Protein', value: 1.2, unit: 'mg/L', status: 'optimal', reference_range_min: 0, reference_range_max: 3.0, ai_interpretation: 'Low CRP indicates minimal systemic inflammation — excellent for cardiovascular health.' },
+    { name: 'Glucose', value: 106, unit: 'mg/dL', status: 'warning', reference_range_min: 70, reference_range_max: 99, ai_interpretation: 'Glucose is above the report range and has risen from the prior result, which could be worth reviewing with a clinician.' },
+    { name: 'Vitamin D', value: 42, unit: 'ng/mL', status: 'optimal', reference_range_min: 30, reference_range_max: 80, ai_interpretation: 'Vitamin D is within the report range and improved from the prior result; ask what maintenance monitoring makes sense.' },
+    { name: 'LDL Cholesterol', value: 145, unit: 'mg/dL', status: 'warning', reference_range_min: 0, reference_range_max: 100, ai_interpretation: 'LDL is above the report range; ask whether lifestyle context, repeat testing, or medication discussion is appropriate.' },
+    { name: 'HDL Cholesterol', value: 58, unit: 'mg/dL', status: 'optimal', reference_range_min: 40, reference_range_max: 100, ai_interpretation: 'HDL is within the report range and can be discussed as part of the overall cholesterol picture.' },
+    { name: 'Hemoglobin', value: 11.8, unit: 'g/dL', status: 'warning', reference_range_min: 13.5, reference_range_max: 17.5, ai_interpretation: 'Hemoglobin is below the report range and has decreased from the prior result; ask what follow-up context or testing is needed.' },
+    { name: 'TSH', value: 2.4, unit: 'uIU/mL', status: 'optimal', reference_range_min: 0.4, reference_range_max: 4.0, ai_interpretation: 'TSH is within the report range.' },
+    { name: 'Magnesium', value: 2.1, unit: 'mg/dL', status: 'optimal', reference_range_min: 1.7, reference_range_max: 2.3, ai_interpretation: 'Magnesium is within the report range.' },
+    { name: 'C-Reactive Protein', value: 1.2, unit: 'mg/L', status: 'optimal', reference_range_min: 0, reference_range_max: 3.0, ai_interpretation: 'CRP is within the report range; discuss it alongside symptoms and other results if relevant.' },
 ];
 
 const DEMO_PROFILE = {

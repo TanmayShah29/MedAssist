@@ -1,17 +1,15 @@
 "use client";
 import Link from "next/link";
-import { Shield, LayoutDashboard, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, ArrowLeft } from "lucide-react";
+import { BrandLockup, BrandMark } from "@/components/branding/brand-lockup";
 
 export default function NotFound() {
   return (
     <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">
       {/* Minimal header */}
       <header className="h-16 flex items-center px-6 border-b border-[#E8E6DF]">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-display text-xl text-[#1C1917] tracking-tight">MedAssist</span>
+        <Link href="/" className="group">
+          <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
         </Link>
       </header>
 
@@ -24,7 +22,7 @@ export default function NotFound() {
           </p>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center">
-              <Shield className="w-8 h-8 text-sky-500" />
+              <BrandMark className="h-14 w-14 rounded-2xl" />
             </div>
           </div>
         </div>

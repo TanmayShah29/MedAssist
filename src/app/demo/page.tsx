@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { BrandLockup } from "@/components/branding/brand-lockup";
 
 /* ─── DESIGN TOKENS ────────────────────────────────────────────────────── */
 const T = {
@@ -22,14 +23,14 @@ const DEMO_PROFILE = {
 };
 
 const DEMO_BIOMARKERS = [
-  { id: "b1", name: "Glucose", value: 106, unit: "mg/dL", status: "warning", category: "metabolic", ref_min: 70, ref_max: 99, prev: 92, ai_interpretation: "Glucose has risen 15% over the last quarter. This confirms a pre-diabetic trend that warrants dietary review. Focus on reducing simple carbohydrates and increasing fiber intake.", confidence: 0.94 },
-  { id: "b2", name: "Vitamin D", value: 42, unit: "ng/mL", status: "optimal", category: "vitamins", ref_min: 30, ref_max: 80, prev: 18, ai_interpretation: "Excellent recovery from critical deficiency. Your D3 supplementation protocol has been highly effective — levels have increased by 133% since your last report.", confidence: 0.97 },
-  { id: "b3", name: "LDL Cholesterol", value: 145, unit: "mg/dL", status: "warning", category: "lipids", ref_min: 0, ref_max: 100, prev: null, ai_interpretation: "Borderline high. Recommend increasing soluble fiber intake (oats, beans) and Omega-3 rich foods. Consider discussing statin therapy with your doctor if lifestyle changes don't show results in 3 months.", confidence: 0.91 },
-  { id: "b4", name: "HDL Cholesterol", value: 58, unit: "mg/dL", status: "optimal", category: "lipids", ref_min: 40, ref_max: 100, prev: null, ai_interpretation: "Good protective cholesterol level. Regular aerobic exercise is likely contributing to this favorable result. Continue current activity levels.", confidence: 0.95 },
-  { id: "b5", name: "Hemoglobin", value: 11.8, unit: "g/dL", status: "warning", category: "hematology", ref_min: 13.5, ref_max: 17.5, prev: 13.5, ai_interpretation: "Downward trend detected — a drop of 12.6% since last report. Monitor for symptoms of fatigue, dizziness, or breathlessness. Dietary iron assessment and follow-up recommended.", confidence: 0.92 },
-  { id: "b6", name: "TSH", value: 2.4, unit: "uIU/mL", status: "optimal", category: "thyroid", ref_min: 0.4, ref_max: 4.0, prev: null, ai_interpretation: "Thyroid Stimulating Hormone is well within range. No metabolic impact from thyroid dysfunction detected. Stable thyroid function supports overall energy metabolism.", confidence: 0.96 },
-  { id: "b7", name: "Magnesium", value: 2.1, unit: "mg/dL", status: "optimal", category: "metabolic", ref_min: 1.7, ref_max: 2.3, prev: null, ai_interpretation: "Magnesium is in the optimal range. This supports healthy muscle function, nerve conduction, and energy production across 300+ enzymatic reactions.", confidence: 0.93 },
-  { id: "b8", name: "C-Reactive Protein", value: 1.2, unit: "mg/L", status: "optimal", category: "inflammation", ref_min: 0, ref_max: 3.0, prev: null, ai_interpretation: "Low CRP indicates minimal systemic inflammation — an excellent prognostic indicator for cardiovascular health. Continue anti-inflammatory dietary habits.", confidence: 0.89 },
+  { id: "b1", name: "Glucose", value: 106, unit: "mg/dL", status: "warning", category: "metabolic", ref_min: 70, ref_max: 99, prev: 92, ai_interpretation: "Glucose is above the report range and has risen 15% since the prior result. Ask your clinician whether fasting status, diet, medications, or repeat testing should be reviewed.", confidence: 0.94 },
+  { id: "b2", name: "Vitamin D", value: 42, unit: "ng/mL", status: "optimal", category: "vitamins", ref_min: 30, ref_max: 80, prev: 18, ai_interpretation: "Vitamin D is within the report range and improved from the prior result. Ask what maintenance monitoring makes sense for you.", confidence: 0.97 },
+  { id: "b3", name: "LDL Cholesterol", value: 145, unit: "mg/dL", status: "warning", category: "lipids", ref_min: 0, ref_max: 100, prev: null, ai_interpretation: "LDL is above the report range. Ask whether lifestyle context, repeat testing, or medication discussion is appropriate.", confidence: 0.91 },
+  { id: "b4", name: "HDL Cholesterol", value: 58, unit: "mg/dL", status: "optimal", category: "lipids", ref_min: 40, ref_max: 100, prev: null, ai_interpretation: "HDL is within the report range and can be reviewed as part of the full cholesterol picture.", confidence: 0.95 },
+  { id: "b5", name: "Hemoglobin", value: 11.8, unit: "g/dL", status: "warning", category: "hematology", ref_min: 13.5, ref_max: 17.5, prev: 13.5, ai_interpretation: "Hemoglobin is below the report range and has decreased since the prior result. Ask whether iron, ferritin, B12, symptoms, or repeat testing should be reviewed.", confidence: 0.92 },
+  { id: "b6", name: "TSH", value: 2.4, unit: "uIU/mL", status: "optimal", category: "thyroid", ref_min: 0.4, ref_max: 4.0, prev: null, ai_interpretation: "TSH is within the report range.", confidence: 0.96 },
+  { id: "b7", name: "Magnesium", value: 2.1, unit: "mg/dL", status: "optimal", category: "metabolic", ref_min: 1.7, ref_max: 2.3, prev: null, ai_interpretation: "Magnesium is within the report range.", confidence: 0.93 },
+  { id: "b8", name: "C-Reactive Protein", value: 1.2, unit: "mg/L", status: "optimal", category: "inflammation", ref_min: 0, ref_max: 3.0, prev: null, ai_interpretation: "CRP is within the report range. Discuss it alongside symptoms and other results if relevant.", confidence: 0.89 },
 ];
 
 type DemoBiomarker = typeof DEMO_BIOMARKERS[number];
@@ -50,9 +51,9 @@ const TREND_DATA: Record<string, { date: string; score: number }[]> = {
 };
 
 const LONGITUDINAL_INSIGHTS = [
-  "Metabolic Alert: Glucose has risen 15% over the last 3 months, indicating a transition to pre-diabetic ranges.",
-  "Supplement Efficacy: Vitamin D has successfully recovered from a critical level (18) to an optimal maintenance level (42).",
-  "Anemic Pattern: Hemoglobin is trending downward; monitor dietary iron intake and consider supplementation.",
+  "Glucose has risen 15% over the last 3 months and is above the report range; ask what follow-up or monitoring plan makes sense.",
+  "Vitamin D improved from 18 to 42 and is now in range; ask what maintenance and retest timeline is appropriate.",
+  "Hemoglobin is trending downward; ask whether iron, ferritin, B12, symptoms, or repeat testing should be reviewed.",
   "Thyroid Stability: TSH levels remain ideal, suggesting no metabolic impact from thyroid function.",
 ];
 
@@ -76,7 +77,7 @@ const statusColor = (s: string) => s === "optimal" ? T.optimal : s === "warning"
 const statusBg = (s: string) => s === "optimal" ? T.optimalBg : s === "warning" ? T.warningBg : T.criticalBg;
 const statusBorder = (s: string) => s === "optimal" ? T.optimalBorder : s === "warning" ? T.warningBorder : T.criticalBorder;
 const statusText = (s: string) => s === "optimal" ? T.optimalText : s === "warning" ? T.warningText : T.criticalText;
-const statusLabel = (s: string) => s === "optimal" ? "Optimal" : s === "warning" ? "Monitor" : "Action Needed";
+const statusLabel = (s: string) => s === "optimal" ? "In range" : s === "warning" ? "Discuss" : "Discuss soon";
 
 const getDelta = (curr: number, prev: number | null) => {
   if (!prev) return null;
@@ -164,12 +165,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
       {/* Logo */}
       <div style={{ padding: "20px 20px 18px", borderBottom: `1px solid ${T.border}` }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: T.brand, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(14,165,233,0.3)" }}>
-              <Icon path={Icons.shield} size={17} color="white" />
-            </div>
-            <span className="font-display" style={{ fontSize: 21, color: T.text }}>MedAssist</span>
-          </div>
+          <BrandLockup showTagline markClassName="h-[34px] w-[34px]" />
           {/* Live dot */}
           <div style={{ position: "relative", width: 8, height: 8 }}>
             <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#10B981", opacity: 0.5, animation: "pulse 2s ease infinite" }} />
@@ -215,7 +211,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
         <p style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8 }}>Prep Engine</p>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0 }} />
-          <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "monospace" }}>Groq · Llama 3.3</span>
+          <span style={{ fontSize: 11, color: "#94A3B8" }}>Private prep active</span>
           <span style={{ marginLeft: "auto", fontSize: 9, color: "#475569" }}>online</span>
         </div>
       </div>
@@ -293,15 +289,15 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
       </div>
 
       {/* Alert Banner */}
-      <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderLeft: "4px solid #DC2626", borderRadius: 14, padding: "14px 20px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderLeft: "4px solid #DC2626", borderRadius: 14, padding: "14px 20px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0, flex: "1 1 260px" }}>
           <div style={{ background: "#DC2626", color: "white", padding: 8, borderRadius: 10 }}><Icon path={Icons.alertCircle} size={18} color="white" /></div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <h4 style={{ color: "#991B1B", fontWeight: 700, fontSize: 15 }}>3 Appointment Talking Points</h4>
             <p style={{ color: "#B91C1C", fontSize: 13, marginTop: 2 }}>Glucose (+15%), Hemoglobin (declining), LDL Cholesterol elevated</p>
           </div>
         </div>
-        <button onClick={() => document.getElementById("demo-prep-sheet")?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#DC2626", color: "white", padding: "8px 16px", borderRadius: 10, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
+        <button onClick={() => document.getElementById("demo-prep-sheet")?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#DC2626", color: "white", padding: "8px 16px", borderRadius: 10, fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", whiteSpace: "nowrap", flex: "0 0 auto" }}>
           View Prep Sheet
         </button>
       </div>
@@ -339,24 +335,24 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
 
       {/* Top Cards */}
       <div className="demo-top-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
-        {/* Readiness Score */}
+        {/* Brief completeness */}
         <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: 24, cursor: "pointer" }} onClick={() => setShowScoreModal(true)}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Readiness Score</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Brief Completeness</p>
               <p style={{ fontSize: 13, color: T.textSec, marginBottom: 16 }}>Click to see breakdown →</p>
               <div style={{ display: "flex", gap: 12 }}>
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#065F46" }}>{optimal.length}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#059669", textTransform: "uppercase" }}>Optimal</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#059669", textTransform: "uppercase" }}>In range</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#92400E" }}>{warning.length}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#D97706", textTransform: "uppercase" }}>Monitor</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#D97706", textTransform: "uppercase" }}>Discuss</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#991B1B" }}>{critical.length}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>Action</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>Soon</div>
                 </div>
               </div>
             </div>
@@ -438,8 +434,8 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h3 style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em" }}>Latest Clinical Biomarkers</h3>
           <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: 700, color: T.textMuted }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: T.optimal, display: "inline-block" }} />Optimal: {optimal.length}</span>
-            <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: T.warning, display: "inline-block" }} />Monitor: {warning.length}</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: T.optimal, display: "inline-block" }} />In range: {optimal.length}</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: T.warning, display: "inline-block" }} />Discuss: {warning.length}</span>
           </div>
         </div>
 
@@ -503,7 +499,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
                 <div key={cat.name} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "12px 14px", marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: T.textSec, textTransform: "uppercase" }}>{cat.name}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: T.brand }}>WEIGHT: {cat.weight}%</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: T.brand }}>{cat.weight}% of score</span>
                   </div>
                   {total > 0 ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -517,7 +513,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
               );
             })}
             <div style={{ background: T.card, borderRadius: 12, border: `1px solid ${T.border}`, padding: 14, marginTop: 4, marginBottom: 24 }}>
-              <p style={{ fontSize: 12, color: T.textSec, lineHeight: 1.6 }}><strong>The Optimism Rule:</strong> If your report has at least one optimal biomarker, your score cannot drop below 50.</p>
+              <p style={{ fontSize: 12, color: T.textSec, lineHeight: 1.6 }}><strong>How to read this:</strong> Your score balances optimal results with areas that need attention, so one concerning value does not erase the full picture.</p>
             </div>
             <button onClick={() => setShowScoreModal(false)} style={{ width: "100%", padding: 14, background: T.text, color: "white", border: "none", borderRadius: 12, fontWeight: 700, cursor: "pointer", fontSize: 15 }}>Close</button>
           </div>
@@ -617,13 +613,13 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
       <div style={{ background: "white", border: `1px solid #BAE6FD`, borderRadius: 18, padding: 24, marginBottom: 24, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, padding: 16, opacity: 0.05 }}><Icon path={Icons.sparkles} size={56} color={T.brand} /></div>
         <div style={{ fontSize: 10, fontWeight: 700, background: "#EFF6FF", color: T.brand, padding: "3px 10px", borderRadius: 6, border: "1px solid #BFDBFE", display: "inline-block", marginBottom: 10 }}>THE BOTTOM LINE</div>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1E293B", lineHeight: 1.4 }}>Overall health is good with 5 optimal biomarkers, but rising Glucose and declining Hemoglobin should be discussed at the next appointment.</h2>
-        <p style={{ fontSize: 12, color: T.textMuted, marginTop: 12, fontStyle: "italic" }}>* AI-generated interpretation based on your specific biomarkers and reference ranges.</p>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1E293B", lineHeight: 1.4 }}>Five values are in range in this sample, while rising Glucose and declining Hemoglobin should be discussed at the next appointment.</h2>
+        <p style={{ fontSize: 12, color: T.textMuted, marginTop: 12, fontStyle: "italic" }}>* AI-generated education based on specific biomarkers and reference ranges. Not a diagnosis.</p>
       </div>
 
       {/* Status Summary */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 24 }}>
-        {[{ count: opt, label: "Optimal", bg: T.optimalBg, border: T.optimalBorder, text: T.optimalText }, { count: warn, label: "Monitor", bg: T.warningBg, border: T.warningBorder, text: T.warningText }, { count: crit, label: "Action Needed", bg: T.criticalBg, border: T.criticalBorder, text: T.criticalText }].map((s, i) => (
+        {[{ count: opt, label: "In range", bg: T.optimalBg, border: T.optimalBorder, text: T.optimalText }, { count: warn, label: "Discuss", bg: T.warningBg, border: T.warningBorder, text: T.warningText }, { count: crit, label: "Discuss soon", bg: T.criticalBg, border: T.criticalBorder, text: T.criticalText }].map((s, i) => (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: 20, textAlign: "center" }}>
             <div className="font-display" style={{ fontSize: 40, fontWeight: 700, color: s.text, lineHeight: 1 }}>{s.count}</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: s.text, textTransform: "uppercase", marginTop: 4, letterSpacing: "0.05em" }}>{s.label}</div>
@@ -715,10 +711,10 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
         <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 20 }}>Based on your current results and trend changes</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
-            "What dietary changes can help lower my Glucose to optimal range?",
-            "Should I be concerned about my declining Hemoglobin trend?",
-            "What's the best approach to lower my LDL Cholesterol?",
-            "How long should I continue Vitamin D supplementation at this dose?",
+            "Could we review why my Glucose is above the report range?",
+            "Should we recheck Hemoglobin or review iron, ferritin, or B12?",
+            "What should we monitor next for LDL Cholesterol?",
+            "What Vitamin D maintenance and retest timeline makes sense?",
           ].map((q, i) => (
             <div key={i} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: 14, display: "flex", gap: 10 }}>
               <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 11, fontWeight: 700, color: T.brand }}>{i + 1}</div>
@@ -870,7 +866,7 @@ const AssistantPage = () => {
             <div className="demo-status-row" style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
               <HealthScoreRing score={82} />
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8 }}>
-                {[{ label: "Optimal", count: 5, color: T.optimal }, { label: "Monitor", count: 3, color: T.warning }, { label: "Action", count: 0, color: T.critical }].map(s => (
+                {[{ label: "In range", count: 5, color: T.optimal }, { label: "Discuss", count: 3, color: T.warning }, { label: "Soon", count: 0, color: T.critical }].map(s => (
                   <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ width: 8, height: 8, borderRadius: "50%", background: s.color }} />
                     <span style={{ fontSize: 13, color: T.textSec }}>{s.label}</span>
@@ -1022,7 +1018,7 @@ const ProfilePage = () => {
           <div style={{ marginTop: 24, padding: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Clinical Summary</p>
             {[
-              { label: "Readiness Score", value: "82 / 100", color: T.optimal },
+              { label: "Brief Completeness", value: "82 / 100", color: T.optimal },
               { label: "Reports Uploaded", value: "3 reports", color: T.brand },
               { label: "Biomarkers Tracked", value: "8 values", color: "#8B5CF6" },
               { label: "Last Report", value: "Oct 24, 2024", color: T.textSec },
@@ -1042,7 +1038,6 @@ const ProfilePage = () => {
 /* ─── SETTINGS PAGE ─────────────────────────────────────────────────────── */
 const SettingsPage = () => {
   const [password, setPassword] = useState("");
-  const [debugMode, setDebugMode] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
   const showToast = (msg: string) => {
@@ -1084,18 +1079,6 @@ const SettingsPage = () => {
         </div>
         <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Download a CSV spreadsheet of all your extracted biomarkers and report history.</p>
         <button onClick={() => showToast("Demo: CSV export would download here")} style={{ background: T.page, border: `1px solid ${T.border}`, color: T.text, borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Export to CSV</button>
-      </div>
-
-      {/* Developer Settings */}
-      <div style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <Icon path={Icons.terminal} size={20} color="#8B5CF6" />
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: T.text }}>Developer Settings</h2>
-        </div>
-        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16 }}>Enable extra diagnostic information and view raw AI/extraction data. Useful for project presentations.</p>
-        <button onClick={() => { setDebugMode(d => !d); showToast(`Debug mode ${debugMode ? "disabled" : "enabled"}`); }} style={{ background: debugMode ? "#8B5CF6" : T.page, border: `1px solid ${debugMode ? "#8B5CF6" : T.border}`, color: debugMode ? "white" : T.text, borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-          {debugMode ? "Debug Mode: ON" : "Debug Mode: OFF"}
-        </button>
       </div>
 
       {/* Danger Zone */}
@@ -1163,6 +1146,10 @@ export default function DemoPage() {
           .demo-assistant-grid { grid-template-columns: 1fr !important; overflow: visible !important; }
           .demo-assistant-chat { border-right: 0 !important; min-height: 620px !important; }
           .demo-assistant-context { overflow: visible !important; }
+          .demo-banner { padding: 8px 16px !important; }
+          .demo-banner-brand { display: none !important; }
+          .demo-banner-pill { font-size: 9px !important; letter-spacing: 0.08em !important; max-width: 152px; white-space: normal !important; text-align: center; line-height: 1.25; }
+          .demo-banner-exit { padding: 8px 12px !important; font-size: 12px !important; }
         }
         @media (max-width: 520px) {
           .demo-progress-grid { grid-template-columns: 1fr !important; }
@@ -1179,7 +1166,7 @@ export default function DemoPage() {
         <main ref={mainRef} className="demo-main" style={{ flex: 1, overflowY: "auto", background: T.page }}>
 
           {/* ── Demo banner ── */}
-          <div style={{
+          <div className="demo-banner" style={{
             position: "sticky",
             top: 0,
             zIndex: 40,
@@ -1189,20 +1176,23 @@ export default function DemoPage() {
             padding: "10px 24px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}>
-            {/* Left: breadcrumb */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.brand, animation: "pulse 2s ease infinite" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Demo</span>
-              <Icon path={Icons.chevronRight} size={12} color={T.textMuted} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{pageLabels[currentPage]}</span>
-            </div>
+	            justifyContent: "space-between",
+	            gap: 16,
+	          }}>
+	            {/* Left: breadcrumb */}
+	            <div className="demo-banner-brand" style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+	              <BrandLockup showTagline markClassName="h-8 w-8 rounded-[10px]" />
+	              <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 10, borderLeft: `1px solid ${T.border}` }}>
+	                <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.brand, animation: "pulse 2s ease infinite" }} />
+	                <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Demo</span>
+	                <Icon path={Icons.chevronRight} size={12} color={T.textMuted} />
+	                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{pageLabels[currentPage]}</span>
+	              </div>
+	            </div>
 
             {/* Right: demo pill + back */}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{
+	              <span className="demo-banner-pill" style={{
                 fontSize: 10, fontWeight: 700, textTransform: "uppercase",
                 letterSpacing: "0.1em", color: "#92400E",
                 background: "#FEF3C7", border: "1px solid #FDE68A",
@@ -1210,7 +1200,7 @@ export default function DemoPage() {
               }}>
                 ✦ Interactive Demo — no account needed
               </span>
-              <Link href="/" style={{
+	              <Link href="/" className="demo-banner-exit" style={{
                 background: T.card, border: `1px solid ${T.border}`,
                 color: T.textSec, borderRadius: 10, padding: "7px 16px",
                 fontSize: 13, fontWeight: 600, cursor: "pointer",

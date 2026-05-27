@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { BrandMark } from "@/components/branding/brand-lockup";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Visit Prep",
@@ -34,9 +34,7 @@ export function MobileNavbar() {
         {/* Logo + page title */}
         <div className="flex items-center gap-2.5 min-w-0">
           <Link href="/dashboard" className="flex-shrink-0">
-            <div className="w-7 h-7 rounded-[8px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30">
-              <Shield className="w-3.5 h-3.5 text-white" />
-            </div>
+            <BrandMark className="h-7 w-7 rounded-[9px]" />
           </Link>
           <span className="font-display text-[15px] text-[#1C1917] tracking-tight font-bold truncate max-w-[160px]">
             {getTitle(pathname)}

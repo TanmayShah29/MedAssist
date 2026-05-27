@@ -16,6 +16,7 @@ import { RangeBar } from '@/components/ui/range-bar'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { useStore } from '@/store/useStore'
 import { labResultSummary, latestUniqueBiomarkers, mergeBiomarkerSources } from '@/lib/medical-data'
+import { getPatientStatus, PATIENT_STATUS } from '@/lib/patient-status'
 
 const WellnessTrendChart = dynamic(
     () => import('@/components/charts/wellness-trend-chart').then(mod => mod.WellnessTrendChart),
@@ -47,7 +48,6 @@ export default function ResultsPage() {
     const [searchQuery, setSearchValue] = useState('')
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
     const [loadingTrends, setLoadingTrends] = useState(false)
-    const [isDebugMode, setIsDebugMode] = useState(false)
     const [supplements, setSupplements] = useState<{ id: number, name: string, start_date: string }[]>([])
     const [mounted, setMounted] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
@@ -55,7 +55,6 @@ export default function ResultsPage() {
 
     useEffect(() => {
         setMounted(true)
-        try { setIsDebugMode(localStorage.getItem("medassist_debug_mode") === "true") } catch (_e) { }
 
         const fetchSupps = async () => {
             try {
@@ -209,12 +208,12 @@ export default function ResultsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                             <div>
-                                <p className="text-[10px] font-bold uppercase text-slate-500">Critical Findings</p>
-                                <p className="text-sm font-medium">{criticalCount} Biomarkers flagged as critical</p>
+                                <p className="text-[10px] font-bold uppercase text-slate-500">Discuss Soon</p>
+                                <p className="text-sm font-medium">{criticalCount} biomarkers to review with a clinician</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold uppercase text-slate-500">Action Recommended</p>
-                                <p className="text-sm font-medium">Review detailed biomarkers with primary care physician</p>
+                                <p className="text-[10px] font-bold uppercase text-slate-500">Visit Focus</p>
+                                <p className="text-sm font-medium">Review detailed biomarkers with your healthcare professional</p>
                             </div>
                         </div>
                     </div>
@@ -312,14 +311,13 @@ export default function ResultsPage() {
                         >
                             <option value="all">All reports</option>
                             {labResults?.map(r => {
-                                const score = r.health_score ?? (r.raw_ai_json as Record<string, unknown> | null)?.healthScore;
                                 return (
                                     <option key={r.id} value={r.id.toString()}>
                                         {new Date(r.uploaded_at || r.created_at).toLocaleDateString('en-US', {
                                             month: 'short',
                                             day: 'numeric',
                                             year: 'numeric'
-                                        })} — Score: {score || 'N/A'}
+                                        })} — Lab report
                                     </option>
                                 );
                             })}
@@ -334,15 +332,15 @@ export default function ResultsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6">
                     <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1">{optimalCount}</span>
-                        <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">Optimal</span>
+                        <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">{PATIENT_STATUS.optimal.label}</span>
                     </div>
                     <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#92400E] block leading-none mb-1">{warningCount}</span>
-                        <span className="text-[12px] font-semibold text-[#92400E] uppercase tracking-wide">Monitor</span>
+                        <span className="text-[12px] font-semibold text-[#92400E] uppercase tracking-wide">{PATIENT_STATUS.warning.label}</span>
                     </div>
                     <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
                         <span className="text-[32px] font-bold font-display text-[#991B1B] block leading-none mb-1">{criticalCount}</span>
-                        <span className="text-[12px] font-semibold text-[#991B1B] uppercase tracking-wide">Action Needed</span>
+                        <span className="text-[12px] font-semibold text-[#991B1B] uppercase tracking-wide">{PATIENT_STATUS.critical.label}</span>
                     </div>
                 </div>
 
@@ -464,8 +462,7 @@ export default function ResultsPage() {
                                         <div className={`px-2 py-1 rounded-[6px] text-[11px] font-bold shrink-0 ml-3 text-center uppercase tracking-wider ${b.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                             b.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                             }`}>
-                                            {b.status === 'optimal' ? 'Optimal' :
-                                                b.status === 'warning' ? 'Monitor' : 'Action'}
+                                            {getPatientStatus(b.status).label}
                                         </div>
                                     </div>
                                 ))}
@@ -510,11 +507,10 @@ export default function ResultsPage() {
                                     <div className={`w-full text-center py-2.5 rounded-[8px] text-[14px] font-bold mb-6 uppercase tracking-widest ${selectedBiomarker.status === 'optimal' ? 'bg-[#D1FAE5] text-[#065F46]' :
                                         selectedBiomarker.status === 'warning' ? 'bg-[#FEF3C7] text-[#92400E]' : 'bg-[#FEE2E2] text-[#991B1B]'
                                         }`}>
-                                        {selectedBiomarker.status === 'optimal' ? 'Optimal Range' :
-                                            selectedBiomarker.status === 'warning' ? 'Needs Monitoring' : 'Requires Action'}
+                                        {getPatientStatus(selectedBiomarker.status).printLabel}
                                     </div>
 
-                                    <h3 className="text-[11px] font-bold uppercase text-[#A8A29E] mb-3 tracking-widest">AI INTERPRETATION</h3>
+                                    <h3 className="text-[11px] font-bold uppercase text-[#A8A29E] mb-3 tracking-widest">WHY THIS MAY MATTER</h3>
                                     <p className="text-[15px] text-[#57534E] leading-relaxed mb-8 text-wrap-safe">
                                         {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
                                     </p>
@@ -540,7 +536,7 @@ export default function ResultsPage() {
                                         ) : (
                                             <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-xl flex flex-col items-center justify-center p-6 text-center bg-white/30">
                                                 <Info size={28} className="text-[#A8A29E] mb-3 opacity-30" />
-                                                <p className="text-[12px] text-[#A8A29E] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to track progress.</p>
+                                                <p className="text-[12px] text-[#A8A29E] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to add context.</p>
                                             </div>
                                         )}
                                     </div>
@@ -548,14 +544,6 @@ export default function ResultsPage() {
                                     <div className="flex justify-between items-center py-4 border-t border-[#E8E6DF] mb-4">
                                         <span className="text-[12px] text-[#A8A29E] font-bold uppercase tracking-wider">AI Confidence</span>
                                         <div className="flex items-center gap-4">
-                                            {isDebugMode && (
-                                                <button
-                                                    onClick={() => alert(JSON.stringify(selectedBiomarker, null, 2))}
-                                                    className="text-[10px] font-bold text-sky-500 hover:underline"
-                                                >
-                                                    RAW DATA
-                                                </button>
-                                            )}
                                             <span className="text-[13px] font-bold text-[#1C1917]">
                                                 {selectedBiomarker.confidence !== null && selectedBiomarker.confidence !== undefined ? `${Math.round(selectedBiomarker.confidence * 100)}%` : '—'}
                                             </span>

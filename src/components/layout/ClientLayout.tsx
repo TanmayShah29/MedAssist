@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import type { MotionProps } from "framer-motion";
 import { Preloader } from "@/components/ui/preloader";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNavbar } from "@/components/layout/mobile-navbar";
@@ -23,8 +25,17 @@ export function ClientLayout({
   standaloneRoutes,
 }: ClientLayoutProps) {
   const nextPathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
   // Safely determine pathname, prioritizing client-side usePathname()
   const pathname = nextPathname || initialPathname || "";
+  const pageMotion: MotionProps = prefersReducedMotion
+    ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0 } }
+    : {
+      initial: { opacity: 0, y: 10, filter: "blur(2px)" },
+      animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+      exit: { opacity: 0, y: -6, filter: "blur(2px)" },
+      transition: { duration: 0.18, ease: "easeOut" },
+    };
 
   const [loading, setLoading] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -73,7 +84,11 @@ export function ClientLayout({
       {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
       {isStandalone && (
         <div className="min-h-[100dvh] overflow-x-hidden">
-          {children}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={pathname} {...pageMotion}>
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
 
@@ -109,9 +124,12 @@ export function ClientLayout({
                 pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0
                 pb-[calc(5rem+env(safe-area-inset-bottom))]
                 lg:pb-0
-                page-enter
               ">
-              {children}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div key={pathname} className="min-h-[100dvh]" {...pageMotion}>
+                  {children}
+                </motion.div>
+              </AnimatePresence>
             </main>
           </div>
 
@@ -124,7 +142,11 @@ export function ClientLayout({
       {/* ── FALLBACK ── */}
       {!isStandalone && !needsAppShell && (
         <div className="min-h-[100dvh] overflow-x-hidden">
-          {children}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={pathname} {...pageMotion}>
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
 

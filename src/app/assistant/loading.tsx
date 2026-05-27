@@ -1,10 +1,5 @@
+import { BrandedLoading } from "@/components/ui/branded-loading";
+
 export default function AssistantLoading() {
-    return (
-        <div className="min-h-[100dvh] p-6 animate-pulse" style={{ background: '#FAFAF7' }}>
-            <div className="h-8 w-40 rounded-lg mb-8" style={{ background: '#E8E6DF' }} />
-            <div className="h-16 rounded-[14px] mb-4" style={{ background: '#E8E6DF' }} />
-            <div className="h-16 rounded-[14px] mb-4 w-3/4" style={{ background: '#E8E6DF' }} />
-            <div className="h-16 rounded-[14px] mb-4" style={{ background: '#E8E6DF' }} />
-        </div>
-    )
+    return <BrandedLoading title="Preparing Prep Assistant" subtitle="Loading your lab context and recent visit priorities." variant="chat" />
 }

@@ -8,6 +8,7 @@ import {
     ResponsiveContainer
 } from "recharts";
 import { Biomarker } from "@/types/medical";
+import { getPatientStatus } from "@/lib/patient-status";
 
 interface Props {
     isOpen: boolean;
@@ -28,31 +29,21 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
             value: b.value,
         }));
 
-    const getStatusStyles = (status: string) => {
-        switch (status) {
-            case 'optimal': return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', dot: 'bg-emerald-500' };
-            case 'warning': return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', dot: 'bg-amber-500' };
-            case 'critical': return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-100', dot: 'bg-red-500' };
-            default: return { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-100', dot: 'bg-gray-500' };
-        }
-    };
+    const styles = getPatientStatus(biomarker.status);
 
-    const styles = getStatusStyles(biomarker.status);
-
-    // Mock health tips based on category (In a real app, these would come from AI or database)
-    const getHealthTips = (category: string, status: string) => {
-        if (status === 'optimal') return ["Keep up your current lifestyle and diet.", "Continue regular screening as recommended by your doctor."];
+    const getDoctorQuestions = (category: string, status: string) => {
+        if (status === 'optimal') return ["Should we keep monitoring this marker at the same interval?", "Does this result change anything about my follow-up plan?"];
 
         switch (category.toLowerCase()) {
-            case 'hematology': return ["Consider iron-rich foods like spinach and lentils.", "Stay well-hydrated throughout the day.", "Ensure adequate Vitamin C intake to aid iron absorption."];
-            case 'metabolic': return ["Increase daily fiber through whole grains and vegetables.", "Focus on complex carbohydrates over simple sugars.", "Incorporate 30 minutes of moderate activity daily."];
-            case 'inflammation': return ["Focus on an anti-inflammatory diet (Omega-3s, turmeric).", "Prioritize 7-9 hours of quality sleep.", "Practice stress management techniques like meditation."];
-            case 'vitamins': return ["Target 15 minutes of safe sun exposure daily.", "Consider dietary sources like fatty fish or fortified foods.", "Discuss supplementation with your healthcare provider."];
-            default: return ["Consult with a healthcare professional about these results.", "Maintain a balanced diet and regular exercise routine.", "Track changes over your next few lab reports."];
+            case 'hematology': return ["Could we review whether this result needs repeat testing?", "Are iron, ferritin, B12, bleeding risk, or inflammation relevant context for this value?", "Which symptoms would make this more urgent to review?"];
+            case 'metabolic': return ["Should this be interpreted with fasting status, diet, medications, or prior results?", "Would repeat testing or a related marker help clarify the pattern?", "What target range should we monitor over time?"];
+            case 'inflammation': return ["Could recent illness, injury, medication, or symptoms explain this result?", "Should this be repeated or paired with another marker?", "What symptoms should prompt earlier follow-up?"];
+            case 'vitamins': return ["Should we review diet, supplements, medications, or absorption issues?", "What level and retest timeline makes sense for me?", "Should any supplement changes be clinician-guided?"];
+            default: return ["What could explain this result in the context of my history?", "Should this be rechecked, and when?", "Are there symptoms, medications, or supplements that could affect this value?"];
         }
     };
 
-    const tips = getHealthTips(biomarker.category, biomarker.status);
+    const questions = getDoctorQuestions(biomarker.category, biomarker.status);
 
     return (
         <AnimatePresence>
@@ -84,9 +75,9 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                         <span className="bg-sky-100 text-sky-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                                             {biomarker.category}
                                         </span>
-                                        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full ${styles.bg} ${styles.text} text-[10px] font-bold border ${styles.border}`}>
-                                            <div className={`w-1.5 h-1.5 rounded-full ${styles.dot}`} />
-                                            {biomarker.status.toUpperCase()}
+                                        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full ${styles.bgClass} ${styles.textClass} text-[10px] font-bold border ${styles.borderClass}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${styles.dotClass}`} />
+                                            {styles.label.toUpperCase()}
                                         </div>
                                     </div>
                                     <h2 className="text-3xl font-bold font-display text-[#1C1917]">{biomarker.name}</h2>
@@ -129,7 +120,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             </div>
                                             <div className="h-2 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
                                                 <div
-                                                    className={`absolute top-0 bottom-0 left-0 rounded-full ${styles.dot}`}
+                                                    className={`absolute top-0 bottom-0 left-0 rounded-full ${styles.barClass}`}
                                                     style={{
                                                         width: `${Math.max(0, Math.min(100, ((Number(biomarker.value) - biomarker.reference_range_min) / (biomarker.reference_range_max - biomarker.reference_range_min)) * 100))}%`,
                                                         minWidth: '4px'
@@ -195,71 +186,59 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 )}
                             </div>
 
-                            {/* Next Steps / Ecosystem Links */}
+                            {/* Evidence and discussion points */}
                             <div className="mb-12">
                                 <div className="flex items-center gap-2 mb-4">
                                     <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
                                         <ChevronRight className="w-4 h-4 text-sky-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">Recommended Next Steps</h3>
+                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">Evidence to review</h3>
                                 </div>
                                 <div className="space-y-3">
-                                    <a
-                                        href="https://www.questdiagnostics.com/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-sky-200 transition-all hover:shadow-md group"
-                                    >
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px]">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600">
                                                 <Activity size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-[#1C1917]">Book Follow-up Lab</p>
-                                                <p className="text-[11px] text-[#A8A29E]">Quest Diagnostics · 3 miles away</p>
+                                                <p className="text-[14px] font-bold text-[#1C1917]">Exact value and range</p>
+                                                <p className="text-[11px] text-[#A8A29E]">{biomarker.value} {biomarker.unit}{biomarker.reference_range_min != null && biomarker.reference_range_max != null ? ` · range ${biomarker.reference_range_min}-${biomarker.reference_range_max} ${biomarker.unit}` : " · no range found in report"}</p>
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-sky-500" />
-                                    </a>
+                                    </div>
 
-                                    <a
-                                        href="https://www.naturemade.com/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-emerald-200 transition-all hover:shadow-md group"
-                                    >
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px]">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
                                                 <Lightbulb size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-[#1C1917]">Supplement Options</p>
-                                                <p className="text-[11px] text-[#A8A29E]">Browse evidence-based options</p>
+                                                <p className="text-[14px] font-bold text-[#1C1917]">Why this may matter</p>
+                                                <p className="text-[11px] text-[#A8A29E]">{styles.description}</p>
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-emerald-500" />
-                                    </a>
+                                    </div>
                                 </div>
                                 <p className="mt-4 text-[11px] text-[#A8A29E] leading-relaxed">
-                                    <strong className="text-[#57534E]">Note:</strong> Links are for convenience. Always discuss any new supplements or diagnostic tests with your physician first.
+                                    <strong className="text-[#57534E]">Note:</strong> This is appointment context, not a diagnosis or treatment recommendation.
                                 </p>
                             </div>
 
-                            {/* Health Tips / Actionable Advice */}
+                            {/* Questions */}
                             <div className="mb-12">
                                 <div className="flex items-center gap-2 mb-4">
                                     <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                                         <Lightbulb className="w-4 h-4 text-amber-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">General Wellness Tips</h3>
+                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">What to ask</h3>
                                 </div>
                                 <div className="space-y-3">
-                                    {tips.map((tip, idx) => (
+                                    {questions.map((question, idx) => (
                                         <div key={idx} className="flex items-start gap-4 p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-amber-200 transition-colors group">
                                             <div className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                             </div>
-                                            <p className="text-sm text-[#57534E] leading-relaxed grow shrink basis-0">{tip}</p>
+                                            <p className="text-sm text-[#57534E] leading-relaxed grow shrink basis-0">{question}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -269,7 +248,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                             <div className="mt-8 pt-8 border-t border-[#E8E6DF] text-center bg-amber-50/30 rounded-b-2xl -mx-6 px-6 pb-8">
                                 <AlertCircle className="w-5 h-5 text-amber-600 mx-auto mb-3" />
                                 <p className="text-[11px] text-[#78716C] leading-relaxed">
-                                    <strong className="text-[#44403C]">MANDATORY MEDICAL DISCLAIMER:</strong> MedAssist is an educational tool and does not provide medical diagnoses or treatment advice. Consult with a qualified healthcare professional before making any health decisions.
+                                    <strong className="text-[#44403C]">Medical safety:</strong> MedAssist is educational, AI can make mistakes, and it does not provide diagnoses, treatment advice, or prescriptions. Discuss results with a qualified healthcare professional. For urgent symptoms, seek urgent or emergency care.
                                 </p>
                             </div>
                         </div>

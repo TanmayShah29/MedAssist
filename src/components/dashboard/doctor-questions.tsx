@@ -6,6 +6,7 @@ import { MessageSquare, Info, ClipboardCopy, CheckCircle2, Copy } from "lucide-r
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SkeletonText } from "@/components/ui/skeleton";
+import { needsClinicianDiscussion } from "@/lib/patient-status";
 
 interface Question {
   question: string;
@@ -24,7 +25,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
   const [copiedAll, setCopiedAll] = useState(false);
 
   const flaggedKey = biomarkers
-    .filter(b => b.status === "warning" || b.status === "critical")
+    .filter(needsClinicianDiscussion)
     .sort((a, b) => String(a.id).localeCompare(String(b.id)))
     .map(b => `${b.id}:${b.status}`)
     .join("|");
@@ -81,7 +82,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
     setTimeout(() => setCopiedAll(false), 2500);
   };
 
-  const hasFlags = biomarkers.some(b => b.status === "warning" || b.status === "critical");
+  const hasFlags = biomarkers.some(needsClinicianDiscussion);
   if (!hasFlags) return null;
 
   return (
@@ -180,7 +181,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
       {/* Footer disclaimer */}
       <div className="mt-5 pt-4 border-t border-[#E8E6DF]">
         <p className="text-[11px] text-[#A8A29E] leading-relaxed">
-          <strong>Note:</strong> Questions are AI-generated based on your latest biomarkers to help facilitate a more productive conversation with your healthcare provider. They do not constitute medical advice.
+          <strong>Note:</strong> Questions are AI-generated from your values to support a more productive clinician conversation. They are not a diagnosis or treatment advice.
         </p>
       </div>
     </div>

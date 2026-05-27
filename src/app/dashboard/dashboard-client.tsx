@@ -36,6 +36,8 @@ import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
 import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
 import { labResultSummary, latestUniqueBiomarkers } from '@/lib/medical-data'
+import { computeBriefCompleteness, PATIENT_STATUS } from '@/lib/patient-status'
+import { TrustLayer } from '@/components/trust-layer'
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -193,7 +195,7 @@ export default function DashboardClient({
     const [demoLabResults, setDemoLabResults] = useState<LabResult[]>([]);
     const [demoBiomarkers, setDemoBiomarkers] = useState<Biomarker[]>([]);
     const [showScoreModal, setShowScoreModal] = useState(false);
-    const [_supplements, setSupplements] = useState<Record<string, unknown>[]>([]);
+    const [supplements, setSupplements] = useState<Record<string, unknown>[]>([]);
 
     const profile = initialProfile;
     const labResults = initialLabResults;
@@ -291,16 +293,12 @@ export default function DashboardClient({
     const criticalCount = latestBiomarkers.filter(b => b.status === 'critical').length;
     const totalCount = latestBiomarkers.length;
 
-    // Health score — from AI JSON or computed fallback
-    let healthScore = 0;
-    const rawJson = latestLabResult?.raw_ai_json as { healthScore?: number } | undefined;
-    if (rawJson && typeof rawJson.healthScore === 'number') {
-        healthScore = rawJson.healthScore;
-    }
-    if (healthScore === 0 && totalCount > 0) {
-        const raw = (optimalCount * 100 + warningCount * 75 + criticalCount * 40) / totalCount;
-        healthScore = Math.round(Math.max(optimalCount > 0 ? 50 : 30, raw));
-    }
+    const briefCompleteness = computeBriefCompleteness({
+        biomarkerCount: totalCount,
+        reportCount: displayLabResults.length,
+        symptomCount: initialSymptoms.length,
+        medicationContextCount: supplements.length,
+    });
 
     const lastUpdated = displayLabResults[0]?.uploaded_at
         ? new Date(displayLabResults[0].uploaded_at).toLocaleDateString('en-US', {
@@ -406,16 +404,16 @@ export default function DashboardClient({
                                     <h3 className="text-sm font-bold text-[#1C1917] text-wrap-safe">Appointment Focus</h3>
                                     <p className="text-xs text-[#57534E] text-wrap-safe">
                                         {criticalCount > 0
-                                            ? `${criticalCount} urgent markers to review with your clinician`
-                                            : `${warningCount} markers to discuss or monitor`}
+                                            ? `${criticalCount} ${PATIENT_STATUS.critical.label.toLowerCase()} marker${criticalCount === 1 ? '' : 's'} to review with your clinician`
+                                            : `${warningCount} marker${warningCount === 1 ? '' : 's'} to discuss or monitor`}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex gap-2 sm:ml-auto flex-wrap">
                                 {[
-                                    { count: optimalCount, label: 'Opt', bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-700' },
-                                    { count: warningCount, label: 'Mon', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-700' },
-                                    { count: criticalCount, label: 'Act', bg: 'bg-red-50 border-red-100', text: 'text-red-700' },
+                                    { count: optimalCount, label: 'In range', bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-700' },
+                                    { count: warningCount, label: 'Discuss', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-700' },
+                                    { count: criticalCount, label: 'Soon', bg: 'bg-red-50 border-red-100', text: 'text-red-700' },
                                 ].map(s => (
                                     <div key={s.label} className={`text-center px-3 py-1 ${s.bg} rounded-lg border min-w-[58px]`}>
                                         <span className={`block text-xs font-bold ${s.text}`}>{s.count}</span>
@@ -535,7 +533,7 @@ export default function DashboardClient({
                         {/* Score + Trends */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 md:gap-6">
                             <HealthScoreOverview
-                                score={healthScore}
+                                score={briefCompleteness}
                                 optimalCount={optimalCount}
                                 warningCount={warningCount}
                                 criticalCount={criticalCount}
@@ -605,9 +603,10 @@ export default function DashboardClient({
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">SUPPLEMENTARY CARE</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
                             <MedicineCabinet />
                         </div>
+                        <TrustLayer variant="full" />
                     </div>
 
                 </div>
@@ -645,9 +644,9 @@ export default function DashboardClient({
                             className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
-                            <h3 className="font-display text-2xl text-[#1C1917] mb-3 relative">Readiness Breakdown</h3>
+                            <h3 className="font-display text-2xl text-[#1C1917] mb-3 relative">Brief Completeness</h3>
                             <p className="text-sm text-[#57534E] mb-6 relative">
-                                Your readiness score highlights which clinical categories may need discussion.
+                                This score estimates how complete your appointment brief is, not how healthy you are.
                             </p>
                             <div className="space-y-3 mb-6 relative">
                                 {[
@@ -663,7 +662,7 @@ export default function DashboardClient({
                                         <div key={cat.name} className="flex flex-col gap-2 p-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-xl">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-bold text-[#44403C] uppercase">{cat.name}</span>
-                                                <span className="text-[10px] font-bold text-sky-600">WEIGHT: {cat.weight}</span>
+                
                                             </div>
                                             {totalInCat > 0 ? (
                                                 <div className="flex items-center gap-2">
@@ -681,11 +680,6 @@ export default function DashboardClient({
                                         </div>
                                     );
                                 })}
-                            </div>
-                            <div className="p-4 bg-[#F5F4EF] rounded-xl border border-[#E8E6DF] mb-6">
-                                <p className="text-[11px] text-[#57534E] leading-relaxed">
-                                    <strong>The Optimism Rule:</strong> If your report has at least one optimal biomarker, your score cannot drop below 50.
-                                </p>
                             </div>
                             <button
                                 onClick={() => setShowScoreModal(false)}

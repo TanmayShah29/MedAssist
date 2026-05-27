@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Brain, Activity, ClipboardList } from "lucide-react"
+import { needsClinicianDiscussion } from "@/lib/patient-status"
 
 interface ClinicalEntity {
     name: string
@@ -19,7 +20,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
     // Transform biomarkers and symptoms into clinical entities
     const entities: ClinicalEntity[] = [
         ...symptoms.map(s => ({ name: s, type: 'Symptom' })),
-        ...biomarkers.filter(b => b.status === 'critical' || b.status === 'warning').map(b => ({
+        ...biomarkers.filter(needsClinicianDiscussion).map(b => ({
             name: `${b.name} ${b.value}`,
             type: 'Lab Value',
             status: b.status
@@ -30,7 +31,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
         <div className="h-full overflow-y-auto p-5 lg:p-6 space-y-8 bg-[#F5F4EF] min-w-0">
             {/* Detected Entities */}
             <div>
-                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Entities Detected</h3>
+                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Context Detected</h3>
                 {entities.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                         {entities.map((e, i) => (
@@ -47,21 +48,21 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                         ))}
                     </div>
                 ) : (
-                    <p className="text-xs text-[#A8A29E] italic">No symptoms or flagged labs found.</p>
+                    <p className="text-xs text-[#A8A29E] italic">No symptoms or discussion-focused labs found.</p>
                 )}
             </div>
 
             {/* Evidence Trail */}
             <div className="pt-4 border-t border-[#E8E6DF]">
-                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Extraction Pipeline</h3>
+                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Preparation Progress</h3>
                 <div className="space-y-3">
                     <div className="flex gap-3 min-w-0">
                         <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0">
                             <Brain className="w-4 h-4 text-emerald-500" />
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[13px] text-[#1C1917] leading-tight mb-1">Pattern recognition active</p>
-                            <p className="text-[11px] text-[#57534E] text-wrap-safe">Groq AI (Llama 3.3) processing...</p>
+                            <p className="text-[13px] text-[#1C1917] leading-tight mb-1">Visit-prep context active</p>
+                            <p className="text-[11px] text-[#57534E] text-wrap-safe">Reviewing values, symptoms, and appointment questions...</p>
                         </div>
                     </div>
                     {biomarkers.length > 0 && (
@@ -70,7 +71,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                                 <Activity className="w-4 h-4 text-sky-500" />
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[13px] text-[#1C1917] leading-tight mb-1">Mapping biomarker trends</p>
+                                <p className="text-[13px] text-[#1C1917] leading-tight mb-1">Mapping biomarker evidence</p>
                                 <p className="text-[11px] text-[#57534E]">{biomarkers.length} values indexed</p>
                             </div>
                         </div>
@@ -83,7 +84,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                 <div className="pt-4 border-t border-[#E8E6DF]">
                     <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3 flex items-center gap-2">
                         <ClipboardList size={14} className="text-sky-500" />
-                        Questions for your Doctor
+                        Questions for your doctor
                     </h3>
                     <div className="space-y-3">
                         {doctorQuestions.map((q, i) => (

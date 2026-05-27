@@ -33,11 +33,11 @@ const instrumentSerif = Instrument_Serif({
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://medassist-app.vercel.app";
 
 export const metadata = {
-  title: "MedAssist — Walk Into Your Doctor Visit Prepared",
-  description: "Turn lab reports into plain-English insights, trend context, and a printable doctor-visit prep sheet.",
+  title: "MedAssist — Visit Prep Intelligence for Lab Reports",
+  description: "Turn lab reports into plain-English insights, trend context, and a doctor-ready appointment brief.",
   openGraph: {
-    title: "MedAssist — Walk Into Your Doctor Visit Prepared",
-    description: "AI-powered appointment prep for your lab reports.",
+    title: "MedAssist — Visit Prep Intelligence for Lab Reports",
+    description: "AI-powered appointment prep that turns lab reports into a doctor-ready brief.",
     url: SITE_URL,
     siteName: "MedAssist",
     images: [
@@ -52,8 +52,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MedAssist — Walk Into Your Doctor Visit Prepared",
-    description: "AI-powered appointment prep for your lab reports.",
+    title: "MedAssist — Visit Prep Intelligence for Lab Reports",
+    description: "AI-powered appointment prep that turns lab reports into a doctor-ready brief.",
     images: [`${SITE_URL}/og-image.png`],
   },
   alternates: {

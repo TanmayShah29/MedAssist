@@ -1,7 +1,7 @@
 {
   "name": "MedAssist",
   "short_name": "MedAssist",
-  "description": "AI-powered doctor visit prep for lab reports. Turn blood work into clear summaries, trends, and appointment questions.",
+  "description": "Visit prep intelligence for lab reports. Turn blood work into clear summaries, trend context, and appointment questions.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

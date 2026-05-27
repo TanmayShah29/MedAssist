@@ -4,7 +4,8 @@ import { useOnboardingStore } from "@/lib/onboarding-store";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, Check } from "lucide-react";
+import { Check } from "lucide-react";
+import { BrandLockup } from "@/components/branding/brand-lockup";
 import { StepBasicInfo } from "./components/step-basic-info";
 import { StepSymptoms } from "./components/step-symptoms";
 import { StepUpload } from "./components/step-upload";
@@ -26,8 +27,8 @@ const STEP_CONTEXT = [
         detail: "Reference ranges can depend on age and biological sex. This makes the first analysis less generic.",
     },
     {
-        title: "Add the symptoms worth connecting",
-        detail: "Symptoms are optional, but they help turn lab values into useful doctor questions.",
+        title: "Add symptoms and medication context",
+        detail: "Symptoms are optional, and medications or supplements can be added after upload to make the visit brief more useful.",
     },
     {
         title: "Choose how to bring in results",
@@ -69,15 +70,7 @@ export default function OnboardingPage() {
 
                     {/* Logo */}
                     <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-sky-500 
-                            flex items-center justify-center">
-                                <Shield className="w-3.5 h-3.5 text-white" />
-                            </div>
-                            <span className="font-display text-lg text-[#1C1917]">
-                                MedAssist
-                            </span>
-                        </div>
+                        <BrandLockup showTagline />
                         <div className="max-w-md sm:text-right">
                             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-sky-600">
                                 Step {currentStep} of {STEP_LABELS.length}

@@ -9,6 +9,20 @@ export default async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
 
+    const protectedPrefixes = [
+        '/assistant',
+        '/dashboard',
+        '/onboarding',
+        '/profile',
+        '/results',
+        '/settings',
+        '/upload',
+    ]
+
+    const isProtectedPath = protectedPrefixes.some(
+        (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    )
+
     // Landing page — NEVER redirect, always show
     if (pathname === '/') {
         return NextResponse.next({ request: { headers: requestHeaders } })
@@ -29,14 +43,16 @@ export default async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // Static files and API — never redirect
+    // Static files, API, legal pages, and unknown routes — never redirect.
+    // Unknown routes must reach Next's not-found boundary instead of becoming /auth.
     if (
         pathname.startsWith('/api') ||
         pathname.startsWith('/_next') ||
         pathname === '/auth/callback' ||
         pathname === '/terms' ||
         pathname === '/privacy' ||
-        pathname.includes('.')
+        pathname.includes('.') ||
+        (!isProtectedPath && pathname !== '/auth')
     ) {
         return NextResponse.next({ request: { headers: requestHeaders } });
     }

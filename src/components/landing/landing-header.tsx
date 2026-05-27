@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Activity, LogOut, Shield } from "lucide-react";
+import { Activity, LogOut } from "lucide-react";
 import { signOutAndResetMedAssist } from "@/lib/account-session";
 import { useLandingAccount } from "@/components/landing/use-landing-account";
+import { BrandLockup } from "@/components/branding/brand-lockup";
 
 export function LandingHeader() {
   const router = useRouter();
@@ -46,11 +47,8 @@ export function LandingHeader() {
         }`}
       >
         <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-[10px] bg-sky-500 flex items-center justify-center shadow-sm shadow-sky-500/30 group-hover:shadow-sky-500/50 transition-shadow">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-display text-[22px] text-[#1C1917] whitespace-nowrap">MedAssist</span>
+          <Link href="/" className="group">
+            <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

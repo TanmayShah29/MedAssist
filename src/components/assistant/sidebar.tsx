@@ -1,4 +1,5 @@
 import { FileText, HelpCircle } from "lucide-react"
+import { getPatientStatus } from "@/lib/patient-status"
 
 interface AssistantSidebarProps {
     biomarkers: import('@/types/medical').Biomarker[]
@@ -23,7 +24,7 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
                                 <span className={`font-semibold sm:shrink-0 text-wrap-safe ${b.status === 'optimal' ? 'text-emerald-600' :
                                     b.status === 'critical' ? 'text-red-600' : 'text-amber-600'
                                     }`}>
-                                    {b.value} {b.unit}
+                                    {b.value} {b.unit} · {getPatientStatus(b.status).shortLabel}
                                 </span>
                             </div>
                         ))}
@@ -32,7 +33,7 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
                     <p className="text-sm text-slate-500 italic text-center py-4">No lab data found</p>
                 )}
                 <p className="text-xs text-slate-400 mt-4 text-center">
-                    AI has access to your full health history
+                    AI uses your saved report context for visit prep
                 </p>
             </div>
 
@@ -45,9 +46,9 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
                 <div className="space-y-2 text-sm text-[#57534E] leading-relaxed text-wrap-safe">
                     <p>You can ask things like:</p>
                     <ul className="list-disc ml-4 space-y-1">
-                        <li>"What does my low Vitamin D mean?"</li>
-                        <li>"How can I improve my Glucose levels?"</li>
-                        <li>"Are my inflammation markers normal?"</li>
+                        <li>"What should I ask about Vitamin D?"</li>
+                        <li>"What context matters for Glucose?"</li>
+                        <li>"What changed since my last report?"</li>
                     </ul>
                 </div>
             </div>

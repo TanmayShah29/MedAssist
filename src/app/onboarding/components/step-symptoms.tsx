@@ -26,7 +26,7 @@ export function StepSymptoms() {
                     How are you feeling?
                 </h2>
                 <p className="text-[#57534E] text-sm leading-relaxed">
-                    Pick anything you would naturally mention to your doctor. Leaving this blank is fine.
+                    Pick anything you would naturally mention to your doctor. You can add medications and supplements from the visit brief after upload.
                 </p>
             </div>
 
@@ -41,8 +41,8 @@ export function StepSymptoms() {
                         How symptoms shape your prep sheet
                     </p>
                     <p className="text-xs text-sky-700 leading-relaxed">
-                        Symptoms help connect the dots. Fatigue plus low hemoglobin, for example,
-                        can become a focused question about iron, B12, or follow-up testing.
+                        Symptoms help prepare better questions. Fatigue plus low hemoglobin, for example,
+                        can become a focused question about iron, B12, medications, or follow-up testing.
                     </p>
                 </div>
             </div>

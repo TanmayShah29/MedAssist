@@ -23,13 +23,13 @@ export interface WellnessTrendDataPoint {
 export const mockHealthMetrics: HealthMetric[] = [
     {
         id: 'm1',
-        label: 'Health Score',
+        label: 'Brief Completeness',
         value: 82,
         trend: 'up',
         trendValue: 2.4,
         status: 'optimal',
         lastUpdated: new Date(),
-        subtitle: 'Top 12% for age group'
+        subtitle: 'Visit prep context'
     },
     {
         id: 'm2',
@@ -49,7 +49,7 @@ export const mockHealthMetrics: HealthMetric[] = [
         trendValue: 1,
         status: 'warning',
         lastUpdated: new Date(),
-        subtitle: 'Action required'
+        subtitle: 'Discuss with clinician'
     },
     {
         id: 'm4',

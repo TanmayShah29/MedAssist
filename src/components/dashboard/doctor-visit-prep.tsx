@@ -5,6 +5,7 @@ import { ClipboardList, Copy, Printer, RefreshCw, Sparkles } from "lucide-react"
 import { toast } from "sonner";
 import { Biomarker } from "@/types/medical";
 import { cn } from "@/lib/utils";
+import { getPatientStatus, needsClinicianDiscussion, sortByPatientPriority } from "@/lib/patient-status";
 
 type PrepResponse = {
     summary: string;
@@ -24,20 +25,19 @@ type PrepResponse = {
 };
 
 function fallbackPrep(biomarkers: Biomarker[]): PrepResponse {
-    const flagged = biomarkers
-        .filter(b => b.status === "critical" || b.status === "warning")
+    const flagged = sortByPatientPriority(biomarkers.filter(needsClinicianDiscussion))
         .slice(0, 5);
 
     return {
         summary: flagged.length > 0
-            ? `Your visit should focus on ${flagged.map(b => b.name).slice(0, 3).join(", ")} and whether follow-up testing or lifestyle changes are appropriate.`
+            ? `Your visit brief should focus on ${flagged.map(b => b.name).slice(0, 3).join(", ")} and what your clinician wants to monitor or recheck.`
             : "Your latest markers look mostly stable. Use the visit to confirm what should be monitored next.",
         checklist: [
             "Bring your latest lab report and any older reports for comparison.",
             "List current medications, supplements, doses, and start dates.",
             "Write down symptoms, energy changes, sleep changes, and diet changes from the last 30 days.",
         ],
-        questions: flagged.slice(0, 3).map(b => `What could explain my ${b.name} being marked ${b.status}, and should we re-test it?`),
+        questions: flagged.slice(0, 3).map(b => `My ${b.name} is ${b.value} ${b.unit || ""}. What context could explain it, and should we re-test it?`),
         flagged,
         changes: [],
         generatedAt: new Date().toISOString(),
@@ -59,7 +59,7 @@ export function DoctorVisitPrep({
     const [loading, setLoading] = useState(false);
 
     const flaggedKey = biomarkers
-        .filter(b => b.status === "warning" || b.status === "critical")
+        .filter(needsClinicianDiscussion)
         .map(b => `${b.id}:${b.status}:${b.value}`)
         .join("|");
 
@@ -101,7 +101,7 @@ export function DoctorVisitPrep({
             "",
             "Key results:",
             ...(prep.flagged.length > 0
-                ? prep.flagged.map(b => `- ${b.name}: ${b.value} ${b.unit || ""} (${b.status})`)
+                ? prep.flagged.map(b => `- ${b.name}: ${b.value} ${b.unit || ""} (${getPatientStatus(b.status).label})`)
                 : ["- No flagged biomarkers in the latest report."]),
             "",
             "Notable changes:",
@@ -165,16 +165,16 @@ export function DoctorVisitPrep({
 
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Key results to discuss</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Top things to discuss</h3>
                     <div className="space-y-2">
                         {prep.flagged.length > 0 ? prep.flagged.map(b => (
                             <div key={b.id} className="flex flex-col items-start gap-2 rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2 min-w-0 sm:flex-row sm:justify-between">
                                 <span className="min-w-0 text-[13px] font-semibold text-[#1C1917] break-words">{b.name}</span>
                                 <span className={cn(
-                                    "max-w-full rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-wrap-safe sm:shrink-0",
-                                    b.status === "critical" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"
+                                    "max-w-full rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-wrap-safe sm:shrink-0 border",
+                                    getPatientStatus(b.status).badgeClass
                                 )}>
-                                    {b.value} {b.unit}
+                                    {b.value} {b.unit} · {getPatientStatus(b.status).label}
                                 </span>
                             </div>
                         )) : (

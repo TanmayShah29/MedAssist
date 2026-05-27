@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HelpCircle, X, Send } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function FeedbackButton() {
+    const [hideForMarketing, setHideForMarketing] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +37,14 @@ export function FeedbackButton() {
             setIsSubmitting(false);
         }
     };
+
+    useEffect(() => {
+        setHideForMarketing(new URLSearchParams(window.location.search).get("marketing") === "1");
+    }, []);
+
+    if (hideForMarketing) {
+        return null;
+    }
 
     return (
         <div className="fixed bottom-24 md:bottom-6 right-6 z-50 flex flex-col items-end">

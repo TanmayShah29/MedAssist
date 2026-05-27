@@ -2,93 +2,89 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Stat = {
-  value: number;
+function CountUp({
+  to,
+  suffix = "",
+  duration = 1500,
+  start,
+}: {
+  to: number;
   suffix?: string;
-  label: string;
-  color: string;
-};
-
-const stats: Stat[] = [
-  { value: 35, suffix: "+", label: "Biomarkers tracked", color: "text-sky-500" },
-  { value: 20, suffix: "s", label: "Analysis time", color: "text-emerald-500" },
-  { value: 100, suffix: "%", label: "Private & encrypted", color: "text-violet-500" },
-  { value: 0, label: "Cost to start", color: "text-amber-500" },
-];
-
-function useCountUp(target: number, active: boolean) {
-  const [value, setValue] = useState(0);
+  duration?: number;
+  start: boolean;
+}) {
+  const [val, setVal] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
-
-    let frame = 0;
-    let start: number | null = null;
-    const duration = 1100;
-
-    const tick = (timestamp: number) => {
-      start ??= timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-
-      setValue(Math.round(target * eased));
-
-      if (progress < 1) {
-        frame = requestAnimationFrame(tick);
-      }
+    if (!start || to === 0) return;
+    let raf: number;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // cubic ease-out
+      setVal(Math.round(to * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
     };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [start, to, duration]);
 
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [active, target]);
-
-  return value;
-}
-
-function CounterTile({ stat, delay }: { stat: Stat; delay: number }) {
-  const [active, setActive] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const value = useCountUp(stat.value, active);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setActive(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
+  if (to === 0) return <>Free</>;
   return (
-    <div
-      ref={ref}
-      className="relative overflow-hidden rounded-[16px] border border-[#E8E6DF] bg-white/78 p-5 text-center shadow-sm landing-reveal"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
-      <div className={`font-display text-4xl font-bold ${stat.color} mb-1 landing-breathe`}>
-        {value}
-        {stat.suffix}
-      </div>
-      <div className="text-[12px] font-medium text-[#A8A29E] uppercase tracking-wider">{stat.label}</div>
-    </div>
+    <>
+      {val}
+      {suffix}
+    </>
   );
 }
 
+const STATS = [
+  { to: 35, suffix: "+", label: "Biomarkers tracked", color: "text-sky-500" },
+  { to: 20, suffix: "s", label: "Analysis time", color: "text-emerald-500" },
+  { to: 100, suffix: "%", label: "Private & encrypted", color: "text-violet-500" },
+  { to: 0, suffix: "", label: "Cost to start", color: "text-amber-500" },
+];
+
 export function StatsCounter() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-      {stats.map((stat, i) => (
-        <CounterTile key={stat.label} stat={stat} delay={i * 80} />
+    <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {STATS.map((s, i) => (
+        <div
+          key={s.label}
+          className="text-center landing-reveal"
+          style={{ animationDelay: `${i * 80}ms` }}
+        >
+          <div className={`font-display text-4xl font-bold ${s.color} mb-1 tabular-nums`}>
+            <CountUp
+              to={s.to}
+              suffix={s.suffix}
+              start={started}
+              duration={1400 + i * 150}
+            />
+          </div>
+          <div className="text-[12px] font-medium text-[#A8A29E] uppercase tracking-wider">
+            {s.label}
+          </div>
+        </div>
       ))}
     </div>
   );

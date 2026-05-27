@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { getPatientStatus } from "@/lib/patient-status";
 
 export type StatusType = "optimal" | "warning" | "critical" | "neutral";
 
@@ -12,17 +13,17 @@ interface StatusBadgeProps {
 
 const STATUS_CONFIG: Record<StatusType, { label: string; dotClass: string; badgeClass: string }> = {
   optimal: {
-    label: "Optimal",
+    label: getPatientStatus("optimal").label,
     dotClass: "bg-emerald-500",
     badgeClass: "status-optimal",
   },
   warning: {
-    label: "Monitor",
+    label: getPatientStatus("warning").label,
     dotClass: "bg-amber-500",
     badgeClass: "status-warning",
   },
   critical: {
-    label: "Action",
+    label: getPatientStatus("critical").label,
     dotClass: "bg-red-500",
     badgeClass: "status-critical",
   },

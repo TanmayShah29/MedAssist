@@ -4,10 +4,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Shield, Loader2, ArrowRight, Mail, RotateCcw, CheckCircle2, Check } from "lucide-react";
+import { Loader2, ArrowRight, Mail, RotateCcw, CheckCircle2, Check } from "lucide-react";
 import Link from "next/link";
 import { logger } from "@/lib/logger";
 import { resetOnboardingCookie } from "@/app/actions/user-data";
+import { BrandLockup } from "@/components/branding/brand-lockup";
 
 function AuthContent() {
     const router = useRouter();
@@ -186,10 +187,11 @@ function AuthContent() {
 
             <form onSubmit={handleAuth} className="space-y-4">
                 <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
+                    <label htmlFor="auth-email" className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
                         Email Address
                     </label>
                     <input
+                        id="auth-email"
                         type="email"
                         name="email"
                         inputMode="email"
@@ -204,10 +206,11 @@ function AuthContent() {
                     />
                 </div>
                 <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
+                    <label htmlFor="auth-password" className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
                         Password
                     </label>
                     <input
+                        id="auth-password"
                         type="password"
                         name="password"
                         autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
@@ -297,12 +300,9 @@ function AuthContent() {
 export default function AuthPage() {
     return (
         <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col justify-center items-center p-4 relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.16),transparent_34rem)]" />
-            <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 flex items-center gap-2 z-10">
-                <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
-                    <Shield className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-display text-xl text-[#1C1917]">MedAssist</span>
+            <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(224,242,254,0.72),rgba(250,250,247,0))]" />
+            <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 z-10 group">
+                <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
             </Link>
 
             <div className="relative grid w-full max-w-5xl grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1fr)]">

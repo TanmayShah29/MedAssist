@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
         if (criticalBiomarkers.length === 0) {
             return NextResponse.json({
                 questions: [{
-                    question: 'How can I maintain my current healthy biomarker levels?',
-                    context: 'All your biomarkers are currently in the optimal range.',
+                    question: 'Which of these in-range results should we keep monitoring over time?',
+                    context: 'All provided biomarkers appear in range, so the visit can focus on what to track next.',
                 }],
             });
         }
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
         // 8. Generate questions via Groq (with retry)
         // Fix #8: Use a JSON object wrapper so response_format: json_object is valid.
         // The prompt asks for { "questions": [...] } and we unwrap below.
-        const questionsPrompt = `Based on these specific lab results that need attention:
+        const questionsPrompt = `Based on these specific lab results that may be worth discussing with a clinician:
 ${criticalBiomarkers.map((b: BiomarkerInput) =>
     `${b.name}: ${b.value} ${b.unit} (status: ${b.status}${
         b.reference_range_min != null && b.reference_range_max != null
@@ -169,6 +169,7 @@ ${criticalBiomarkers.map((b: BiomarkerInput) =>
 Generate 3-5 specific questions this person should ask their doctor at their next appointment.
 For each question, reference the actual numeric value and frame it as a practical appointment talking point.
 Provide a brief "Why ask this" context that explains what decision, follow-up test, or monitoring plan the question could clarify.
+Do not diagnose, prescribe, claim causality, or imply the person has a condition. Do not recommend medications or supplements. Prefer phrases like "could we review" and "should we monitor".
 
 Return a JSON object with a "questions" key containing an array:
 {
@@ -219,8 +220,8 @@ Return a JSON object with a "questions" key containing an array:
         } catch (e) {
             logger.error('[generate-questions] Failed to parse AI JSON response', e);
             questions = [{
-                question: 'Could not generate structured questions. Please ask your doctor about your flagged biomarkers.',
-                context: 'There was an error processing the detailed questions.',
+                question: 'Could we review the results marked for discussion and decide what should be monitored next?',
+                context: 'There was an error generating detailed questions, so this fallback keeps the visit focused on clinician review.',
             }];
         }
 

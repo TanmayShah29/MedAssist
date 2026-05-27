@@ -286,7 +286,7 @@ function StepUpload({ file, onFile }: {
 function StepProcessing({ onComplete }: { onComplete: () => void }) {
     const steps = React.useMemo(() => [
         { label: "Extracting medical entities", duration: 800 },
-        { label: "Running Groq Medical NLP", duration: 1200 },
+        { label: "Reviewing report context", duration: 1200 },
         { label: "Calculating risk scores", duration: 900 },
         { label: "Generating health insights", duration: 1000 },
         { label: "Updating your dashboard", duration: 600 },

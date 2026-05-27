@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import { animate } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { PATIENT_STATUS } from '@/lib/patient-status';
 
 import { Biomarker } from '@/types/medical';
 
@@ -17,10 +18,10 @@ interface HealthScoreOverviewProps {
 }
 
 function getScoreLabel(score: number): { label: string; color: string; bg: string; ring: string } {
-    if (score >= 85) return { label: "Excellent", color: "#065F46", bg: "#ECFDF5", ring: "#10B981" };
-    if (score >= 70) return { label: "Good", color: "#0C4A6E", bg: "#E0F2FE", ring: "#0EA5E9" };
-    if (score >= 55) return { label: "Fair", color: "#78350F", bg: "#FFFBEB", ring: "#F59E0B" };
-    return { label: "Needs Attention", color: "#991B1B", bg: "#FFF1F2", ring: "#EF4444" };
+    if (score >= 85) return { label: "Ready to review", color: "#065F46", bg: "#ECFDF5", ring: "#10B981" };
+    if (score >= 70) return { label: "Almost ready", color: "#0C4A6E", bg: "#E0F2FE", ring: "#0EA5E9" };
+    if (score >= 45) return { label: "Add more context", color: "#78350F", bg: "#FFFBEB", ring: "#F59E0B" };
+    return { label: "Start your brief", color: "#991B1B", bg: "#FFF1F2", ring: "#EF4444" };
 }
 
 export function HealthScoreOverview({ score, optimalCount, warningCount, criticalCount, biomarkers: _biomarkers = [], onClick }: HealthScoreOverviewProps) {
@@ -67,18 +68,18 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
-            aria-label={onClick ? "Visit readiness score details" : undefined}
+            aria-label={onClick ? "Brief completeness details" : undefined}
         >
             <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
                 <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
-                    Visit Readiness Score
+                    Brief Completeness
                     <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">
                         <Info className="w-3.5 h-3.5" />
                         <div className={cn(
                             "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-opacity z-10 normal-case leading-relaxed font-normal",
                             (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 pointer-events-none md:pointer-events-none'
                         )}>
-                            A quick readiness estimate based on how many markers need discussion. Click to see breakdown.
+                            A preparation estimate based on lab data, prior reports, symptoms, and medication context. Click to see breakdown.
                         </div>
                     </div>
                 </h3>
@@ -119,15 +120,15 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                         {scoreInfo.label}
                     </span>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Optimal</span>
+                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} /> {PATIENT_STATUS.optimal.label}</span>
                         <span className="font-bold text-[#1C1917]">{optimalCount}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Monitor</span>
+                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} /> {PATIENT_STATUS.warning.label}</span>
                         <span className="font-bold text-[#1C1917]">{warningCount}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-red-500" /> Action</span>
+                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} /> {PATIENT_STATUS.critical.label}</span>
                         <span className="font-bold text-[#1C1917]">{criticalCount}</span>
                     </div>
                 </div>

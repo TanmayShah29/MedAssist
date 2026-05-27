@@ -56,7 +56,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         reference_range_max: 99,
         lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Glucose has risen 15% over the last quarter. This confirms a pre-diabetic trend that warrants dietary review."
+        ai_interpretation: "Glucose has risen 15% over the last quarter and is above the report range; ask what follow-up or monitoring plan makes sense."
     },
     // Vitamin Profile - Significantly Improved
     {
@@ -68,7 +68,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "vitamins",
         lab_result_id: "demo-previous",
         created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Severely low. Risk of bone density loss."
+        ai_interpretation: "Vitamin D was below the report range in this older sample; review the trend with a clinician."
     },
     {
         id: "demo-v-2",
@@ -79,7 +79,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "vitamins",
         lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Excellent recovery. Supplementation protocol is highly effective."
+        ai_interpretation: "Vitamin D is now within the report range; ask what maintenance monitoring makes sense."
     },
     // Lipid Profile
     {
@@ -91,7 +91,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "lipids",
         lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Borderline high. Recommend increasing soluble fiber intake."
+        ai_interpretation: "LDL is above the report range; ask whether lifestyle context, repeat testing, or medication discussion is appropriate."
     },
     {
         id: "demo-l-2",
@@ -123,7 +123,7 @@ export const DEMO_HISTORY: Biomarker[] = [
         category: "hematology",
         lab_result_id: "demo-latest",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        ai_interpretation: "Downward trend detected. Monitor for symptoms of fatigue."
+        ai_interpretation: "Hemoglobin has decreased from the prior result; ask whether symptoms or follow-up testing should be reviewed."
     },
     {
         id: "demo-r-1",
@@ -164,12 +164,12 @@ export const DEMO_LAB_RESULT: DemoLabResult = {
     raw_ai_json: {
         healthScore: 82,
         riskLevel: "moderate",
-        summary: "Clinical analysis of your latest report reveals a significant recovery in Vitamin D levels and a robust lipid profile. However, there is a persistent upward trend in Glucose and a slight decline in Hemoglobin that requires attention.",
+        summary: "The sample report shows Vitamin D now in range, while Glucose and Hemoglobin are useful appointment discussion points. Use this as context for a clinician conversation, not as a diagnosis.",
         longitudinalInsights: [
-            "Metabolic Alert: Glucose has risen 15% over the last 3 months, indicating a transition to pre-diabetic ranges.",
-            "Supplement Efficacy: Vitamin D has successfully recovered from a critical level (18) to an optimal maintenance level (42).",
-            "Anemic Pattern: Hemoglobin is trending downward as Ferritin remains stable; monitor dietary iron intake.",
-            "Thyroid Stability: TSH levels remain ideal, suggesting no metabolic impact from thyroid function."
+            "Glucose has risen 15% over the last 3 months and is above the report range; ask what follow-up or monitoring plan makes sense.",
+            "Vitamin D improved from 18 to 42 and is now in range; ask what maintenance and retest timeline is appropriate.",
+            "Hemoglobin is trending downward; ask whether symptoms, iron, ferritin, B12, or repeat testing should be reviewed.",
+            "TSH is in range in the sample report."
         ]
     }
 };

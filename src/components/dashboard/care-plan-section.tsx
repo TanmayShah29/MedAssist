@@ -2,12 +2,13 @@
 
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { Biomarker } from '@/types/medical'
+import { getPatientStatus, needsClinicianDiscussion, sortByPatientPriority } from '@/lib/patient-status'
 
 const RECOMMENDATIONS: Record<string, string> = {
-    'Vitamin D': 'Consider 15 min daily sunlight or discuss D3 supplementation with your doctor.',
+    'Vitamin D': 'Ask what maintenance level and retest timeline make sense for you.',
     'Glucose': 'Ask whether this trend changes your follow-up testing or meal-timing recommendations.',
     'Hemoglobin A1c': 'Ask what target range and re-test timeline make sense for you.',
-    'LDL Cholesterol': 'Ask whether lifestyle changes are enough for now or if medication should be discussed.',
+    'LDL Cholesterol': 'Ask whether lifestyle context, repeat testing, or medication discussion is appropriate.',
     'CRP': 'Ask whether this needs repeat testing or symptom context.',
     'Iron': 'Ask whether ferritin, B12, or dietary intake should be reviewed together.',
     'Hemoglobin': 'Ask whether iron, ferritin, B12, or bleeding risk should be checked.',
@@ -20,9 +21,7 @@ interface CarePlanSectionProps {
 }
 
 export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
-    const nonOptimal = [...latestBiomarkers]
-        .filter(b => b.status !== 'optimal')
-        .sort((a, _b) => (a.status === 'critical' ? -1 : 1))
+    const nonOptimal = sortByPatientPriority(latestBiomarkers.filter(needsClinicianDiscussion))
         .slice(0, 3);
 
     if (nonOptimal.length === 0) return null;
@@ -43,7 +42,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
                         <ArrowRight className="w-5 h-5 text-sky-400" />
                     </div>
                     <h3 className="text-[20px] leading-tight font-bold font-display text-wrap-safe">
-                        Appointment Talking Points
+                        Top Discussion Points
                     </h3>
                 </div>
 
@@ -58,20 +57,20 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
 }
 
 function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priority: number }) {
-    const isCritical = b.status === 'critical';
-    const badgeClass = isCritical
+    const status = getPatientStatus(b.status);
+    const badgeClass = b.status === 'critical'
         ? 'bg-red-500/20 border-red-500/30 text-red-400'
         : 'bg-amber-500/20 border-amber-500/30 text-amber-400';
 
     const recommendation =
         RECOMMENDATIONS[b.name] ??
-        `Your ${b.name} is ${b.status} — ask your doctor what could explain it and when it should be rechecked.`;
+        `Your ${b.name} is marked "${status.label}" — ask your clinician what could explain it and when it should be rechecked.`;
 
     return (
         <div className="bg-white/5 border border-white/10 rounded-[14px] p-4 lg:p-5 hover:bg-white/10 transition-colors group min-w-0">
             <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
-                    {b.status.toUpperCase()}
+                    {status.label.toUpperCase()}
                 </span>
                 <span className="text-[10px] text-white/40 font-mono shrink-0">PRIORITY {priority}</span>
             </div>

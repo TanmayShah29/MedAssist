@@ -69,7 +69,7 @@ export function MedicineCabinet() {
                     frequency: "",
                     start_date: new Date().toISOString().split('T')[0]
                 });
-                toast.success('Supplement added to your cabinet');
+                toast.success('Medication or supplement added to your context');
             }
         } catch (_error) {
             toast.error('Failed to add supplement. Please check your connection.');
@@ -83,7 +83,7 @@ export function MedicineCabinet() {
             });
             if (res.ok) {
                 setSupplements(supplements.filter(s => s.id !== id));
-                toast.success('Supplement removed');
+                toast.success('Medication or supplement removed');
             } else {
                 const data = await res.json().catch(() => ({}));
                 toast.error(data.error || 'Failed to remove supplement');
@@ -101,14 +101,14 @@ export function MedicineCabinet() {
                         <Pill className="w-5 h-5 text-rose-600" />
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-[18px] font-bold text-[#1C1917] truncate">Medicine Cabinet</h3>
-                        <p className="text-[12px] text-[#A8A29E] truncate">Track supplements & medications</p>
+                        <h3 className="text-[18px] font-bold text-[#1C1917] truncate">Medication Context</h3>
+                        <p className="text-[12px] text-[#A8A29E] truncate">Track medications & supplements for your clinician</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
                     className="p-2 bg-[#F5F4EF] hover:bg-[#EFEDE6] rounded-full transition-colors"
-                    aria-label={showAddForm ? "Close add supplement form" : "Add supplement"}
+                    aria-label={showAddForm ? "Close add medication or supplement form" : "Add medication or supplement"}
                 >
                     {showAddForm ? <X size={20} className="text-[#57534E]" /> : <Plus size={20} className="text-[#57534E]" />}
                 </button>
@@ -125,13 +125,13 @@ export function MedicineCabinet() {
                     >
                         <div className="grid grid-cols-1 gap-3">
                             <div>
-                                <label className="text-[11px] font-bold text-[#A8A29E] uppercase mb-1 block">Supplement Name</label>
+                                <label className="text-[11px] font-bold text-[#A8A29E] uppercase mb-1 block">Medication or Supplement</label>
                                 <input
                                     type="text"
                                     required
                                     value={newSupp.name}
                                     onChange={e => setNewSupp({ ...newSupp, name: e.target.value })}
-                                    placeholder="e.g. Vitamin D3, Magnesium"
+                                    placeholder="e.g. Vitamin D3, Metformin"
                                     className="w-full px-3 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-lg text-sm"
                                 />
                             </div>
@@ -160,7 +160,7 @@ export function MedicineCabinet() {
                             type="submit"
                             className="w-full py-2.5 bg-[#1C1917] text-white rounded-lg font-bold text-sm hover:bg-black transition-colors"
                         >
-                            Add to Cabinet
+                            Add to visit context
                         </button>
                     </motion.form>
                 )}
@@ -192,7 +192,7 @@ export function MedicineCabinet() {
                     ))
                 ) : (
                     <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#E8E6DF]">
-                        <p className="text-[12px] text-[#A8A29E]">No supplements logged yet.</p>
+                        <p className="text-[12px] text-[#A8A29E]">No medications or supplements logged yet.</p>
                     </div>
                 )}
             </div>
@@ -201,7 +201,7 @@ export function MedicineCabinet() {
                 <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-rose-400 mt-0.5" />
                     <p className="text-[11px] text-[#A8A29E] leading-relaxed">
-                        Supplement start dates are marked on your biomarker trend charts so you can track what’s working over time.
+                        Start dates are shown as context on biomarker trend charts. Review medication or supplement changes with your clinician.
                     </p>
                 </div>
             </div>

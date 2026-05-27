@@ -7,6 +7,7 @@ import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2, ChevronLeft, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { saveProfileFromSession, saveReviewedReportFromSession } from "@/app/actions/user-data";
+import { computeBriefCompleteness, PATIENT_STATUS } from "@/lib/patient-status";
 
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
@@ -17,10 +18,12 @@ const GENERIC_PROCESSING_MSG = 'We could not analyze this report right now. Plea
 
 function deriveReviewedScore(biomarkers: ExtractedLabValue[]) {
     if (biomarkers.length === 0) return 0;
-    const optimal = biomarkers.filter((b) => b.status === "optimal").length;
-    const warning = biomarkers.filter((b) => b.status === "warning").length;
-    const critical = biomarkers.filter((b) => b.status === "critical").length;
-    return Math.max(0, Math.min(100, Math.round(((optimal * 100) + (warning * 65) + (critical * 25)) / biomarkers.length)));
+    return computeBriefCompleteness({
+        biomarkerCount: biomarkers.length,
+        reportCount: 1,
+        symptomCount: useOnboardingStore.getState().selectedSymptoms.length,
+        medicationContextCount: 0,
+    });
 }
 
 function deriveRiskLevel(biomarkers: ExtractedLabValue[]): "low" | "moderate" | "high" {
@@ -41,24 +44,6 @@ const getErrorMessage = (error: string, debug?: DebugPayload) => {
     if (error.includes('image-based') || error === IMAGE_BASED_MSG)
         return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true, debug }
     return { title: 'Something went wrong', detail: error, canRetry: true, debug }
-}
-
-function shouldShowDebug() {
-    try {
-        return localStorage.getItem("medassist_debug_mode") === "true";
-    } catch {
-        return false;
-    }
-}
-
-function formatDebugPayload(debug: DebugPayload) {
-    if (!debug) return "";
-    if (typeof debug === "string") return debug;
-    try {
-        return JSON.stringify(debug, null, 2);
-    } catch {
-        return String(debug);
-    }
 }
 
 async function readDebuggableJson(response: Response) {
@@ -213,15 +198,15 @@ function ReviewExtractedValues({
             <div className="grid grid-cols-3 gap-3 mb-5">
                 <div className="rounded-[12px] border border-emerald-100 bg-emerald-50 p-4">
                     <p className="text-2xl font-bold text-emerald-700">{optimalCount}</p>
-                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Optimal</p>
+                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">{PATIENT_STATUS.optimal.label}</p>
                 </div>
                 <div className="rounded-[12px] border border-amber-100 bg-amber-50 p-4">
                     <p className="text-2xl font-bold text-amber-700">{warningCount}</p>
-                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Monitor</p>
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">{PATIENT_STATUS.warning.label}</p>
                 </div>
                 <div className="rounded-[12px] border border-red-100 bg-red-50 p-4">
                     <p className="text-2xl font-bold text-red-700">{criticalCount}</p>
-                    <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">Action</p>
+                    <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">{PATIENT_STATUS.critical.label}</p>
                 </div>
             </div>
 
@@ -267,9 +252,9 @@ function ReviewExtractedValues({
                                 onChange={(e) => updateRow(index, { status: e.target.value as ExtractedLabValue["status"] })}
                                 className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm capitalize focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             >
-                                <option value="optimal">Optimal</option>
-                                <option value="warning">Monitor</option>
-                                <option value="critical">Action needed</option>
+                                <option value="optimal">{PATIENT_STATUS.optimal.label}</option>
+                                <option value="warning">{PATIENT_STATUS.warning.label}</option>
+                                <option value="critical">{PATIENT_STATUS.critical.label}</option>
                             </select>
                             <button
                                 type="button"
@@ -301,7 +286,7 @@ function ReviewExtractedValues({
 
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Reviewed readiness score</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Brief completeness</p>
                     <p className="font-display text-3xl text-[#1C1917]">{reviewedScore}<span className="text-sm text-[#57534E] font-sans"> / 100</span></p>
                 </div>
                 <button
@@ -337,7 +322,7 @@ export function StepProcessing() {
     const stages = useMemo(() => [
         { step: 1, label: 'Reading the report', detail: 'Extracting the values from your PDF', duration: 8000 },
         { step: 2, label: 'Identifying biomarkers', detail: 'Finding hemoglobin, glucose, vitamins, lipids, and more', duration: 6000 },
-        { step: 3, label: 'Checking ranges', detail: 'Separating optimal results from items to monitor', duration: 5000 },
+        { step: 3, label: 'Checking ranges', detail: 'Separating in-range values from items to discuss', duration: 5000 },
         { step: 4, label: 'Drafting doctor questions', detail: 'Turning findings into appointment talking points', duration: 5000 },
         { step: 5, label: 'Preparing your review screen', detail: 'Getting extracted values ready for your confirmation', duration: 4000 },
     ], []);
@@ -583,18 +568,6 @@ export function StepProcessing() {
                         <p className="mt-3 text-[13px] text-[#57534E] text-center">
                             You can go back and enter your lab values manually instead.
                         </p>
-                    )}
-                    {errorData.debug && shouldShowDebug() && (
-                        <div className="mt-5 rounded-[10px] border border-red-200 bg-white/70 overflow-hidden">
-                            <div className="border-b border-red-100 px-3 py-2">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#991B1B]">
-                                    Debug log
-                                </p>
-                            </div>
-                            <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-words p-3 text-[11px] leading-relaxed text-[#1C1917] font-mono">
-                                {formatDebugPayload(errorData.debug)}
-                            </pre>
-                        </div>
                     )}
                     <button
                         onClick={goBackToUpload}

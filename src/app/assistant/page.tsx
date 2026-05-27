@@ -13,6 +13,8 @@ import { Biomarker } from "@/types/medical";
 import DOMPurify from "dompurify";
 import { latestUniqueBiomarkers, mergeBiomarkerSources } from "@/lib/medical-data";
 import { useStore } from "@/store/useStore";
+import { getPatientStatus } from "@/lib/patient-status";
+import { TrustLayer } from "@/components/trust-layer";
 
 // Types
 type Message = {
@@ -156,7 +158,7 @@ export function AssistantPageInner() {
                     setMessages([{
                         id: "1",
                         role: "assistant",
-                        content: `Hello! I'm here to help you prepare for your next doctor visit. I notice your ${critical.name} is ${critical.status === 'optimal' ? 'looking good' : 'currently ' + critical.status}; I can help turn that into clear questions for your clinician.`,
+                        content: `Hello! I'm here to help you prepare for your next doctor visit. I notice your ${critical.name} is marked ${getPatientStatus(critical.status).label}; I can help turn that into clear questions for your clinician.`,
                         timestamp: new Date()
                     }]);
                 }
@@ -403,21 +405,21 @@ export function AssistantPageInner() {
                 {messages.filter(m => m.role === 'user').length === 0 && (
                     <div className="flex flex-wrap gap-2 pb-3 mb-1 max-h-28 overflow-y-auto lg:max-h-none lg:overflow-visible">
                         {(() => {
-                            const criticalMarkers = biomarkers.filter(b => b.status === 'critical').map(b => b.name);
-                            const warningMarkers = biomarkers.filter(b => b.status === 'warning').map(b => b.name);
+                            const soonMarkers = biomarkers.filter(b => b.status === 'critical').map(b => b.name);
+                            const discussMarkers = biomarkers.filter(b => b.status === 'warning').map(b => b.name);
                             const dynamicQuestions = [];
                             
-                            if (criticalMarkers.length > 0) {
-                                dynamicQuestions.push(`Explain my flagged ${criticalMarkers[0]}`);
-                                dynamicQuestions.push(`What should I ask my doctor about ${criticalMarkers[0]}?`);
+                            if (soonMarkers.length > 0) {
+                                dynamicQuestions.push(`Why is ${soonMarkers[0]} marked discuss soon?`);
+                                dynamicQuestions.push(`What should I ask my doctor about ${soonMarkers[0]}?`);
                             }
-                            if (warningMarkers.length > 0) {
-                                dynamicQuestions.push(`What should I eat to improve ${warningMarkers[0]}?`);
+                            if (discussMarkers.length > 0) {
+                                dynamicQuestions.push(`What context should I discuss for ${discussMarkers[0]}?`);
                             }
                             if (dynamicQuestions.length === 0) {
                                 dynamicQuestions.push(
                                     "What do my latest results mean?",
-                                    "Are there any hidden risks?",
+                                    "What should I monitor over time?",
                                     "What changed since my last report?",
                                     "What should I ask my doctor?"
                                 );
@@ -470,7 +472,7 @@ export function AssistantPageInner() {
                     </button>
                 </div>
                 <p className="text-[11px] text-[#A8A29E] text-center mt-3">
-                    AI-generated insights for educational purposes only. Always consult your physician.
+                    Educational only. AI can make mistakes; discuss results with a qualified clinician.
                 </p>
             </div>
         </>
@@ -516,13 +518,13 @@ export function AssistantPageInner() {
                                         {contextData.title} {contextData.value && `— ${contextData.value}`}
                                     </p>
                                     <p className="text-sm text-sky-700 mt-1 break-words">
-                                        {contextData.trend} {contextData.status === "critical" && "· Below optimal range"}
+                                        {contextData.trend} {contextData.status === "critical" && "· Outside report range"}
                                     </p>
                                 </div>
 
                                 {contextData.status === "critical" && (
                                     <span className="px-3 py-1 bg-red-100/80 text-red-700 text-xs font-bold rounded-full border border-red-200 shrink-0">
-                                        Action Required
+                                        {getPatientStatus(contextData.status).label}
                                     </span>
                                 )}
                             </div>
@@ -547,6 +549,7 @@ export function AssistantPageInner() {
                                     doctorQuestions={doctorQuestions}
                                 />
                             </div>
+                            <TrustLayer variant="compact" />
                         </div>
                     </div>
 

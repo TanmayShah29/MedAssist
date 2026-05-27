@@ -1,9 +1,10 @@
-'use client'; // Error components must be Client Components
+'use client';
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, LayoutDashboard } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { BrandLockup } from '@/components/branding/brand-lockup';
 
 export default function ErrorPage({
     error,
@@ -17,36 +18,56 @@ export default function ErrorPage({
     }, [error]);
 
     return (
-        <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-slate-50 px-4 text-center">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-md w-full">
-                <div className="mx-auto bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                    <AlertTriangle className="h-8 w-8 text-rose-600" />
+        <div className="flex min-h-[100dvh] flex-col bg-[#FAFAF7]">
+            {/* Minimal brand header */}
+            <header className="h-16 flex items-center px-6 border-b border-[#E8E6DF]">
+                <Link href="/" className="group">
+                    <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
+                </Link>
+            </header>
+
+            {/* Error content */}
+            <main className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+                {/* Error indicator */}
+                <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mb-6">
+                    <AlertTriangle className="h-8 w-8 text-red-500" />
                 </div>
-                
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">Something went wrong</h2>
-                
-                <p className="text-slate-600 mb-8 max-w-[280px] mx-auto text-sm">
-                    We encountered an unexpected error. Our team has been notified.
+
+                <h1 className="font-display text-3xl text-[#1C1917] mb-3">
+                    Something went wrong
+                </h1>
+                <p className="text-[#57534E] text-[15px] max-w-sm leading-relaxed mb-8">
+                    We hit an unexpected error. Our team has been notified — you can try again or head back to your dashboard.
                 </p>
 
-                <div className="flex flex-col gap-3">
+                {/* Error digest for support */}
+                {error.digest && (
+                    <p className="text-[11px] font-mono text-[#A8A29E] bg-[#F5F4EF] border border-[#E8E6DF] px-3 py-1.5 rounded-full mb-8">
+                        Error ID: {error.digest}
+                    </p>
+                )}
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                     <button
                         onClick={() => reset()}
-                        className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium transition-colors"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-sky-500 text-white rounded-[10px] font-semibold text-sm shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:bg-sky-600 hover:shadow-[0_4px_18px_rgba(14,165,233,0.35)] transition-all min-h-[44px] active:scale-95"
                     >
                         <RefreshCw className="h-4 w-4" />
                         Try again
                     </button>
-                    
                     <Link
                         href="/dashboard"
-                        className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[10px] font-semibold text-sm hover:border-[#D9D6CD] hover:text-[#1C1917] transition-all min-h-[44px]"
                     >
-                        <Home className="h-4 w-4" />
+                        <LayoutDashboard className="w-4 h-4" />
                         Back to Dashboard
                     </Link>
                 </div>
-            </div>
+
+                <p className="text-[11px] text-[#A8A29E] mt-12">
+                    If this keeps happening, please contact support.
+                </p>
+            </main>
         </div>
     );
 }
