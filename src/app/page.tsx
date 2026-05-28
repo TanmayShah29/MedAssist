@@ -19,47 +19,44 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
   );
 }
 
-// ── Hero floating workspace scene ─────────────────────────────────────────
-function HeroWorkspaceScene() {
+// ── Hero workflow scene ──────────────────────────────────────────────────
+function HeroWorkflowScene() {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden lg:block">
-      {/* Glucose monitor card */}
-      <div className="absolute left-[7%] top-[29%] w-56 rounded-[14px] border border-amber-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float landing-card-pop">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">Discuss</p>
-          <span className="h-2 w-2 rounded-full bg-amber-400 landing-dot-pulse" />
-        </div>
-        <p className="text-sm font-bold text-[#1C1917]">Glucose 106 mg/dL</p>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-amber-100">
-          <div className="h-full rounded-full bg-amber-400 landing-meter-fill" />
-        </div>
-        <p className="mt-2 text-xs font-semibold text-amber-700">+15% from prior</p>
-      </div>
+    <div className="pointer-events-none relative mx-auto mt-8 hidden w-full max-w-4xl lg:block landing-rise" style={{ animationDelay: "240ms" }}>
+      <div className="absolute left-[18%] right-[18%] top-1/2 h-px -translate-y-1/2 bg-sky-200/80" />
+      <div className="absolute left-[18%] right-[18%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-data-trace" />
 
-      {/* Ready card */}
-      <div className="absolute right-[7%] top-[33%] w-60 rounded-[14px] border border-emerald-100 bg-white/88 p-4 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "180ms, 900ms" }}>
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+      <div className="relative grid grid-cols-3 gap-5">
+        <div className="rounded-[16px] border border-sky-100 bg-white/90 p-4 shadow-xl shadow-stone-900/[0.04] backdrop-blur landing-float landing-card-pop">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Upload</p>
+            <Upload className="h-4 w-4 text-sky-500" />
+          </div>
+          <div className="rounded-[12px] border border-dashed border-sky-200 bg-sky-50/60 p-3.5">
+            <p className="text-sm font-bold text-[#1C1917]">Blood work PDF</p>
+            <p className="mt-1 text-xs text-[#78716C]">CBC, CMP, lipids, A1C</p>
+          </div>
         </div>
-        <p className="text-sm font-bold text-[#1C1917]">3 doctor questions drafted</p>
-        <p className="mt-2 text-xs leading-relaxed text-[#57534E]">Bring a focused one-page brief to the appointment.</p>
-      </div>
 
-      {/* Trace lines */}
-      <div className="absolute bottom-[27%] left-[23%] h-px w-[54%] origin-center bg-sky-300/70 landing-pulse-line" />
-      <div className="absolute bottom-[26%] left-[23%] h-px w-[54%] origin-left bg-gradient-to-r from-transparent via-sky-500 to-transparent landing-data-trace" />
-
-      {/* Analyzing card */}
-      <div className="absolute left-[18%] top-[58%] w-48 rounded-[14px] border border-violet-100 bg-white/84 p-3 shadow-xl shadow-stone-900/5 backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "300ms, 1400ms" }}>
-        <div className="mb-2 flex items-center gap-2">
-          <Brain className="h-4 w-4 text-violet-500" />
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyzing</p>
+        <div className="rounded-[16px] border border-violet-100 bg-white/92 p-4 shadow-xl shadow-stone-900/[0.05] backdrop-blur landing-float-slow landing-card-pop" style={{ animationDelay: "120ms, 860ms" }}>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-violet-700">Analyze</p>
+            <Brain className="h-4 w-4 text-violet-500" />
+          </div>
+          <div className="space-y-2.5">
+            <span className="block h-2 w-full rounded-full bg-violet-100 landing-shimmer" />
+            <span className="block h-2 w-4/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "220ms" }} />
+            <span className="block h-2 w-2/3 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "440ms" }} />
+          </div>
         </div>
-        <div className="space-y-1.5">
-          <span className="block h-1.5 w-full rounded-full bg-violet-100 landing-shimmer" />
-          <span className="block h-1.5 w-4/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "280ms" }} />
-          <span className="block h-1.5 w-3/5 rounded-full bg-violet-100 landing-shimmer" style={{ animationDelay: "560ms" }} />
+
+        <div className="rounded-[16px] border border-emerald-100 bg-white/90 p-4 shadow-xl shadow-stone-900/[0.04] backdrop-blur landing-float landing-card-pop" style={{ animationDelay: "220ms, 420ms" }}>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
+            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+          </div>
+          <p className="text-sm font-bold text-[#1C1917]">3 doctor questions drafted</p>
+          <p className="mt-2 text-xs leading-relaxed text-[#57534E]">A focused one-page brief for the appointment.</p>
         </div>
       </div>
     </div>
@@ -99,20 +96,19 @@ export default function LandingPage() {
       <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-[100dvh] px-4 pb-16 pt-24 sm:px-6 sm:pt-28 overflow-hidden">
+      <section className="relative min-h-[100dvh] px-4 pb-10 pt-20 sm:px-6 sm:pt-24 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_46%,#EAF8FF_100%)]" />
         <div className="absolute inset-0 opacity-[0.28] landing-grid-drift" />
         <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent landing-pulse-line" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
-        <HeroWorkspaceScene />
 
         <div className="relative mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-6xl flex-col justify-center">
           <div className="mx-auto max-w-3xl text-center">
-            <Pill className="bg-white/86 border border-sky-200 text-sky-700 mb-6 shadow-sm landing-rise">
+            <Pill className="bg-white/86 border border-sky-200 text-sky-700 mb-5 shadow-sm landing-rise">
               <ClipboardList size={10} /> Visit prep intelligence
             </Pill>
 
-            <h1 className="font-display text-[42px] sm:text-6xl lg:text-[74px] text-[#1C1917] leading-[0.98] mb-6 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
+            <h1 className="font-display text-[42px] sm:text-6xl lg:text-[68px] xl:text-[74px] text-[#1C1917] leading-[0.98] mb-5 max-w-full text-balance landing-rise" style={{ animationDelay: "60ms" }}>
               Lab reports, translated into doctor-ready{" "}
               <span className="relative inline-block">
                 clarity.
@@ -120,7 +116,7 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="text-[17px] sm:text-lg text-[#57534E] leading-relaxed mb-8 max-w-2xl mx-auto overflow-wrap-anywhere landing-rise" style={{ animationDelay: "110ms" }}>
+            <p className="text-[16px] sm:text-[17px] text-[#57534E] leading-relaxed mb-7 max-w-2xl mx-auto overflow-wrap-anywhere landing-rise" style={{ animationDelay: "110ms" }}>
               Upload a blood work PDF. MedAssist explains what changed, prioritizes what matters, and creates a one-page appointment brief with questions you can bring to your doctor.
             </p>
 
@@ -140,11 +136,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <p className="text-[12px] text-[#A8A29E] landing-rise" style={{ animationDelay: "210ms" }}>
-              No login to try the demo · Free account · No credit card
-            </p>
-
-            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-6 justify-center landing-rise" style={{ animationDelay: "260ms" }}>
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3 mt-5 justify-center landing-rise" style={{ animationDelay: "260ms" }}>
               {[
                 { icon: Lock, label: "Private by design" },
                 { icon: Trash2, label: "Delete reports anytime" },
@@ -158,6 +150,7 @@ export default function LandingPage() {
             </div>
             <MobileHeroPreview />
           </div>
+          <HeroWorkflowScene />
         </div>
       </section>
 

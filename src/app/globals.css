@@ -317,6 +317,33 @@
     animation: landingShimmer 2.2s ease-in-out infinite;
   }
 
+  .landing-grid-drift {
+    background-image:
+      linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.10) 1px, transparent 1px);
+    background-size: 72px 72px;
+    animation: landingGridDrift 18s linear infinite;
+  }
+
+  .landing-pulse-line {
+    animation: landingPulseLine 3.8s ease-in-out infinite;
+  }
+
+  .landing-data-trace {
+    animation: landingDataTrace 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    transform-origin: left center;
+  }
+
+  .landing-dot-pulse {
+    animation: landingDotPulse 1.8s ease-in-out infinite;
+  }
+
+  .landing-meter-fill,
+  .landing-progress {
+    animation: landingMeterFill 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: left center;
+  }
+
   .landing-chip {
     transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
   }
@@ -857,6 +884,61 @@
   }
 }
 
+@keyframes landingGridDrift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 72px 72px, 72px 72px;
+  }
+}
+
+@keyframes landingPulseLine {
+  0%, 100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.82;
+  }
+}
+
+@keyframes landingDataTrace {
+  0% {
+    opacity: 0;
+    transform: scaleX(0) translateX(-12%);
+  }
+  18% {
+    opacity: 0.82;
+  }
+  74% {
+    opacity: 0.82;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1) translateX(12%);
+  }
+}
+
+@keyframes landingDotPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes landingMeterFill {
+  from {
+    transform: scaleX(0.18);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes brandSkeletonSweep {
   100% {
     transform: translateX(100%);
@@ -975,7 +1057,13 @@
   .landing-flow-line,
   .landing-typewriter,
   .landing-cta-aurora,
-  .landing-button-shine {
+  .landing-button-shine,
+  .landing-grid-drift,
+  .landing-pulse-line,
+  .landing-data-trace,
+  .landing-dot-pulse,
+  .landing-meter-fill,
+  .landing-progress {
     animation: none !important;
   }
 }
