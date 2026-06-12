@@ -79,8 +79,8 @@ export function BiomarkerGrid({
     return (
         <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#A8A29E] uppercase tracking-tighter">
+                <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#78716C] uppercase tracking-tighter">
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} />{PATIENT_STATUS.optimal.label}: {optimalCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} />{PATIENT_STATUS.warning.label}: {warningCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} />{PATIENT_STATUS.critical.label}: {criticalCount}</span>
@@ -150,7 +150,7 @@ function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
     return (
         <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
             <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#78716C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="1" />
                     <line x1="9" y1="12" x2="15" y2="12" />
@@ -248,7 +248,7 @@ function BiomarkerCard({
                             {Math.abs(delta.percent)}% from last
                         </div>
                     ) : (
-                        <div className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-tighter">No previous data</div>
+                        <div className="text-[9px] font-bold text-[#78716C] uppercase tracking-tighter">No previous data</div>
                     )}
                 </div>
             </div>
@@ -256,14 +256,14 @@ function BiomarkerCard({
             {/* Name + interpretation */}
             <div className="grow shrink basis-0 flex flex-col min-w-0">
                 <span className="text-[15px] font-bold text-[#1C1917] block mb-1 break-words">{b.name}</span>
-                <p className="text-[11px] text-[#A8A29E] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
+                <p className="text-[11px] text-[#78716C] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
                     {b.ai_interpretation || 'Clinical data point extracted from report.'}
                 </p>
 
                 {/* Range bar */}
                 {showBar && (
                     <div className="mt-3">
-                        <div className="flex justify-between gap-2 text-[10px] text-[#A8A29E] font-medium mb-1 min-w-0">
+                        <div className="flex justify-between gap-2 text-[10px] text-[#78716C] font-medium mb-1 min-w-0">
                             <span className="min-w-0 break-words">{rangeMin}</span>
                             <span className="min-w-0 break-words text-right">{rangeMax} {b.unit}</span>
                         </div>

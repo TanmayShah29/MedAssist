@@ -81,7 +81,7 @@ export function Sidebar({ className }: { className?: string }) {
               <div className="flex items-center gap-3">
                 <item.icon
                   className={cn("w-4 h-4 transition-transform duration-150",
-                    isActive ? "text-[#0EA5E9]" : "text-[#A8A29E] group-hover:text-[#57534E]",
+                    isActive ? "text-[#0EA5E9]" : "text-[#78716C] group-hover:text-[#57534E]",
                     "group-hover:scale-110"
                   )}
                 />
@@ -110,7 +110,7 @@ export function Sidebar({ className }: { className?: string }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-            <span className="text-[11px] text-[#A8A29E]">Private prep active</span>
+            <span className="text-[11px] text-[#78716C]">Private prep active</span>
           </div>
           <span className="text-[10px] text-emerald-500 font-semibold">LIVE</span>
         </div>
@@ -127,14 +127,14 @@ export function Sidebar({ className }: { className?: string }) {
 
         <div className="grow shrink basis-0 min-w-0">
           <p className="text-sm font-semibold text-[#1C1917] truncate">
-            {user.name ?? <span className="text-[#A8A29E] font-normal">Loading…</span>}
+            {user.name ?? <span className="text-[#78716C] font-normal">Loading…</span>}
           </p>
-          <p className="text-[11px] text-[#A8A29E]">Patient</p>
+          <p className="text-[11px] text-[#78716C]">Patient</p>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="text-[#A8A29E] hover:text-red-500 transition-colors p-2.5 hover:bg-red-50 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="text-[#78716C] hover:text-red-500 transition-colors p-2.5 hover:bg-red-50 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
           title="Sign Out"
           style={{ WebkitAppearance: "none" }}
         >

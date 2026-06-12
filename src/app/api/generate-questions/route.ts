@@ -1,11 +1,14 @@
 import { getAuthClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { apiResponse } from '@/lib/api-response';
 import { checkRateLimit } from '@/services/rateLimitService';
+import { validateContentLength } from '@/lib/request-validation';
 import { withRetry } from '@/lib/retry';
 import { logger } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import Groq from 'groq-sdk';
 import { z } from 'zod';
+import { GenerateQuestionsRequestSchema, GeneratedQuestionsSchema } from '@/lib/validations/api';
 
 export const maxDuration = 30;
 export const runtime = 'nodejs';
@@ -16,19 +19,6 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const MODEL = 'llama-3.3-70b-versatile';
 
 // ── Input validation ────────────────────────────────────────────────────────
-
-const requestSchema = z.object({
-    biomarkers: z.array(z.object({
-        name: z.string().min(1).max(200),
-        value: z.union([z.number(), z.string()])
-            .transform(v => Number(v))
-            .refine(n => !Number.isNaN(n), { message: 'value must be numeric' }),
-        unit: z.string().max(50),
-        status: z.enum(['optimal', 'warning', 'critical']),
-        reference_range_min: z.number().nullable().optional(),
-        reference_range_max: z.number().nullable().optional(),
-    })).optional().default([]),
-});
 
 // Type guard for cached doctor questions stored in raw_ai_json
 function parseCachedQuestions(
@@ -57,7 +47,7 @@ function parseCachedQuestions(
     return validated.length > 0 ? validated : null;
 }
 
-type BiomarkerInput = z.infer<typeof requestSchema>['biomarkers'][number];
+type BiomarkerInput = z.infer<typeof GenerateQuestionsRequestSchema>['biomarkers'][number];
 
 // ── Route handler ────────────────────────────────────────────────────────────
 
@@ -65,7 +55,7 @@ export async function POST(request: NextRequest) {
     // 1. IP-level rate limit
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: rateLimitResult.message || 'Too many requests' },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         );
@@ -75,7 +65,7 @@ export async function POST(request: NextRequest) {
     const supabase = await getAuthClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        return apiResponse({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 3. Parse & validate body
@@ -83,12 +73,12 @@ export async function POST(request: NextRequest) {
     try {
         body = await request.json();
     } catch {
-        return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
+        return apiResponse({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
 
-    const parseResult = requestSchema.safeParse(body);
+    const parseResult = GenerateQuestionsRequestSchema.safeParse(body);
     if (!parseResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: parseResult.error.issues[0]?.message || 'Invalid input' },
             { status: 400 }
         );
@@ -97,17 +87,18 @@ export async function POST(request: NextRequest) {
     const { biomarkers } = parseResult.data;
 
     if (biomarkers.length === 0) {
-        return NextResponse.json({ questions: [] });
+        return apiResponse({ questions: [] });
     }
 
     try {
+        validateContentLength(request);
         // 4. Only generate questions for flagged biomarkers
         const criticalBiomarkers = biomarkers.filter(
             (b: BiomarkerInput) => b.status === 'critical' || b.status === 'warning'
         );
 
         if (criticalBiomarkers.length === 0) {
-            return NextResponse.json({
+            return apiResponse({
                 questions: [{
                     question: 'Which of these in-range results should we keep monitoring over time?',
                     context: 'All provided biomarkers appear in range, so the visit can focus on what to track next.',
@@ -132,7 +123,7 @@ export async function POST(request: NextRequest) {
 
         const cachedLocal = parseCachedQuestions(latestReport?.raw_ai_json, cacheKey);
         if (cachedLocal) {
-            return NextResponse.json({ questions: cachedLocal, cached: true });
+            return apiResponse({ questions: cachedLocal, cached: true });
         }
 
         // 7. Global AI response cache (keyed on name + status + value, cross-user)
@@ -145,12 +136,14 @@ export async function POST(request: NextRequest) {
 
             if (globalCache) {
                 // Bump usage count asynchronously — don't block the response
-                supabaseAdmin.from('global_ai_cache')
-                    .update({ usage_count: ((globalCache.usage_count as number) || 0) + 1, updated_at: new Date().toISOString() })
-                    .eq('cache_key', cacheKey)
-                    .then(() => { /* fire-and-forget */ });
+                Promise.resolve(
+                    supabaseAdmin.from('global_ai_cache')
+                        .update({ usage_count: ((globalCache.usage_count as number) || 0) + 1, updated_at: new Date().toISOString() })
+                        .eq('cache_key', cacheKey)
+                ).then(() => {})
+                    .catch((err: unknown) => logger.error('[generate-questions] Cache bump failed:', err));
 
-                return NextResponse.json({ questions: globalCache.response_json, cached: 'global' });
+                return apiResponse({ questions: globalCache.response_json, cached: 'global' });
             }
         }
 
@@ -193,18 +186,11 @@ Return a JSON object with a "questions" key containing an array:
         );
 
         // 9. Parse AI response — always expect { questions: [...] } now (fix #8)
-        const questionsSchema = z.object({
-            questions: z.array(z.object({
-                question: z.string(),
-                context: z.string(),
-            })).min(1),
-        });
-
         let questions: { question: string; context: string }[] = [];
         try {
             const content = completion.choices[0].message.content || '{}';
             const parsed = JSON.parse(content);
-            const validated = questionsSchema.safeParse(parsed);
+            const validated = GeneratedQuestionsSchema.safeParse(parsed);
             if (validated.success) {
                 questions = validated.data.questions;
             } else {
@@ -235,26 +221,31 @@ Return a JSON object with a "questions" key containing an array:
                     cached_doctor_questions: questions,
                     cached_doctor_questions_key: cacheKey,
                 };
-                supabase.from('lab_results')
-                    .update({ raw_ai_json: updatedAiJson })
-                    .eq('id', latestReport.id)
-                    .then(() => { /* fire-and-forget */ });
+                Promise.resolve(
+                    supabase.from('lab_results')
+                        .update({ raw_ai_json: updatedAiJson })
+                        .eq('id', latestReport.id)
+                ).then(() => {})
+                    .catch((err: unknown) => logger.error('[generate-questions]  local cache write failed:', err));
             }
 
             // Fix #1: null-guard supabaseAdmin before writing global cache
             if (supabaseAdmin) {
-                supabaseAdmin.from('global_ai_cache').upsert({
-                    cache_key: cacheKey,
-                    response_json: questions,
-                    updated_at: new Date().toISOString(),
-                }, { onConflict: 'cache_key' }).then(() => { /* fire-and-forget */ });
+                Promise.resolve(
+                    supabaseAdmin.from('global_ai_cache').upsert({
+                        cache_key: cacheKey,
+                        response_json: questions,
+                        updated_at: new Date().toISOString(),
+                    }, { onConflict: 'cache_key' })
+                ).then(() => {})
+                    .catch((err: unknown) => logger.error('[generate-questions] global cache write failed:', err));
             }
         }
 
-        return NextResponse.json({ questions, cached: false });
+        return apiResponse({ questions, cached: false });
 
     } catch (error: unknown) {
         logger.error('[generate-questions] Unexpected error', error);
-        return NextResponse.json({ error: 'Failed to generate questions. Please try again.' }, { status: 500 });
+        return apiResponse({ error: 'Failed to generate questions. Please try again.' }, { status: 500 });
     }
 }

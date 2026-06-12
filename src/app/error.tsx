@@ -42,7 +42,7 @@ export default function ErrorPage({
 
                 {/* Error digest for support */}
                 {error.digest && (
-                    <p className="text-[11px] font-mono text-[#A8A29E] bg-[#F5F4EF] border border-[#E8E6DF] px-3 py-1.5 rounded-full mb-8">
+                    <p className="text-[11px] font-mono text-[#78716C] bg-[#F5F4EF] border border-[#E8E6DF] px-3 py-1.5 rounded-full mb-8">
                         Error ID: {error.digest}
                     </p>
                 )}
@@ -64,7 +64,7 @@ export default function ErrorPage({
                     </Link>
                 </div>
 
-                <p className="text-[11px] text-[#A8A29E] mt-12">
+                <p className="text-[11px] text-[#78716C] mt-12">
                     If this keeps happening, please contact support.
                 </p>
             </main>

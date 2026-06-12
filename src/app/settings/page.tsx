@@ -45,7 +45,7 @@ function SettingsRow({
       </div>
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-semibold break-words ${danger ? "text-red-700" : "text-[#1C1917]"}`}>{title}</p>
-        {description && <p className="text-[12px] text-[#A8A29E] mt-0.5 leading-relaxed break-words">{description}</p>}
+        {description && <p className="text-[12px] text-[#78716C] mt-0.5 leading-relaxed break-words">{description}</p>}
         {children && <div className="mt-3">{children}</div>}
       </div>
     </div>
@@ -168,7 +168,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8A29E] hover:text-[#57534E] transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#78716C] hover:text-[#57534E] transition-colors"
                   style={{ WebkitAppearance: "none" }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -289,7 +289,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-[#1C1917]">MedAssist</p>
-                <p className="text-[11px] text-[#A8A29E]">Health Intelligence Platform</p>
+                <p className="text-[11px] text-[#78716C]">Health Intelligence Platform</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-[#C5C2B8]" />

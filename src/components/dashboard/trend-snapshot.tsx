@@ -16,9 +16,9 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
         return (
             <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 flex items-center justify-center text-center shadow-sm h-full min-h-[160px]">
                 <div>
-                    <Activity className="w-8 h-8 text-[#A8A29E] mx-auto mb-3 opacity-50" />
+                    <Activity className="w-8 h-8 text-[#78716C] mx-auto mb-3 opacity-50" />
                     <h3 className="text-[15px] font-bold text-[#57534E] mb-1">Upload another report</h3>
-                    <p className="text-[13px] text-[#A8A29E]">Give your next visit trend context instead of a single snapshot.</p>
+                    <p className="text-[13px] text-[#78716C]">Give your next visit trend context instead of a single snapshot.</p>
                 </div>
             </div>
         );
@@ -50,7 +50,7 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
 
     return (
         <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full">
-            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider mb-4">Visit Trend Snapshot</h3>
+            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider mb-4">Visit Trend Snapshot</h3>
             <div className="space-y-3 min-w-0">
                 {trends.map((item, idx) => {
                     if (!item) return null;

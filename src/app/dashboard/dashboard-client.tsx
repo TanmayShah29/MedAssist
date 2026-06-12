@@ -19,6 +19,7 @@ import {
     MessageSquareText,
 } from 'lucide-react'
 
+import { MedicalDisclaimer } from '@/components/medical-disclaimer'
 import { UploadModal } from '@/components/upload-modal'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { AIInsightsFeed } from '@/components/dashboard/ai-insights-feed'
@@ -35,7 +36,7 @@ import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
 
 import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
-import { labResultSummary, latestUniqueBiomarkers } from '@/lib/medical-data'
+import { labResultSummary, latestUniqueBiomarkers, decryptRawAiJson } from '@/lib/medical-data'
 import { computeBriefCompleteness, PATIENT_STATUS } from '@/lib/patient-status'
 import { TrustLayer } from '@/components/trust-layer'
 
@@ -94,7 +95,7 @@ function LongitudinalComparisonCard({
             <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                     <h3 className="text-[18px] font-bold text-[#1C1917]">Progress Report</h3>
-                    <p className="text-[12px] text-[#A8A29E] mt-0.5 break-words">
+                    <p className="text-[12px] text-[#78716C] mt-0.5 break-words">
                         Changes from{' '}
                         {new Date(previousReportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                         {' '}to{' '}
@@ -121,7 +122,7 @@ function LongitudinalComparisonCard({
                             </div>
                             <div className="flex items-baseline gap-1 min-w-0">
                                 <span className="text-[20px] font-extrabold text-[#1C1917] break-words min-w-0">{change.currentValue}</span>
-                                <span className="text-[12px] text-[#A8A29E] break-words min-w-0">{change.unit}</span>
+                                <span className="text-[12px] text-[#78716C] break-words min-w-0">{change.unit}</span>
                             </div>
                             <p className="text-[11px] text-[#78716C] mt-1">Was {change.previousValue} {change.unit}</p>
                         </div>
@@ -161,7 +162,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
                     Try with sample lab report
                 </button>
             </div>
-            <p className="text-[12px] text-[#A8A29E] mt-3">
+            <p className="text-[12px] text-[#78716C] mt-3">
                 Supports digital PDF lab reports · Prep sheet generated in under a minute
             </p>
         </div>
@@ -282,8 +283,9 @@ export default function DashboardClient({
     const latestLabResult = displayLabResults[0];
     const latestSummary = labResultSummary(latestLabResult);
 
+    const decryptedJson = decryptRawAiJson(latestLabResult?.raw_ai_json);
     const longitudinalInsights: string[] =
-        (latestLabResult?.raw_ai_json as { longitudinalInsights?: string[] })?.longitudinalInsights ?? [];
+        (decryptedJson as { longitudinalInsights?: string[] })?.longitudinalInsights ?? [];
 
     const symptomConnections = latestLabResult?.symptom_connections ?? [];
 
@@ -361,7 +363,7 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated && (
-                        <p className="text-[11px] sm:text-[12px] font-bold text-[#A8A29E] uppercase tracking-wider ml-auto text-right leading-tight">Report: {lastUpdated}</p>
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#78716C] uppercase tracking-wider ml-auto text-right leading-tight">Report: {lastUpdated}</p>
                     )}
                     {isOffline && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-2">
@@ -484,6 +486,7 @@ export default function DashboardClient({
 
                     {/* ── LEFT: Main clinical column ── */}
                     <div className="flex flex-col gap-6 min-w-0">
+                        <MedicalDisclaimer variant="compact" className="mb-2" />
                         <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
@@ -497,7 +500,7 @@ export default function DashboardClient({
                                     <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0">
                                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                                             <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
-                                            <span className="text-[12px] text-[#A8A29E]">may be related to</span>
+                                            <span className="text-[12px] text-[#78716C]">may be related to</span>
                                             {conn.relatedBiomarkers?.map(b => (
                                                 <span key={b} className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-md px-2 py-0.5 text-[12px] text-[#57534E]">{b}</span>
                                             ))}
@@ -549,7 +552,7 @@ export default function DashboardClient({
 
                         {/* AI Insights */}
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
                             <AIInsightsFeed analysis={{ summary: latestSummary }} />
                         </div>
 
@@ -603,7 +606,7 @@ export default function DashboardClient({
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
                             <MedicineCabinet />
                         </div>
                         <TrustLayer variant="full" />
@@ -675,7 +678,7 @@ export default function DashboardClient({
                                                     <span className="text-[10px] font-bold text-emerald-600">{optimalInCat}/{totalInCat}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-[10px] text-[#A8A29E] italic">Not in latest report</span>
+                                                <span className="text-[10px] text-[#78716C] italic">Not in latest report</span>
                                             )}
                                         </div>
                                     );
@@ -704,7 +707,7 @@ export default function DashboardClient({
                         and does not provide medical diagnoses, treatment advice, or prescriptions. Always consult with a
                         qualified healthcare professional before making any health decisions.
                     </p>
-                    <p className="text-[11px] text-[#A8A29E]">
+                    <p className="text-[11px] text-[#78716C]">
                         &copy; {new Date().getFullYear()} MedAssist. All rights reserved.
                     </p>
                 </div>

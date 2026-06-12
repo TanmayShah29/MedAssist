@@ -20,7 +20,7 @@ export default function PrivacyPage() {
             }}>
                 Privacy Policy
             </h1>
-            <p style={{ color: '#A8A29E', fontSize: 13, margin: '0 0 40px 0' }}>
+            <p style={{ color: '#78716C', fontSize: 13, margin: '0 0 40px 0' }}>
                 Last updated: February 2026
             </p>
 

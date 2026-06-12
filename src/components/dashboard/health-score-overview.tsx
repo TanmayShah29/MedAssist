@@ -71,9 +71,17 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             aria-label={onClick ? "Brief completeness details" : undefined}
         >
             <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
-                <h3 className="text-[10px] font-semibold uppercase text-[#A8A29E] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
+                <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
                     Brief Completeness
-                    <div className="cursor-help text-[#A8A29E] hover:text-[#57534E] relative">
+                    <button
+                      type="button"
+                      aria-label="About brief completeness"
+                      className="cursor-help text-[#78716C] hover:text-[#57534E] relative"
+                      onFocus={() => setShowTooltip(true)}
+                      onBlur={() => setShowTooltip(false)}
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
                         <Info className="w-3.5 h-3.5" />
                         <div className={cn(
                             "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-opacity z-10 normal-case leading-relaxed font-normal",
@@ -81,7 +89,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                         )}>
                             A preparation estimate based on lab data, prior reports, symptoms, and medication context. Click to see breakdown.
                         </div>
-                    </div>
+                    </button>
                 </h3>
                 {onClick && (
                     <span className="text-[10px] font-semibold text-sky-500 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
@@ -107,7 +115,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="font-display text-3xl font-bold text-[#1C1917] leading-none">{displayScore}</span>
-                        <span className="text-[10px] font-bold text-[#A8A29E] mt-0.5">/ 100</span>
+                        <span className="text-[10px] font-bold text-[#78716C] mt-0.5">/ 100</span>
                     </div>
                 </div>
 

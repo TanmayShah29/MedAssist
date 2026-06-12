@@ -12,6 +12,36 @@ const LIMITS = {
     PER_HOUR: { limit: 100, window: 3600 }
 };
 
+// ── In-memory rate limit fallback (when DB is unreachable) ───────────────
+const inMemoryRateLimit = new Map<string, { count: number; windowStart: number }>();
+
+// Clean up old entries every 60 seconds
+setInterval(() => {
+    const now = Date.now();
+    const windowMs = 60000;
+    const currentWindowStart = Math.floor(now / windowMs) * windowMs;
+    for (const [key, value] of inMemoryRateLimit.entries()) {
+        if (value.windowStart < currentWindowStart) {
+            inMemoryRateLimit.delete(key);
+        }
+    }
+}, 60000).unref();
+
+function checkInMemoryRateLimit(ipHash: string, limit: number): boolean {
+    const now = Date.now();
+    const windowMs = 60000;
+    const windowStart = Math.floor(now / windowMs) * windowMs;
+
+    const entry = inMemoryRateLimit.get(ipHash);
+    if (!entry || entry.windowStart !== windowStart) {
+        inMemoryRateLimit.set(ipHash, { count: 1, windowStart });
+        return true;
+    }
+
+    entry.count++;
+    return entry.count <= limit;
+}
+
 export type RateLimitResult = {
     success: boolean;
     message?: string;
@@ -50,13 +80,13 @@ async function getClientIp(): Promise<string> {
 }
 
 /**
- * CHECK RATE LIMIT (New Service Method)
+ * CHECK RATE LIMIT
  * Calls Supabase RPC `check_rate_limit`.
  */
-export async function checkRateLimit(): Promise<RateLimitResult> {
-    // Bypass only when explicitly disabled (e.g. local dev without Supabase)
-    if (process.env.DISABLE_RATE_LIMIT === 'true') {
-        logger.info('[RateLimit] Bypassed via DISABLE_RATE_LIMIT=true');
+export async function checkRateLimit(identifier?: string): Promise<RateLimitResult> {
+    // Bypass only when explicitly confirmed (e.g. local dev without Supabase)
+    if (process.env.MEDASSIST_ALLOW_RATE_LIMIT_BYPASS === 'true-and-confirmed') {
+        logger.info('[RateLimit] Bypassed via MEDASSIST_ALLOW_RATE_LIMIT_BYPASS');
         return { success: true };
     }
 
@@ -66,18 +96,22 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
     }
 
     try {
-        logger.info('[RateLimit] Starting check...');
-        const ip = await getClientIp();
-        logger.info(`[RateLimit] IP: ${ip}`);
-        const ipHash = hashIp(ip);
+        let fingerprint: string;
+        if (identifier) {
+            // Use the provided identifier (e.g. userId) as the fingerprint
+            fingerprint = identifier;
+        } else {
+            // Fall back to IP hashing for anonymous/unknown identifiers
+            const ip = await getClientIp();
+            fingerprint = hashIp(ip);
+        }
 
         // 1. Check Minute Limit
         const { data: allowedMinute, error: errorMin } = await supabaseAdmin.rpc('check_rate_limit', {
-            p_fingerprint: ipHash,
+            p_fingerprint: fingerprint,
             p_window_seconds: LIMITS.PER_MINUTE.window,
             p_limit: LIMITS.PER_MINUTE.limit
         });
-        logger.info(`[RateLimit] Supabase result (Minute): ${allowedMinute}, ${errorMin}`);
 
         if (errorMin) {
             // Specifically handle "function not found" to help developer
@@ -88,8 +122,6 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
         }
 
         if (!allowedMinute) {
-            // Deterministic cooldown: If blocked by minute rule, wait up to 60s. 
-            // Ideally RPC returns TTL, but safe fallback is full window.
             return {
                 success: false,
                 message: "Rate limit exceeded (10/min).",
@@ -99,7 +131,7 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
 
         // 2. Check Hourly Limit
         const { data: allowedHour, error: errorHour } = await supabaseAdmin.rpc('check_rate_limit', {
-            p_fingerprint: ipHash,
+            p_fingerprint: fingerprint,
             p_window_seconds: LIMITS.PER_HOUR.window,
             p_limit: LIMITS.PER_HOUR.limit
         });
@@ -116,26 +148,22 @@ export async function checkRateLimit(): Promise<RateLimitResult> {
         return { success: true };
 
     } catch (error) {
-        // ⚠️  INFRA FAILURE: the rate-limit DB/RPC is unreachable.
-        // Failing closed means ALL users are blocked until it recovers.
-        // This log should trigger a monitoring alert in production.
         logger.error(
-            '[RateLimit] Infrastructure failure — rate-limit RPC unreachable. ' +
-            'All traffic is being blocked until DB connectivity is restored.',
+            '[RateLimit] Infrastructure failure — rate-limit RPC unreachable. Falling back to in-memory limiter.',
             error
         );
 
-        // Fail open only when explicitly disabled (local dev)
-        if (process.env.DISABLE_RATE_LIMIT === 'true') {
-            logger.info('[RateLimit] DISABLE_RATE_LIMIT=true: failing open despite infra error');
-            return { success: true };
+        // Fall back to in-memory rate limiting (stops abuse without blocking all traffic)
+        const ip = await getClientIp().catch(() => "unknown");
+        const fingerprint = identifier || hashIp(ip);
+        if (!checkInMemoryRateLimit(fingerprint, LIMITS.PER_MINUTE.limit)) {
+            return {
+                success: false,
+                message: "Rate limit exceeded. Please wait a moment.",
+                retryAfter: LIMITS.PER_MINUTE.window,
+            };
         }
 
-        // Fail closed in production (intentional — prevents quota abuse during outage)
-        return {
-            success: false,
-            message: 'Service temporarily unavailable. Please try again shortly.',
-            retryAfter: 60,
-        };
+        return { success: true };
     }
 }

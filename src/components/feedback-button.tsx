@@ -70,7 +70,7 @@ export function FeedbackButton() {
                             <h3 className="text-sm font-semibold text-[#1C1917]">Send Feedback</h3>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-[#A8A29E] hover:text-[#1C1917] transition-colors p-1"
+                                className="text-[#78716C] hover:text-[#1C1917] transition-colors p-1"
                                 aria-label="Close"
                             >
                                 <X size={16} />
@@ -81,7 +81,7 @@ export function FeedbackButton() {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Found a bug? Have a suggestion?"
-                                className="w-full text-sm bg-[#FAFAF7] border border-[#E8E6DF] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#1C1917] placeholder:text-[#A8A29E]"
+                                className="w-full text-sm bg-[#FAFAF7] border border-[#E8E6DF] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#1C1917] placeholder:text-[#78716C]"
                                 required
                             />
                             <button

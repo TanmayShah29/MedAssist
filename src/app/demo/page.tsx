@@ -9,7 +9,7 @@ import { BrandLockup } from "@/components/branding/brand-lockup";
 const T = {
   page: "#FAFAF7", card: "#F5F4EF", cardHover: "#EFEDE6",
   border: "#E8E6DF", borderMed: "#D9D6CD",
-  text: "#1C1917", textSec: "#57534E", textMuted: "#A8A29E",
+  text: "#1C1917", textSec: "#57534E", textMuted: "#78716C",
   brand: "#0EA5E9", brandHover: "#0284C7",
   optimal: "#10B981", warning: "#F59E0B", critical: "#EF4444",
   optimalBg: "#F0FDF4", optimalBorder: "#BBF7D0", optimalText: "#065F46",
@@ -1235,8 +1235,8 @@ export default function DemoPage() {
                   padding: '8px 12px', border: 'none', background: 'transparent',
                   cursor: 'pointer', minWidth: 44, minHeight: 44,
                 }}>
-                  <Icon path={iconPath} size={22} color={active ? T.brand : '#A8A29E'} />
-                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? T.brand : '#A8A29E' }}>{labels[id]}</span>
+                  <Icon path={iconPath} size={22} color={active ? T.brand : '#78716C'} />
+                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? T.brand : '#78716C' }}>{labels[id]}</span>
                 </button>
               );
             })}

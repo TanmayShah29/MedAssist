@@ -135,7 +135,7 @@ export function DoctorVisitPrep({
                         <h2 className="text-[21px] font-bold text-[#1C1917] leading-tight text-wrap-safe">
                             Your appointment one-pager
                         </h2>
-                        <p className="text-[12px] text-[#A8A29E] mt-1">
+                        <p className="text-[12px] text-[#78716C] mt-1">
                             Generated from your latest results{prep.reportCount > 1 ? ` and ${prep.reportCount - 1} prior report${prep.reportCount > 2 ? "s" : ""}` : ""}.
                         </p>
                     </div>
@@ -165,7 +165,7 @@ export function DoctorVisitPrep({
 
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Top things to discuss</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Top things to discuss</h3>
                     <div className="space-y-2">
                         {prep.flagged.length > 0 ? prep.flagged.map(b => (
                             <div key={b.id} className="flex flex-col items-start gap-2 rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2 min-w-0 sm:flex-row sm:justify-between">
@@ -178,13 +178,13 @@ export function DoctorVisitPrep({
                                 </span>
                             </div>
                         )) : (
-                            <p className="text-[13px] text-[#A8A29E]">No flagged biomarkers in the latest report.</p>
+                            <p className="text-[13px] text-[#78716C]">No flagged biomarkers in the latest report.</p>
                         )}
                     </div>
                 </div>
 
                 <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">What changed</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">What changed</h3>
                     <div className="space-y-2">
                         {prep.changes.length > 0 ? prep.changes.map(change => (
                             <div key={change.name} className="rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2">
@@ -194,10 +194,10 @@ export function DoctorVisitPrep({
                                         {change.percent > 0 ? "+" : ""}{change.percent}%
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-[#A8A29E] mt-0.5 break-words">{change.previous} to {change.current}</p>
+                                <p className="text-[11px] text-[#78716C] mt-0.5 break-words">{change.previous} to {change.current}</p>
                             </div>
                         )) : (
-                            <p className="text-[13px] text-[#A8A29E]">Upload another report to turn this into a trend review.</p>
+                            <p className="text-[13px] text-[#78716C]">Upload another report to turn this into a trend review.</p>
                         )}
                     </div>
                 </div>
@@ -205,7 +205,7 @@ export function DoctorVisitPrep({
 
             <div className="grid grid-cols-1 gap-4 mt-4 xl:grid-cols-2">
                 <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Ask your doctor</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Ask your doctor</h3>
                     <ol className="space-y-2">
                         {prep.questions.map((question, index) => (
                             <li key={question} className="flex gap-2 text-[13px] text-[#57534E] leading-relaxed">
@@ -217,7 +217,7 @@ export function DoctorVisitPrep({
                 </div>
 
                 <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#A8A29E] mb-3">Bring with you</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Bring with you</h3>
                     <ul className="space-y-2">
                         {prep.checklist.map(item => (
                             <li key={item} className="flex gap-2 text-[13px] text-[#57534E] leading-relaxed">

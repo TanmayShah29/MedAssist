@@ -2,12 +2,33 @@ import Groq from "groq-sdk";
 import { ExtractionResultSchema } from "./validations/analysis";
 import { logger } from "@/lib/logger";
 import { withRetry } from "@/lib/retry";
+import { checkUrgentFindings } from "@/lib/urgent-findings";
+import { validateBiomarkerPlausibility } from "@/lib/ai-validator";
+
+function isGroqRateLimitError(error: unknown): boolean {
+    return (
+        (error as { status?: number })?.status === 429 ||
+        (error as Error).message?.includes("rate_limit") ||
+        (error as Error).message?.includes("rate limit") ||
+        (error as { code?: string })?.code === "rate_limit_exceeded"
+    );
+}
+
+function handleGroqRateLimit(error: unknown): never {
+    if (isGroqRateLimitError(error)) {
+        throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
+    }
+    throw error;
+}
+
+const CONFIDENCE_THRESHOLD = 0.4;
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
 const MODEL = "llama-3.3-70b-versatile";
+const EXTRACTION_MODEL = "llama-3-8b-8192";
 const GROQ_TIMEOUT_MS = 25_000; // 25s — leaves ~10s headroom for retry + DB save within Vercel's 60s limit
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -57,6 +78,36 @@ export class AIExtractionError extends Error {
   }
 }
 
+function sanitizeString(raw: string, maxLen: number = 2000): string {
+  return raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "").trim().slice(0, maxLen);
+}
+
+function sanitizeLabText(raw: string, maxChars: number = 30_000): string {
+  const stripped = raw
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+    .trim()
+    .slice(0, maxChars);
+  return `<lab_report>\n${stripped}\n</lab_report>`;
+}
+
+function anonymizeProfile(profile: {
+    first_name?: string;
+    age?: number;
+    sex?: string;
+    blood_type?: string;
+} | null | undefined): { ageRange?: string; sex?: string } | null {
+    if (!profile) return null;
+    return {
+        ageRange: profile.age != null
+            ? profile.age < 30 ? "under 30"
+            : profile.age < 50 ? "30s–40s"
+            : profile.age < 65 ? "50s–60s"
+            : "65+"
+            : undefined,
+        sex: profile.sex,
+    };
+}
+
 // ── System prompt (extracted so it's easier to edit) ───────────────────────
 
 function buildSystemPrompt(symptoms: string[], historicalContext: string): string {
@@ -77,7 +128,7 @@ If historical data is provided, identify trends (e.g., "Glucose has risen 5% sin
 
 If the user has reported symptoms, consider them when writing interpretations, but NEVER use diagnostic language. Use "may be worth discussing" or "could help your clinician interpret this" instead of medical conclusions.
 
-User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}${historicalContext}
+User's reported symptoms: ${symptoms.length > 0 ? symptoms.map(s => sanitizeString(s)).join(", ") : "none reported"}${historicalContext}
 
 Return only a JSON object with this structure:
 {
@@ -155,10 +206,10 @@ export async function extractAndInterpretBiomarkers(
             },
             {
               role: "user",
-              content: `Extract all biomarkers from this lab report:\n\n${pdfText}`,
+              content: `Extract all biomarkers from this lab report:\n\n${sanitizeLabText(pdfText)}`,
             },
           ],
-          model: MODEL,
+          model: EXTRACTION_MODEL,
           temperature: 0.1,
           max_tokens: 4000,
           response_format: { type: "json_object" },
@@ -181,12 +232,7 @@ export async function extractAndInterpretBiomarkers(
     if (error instanceof Error && error.name === "AbortError") {
       throw new Error("AI analysis timed out. Please try again.");
     }
-    const isRateLimit =
-      (error as { status?: number })?.status === 429 ||
-      (error as Error).message?.includes("rate_limit");
-    if (isRateLimit) {
-      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
-    }
+    handleGroqRateLimit(error);
     throw new Error(`AI analysis failed: ${(error as Error).message || "Unknown error"}`);
   }
 
@@ -285,13 +331,40 @@ export async function extractAndInterpretBiomarkers(
     };
   }
 
-  if (validationResult.data.biomarkers.length === 0) {
-    throw new AIExtractionError(
-      "No biomarkers were found in this PDF. Make sure you are uploading a digital lab report with numeric test results, not a prescription or doctor note."
+  const highConfidenceBiomarkers = validationResult.data.biomarkers.filter(
+    (b) => b.confidence >= CONFIDENCE_THRESHOLD
+  );
+
+  const lowConfidenceCount = validationResult.data.biomarkers.length - highConfidenceBiomarkers.length;
+  if (lowConfidenceCount > 0) {
+    logger.warn(
+      `Confidence filter: removed ${lowConfidenceCount} biomarkers below ${CONFIDENCE_THRESHOLD} threshold`
     );
   }
 
-  return validationResult.data;
+  if (highConfidenceBiomarkers.length === 0) {
+    throw new AIExtractionError(
+      "AI analysis completed but confidence was too low for reliable extraction. Please try again or enter values manually."
+    );
+  }
+
+  const urgentFindings = checkUrgentFindings(highConfidenceBiomarkers);
+  if (urgentFindings.some((f) => f.severity === "critical")) {
+    logger.error("Critical urgent findings detected in AI output:", urgentFindings);
+  }
+
+  const plausibilityWarnings = validateBiomarkerPlausibility(highConfidenceBiomarkers);
+  const criticalWarnings = plausibilityWarnings.filter((w) => w.severity === "error");
+  if (criticalWarnings.length > 0) {
+    throw new AIExtractionError(
+      "AI analysis produced values outside physiologically possible ranges. Please try again."
+    );
+  }
+
+  return {
+    ...validationResult.data,
+    biomarkers: highConfidenceBiomarkers,
+  };
 }
 
 // ── Health Q&A ──────────────────────────────────────────────────────────────
@@ -318,16 +391,15 @@ export async function answerHealthQuestion(
           .join("\n")}`
       : "The user has not uploaded a lab report yet.";
 
+  const safeProfile = anonymizeProfile(profile);
   const systemPrompt = `You are MedAssist's appointment-prep assistant. You help users understand lab results in plain English and prepare for a more productive doctor visit.
 
 User Profile:
-- Name: ${profile?.first_name || "Not provided"}
-- Age: ${profile?.age || "Not provided"}
-- Sex: ${profile?.sex || "Not provided"}
-- Blood Type: ${profile?.blood_type || "Not provided"}
+- Age range: ${safeProfile?.ageRange || "Not provided"}
+- Sex: ${safeProfile?.sex || "Not provided"}
 
 ${biomarkerContextStr}
-${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` : ""}
+${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.map(s => sanitizeString(s)).join(", ")}\n` : ""}
 - Never diagnose, prescribe, claim causality, or provide treatment plans
 - Always recommend consulting a physician
 - Reference the user's specific values when answering
@@ -366,12 +438,7 @@ ${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` :
     const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
-    const isRateLimit =
-      (error as { status?: number })?.status === 429 ||
-      (error as Error).message?.includes("rate_limit");
-    if (isRateLimit) {
-      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
-    }
+    handleGroqRateLimit(error);
     throw new Error(`AI question failed: ${(error as Error).message || "Unknown error"}`);
   }
 }
@@ -398,16 +465,15 @@ export async function streamHealthQuestion(
           .join("\n")}`
       : "The user has not uploaded a lab report yet.";
 
+  const safeProfile = anonymizeProfile(profile);
   const systemPrompt = `You are MedAssist's appointment-prep assistant. You help users understand lab results in plain English and prepare for a more productive doctor visit.
 
 User Profile:
-- Name: ${profile?.first_name || "Not provided"}
-- Age: ${profile?.age || "Not provided"}
-- Sex: ${profile?.sex || "Not provided"}
-- Blood Type: ${profile?.blood_type || "Not provided"}
+- Age range: ${safeProfile?.ageRange || "Not provided"}
+- Sex: ${safeProfile?.sex || "Not provided"}
 
 ${biomarkerContextStr}
-${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.join(", ")}\n` : ""}
+${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.map(s => sanitizeString(s)).join(", ")}\n` : ""}
 - Never diagnose, prescribe, claim causality, or provide treatment plans
 - Always recommend consulting a physician
 - Reference the user's specific values when answering
@@ -455,7 +521,7 @@ export async function generateAIGreeting(
               role: "system",
               content: `You are MedAssist AI, a warm and approachable health education assistant.
 
-Generate a personalized opening message for a user named ${firstName}.
+Generate a personalized opening message for the user.
 
 RULES:
 - Reference 1-2 specific findings from their biomarkers
@@ -472,7 +538,7 @@ RULES:
 User's lab results:
 ${biomarkerSummary}
 
-User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none reported"}`,
+User's reported symptoms: ${symptoms.length > 0 ? symptoms.map(s => sanitizeString(s)).join(", ") : "none reported"}`,
             },
             { role: "user", content: "Generate my personalized greeting." },
           ],
@@ -491,12 +557,7 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.join(", ") : "none re
     const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
-    const isRateLimit =
-      (error as { status?: number })?.status === 429 ||
-      (error as Error).message?.includes("rate_limit");
-    if (isRateLimit) {
-      throw new Error("RATE_LIMIT: Too many requests. Please wait a minute and try again.");
-    }
+    handleGroqRateLimit(error);
     throw new Error(`AI greeting failed: ${(error as Error).message || "Unknown error"}`);
   }
 }

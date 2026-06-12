@@ -211,7 +211,7 @@ function ReviewExtractedValues({
             </div>
 
             <div className="rounded-[16px] border border-[#E8E6DF] bg-white overflow-hidden shadow-sm">
-                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#F5F4EF] border-b border-[#E8E6DF] text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">
+                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#F5F4EF] border-b border-[#E8E6DF] text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">
                     <span>Name</span>
                     <span>Value</span>
                     <span>Unit</span>
@@ -259,7 +259,7 @@ function ReviewExtractedValues({
                             <button
                                 type="button"
                                 onClick={() => removeRow(index)}
-                                className="h-10 w-10 rounded-[10px] text-[#A8A29E] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
+                                className="h-10 w-10 rounded-[10px] text-[#78716C] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
                                 aria-label={`Remove ${row.name || "row"}`}
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -286,7 +286,7 @@ function ReviewExtractedValues({
 
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A8A29E]">Brief completeness</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Brief completeness</p>
                     <p className="font-display text-3xl text-[#1C1917]">{reviewedScore}<span className="text-sm text-[#57534E] font-sans"> / 100</span></p>
                 </div>
                 <button
@@ -552,7 +552,7 @@ export function StepProcessing() {
                         </button>
                     )}
 
-                    {errorData.redirect && (
+                    {errorData.redirect && errorData.redirect.startsWith('/') && (
                         <a href={errorData.redirect} className="mt-6 block w-full">
                             <button
                                 className="w-full flex items-center justify-center gap-2 px-4 py-3 
@@ -618,7 +618,7 @@ export function StepProcessing() {
                                     "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 transition-colors duration-300",
                                     isActive && "bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200",
                                     isCompleted && "bg-emerald-500 border-emerald-500 text-white",
-                                    isPending && "bg-white border-[#E8E6DF] text-[#A8A29E]"
+                                    isPending && "bg-white border-[#E8E6DF] text-[#78716C]"
                                 )}
                             >
                                 {isCompleted ? <Check className="w-4 h-4" /> : stage.step}
@@ -645,7 +645,7 @@ export function StepProcessing() {
             </div>
 
             <div className="mt-12 text-center">
-                <p className="text-xs text-[#A8A29E] font-medium">This usually takes 20–40 seconds</p>
+                <p className="text-xs text-[#78716C] font-medium">This usually takes 20–40 seconds</p>
                 <button
                     onClick={goBackToUpload}
                     className="mt-4 text-sm text-[#57534E] hover:text-[#1C1917] font-medium flex items-center gap-1.5 mx-auto"

@@ -9,6 +9,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNavbar } from "@/components/layout/mobile-navbar";
 import { BottomMenu } from "@/components/ui/bottom-menu";
 import { FeedbackButton } from "@/components/feedback-button";
+import { ConsentBanner } from "@/components/consent-banner";
 import { Toaster } from "sonner";
 
 interface ClientLayoutProps {
@@ -150,6 +151,7 @@ export function ClientLayout({
         </div>
       )}
 
+      <ConsentBanner />
       <FeedbackButton />
       <Toaster position="bottom-center" />
     </>

@@ -20,7 +20,7 @@ export default function TermsPage() {
             }}>
                 Terms of Service
             </h1>
-            <p style={{ color: '#A8A29E', fontSize: 13, margin: '0 0 40px 0' }}>
+            <p style={{ color: '#78716C', fontSize: 13, margin: '0 0 40px 0' }}>
                 Last updated: February 2026
             </p>
 
@@ -75,7 +75,7 @@ export default function TermsPage() {
                 paddingTop: 24,
                 borderTop: '1px solid #E8E6DF'
             }}>
-                <p style={{ fontSize: 13, color: '#A8A29E' }}>
+                <p style={{ fontSize: 13, color: '#78716C' }}>
                     Questions? Contact us at support@medassist.app
                 </p>
             </div>

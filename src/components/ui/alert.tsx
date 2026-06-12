@@ -248,6 +248,7 @@ export function ClinicalAlert({
             {onDismiss && (
                 <button
                     onClick={onDismiss}
+                    aria-label="Dismiss alert"
                     className="flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity"
                 >
                     <X className={cn("w-4 h-4", urgent ? "text-red-500" : "text-amber-500")} />
@@ -301,6 +302,7 @@ export function ToastNotification({
                     </p>
                     <button
                         onClick={onDismiss}
+                        aria-label="Dismiss notification"
                         className={cn("flex-shrink-0 opacity-50 hover:opacity-100", cfg.iconColor)}
                     >
                         <X className="w-3.5 h-3.5" />

@@ -8,7 +8,11 @@ export const BiomarkerCategorySchema = z.string().transform(val => {
 });
 
 export const BiomarkerSchema = z.object({
-    name: z.string().min(1, "Biomarker name is required"),
+    name: z.string()
+        .min(1, "Biomarker name is required")
+        .max(200)
+        .regex(/^[a-zA-Z0-9\s\-\.\(\)\/\,\'\+]+$/, "Biomarker name contains invalid characters")
+        .transform((s) => s.trim()),
     value: z.coerce.number().refine((n) => !Number.isNaN(n), "Value must be a number"),
     unit: z.string().default("unit"),
     referenceMin: z.union([z.coerce.number(), z.null(), z.undefined()]).optional().nullable().transform((v) => (v === undefined || v === null || Number.isNaN(Number(v)) ? null : Number(v))),

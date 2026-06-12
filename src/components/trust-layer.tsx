@@ -37,7 +37,7 @@ export function TrustLayer({ variant = 'full', className }: TrustLayerProps) {
                 className
             )}
         >
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#A8A29E]">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#78716C]">
                 Important information
             </p>
             <ul className="space-y-2 text-[13px] text-[#57534E]">

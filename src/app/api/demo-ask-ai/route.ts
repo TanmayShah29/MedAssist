@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { validateContentLength } from '@/lib/request-validation';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical';
 import { z } from 'zod';
@@ -23,18 +24,19 @@ const DEMO_BIOMARKERS = [
     { name: 'C-Reactive Protein', value: 1.2, unit: 'mg/L', status: 'optimal', reference_range_min: 0, reference_range_max: 3.0, ai_interpretation: 'CRP is within the report range; discuss it alongside symptoms and other results if relevant.' },
 ];
 
+// WARNING: Demo data must NEVER contain real personally identifiable information (PII).
 const DEMO_PROFILE = {
-    first_name: 'Tanmay',
-    age: 22,
-    sex: 'male',
-    blood_type: 'B+',
+    first_name: 'Demo',
+    age: 35,
+    sex: 'not specified',
+    blood_type: 'Unknown',
 };
 
 export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
         return NextResponse.json(
-            { error: rateLimitResult.message || 'Too many requests.' },
+            { error: "Too many requests. Please wait a moment." },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         );
     }
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
     const { question, symptoms } = parseResult.data;
 
     try {
+        validateContentLength(request);
         const wantsStream = request.headers.get('accept')?.includes('text/plain');
         if (wantsStream) {
             const encoder = new TextEncoder();

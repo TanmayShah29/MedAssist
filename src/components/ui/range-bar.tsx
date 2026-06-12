@@ -153,7 +153,7 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                 display: 'flex',
                 justifyContent: 'center',
                 fontSize: 11,
-                color: '#A8A29E',
+                color: '#78716C',
                 marginTop: 8,
                 minWidth: 0,
                 overflowWrap: 'anywhere',

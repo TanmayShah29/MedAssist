@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiResponse } from '@/lib/api-response'
 import { getAuthClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/services/rateLimitService'
 import { getAppointmentPrep } from '@/lib/groq-medical'
@@ -69,9 +70,14 @@ function buildPrepPayload(biomarkers: Biomarker[], symptoms: string[], profile?:
 }
 
 export async function POST(request: NextRequest) {
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > 1_000_000) {
+        return apiResponse({ error: "Request body too large" }, { status: 413 });
+    }
+
     const rateLimitResult = await checkRateLimit()
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: rateLimitResult.message || 'Too many requests.' },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         )
@@ -81,18 +87,18 @@ export async function POST(request: NextRequest) {
     try {
         body = await request.json()
     } catch {
-        return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 })
+        return apiResponse({ error: 'Invalid JSON.' }, { status: 400 })
     }
 
     const parseResult = requestSchema.safeParse(body)
     if (!parseResult.success) {
-        return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid input' }, { status: 400 })
+        return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid input' }, { status: 400 })
     }
 
     if (parseResult.data.demo) {
         const { flagged, changes, context } = buildPrepPayload(DEMO_HISTORY, ['Fatigue', 'Low Energy'], { first_name: 'Tanmay' })
         const prep = await getAppointmentPrep(context)
-        return NextResponse.json({
+        return apiResponse({
             ...prep,
             flagged,
             changes,
@@ -105,7 +111,7 @@ export async function POST(request: NextRequest) {
     const supabase = await getAuthClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        return apiResponse({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const [{ data: rawBiomarkers }, { data: labResults }, { data: symptoms }, { data: profile }] = await Promise.all([
@@ -130,7 +136,7 @@ export async function POST(request: NextRequest) {
     const { flagged, changes, context } = buildPrepPayload(mergedBiomarkers, symptomNames, profile)
     const prep = await getAppointmentPrep(context)
 
-    return NextResponse.json({
+    return apiResponse({
         ...prep,
         flagged,
         changes,

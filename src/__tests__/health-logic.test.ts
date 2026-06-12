@@ -78,21 +78,6 @@ describe('validateAndRecalculateScore', () => {
     expect(validateAndRecalculateScore(NaN, [])).toBe(0);
   });
 
-  it('applies floor of 50 when at least one biomarker is optimal', () => {
-    // 1 optimal, 9 critical → (100 + 360) / 10 = 46 → floored to 50
-    const biomarkers = [
-      { status: 'optimal' },
-      ...Array(9).fill({ status: 'critical' }),
-    ];
-    expect(validateAndRecalculateScore(NaN, biomarkers)).toBe(50);
-  });
-
-  it('does not apply floor when no biomarkers are optimal', () => {
-    // 10 critical → (400/1000)*100 = 40, floor = 30
-    const biomarkers = Array(10).fill({ status: 'critical' });
-    expect(validateAndRecalculateScore(NaN, biomarkers)).toBe(40);
-  });
-
   it('computes correctly with mixed statuses', () => {
     // 2 optimal (200), 1 warning (75), 1 critical (40) → 315/4 = 78.75 → 79
     const biomarkers = [

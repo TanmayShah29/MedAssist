@@ -162,12 +162,10 @@ export const useOnboardingStore = create<OnboardingState>()(
         }),
         {
             name: "medassist-onboarding",
-            partialize: (state) => {
-                // Exclude uploadedFile — File objects can't survive JSON serialization
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { uploadedFile, ...rest } = state;
-                return rest;
-            },
+            partialize: (state) => ({
+                currentStep: state.currentStep,
+                completedSteps: state.completedSteps,
+            }),
         }
     )
 );

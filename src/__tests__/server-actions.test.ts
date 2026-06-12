@@ -88,22 +88,18 @@ describe('deleteLabResult — input validation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockGetUser = vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
-        mockDelete = vi.fn();
-        mockEq = vi.fn().mockResolvedValue({ data: null, error: null });
-        mockFrom = vi.fn().mockReturnValue({ delete: mockDelete });
-        mockDelete.mockReturnValue({ eq: mockEq });
+        mockFrom = vi.fn();
 
         (getAuthClient as ReturnType<typeof vi.fn>).mockResolvedValue({
             auth: { getUser: mockGetUser },
             from: mockFrom,
         });
 
-        (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from.mockReset();
         reportChain = buildDeleteChain();
         biomarkerChain = buildDeleteChain();
         deleteReportChain = buildDeleteChain();
-        adminFrom = (supabaseAdmin as unknown as Record<string, ReturnType<typeof vi.fn>>).from;
-        adminFrom
+        
+        mockFrom
             .mockReturnValueOnce(reportChain)
             .mockReturnValueOnce(biomarkerChain)
             .mockReturnValueOnce(deleteReportChain);
@@ -120,9 +116,9 @@ describe('deleteLabResult — input validation', () => {
     it('passes a UUID string through to the DB (RLS guards access)', async () => {
         const uuid = 'b534d94e-b7e0-4d21-962f-d62d8de7ed81';
         const result = await deleteLabResult(uuid);
-        expect(adminFrom).toHaveBeenNthCalledWith(1, 'lab_results');
-        expect(adminFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
-        expect(adminFrom).toHaveBeenNthCalledWith(3, 'lab_results');
+        expect(mockFrom).toHaveBeenNthCalledWith(1, 'lab_results');
+        expect(mockFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
+        expect(mockFrom).toHaveBeenNthCalledWith(3, 'lab_results');
         expect(reportChain.eq).toHaveBeenCalledWith('id', uuid);
         expect(reportChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
         expect(biomarkerChain.delete).toHaveBeenCalled();
@@ -136,9 +132,9 @@ describe('deleteLabResult — input validation', () => {
 
     it('calls .from("lab_results").delete().eq("id", ...) for a numeric string ID', async () => {
         const result = await deleteLabResult('42');
-        expect(adminFrom).toHaveBeenNthCalledWith(1, 'lab_results');
-        expect(adminFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
-        expect(adminFrom).toHaveBeenNthCalledWith(3, 'lab_results');
+        expect(mockFrom).toHaveBeenNthCalledWith(1, 'lab_results');
+        expect(mockFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
+        expect(mockFrom).toHaveBeenNthCalledWith(3, 'lab_results');
         expect(reportChain.eq).toHaveBeenCalledWith('id', '42');
         expect(biomarkerChain.eq).toHaveBeenCalledWith('lab_result_id', '42');
         expect(deleteReportChain.eq).toHaveBeenCalledWith('id', '42');

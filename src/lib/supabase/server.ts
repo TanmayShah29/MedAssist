@@ -24,7 +24,7 @@ export async function getAuthClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, { ...options, sameSite: 'strict' })
             );
           } catch {
             // Ignored in read-only contexts (e.g. Server Components after

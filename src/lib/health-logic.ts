@@ -35,9 +35,7 @@ export function validateAndRecalculateScore(
   const critical = biomarkers.filter(b => b.status === 'critical').length;
 
   const rawScore = ((optimal * 100) + (warning * 75) + (critical * 40)) / total;
-  // Apply a floor so users with some optimal markers aren't demoralised by minor deviations
-  const floor = optimal > 0 ? 50 : 30;
-  return Math.round(Math.max(floor, rawScore));
+  return Math.round(rawScore);
 }
 
 /**

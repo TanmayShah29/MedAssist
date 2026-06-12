@@ -167,7 +167,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">First Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">First Name</label>
                                 <input
                                     type="text"
                                     value={profile?.first_name || ''}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Last Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Last Name</label>
                                 <input
                                     type="text"
                                     value={profile?.last_name || ''}
@@ -185,7 +185,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Age</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Age</label>
                                 <input
                                     type="number"
                                     value={profile?.age || ''}
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Sex</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Sex</label>
                                 <select
                                     value={profile?.sex || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, sex: e.target.value } : null)}
@@ -210,7 +210,7 @@ export default function ProfilePage() {
                                 </select>
                             </div>
                             <div className="sm:col-span-1">
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] block mb-1">Blood Type</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Blood Type</label>
                                 <input
                                     type="text"
                                     value={profile?.blood_type || ''}
@@ -245,13 +245,13 @@ export default function ProfilePage() {
                                         <p className="text-sm font-medium text-[#1C1917] truncate">
                                             {report.summary || 'Blood Panel Report'}
                                         </p>
-                                        <p className="text-xs text-[#A8A29E] mt-0.5">
+                                        <p className="text-xs text-[#78716C] mt-0.5">
                                             {new Date(report.uploaded_at).toLocaleDateString(undefined, {
                                                 year: 'numeric', month: 'short', day: 'numeric'
                                             })}
                                         </p>
                                     </div>
-                                    <div className="hidden text-xs text-[#A8A29E] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
+                                    <div className="hidden text-xs text-[#78716C] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
                                         View Details
                                         <ChevronRight size={14} />
                                     </div>
@@ -260,7 +260,8 @@ export default function ProfilePage() {
                                             e.stopPropagation();
                                             handleDeleteReport(report.id);
                                         }}
-                                        className="p-2 text-[#A8A29E] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                        aria-label="Delete report"
+                                        className="p-2 text-[#78716C] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                         title="Delete report"
                                     >
                                         <Trash2 size={14} />
@@ -269,7 +270,7 @@ export default function ProfilePage() {
                             )) : (
                                 <div className="text-center py-6 bg-white border border-[#E8E6DF] border-dashed rounded-[10px]">
                                     <FileText className="w-6 h-6 text-[#D6D3C9] mx-auto mb-2" />
-                                    <p className="text-sm text-[#A8A29E] font-medium">No reports uploaded yet.</p>
+                                    <p className="text-sm text-[#78716C] font-medium">No reports uploaded yet.</p>
                                 </div>
                             )}
                         </div>
@@ -294,23 +295,23 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] mb-2">
                                     Reported Symptoms
                                 </p>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {symptoms.length > 0 ? symptoms.map(s => (
                                         <span key={s} className="min-w-0 text-xs font-medium bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-[8px] text-[#57534E] shadow-sm flex items-center gap-2 group">
                                             {s}
-                                            <button onClick={() => handleToggleSymptom(s)} className="text-[#A8A29E] hover:text-red-500 transition-colors">
+                                            <button onClick={() => handleToggleSymptom(s)} aria-label={`Remove ${s}`} className="text-[#78716C] hover:text-red-500 transition-colors">
                                                 <X size={12} />
                                             </button>
                                         </span>
                                     )) : (
-                                        <p className="text-sm text-[#A8A29E] italic">No symptoms selected.</p>
+                                        <p className="text-sm text-[#78716C] italic">No symptoms selected.</p>
                                     )}
                                 </div>
 
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A29E] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] mb-2">
                                     Quick Add
                                 </p>
                                 <div className="flex flex-wrap gap-2">

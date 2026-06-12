@@ -2,12 +2,12 @@
 
 import { getAuthClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ExtractedLabValue } from "@/lib/onboarding-store";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 import { mergeBiomarkerSources } from "@/lib/medical-data";
 import { Biomarker } from "@/types/medical";
+import { encrypt } from "@/lib/crypto/encryption";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // saveLabResult — persist a full lab report + biomarkers in one atomic RPC
@@ -63,59 +63,22 @@ export async function saveLabResult(args: SaveLabResultArgs) {
       return { success: false, error: "Unauthorized: session does not match target user." };
     }
 
-    // Use explicit inserts instead of the save_complete_report RPC. Some live
-    // Supabase environments may still have an old/stale RPC definition with
-    // biomarker columns ordered incorrectly, which can try to insert a UUID into
-    // lab_result_id (BIGINT). Explicit column inserts make the save path obvious.
-    const db = supabaseAdmin ?? supabase;
+    const { data: labResultId, error: rpcError } = await supabase.rpc("save_complete_report", {
+      p_user_id: userId,
+      p_file_name: fileName,
+      p_health_score: healthScore,
+      p_risk_level: riskLevel,
+      p_summary: summary,
+      p_plain_summary: args.plainSummary ?? null,
+      p_biomarkers: labValues,
+      p_raw_ocr_text: rawOcrText ?? null,
+      p_raw_ai_json: rawAiJson ?? null,
+      p_symptom_connections: args.symptomConnections ?? null,
+    });
 
-    const { data: labResult, error: reportError } = await db
-      .from("lab_results")
-      .insert({
-        user_id: userId,
-        file_name: fileName,
-        health_score: healthScore,
-        risk_level: riskLevel,
-        summary,
-        plain_summary: args.plainSummary ?? null,
-        processed: true,
-        raw_ocr_text: rawOcrText ?? null,
-        raw_ai_json: rawAiJson ?? null,
-        symptom_connections: args.symptomConnections ?? null,
-        uploaded_at: new Date().toISOString(),
-      })
-      .select("id")
-      .single();
-
-    if (reportError || !labResult?.id) {
-      logger.error("saveLabResult lab_results insert error:", reportError);
-      throw new Error(reportError?.message || "Lab result insert returned no id.");
-    }
-
-    const labResultId = labResult.id as string; // UUID in production DB
-
-    const biomarkerRows = labValues.map((b) => ({
-      user_id: userId,
-      lab_result_id: labResultId,
-      name: b.name,
-      value: b.value,
-      unit: b.unit,
-      status: b.status,
-      reference_range_min: b.referenceMin ?? null,
-      reference_range_max: b.referenceMax ?? null,
-      category: b.category,
-      confidence: b.confidence,
-      ai_interpretation: b.aiInterpretation,
-    }));
-
-    const { error: biomarkerError } = await db
-      .from("biomarkers")
-      .insert(biomarkerRows);
-
-    if (biomarkerError) {
-      logger.error("saveLabResult biomarkers insert error:", biomarkerError);
-      await db.from("lab_results").delete().eq("id", labResultId);
-      throw new Error(biomarkerError.message);
+    if (rpcError) {
+      logger.error("saveLabResult RPC error:", rpcError);
+      throw new Error(rpcError.message);
     }
 
     logger.info(`saveLabResult: saved report ${labResultId} for user ${userId}`);
@@ -205,18 +168,13 @@ export async function deleteLabResult(labResultId: number | string) {
 
   try {
     // Use authenticated client — RLS ensures the user can only delete their own rows.
-    // Delete biomarkers explicitly first because some deployed databases may not
-    // have ON DELETE CASCADE on biomarkers.lab_result_id even if the current
-    // schema does.
     const supabase = await getAuthClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       return { success: false, error: "User not authenticated." };
     }
 
-    const db = supabaseAdmin ?? supabase;
-
-    const { data: report, error: reportLookupError } = await db
+    const { data: report, error: reportLookupError } = await supabase
       .from("lab_results")
       .select("id")
       .eq("id", id)
@@ -228,7 +186,7 @@ export async function deleteLabResult(labResultId: number | string) {
       return { success: false, error: "Report not found or already deleted." };
     }
 
-    const { error: biomarkerError } = await db
+    const { error: biomarkerError } = await supabase
       .from("biomarkers")
       .delete()
       .eq("lab_result_id", id)
@@ -236,7 +194,7 @@ export async function deleteLabResult(labResultId: number | string) {
 
     if (biomarkerError) throw biomarkerError;
 
-    const { error: reportError } = await db
+    const { error: reportError } = await supabase
       .from("lab_results")
       .delete()
       .eq("id", id)
@@ -292,7 +250,6 @@ export async function updateUserProfile(
 
   try {
     const { first_name, last_name, age, sex, blood_type, symptoms } = data;
-    const db = supabaseAdmin ?? supabase;
 
     const profileUpdates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -303,7 +260,7 @@ export async function updateUserProfile(
     if (sex !== undefined) profileUpdates.sex = sex;
     if (blood_type !== undefined) profileUpdates.blood_type = blood_type;
 
-    const { error: profileError } = await db
+    const { error: profileError } = await supabase
       .from("profiles")
       .update(profileUpdates)
       .eq("id", userId);
@@ -311,9 +268,9 @@ export async function updateUserProfile(
     if (profileError) throw profileError;
 
     if (symptoms !== undefined) {
-      await db.from("symptoms").delete().eq("user_id", userId);
+      await supabase.from("symptoms").delete().eq("user_id", userId);
       if (symptoms.length > 0) {
-        const { error: sympError } = await db
+        const { error: sympError } = await supabase
           .from("symptoms")
           .insert(symptoms.map((s) => ({ user_id: userId, symptom: s })));
         if (sympError) throw sympError;
@@ -329,14 +286,16 @@ export async function updateUserProfile(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// getUserBiomarkerHistory — fetch the last 100 biomarkers for a user.
+// getUserBiomarkerHistory — fetch biomarkers for a user.
 //
 // Uses the authenticated client (cookies) so RLS correctly scopes results
 // to the logged-in user without requiring the service role key.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function getUserBiomarkerHistory(userId: string) {
+export async function getUserBiomarkerHistory(userId: string, options?: { limit?: number }) {
   if (!userId) return [];
+
+  const queryLimit = options?.limit ?? 1000;
 
   try {
     const supabase = await getAuthClient();
@@ -349,7 +308,7 @@ export async function getUserBiomarkerHistory(userId: string) {
         )
         .eq("lab_results.user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(100),
+        .limit(queryLimit),
       supabase
         .from("lab_results")
         .select("id, uploaded_at, created_at, raw_ai_json")
@@ -362,7 +321,7 @@ export async function getUserBiomarkerHistory(userId: string) {
       logger.error("getUserBiomarkerHistory query error:", error.message);
       return [];
     }
-    return mergeBiomarkerSources(data as Biomarker[] | null, labResults || []).slice(0, 100);
+    return mergeBiomarkerSources(data as Biomarker[] | null, labResults || []).slice(0, queryLimit);
   } catch (error) {
     logger.error(
       "getUserBiomarkerHistory failed:",
@@ -478,5 +437,31 @@ export async function saveProfileFromSession(data: {
     const msg = error instanceof Error ? error.message : "Unknown error";
     logger.error("saveProfileFromSession failed:", msg);
     return { success: false, error: msg };
+  }
+}
+
+export async function logAccessAction(params: { resource: string; resourceId?: string; action?: string }) {
+  try {
+    const supabase = await getAuthClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const headerList = await headers();
+    const ip = headerList.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const ua = headerList.get('user-agent') || 'unknown';
+
+    await logAuditEvent({
+      userId: user.id,
+      action: params.action || 'ACCESS_RESOURCE',
+      resource: params.resource,
+      resourceId: params.resourceId,
+      ipAddress: ip,
+      userAgent: ua,
+    });
+
+    return { success: true };
+  } catch (error) {
+    logger.error("logAccessAction failed:", error);
+    return { success: false };
   }
 }

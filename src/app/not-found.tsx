@@ -53,7 +53,7 @@ export default function NotFound() {
         </div>
 
         {/* Legal note */}
-        <p className="text-[11px] text-[#A8A29E] mt-12">
+        <p className="text-[11px] text-[#78716C] mt-12">
           If you believe this is an error, please contact support.
         </p>
       </main>

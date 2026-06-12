@@ -63,7 +63,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             className={cn(
                                 "flex flex-col items-center gap-1 group relative flex-1 min-h-[54px] justify-center",
                                 "transition-all duration-150 active:scale-90",
-                                isActive ? "text-sky-500" : "text-[#A8A29E]"
+                                isActive ? "text-sky-500" : "text-[#78716C]"
                             )}
                         >
                             {/* Active background pill */}
@@ -92,7 +92,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
 
                             <span className={cn(
                                 "text-[10px] font-bold transition-colors leading-none",
-                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#A8A29E]"
+                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#78716C]"
                             )}>
                                 {item.label}
                             </span>

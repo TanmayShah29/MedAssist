@@ -1,37 +1,18 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { apiResponse } from '@/lib/api-response'
+import { validateContentLength } from '@/lib/request-validation';
 import { checkRateLimit } from '@/services/rateLimitService';
-import { z } from 'zod';
+import { SupplementSchema } from '@/lib/validations/api';
+import { getAuthClient } from '@/lib/supabase/server';
 
 export const maxDuration = 15;
 export const runtime = 'nodejs';
 
 export async function GET(_request: NextRequest) {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // Ignored
-                    }
-                },
-            },
-        }
-    )
+    const supabase = await getAuthClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) return apiResponse({ error: 'Unauthorized' }, { status: 401 })
 
     const { data, error } = await supabase
         .from('supplements')
@@ -39,58 +20,30 @@ export async function GET(_request: NextRequest) {
         .eq('user_id', user.id)
         .order('start_date', { ascending: false })
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ supplements: data })
+    if (error) return apiResponse({ error: error.message }, { status: 500 })
+    return apiResponse({ supplements: data })
 }
 
 export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: rateLimitResult.message || 'Too many requests' },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         );
     }
 
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // Ignored
-                    }
-                },
-            },
-        }
-    )
+    const supabase = await getAuthClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) return apiResponse({ error: 'Unauthorized' }, { status: 401 })
 
     try {
+        validateContentLength(request);
         const body = await request.json()
-        const supplementSchema = z.object({
-            name: z.string().trim().min(1, 'Name is required'),
-            dosage: z.string().optional().nullable(),
-            frequency: z.string().optional().nullable(),
-            start_date: z.string().refine((date) => !isNaN(new Date(date).getTime()), {
-                message: 'Invalid start_date. Use YYYY-MM-DD.'
-            })
-        });
-
-        const parseResult = supplementSchema.safeParse(body);
+        const parseResult = SupplementSchema.safeParse(body);
         if (!parseResult.success) {
-            return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid request body' }, { status: 400 });
+            return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid request body' }, { status: 400 });
         }
 
         const { name, dosage, frequency, start_date } = parseResult.data;
@@ -104,51 +57,31 @@ export async function POST(request: NextRequest) {
             .select()
             .single()
 
-        if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-        return NextResponse.json({ supplement: data })
+        if (error) return apiResponse({ error: error.message }, { status: 500 })
+        return apiResponse({ supplement: data })
     } catch (_error) {
-        return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+        return apiResponse({ error: 'Invalid request body' }, { status: 400 })
     }
 }
 
 export async function DELETE(request: NextRequest) {
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: rateLimitResult.message || 'Too many requests' },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         );
     }
 
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // Ignored
-                    }
-                },
-            },
-        }
-    )
+    const supabase = await getAuthClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) return apiResponse({ error: 'Unauthorized' }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
-    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    if (!id) return apiResponse({ error: 'ID is required' }, { status: 400 })
 
     const { error } = await supabase
         .from('supplements')
@@ -156,6 +89,6 @@ export async function DELETE(request: NextRequest) {
         .eq('id', id)
         .eq('user_id', user.id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true })
+    if (error) return apiResponse({ error: error.message }, { status: 500 })
+    return apiResponse({ success: true })
 }

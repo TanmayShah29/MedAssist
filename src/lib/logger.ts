@@ -22,6 +22,12 @@ function timestamp(): string {
   return new Date().toISOString();
 }
 
+const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+
+function redactSensitiveData(message: string): string {
+  return message.replace(UUID_PATTERN, (match) => match.slice(0, 8) + "...");
+}
+
 function safeSerialize(data: unknown): unknown {
   if (data instanceof Error) {
     // In production strip stack trace so internal paths aren't exposed
@@ -48,29 +54,34 @@ export const logger = {
 
   info(message: string, data?: unknown): void {
     if (isProduction && process.env.ENABLE_VERBOSE_LOGGING !== 'true') return;
+    const safeMsg = redactSensitiveData(message);
     if (data !== undefined) {
-      console.log(`[INFO]  [${timestamp()}] ${message}`, safeSerialize(data));
+      console.log(`[INFO]  [${timestamp()}] ${safeMsg}`, safeSerialize(data));
     } else {
-      console.log(`[INFO]  [${timestamp()}] ${message}`);
+      console.log(`[INFO]  [${timestamp()}] ${safeMsg}`);
     }
   },
 
   warn(message: string, data?: unknown): void {
+    const safeMsg = redactSensitiveData(message);
     if (data !== undefined) {
-      console.warn(`[WARN]  [${timestamp()}] ${message}`, safeSerialize(data));
+      console.warn(`[WARN]  [${timestamp()}] ${safeMsg}`, safeSerialize(data));
     } else {
-      console.warn(`[WARN]  [${timestamp()}] ${message}`);
+      console.warn(`[WARN]  [${timestamp()}] ${safeMsg}`);
     }
   },
 
   error(message: string, error?: unknown): void {
+    const safeMsg = redactSensitiveData(message);
     const serialized = safeSerialize(error);
     if (serialized !== undefined) {
-      console.error(`[ERROR] [${timestamp()}] ${message}`, serialized);
+      console.error(`[ERROR] [${timestamp()}] ${safeMsg}`, serialized);
     } else {
-      console.error(`[ERROR] [${timestamp()}] ${message}`);
+      console.error(`[ERROR] [${timestamp()}] ${safeMsg}`);
     }
-    // Forward to external monitoring (Sentry etc.) if configured
-    _onError(error, message);
+    if (error instanceof Error) {
+      error.message = redactSensitiveData(error.message);
+    }
+    _onError(error, safeMsg);
   },
 };

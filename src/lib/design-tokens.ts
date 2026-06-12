@@ -18,7 +18,7 @@ export const tokens = {
     text: {
         primary: '#1C1917',  // main headings — warm near-black
         secondary: '#57534E',  // body text — warm gray
-        muted: '#A8A29E',  // captions, labels — warm muted
+        muted: '#78716C',  // captions, labels — warm muted
         subtle: '#D6D3D1',  // placeholders, dividers
         onDark: '#F1F5F9',  // text on dark sections
         onDarkMuted: '#94A3B8', // muted text on dark sections

@@ -2,9 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { waitUntil } from '@vercel/functions'
 import DashboardClient from './dashboard-client'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { mergeBiomarkerSources } from '@/lib/medical-data'
+import { logAuditEvent } from '@/lib/audit-log'
+import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +19,10 @@ export const metadata = {
 
 async function DashboardContent({ user }: { user: { id: string } }) {
     const cookieStore = await cookies()
+    const headerList = await headers()
+    const ip = headerList.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+    const ua = headerList.get('user-agent') || 'unknown'
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -26,6 +34,17 @@ async function DashboardContent({ user }: { user: { id: string } }) {
             },
         }
     )
+
+    // Log the access event for compliance
+    waitUntil(
+        logAuditEvent({
+            userId: user.id,
+            action: 'ACCESS_DASHBOARD',
+            resource: 'dashboard',
+            ipAddress: ip,
+            userAgent: ua,
+        })
+    );
 
     const [profileResponse, biomarkerResponse, symptomResponse, labResponse] = await Promise.all([
         supabase.from('profiles').select('id, first_name, last_name, age, sex, blood_type, onboarding_complete').eq('id', user.id).single(),
@@ -83,7 +102,7 @@ export default async function DashboardPage() {
 
     return (
         <ErrorBoundary>
-            <Suspense fallback={<div className="min-h-[100dvh] bg-[#FAFAF7] flex items-center justify-center"><div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" /></div>}>
+            <Suspense fallback={<div className="min-h-[100dvh] bg-[#FAFAF7] flex items-center justify-center"><Skeleton className="h-8 w-48 rounded-xl" /></div>}>
                 <DashboardContent user={user} />
             </Suspense>
         </ErrorBoundary>

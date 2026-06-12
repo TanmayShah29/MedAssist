@@ -187,7 +187,7 @@ function AuthContent() {
 
             <form onSubmit={handleAuth} className="space-y-4">
                 <div>
-                    <label htmlFor="auth-email" className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
+                    <label htmlFor="auth-email" className="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5 ml-1">
                         Email Address
                     </label>
                     <input
@@ -200,13 +200,13 @@ function AuthContent() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className="w-full px-4 py-3 rounded-[12px] bg-[#FAFAF7] border border-[#E8E6DF] 
-                                 text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 
+                                 text-[#1C1917] placeholder:text-[#78716C] focus:outline-none focus:ring-2 
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="name@example.com"
                     />
                 </div>
                 <div>
-                    <label htmlFor="auth-password" className="block text-xs font-semibold uppercase tracking-wider text-[#A8A29E] mb-1.5 ml-1">
+                    <label htmlFor="auth-password" className="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5 ml-1">
                         Password
                     </label>
                     <input
@@ -218,7 +218,7 @@ function AuthContent() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="w-full px-4 py-3 rounded-[12px] bg-[#FAFAF7] border border-[#E8E6DF] 
-                                 text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 
+                                 text-[#1C1917] placeholder:text-[#78716C] focus:outline-none focus:ring-2 
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="••••••••"
                     />
@@ -289,7 +289,7 @@ function AuthContent() {
                 </button>
             </div>
 
-            <div className="mt-6 flex justify-center gap-6 text-xs text-[#A8A29E]">
+            <div className="mt-6 flex justify-center gap-6 text-xs text-[#78716C]">
                 <Link href="/terms" className="hover:text-[#57534E] transition-colors">Terms of Service</Link>
                 <Link href="/privacy" className="hover:text-[#57534E] transition-colors">Privacy Policy</Link>
             </div>

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { apiResponse } from '@/lib/api-response';
+import { validateContentLength } from '@/lib/request-validation';
+import { getAuthClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
+import { FeedbackSchema } from '@/lib/validations/api';
 
 export const maxDuration = 15;
 export const runtime = 'nodejs';
@@ -12,62 +13,38 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: rateLimitResult.message || 'Too many feedback submissions. Please try again later.' },
             { status: 429 }
         );
     }
 
     try {
+        validateContentLength(req);
         let body: unknown;
         try {
             body = await req.json();
         } catch {
-            return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 });
+            return apiResponse({ error: 'Invalid JSON.' }, { status: 400 });
         }
 
-        const feedbackSchema = z.object({
-            message: z.string().trim().min(3, 'Message is required (min 3 characters).').max(2000, 'Message too long.'),
-            url: z.string().url('Invalid URL').nullable().optional()
-        });
-
-        const parseResult = feedbackSchema.safeParse(body);
+        const parseResult = FeedbackSchema.safeParse(body);
         if (!parseResult.success) {
-            return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid input.' }, { status: 400 });
+            return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid input.' }, { status: 400 });
         }
 
         const { message, url } = parseResult.data;
 
         let userId: string | null = null;
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() {
-                        return cookieStore.getAll()
-                    },
-                    setAll(cookiesToSet) {
-                        try {
-                            cookiesToSet.forEach(({ name, value, options }) =>
-                                cookieStore.set(name, value, options)
-                            )
-                        } catch {
-                            // Ignored
-                        }
-                    }
-                }
-            }
-        );
+        const supabase = await getAuthClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return apiResponse({ error: 'Unauthorized' }, { status: 401 });
         }
         userId = user.id;
 
         if (!supabaseAdmin) {
-            return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 });
+            return apiResponse({ error: 'Service unavailable.' }, { status: 503 });
         }
 
         const { error } = await supabaseAdmin
@@ -76,10 +53,10 @@ export async function POST(req: NextRequest) {
 
         if (error) throw error;
 
-        return NextResponse.json({ success: true });
+        return apiResponse({ success: true });
     } catch (err) {
         logger.error('[feedback] Failed to save feedback', err);
-        return NextResponse.json(
+        return apiResponse(
             { error: (err as Error).message || 'Failed to send feedback.' },
             { status: 500 }
         );

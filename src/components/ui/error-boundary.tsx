@@ -46,7 +46,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             We encountered an unexpected error. Our team has been notified.
                         </p>
                         {this.state.errorId && (
-                            <p className="inline-flex rounded-[8px] border border-[#E8E6DF] bg-[#F5F4EF] px-2 py-1 font-mono text-xs text-[#A8A29E]">
+                            <p className="inline-flex rounded-[8px] border border-[#E8E6DF] bg-[#F5F4EF] px-2 py-1 font-mono text-xs text-[#78716C]">
                                 Reference: {this.state.errorId}
                             </p>
                         )}

@@ -10,11 +10,14 @@ import { AssistantSidebar } from "@/components/assistant/sidebar";
 import { AnalysisPanel } from "@/components/assistant/analysis-panel";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Biomarker } from "@/types/medical";
-import DOMPurify from "dompurify";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import { latestUniqueBiomarkers, mergeBiomarkerSources } from "@/lib/medical-data";
 import { useStore } from "@/store/useStore";
 import { getPatientStatus } from "@/lib/patient-status";
+import { MedicalDisclaimer } from "@/components/medical-disclaimer";
 import { TrustLayer } from "@/components/trust-layer";
+import { logAccessAction } from "@/app/actions/user-data";
 
 // Types
 type Message = {
@@ -60,6 +63,7 @@ export function AssistantPageInner() {
 
     // Fetch Data
     useEffect(() => {
+        logAccessAction({ resource: 'assistant_page', action: 'VIEW_ASSISTANT' });
         const fetchData = async () => {
             if (demoMode) {
                 const demoBiomarkers = latestUniqueBiomarkers(await getDemoBiomarkers());
@@ -324,10 +328,17 @@ export function AssistantPageInner() {
                 </div>
             )}
 
+            <MedicalDisclaimer variant="compact" className="mx-5 mb-2" />
+
             {/* Messages Area */}
-            <div className="grow shrink basis-0 overflow-y-auto p-5 space-y-6 min-w-0">
+            <div
+                role="log"
+                aria-live="polite"
+                aria-label="Chat messages from AI assistant"
+                className="grow shrink basis-0 overflow-y-auto p-5 space-y-6 min-w-0"
+            >
                 {messages.map((msg) => (
-                    <div key={msg.id} className={cn(
+                    <div key={msg.id} role="article" aria-label={`${msg.role} message`} className={cn(
                         "flex w-full",
                         msg.role === "user" ? "justify-end" : "justify-start"
                     )}>
@@ -350,15 +361,15 @@ export function AssistantPageInner() {
                             <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
-                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                        <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                     </div>
-                                    <span className="text-xs text-[#A8A29E]">Thinking...</span>
+                                    <span className="text-xs text-[#78716C]">Thinking...</span>
                                 </div>
                             </div>
                         ) : msg.isError ? (
-                            <div className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0">
+                            <div role="alert" className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0">
                                 <p>{msg.content}</p>
                                 <button
                                     onClick={() => {
@@ -377,7 +388,20 @@ export function AssistantPageInner() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 whitespace-pre-wrap [&_*]:break-words" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.content) }} />
+                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 [&_*]:break-words">
+                                                <ReactMarkdown
+                                                    rehypePlugins={[rehypeSanitize]}
+                                                    components={{
+                                                        a: ({ href, children }) => (
+                                                            <a href={href} target="_blank" rel="noopener noreferrer" className="text-amber-700 underline">
+                                                                {children}
+                                                            </a>
+                                                        ),
+                                                    }}
+                                                >
+                                                    {msg.content}
+                                                </ReactMarkdown>
+                                            </div>
                         )}
                     </div>
                 ))}
@@ -386,11 +410,11 @@ export function AssistantPageInner() {
                         <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
                             <div className="flex items-center gap-2">
                                 <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-[#A8A29E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                 </div>
-                                <span className="text-xs text-[#A8A29E]">Thinking...</span>
+                                <span className="text-xs text-[#78716C]">Thinking...</span>
                             </div>
                         </div>
                     </div>
@@ -471,7 +495,7 @@ export function AssistantPageInner() {
                         )}
                     </button>
                 </div>
-                <p className="text-[11px] text-[#A8A29E] text-center mt-3">
+                <p className="text-[11px] text-[#78716C] text-center mt-3">
                     Educational only. AI can make mistakes; discuss results with a qualified clinician.
                 </p>
             </div>

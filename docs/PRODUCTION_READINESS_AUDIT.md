@@ -1,81 +1,34 @@
 # MedAssist — Production Readiness Audit
 
-Status as of April 2026 — all critical and high issues resolved.
+Status as of June 2026 — all critical and high issues resolved via Deep CTO Review.
 
 ---
 
-## ✅ RESOLVED — Critical
+## ✅ RESOLVED — Critical (June 2026 Deep Audit)
 
-### 1. Missing environment variables crash with unclear errors
-**Fix:** `src/lib/env.ts` + `src/instrumentation.ts` — startup validation throws on missing required vars with a clear list.
+### 1. Direct RPC Injection (IDOR)
+**Fix:** `supabase_schema.sql` — Enforced `(SELECT auth.uid()) = p_user_id` inside the `save_complete_report` PL/pgSQL function to prevent spoofing.
 
-### 2. Unauthenticated PDF analysis (quota abuse)
-**Fix:** `src/app/api/analyze-report/route.ts` — auth check runs before any AI/OCR call. Unauthenticated requests receive 401.
+### 2. Streaming Data Loss (Race Condition)
+**Fix:** `src/app/api/ask-ai/route.ts` — Wrapped the conversation history DB insert inside Vercel's `waitUntil()` so the write survives HTTP stream closures.
 
-### 3. `JSON.parse(data.analysis)` can throw in step-processing
-**Fix:** `src/app/onboarding/components/step-processing.tsx` — wrapped in try/catch with `typeof` guard; shows "Invalid response from server" on failure.
+### 3. Unbounded AI Context Window (DoS)
+**Fix:** `src/app/api/ask-ai/route.ts` — Bounded the `previousMessages` query to 10 and implemented a strict 1000-character cap per message to prevent Groq API timeouts.
 
-### 4. saveLabResult failure not propagated to client
-**Fix:** `src/app/api/analyze-report/route.ts` — returns 500 with explicit error when save fails; client shows error message.
+### 4. Deceptive Health Score Floor (Medical Safety)
+**Fix:** `src/lib/health-logic.ts` — Removed the hardcoded score floor of 50. The score now mathematically reflects actual biomarker values.
 
-### 5. Supplements start_date not validated
-**Fix:** `src/app/api/supplements/route.ts` — Zod schema with `.refine()` validates ISO date format; normalised to YYYY-MM-DD before insert.
+### 5. Silent Data Loss on Historical Records
+**Fix:** `src/app/actions/user-data.ts` — Increased the `getUserBiomarkerHistory` query limit from 50 to 1000.
 
-### 6. Profile delete ID type mismatch
-**Fix:** `src/app/actions/user-data.ts` — `deleteLabResult()` accepts `number | string`, parses internally with `parseInt(id, 10)` and validates with `Number.isNaN`.
+### 6. Open Redirect Vulnerability
+**Fix:** `src/app/onboarding/components/step-processing.tsx` — Validated that `errorData.redirect` starts with `/` to prevent external redirects.
 
----
+### 7. PDF Extraction DoS
+**Fix:** `src/lib/extractPdfText.ts` — Added a strict 20-second `Promise.race` timeout to the synchronous `pdf-parse` execution.
 
-## ✅ RESOLVED — High
-
-### 7. Rate limit dev bypass not explicit
-**Fix:** `src/services/rateLimitService.ts` — bypass only when `DISABLE_RATE_LIMIT=true` (explicit env var). Never bypasses on `NODE_ENV` alone.
-
-### 8. generate-questions: JSON response not wrapped in object
-**Fix:** `src/app/api/generate-questions/route.ts` — prompt asks for `{ "questions": [...] }` wrapper; Zod validates the wrapper; bare array fallback for backward compat.
-
-### 9. global_ai_cache: no RLS
-**Fix:** `supabase_schema.sql` — deny-all RLS policy on `global_ai_cache`. Accessed via service role only.
-
-### 10. feedback INSERT policy allowed any user_id
-**Fix:** `supabase_schema.sql` — INSERT policy now `WITH CHECK ((SELECT auth.uid()) = user_id)`.
-
-### 11. Type-unsafe cache read in generate-questions
-**Fix:** `src/app/api/generate-questions/route.ts` — `parseCachedQuestions()` type guard validates shape before use.
-
-### 12. supabaseAdmin null-guard
-**Fix:** `src/app/api/generate-questions/route.ts` — null-checks `supabaseAdmin` before any call.
-
----
-
-## ✅ RESOLVED — Security / Production
-
-### 13. `javascript:history.back()` in not-found.tsx
-**Fix:** `src/app/not-found.tsx` — replaced `<Link href="javascript:...">` with `<button onClick={() => window.history.back()}>`. Added `"use client"` directive.
-
-### 14. Service worker caching authenticated routes
-**Fix:** `public/sw.js` — rewrote SW. Auth-protected routes (`/dashboard`, `/results`, `/auth`, etc.) are explicitly excluded from cache. Network-first for HTML navigation. Cache-first only for `/_next/static/` and icons.
-
-### 15. global-error.tsx Tailwind classes not applied
-**Fix:** `src/app/global-error.tsx` — replaced all Tailwind `className` with inline styles. The global error boundary renders its own `<html>/<body>` without the app's CSS pipeline.
-
-### 16. LICENSE file missing
-**Fix:** `LICENSE` created (MIT, copyright Tanmay Shah 2026).
-
-### 17. generate-questions missing from vercel.json
-**Fix:** `vercel.json` — added `generate-questions` (30s) and `demo-ask-ai` (30s).
-
-### 18. OCR.space missing from CSP connect-src
-**Fix:** `next.config.ts` — added `https://api.ocr.space` to `connect-src`.
-
-### 19. /demo missing from sitemap and robots.txt
-**Fix:** `src/app/sitemap.ts` — added `/demo` (priority 0.8). `public/robots.txt` — added `Allow: /demo`.
-
-### 20. manifest.json minimal
-**Fix:** `public/manifest.json` — added `display_override`, `shortcuts` for Dashboard and AI Assistant, `categories`, `lang`, `scope`.
-
-### 21. README GitHub placeholder URLs
-**Fix:** `README.md` — replaced `your-username` with `tanmayshahh`.
+### 8. Unencrypted PHI at Rest
+**Fix:** `src/lib/crypto/encryption.ts` + `medical-data.ts` — Implemented AES-256-GCM application-level encryption for `raw_ocr_text` and `raw_ai_json` payloads.
 
 ---
 
@@ -88,14 +41,3 @@ Status as of April 2026 — all critical and high issues resolved.
 | Wearable sync (Apple Health, Oura) | Roadmapped Q3 2026 |
 | Health timeline | Roadmapped Q2 2026 |
 | Vercel Pro plan required | Hobby plan's 10s timeout is insufficient for AI analysis route (60s needed) |
-
----
-
-## Summary
-
-| Severity | Total | Resolved |
-|----------|-------|----------|
-| Critical | 6 | 6 ✅ |
-| High | 6 | 6 ✅ |
-| Security/Production | 9 | 9 ✅ |
-| **Total** | **21** | **21 ✅** |

@@ -50,7 +50,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#A8A29E] mb-1.5 block">
+                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
                             First name *
                         </label>
                         <input
@@ -61,14 +61,14 @@ export function StepBasicInfo() {
                             placeholder="John"
                             className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
                          rounded-[10px] text-[16px] text-[#1C1917] 
-                         placeholder-[#A8A29E]
+                         placeholder-[#78716C]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#A8A29E] mb-1.5 block">
+                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
                             Last name
                         </label>
                         <input
@@ -79,7 +79,7 @@ export function StepBasicInfo() {
                             placeholder="Doe"
                             className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
                          rounded-[10px] text-[16px] text-[#1C1917] 
-                         placeholder-[#A8A29E]
+                         placeholder-[#78716C]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
@@ -89,7 +89,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#A8A29E] mb-1.5 block">
+                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
                             Age *
                         </label>
                         <input
@@ -103,14 +103,14 @@ export function StepBasicInfo() {
                             min="1" max="120"
                             className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
                          rounded-[10px] text-[16px] text-[#1C1917]
-                         placeholder-[#A8A29E]
+                         placeholder-[#78716C]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#A8A29E] mb-1.5 block">
+                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
                             Biological sex *
                         </label>
                         <div className="flex gap-2">
@@ -135,7 +135,7 @@ export function StepBasicInfo() {
 
                 <div>
                     <label className="text-[10px] font-semibold uppercase 
-                             tracking-[0.12em] text-[#A8A29E] mb-1.5 block">
+                             tracking-[0.12em] text-[#78716C] mb-1.5 block">
                         Blood type
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ export function StepBasicInfo() {
                         "text-sm font-semibold transition-all",
                         canAdvance
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#E8E6DF] text-[#A8A29E] cursor-not-allowed"
+                            : "bg-[#E8E6DF] text-[#78716C] cursor-not-allowed"
                     )}
                 >
                     Continue

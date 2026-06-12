@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiResponse } from '@/lib/api-response';
 import { validateEnv } from '@/lib/env';
 import { extractTextFromPdf, ImageBasedPdfError } from '@/services/extractionService';
 import { analyzeLabText } from '@/services/aiAnalysisService';
@@ -7,8 +8,10 @@ import { ExtractedLabValue } from '@/lib/onboarding-store';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { getAuthClient } from '@/lib/supabase/server';
+import { FormSymptomsSchema, ManualPayloadSchema } from '@/lib/validations/api';
 import { z } from 'zod';
 import { MAX_FILE_SIZE_BYTES, MAX_UPLOADS_PER_HOUR } from '@/lib/constants';
+import { validateContentLength, MAX_UPLOAD_BYTES } from '@/lib/request-validation';
 
 /** Client can use this to show clean image-based PDF message and manual entry option. */
 export const IMAGE_BASED_PDF_ERROR_CODE = 'IMAGE_BASED_PDF';
@@ -16,7 +19,6 @@ export const IMAGE_BASED_PDF_ERROR_CODE = 'IMAGE_BASED_PDF';
 export const maxDuration = 60;
 export const runtime = "nodejs";
 
-const formSymptomsSchema = z.array(z.string().trim().min(1)).max(30).catch([]);
 const GENERIC_ANALYSIS_ERROR = 'We could not analyze this report right now. Please try again in a moment, or enter the values manually.';
 
 function toDebugPayload(error: unknown, stage: string, extra: Record<string, unknown> = {}) {
@@ -38,7 +40,7 @@ function parseFormSymptoms(raw: FormDataEntryValue | null): string[] {
 
     try {
         const parsed = JSON.parse(raw);
-        const result = formSymptomsSchema.parse(parsed);
+        const result = FormSymptomsSchema.parse(parsed);
         return Array.from(new Set(result));
     } catch {
         return [];
@@ -56,11 +58,12 @@ function includeDebug(debug: Record<string, unknown>) {
 
 export async function POST(req: NextRequest) {
     try {
+        validateContentLength(req, MAX_UPLOAD_BYTES);
         validateEnv();
         const rateLimitResult = await checkRateLimit();
         if (!rateLimitResult.success) {
             logger.warn(`Rate limit exceeded: ${rateLimitResult.message}`);
-            return NextResponse.json(
+            return apiResponse(
                     {
                         success: false,
                         error: rateLimitResult.message,
@@ -74,7 +77,7 @@ export async function POST(req: NextRequest) {
         const supabaseAuth = await getAuthClient();
         const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
         if (!authUser) {
-            return NextResponse.json(
+            return apiResponse(
                 {
                     success: false,
                     error: 'Sign in to analyze reports.',
@@ -92,7 +95,7 @@ export async function POST(req: NextRequest) {
             .eq('user_id', authUser.id)
             .gte('uploaded_at', oneHourAgo);
         if (uploadCount !== null && uploadCount >= MAX_UPLOADS_PER_HOUR) {
-            return NextResponse.json(
+            return apiResponse(
                 {
                     success: false,
                     error: `Rate limit exceeded. You can analyze up to ${MAX_UPLOADS_PER_HOUR} reports per hour. Please try again later.`,
@@ -115,7 +118,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (!file) {
-            return NextResponse.json({
+            return apiResponse({
                 success: false,
                 error: 'No file uploaded. Upload a PDF or use manual entry.',
                 debug: includeDebug({ stage: 'request-parse', fields: Array.from(formData.keys()) }),
@@ -123,7 +126,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (file.size > MAX_FILE_SIZE_BYTES) {
-            return NextResponse.json({
+            return apiResponse({
                 success: false,
                 error: `File size exceeds ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB limit.`,
                 debug: includeDebug({ stage: 'file-validation', fileName: file.name, fileSize: file.size, max: MAX_FILE_SIZE_BYTES }),
@@ -135,7 +138,7 @@ export async function POST(req: NextRequest) {
         const fileName = file.name.toLowerCase();
         const isAcceptableMime = !file.type || file.type === 'application/pdf' || file.type === 'application/octet-stream';
         if (!fileName.endsWith('.pdf') || !isAcceptableMime) {
-            return NextResponse.json(
+            return apiResponse(
                 {
                     success: false,
                     error: 'Invalid file type. Only PDF files are accepted.',
@@ -150,7 +153,7 @@ export async function POST(req: NextRequest) {
 
         // Section 1e — PDF Magic Bytes validation (%PDF-)
         if (buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-') {
-            return NextResponse.json(
+            return apiResponse(
                 {
                     success: false,
                     error: 'Invalid file content. The file does not appear to be a valid PDF.',
@@ -172,7 +175,7 @@ export async function POST(req: NextRequest) {
             extractedText = result.text;
         } catch (extractErr) {
             if (extractErr instanceof ImageBasedPdfError) {
-                return NextResponse.json(
+                return apiResponse(
                     {
                         success: false,
                         error: extractErr.message,
@@ -186,7 +189,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (!extractedText || extractedText.trim().length < 100) {
-            return NextResponse.json({
+            return apiResponse({
                 success: false,
                 error: 'Could not extract enough text from this PDF. Please ensure it is a digital lab report and not a scan or photo.',
                 code: IMAGE_BASED_PDF_ERROR_CODE,
@@ -215,8 +218,9 @@ export async function POST(req: NextRequest) {
         const analysisResult = await analyzeLabText(extractedText, { symptoms: userSymptoms, history });
 
         // 6. Data Persistence
+        let saveResult: Awaited<ReturnType<typeof saveLabResult>> | null = null;
         if (shouldSave) {
-            const saveResult = await saveLabResult({
+            saveResult = await saveLabResult({
                 userId: authUser.id,
                 healthScore: analysisResult.healthScore,
                 riskLevel: analysisResult.riskLevel,
@@ -232,7 +236,7 @@ export async function POST(req: NextRequest) {
 
             if (!saveResult.success) {
                 logger.error("Failed to save via action:", saveResult.error);
-                return NextResponse.json(
+                return apiResponse(
                     {
                         success: false,
                         error: 'Analysis finished, but we could not save the results. Please try again.',
@@ -248,18 +252,16 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        return NextResponse.json({
+        return apiResponse({
             success: true,
             saved: shouldSave,
-            fileName: file.name,
-            extractedText,
-            analysis: JSON.stringify(analysisResult)
+            labResultId: saveResult?.labResultId ?? null,
         });
 
     } catch (error: unknown) {
         if (error instanceof z.ZodError) {
             logger.error("Validation Error:", error.issues);
-            return NextResponse.json({
+            return apiResponse({
                 success: false,
                 error: 'AI analysis validation failed. The report format may be unsupported.',
                 details: process.env.NODE_ENV === 'production' ? undefined : error.issues,
@@ -267,7 +269,7 @@ export async function POST(req: NextRequest) {
             }, { status: 422 });
         }
         if (error instanceof ImageBasedPdfError) {
-            return NextResponse.json(
+            return apiResponse(
                 {
                     success: false,
                     error: error.message,
@@ -280,7 +282,7 @@ export async function POST(req: NextRequest) {
 
         const debug = toDebugPayload(error, 'pipeline-catch');
         logger.error("Pipeline Error:", debug);
-        return NextResponse.json({
+        return apiResponse({
             success: false,
             error: isConfigurationError(error) ? GENERIC_ANALYSIS_ERROR : ((error as Error).message || GENERIC_ANALYSIS_ERROR),
             debug: includeDebug(debug),
@@ -293,35 +295,27 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
     const supabase = await getAuthClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        return NextResponse.json({
+        return apiResponse({
             success: false,
             error: 'You must be signed in to save results.',
             debug: includeDebug({ stage: 'manual-auth', message: 'No Supabase auth user returned for manual entry request.' }),
         }, { status: 401 });
     }
 
-    const manualPayloadSchema = z.object({
-        biomarkers: z.array(z.object({
-            name: z.string().trim().min(1),
-            value: z.union([z.number(), z.string()]).transform(v => Number(v)).refine(n => !Number.isNaN(n)),
-            unit: z.string().trim().default('unit').transform(u => u || 'unit')
-        })).min(1, 'Please add at least one biomarker with a valid name and numeric value.')
-    });
-
     let payloadRaw;
     try {
         payloadRaw = JSON.parse(manualPayloadRaw);
     } catch (error) {
-        return NextResponse.json({
+        return apiResponse({
             success: false,
             error: 'Invalid manual entry data format.',
             debug: includeDebug(toDebugPayload(error, 'manual-payload-json', { manualPayloadRaw })),
         }, { status: 400 });
     }
 
-    const parseResult = manualPayloadSchema.safeParse(payloadRaw);
+    const parseResult = ManualPayloadSchema.safeParse(payloadRaw);
     if (!parseResult.success) {
-        return NextResponse.json({
+        return apiResponse({
             success: false,
             error: parseResult.error.issues[0]?.message || 'Invalid data.',
             debug: includeDebug(toDebugPayload(parseResult.error, 'manual-payload-validation', { issues: parseResult.error.issues })),
@@ -360,16 +354,15 @@ async function handleManualEntry(manualPayloadRaw: string, requestSymptoms: stri
 
     if (!saveResult.success) {
         logger.error("Failed to save manual report:", saveResult.error);
-        return NextResponse.json({
+        return apiResponse({
             success: false,
             error: 'Analysis finished, but we could not save the results. Please try again.',
             debug: includeDebug({ stage: 'manual-save-report', saveResult, biomarkerCount: analysisResult.biomarkers.length }),
         }, { status: 500 });
     }
 
-    return NextResponse.json({
+    return apiResponse({
         success: true,
-        extractedText: fullText,
-        analysis: JSON.stringify(analysisResult)
+        labResultId: saveResult?.labResultId ?? null,
     });
 }

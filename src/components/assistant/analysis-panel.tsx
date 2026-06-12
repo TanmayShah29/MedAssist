@@ -31,7 +31,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
         <div className="h-full overflow-y-auto p-5 lg:p-6 space-y-8 bg-[#F5F4EF] min-w-0">
             {/* Detected Entities */}
             <div>
-                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Context Detected</h3>
+                <h3 className="text-[11px] uppercase tracking-widest text-[#78716C] font-semibold mb-3">Context Detected</h3>
                 {entities.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                         {entities.map((e, i) => (
@@ -48,13 +48,13 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                         ))}
                     </div>
                 ) : (
-                    <p className="text-xs text-[#A8A29E] italic">No symptoms or discussion-focused labs found.</p>
+                    <p className="text-xs text-[#78716C] italic">No symptoms or discussion-focused labs found.</p>
                 )}
             </div>
 
             {/* Evidence Trail */}
             <div className="pt-4 border-t border-[#E8E6DF]">
-                <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3">Preparation Progress</h3>
+                <h3 className="text-[11px] uppercase tracking-widest text-[#78716C] font-semibold mb-3">Preparation Progress</h3>
                 <div className="space-y-3">
                     <div className="flex gap-3 min-w-0">
                         <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0">
@@ -82,7 +82,7 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
             {/* Feature 8: Doctor Ready Questions */}
             {doctorQuestions.length > 0 && (
                 <div className="pt-4 border-t border-[#E8E6DF]">
-                    <h3 className="text-[11px] uppercase tracking-widest text-[#A8A29E] font-semibold mb-3 flex items-center gap-2">
+                    <h3 className="text-[11px] uppercase tracking-widest text-[#78716C] font-semibold mb-3 flex items-center gap-2">
                         <ClipboardList size={14} className="text-sky-500" />
                         Questions for your doctor
                     </h3>

@@ -12,14 +12,9 @@ export interface UserProfile {
 const DEFAULT: UserProfile = { name: null, initials: "?", email: null };
 
 /**
- * Shared hook that fetches + caches the authenticated user's display name
+ * Shared hook that fetches the authenticated user's display name
  * and initials. Used by Sidebar, MobileNavbar, and any other component
  * that needs to show user identity.
- *
- * Priority:
- *   1. localStorage medassist-onboarding (fastest, avoids network)
- *   2. Supabase profiles table
- *   3. Supabase auth email fallback
  */
 export function useUserProfile(): UserProfile {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT);
@@ -31,32 +26,7 @@ export function useUserProfile(): UserProfile {
     );
 
     const fetchProfile = async () => {
-      // 1. Try localStorage first for an optimistic first paint only.
-      // Do not return early: onboarding storage can be stale after profile
-      // edits, account deletion, or a new account on the same device.
-      try {
-        const stored = localStorage.getItem("medassist-onboarding");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          const firstName = parsed?.state?.basicInfo?.firstName as string | undefined;
-          const lastName = parsed?.state?.basicInfo?.lastName as string | undefined;
-          if (firstName) {
-            setProfile({
-              name: `${firstName} ${lastName ?? ""}`.trim(),
-              initials: `${firstName[0]}${lastName?.[0] ?? ""}`.toUpperCase(),
-              email: null,
-            });
-          }
-          // Legacy shape
-          else if (parsed?.name) {
-            setProfile({ name: parsed.name, initials: parsed.name[0].toUpperCase(), email: null });
-          }
-        }
-      } catch {
-        // localStorage unavailable — fall through
-      }
-
-      // 2. Supabase auth + profile table
+      // Supabase auth + profile table
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 

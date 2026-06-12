@@ -84,6 +84,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 </div>
                                 <button
                                     onClick={onClose}
+                                    aria-label="Close detail panel"
                                     className="p-3 -m-1 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                                     style={{ WebkitAppearance: 'none' }}
                                 >
@@ -95,14 +96,14 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                             <div className="bg-white border border-[#E8E6DF] rounded-2xl p-6 mb-8 shadow-sm">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
-                                        <p className="text-sm text-[#A8A29E] font-medium mb-1">CURRENT VALUE</p>
+                                        <p className="text-sm text-[#78716C] font-medium mb-1">CURRENT VALUE</p>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-4xl font-bold text-[#1C1917] font-display">{biomarker.value}</span>
                                             <span className="text-lg text-[#57534E]">{biomarker.unit}</span>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-[#A8A29E] font-bold uppercase mb-1">STABILITY</p>
+                                        <p className="text-[10px] text-[#78716C] font-bold uppercase mb-1">STABILITY</p>
                                         <div className="flex items-center gap-1 text-emerald-600 font-semibold text-sm">
                                             <TrendingUp className="w-4 h-4" />
                                             Stable
@@ -114,7 +115,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     biomarker.reference_range_max !== undefined && biomarker.reference_range_max !== null &&
                                     biomarker.reference_range_max > biomarker.reference_range_min && (
                                         <div className="mt-4 pt-4 border-t border-[#E8E6DF]">
-                                            <div className="flex justify-between text-xs text-[#A8A29E] font-medium mb-2">
+                                            <div className="flex justify-between text-xs text-[#78716C] font-medium mb-2">
                                                 <span>Min: {biomarker.reference_range_min}</span>
                                                 <span>Max: {biomarker.reference_range_max}</span>
                                             </div>
@@ -181,7 +182,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     </div>
                                 ) : (
                                     <div className="bg-[#F5F4EF] border border-dashed border-[#E8E6DF] rounded-2xl p-8 text-center">
-                                        <p className="text-sm text-[#A8A29E]">More reports needed to generate a trend chart</p>
+                                        <p className="text-sm text-[#78716C]">More reports needed to generate a trend chart</p>
                                     </div>
                                 )}
                             </div>
@@ -202,7 +203,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             </div>
                                             <div>
                                                 <p className="text-[14px] font-bold text-[#1C1917]">Exact value and range</p>
-                                                <p className="text-[11px] text-[#A8A29E]">{biomarker.value} {biomarker.unit}{biomarker.reference_range_min != null && biomarker.reference_range_max != null ? ` · range ${biomarker.reference_range_min}-${biomarker.reference_range_max} ${biomarker.unit}` : " · no range found in report"}</p>
+                                                <p className="text-[11px] text-[#78716C]">{biomarker.value} {biomarker.unit}{biomarker.reference_range_min != null && biomarker.reference_range_max != null ? ` · range ${biomarker.reference_range_min}-${biomarker.reference_range_max} ${biomarker.unit}` : " · no range found in report"}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -214,12 +215,12 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             </div>
                                             <div>
                                                 <p className="text-[14px] font-bold text-[#1C1917]">Why this may matter</p>
-                                                <p className="text-[11px] text-[#A8A29E]">{styles.description}</p>
+                                                <p className="text-[11px] text-[#78716C]">{styles.description}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <p className="mt-4 text-[11px] text-[#A8A29E] leading-relaxed">
+                                <p className="mt-4 text-[11px] text-[#78716C] leading-relaxed">
                                     <strong className="text-[#57534E]">Note:</strong> This is appointment context, not a diagnosis or treatment recommendation.
                                 </p>
                             </div>

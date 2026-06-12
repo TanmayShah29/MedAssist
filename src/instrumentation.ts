@@ -14,21 +14,19 @@
  */
 
 export async function register() {
-  // ── Sentry (disabled until package is installed) ─────────────────────────
-  // Uncomment after running: npm install @sentry/nextjs
-  //
-  // if (process.env.NEXT_RUNTIME === 'nodejs') {
-  //   const Sentry = await import('@sentry/nextjs');
-  //   Sentry.init({
-  //     dsn: process.env.SENTRY_DSN,
-  //     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  //     environment: process.env.NODE_ENV,
-  //   });
-  //
-  //   // Wire logger so all logger.error() calls are forwarded to Sentry
-  //   const { logger } = await import('@/lib/logger');
-  //   logger.onError = (err) => Sentry.captureException(err);
-  // }
+  // ── Sentry ───────────────────────────────────────────────────────────────
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const Sentry = await import('@sentry/nextjs');
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN || undefined,
+      tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+      environment: process.env.NODE_ENV,
+    });
+
+    // Wire logger so all logger.error() calls are forwarded to Sentry
+    const { logger } = await import('@/lib/logger');
+    logger.onError = (err) => Sentry.captureException(err);
+  }
 
   // ── Startup validation ───────────────────────────────────────────────────
   // Verify required env vars are present before accepting any requests.
@@ -49,6 +47,4 @@ export async function register() {
 }
 
 // ── Sentry — capture unhandled errors in server components ──────────────────
-// Uncomment after running: npm install @sentry/nextjs
-//
-// export const onRequestError = Sentry.captureRequestError;
+export const onRequestError = (await import('@sentry/nextjs')).captureRequestError;

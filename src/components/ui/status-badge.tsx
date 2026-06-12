@@ -74,6 +74,8 @@ export function StatusDot({ status, className }: { status: StatusType; className
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.neutral;
   return (
     <span
+      role="img"
+      aria-label={`Status: ${status}`}
       className={cn(
         "inline-block rounded-full flex-shrink-0",
         config.dotClass,

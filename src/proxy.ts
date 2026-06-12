@@ -2,8 +2,38 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+function validateCsrf(request: NextRequest): boolean {
+    if (request.method === 'GET' || request.method === 'HEAD' || request.method === 'OPTIONS') {
+        return true;
+    }
+
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    const allowedOrigins = [
+        process.env.NEXT_PUBLIC_SITE_URL,
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+        'https://medassist-app.vercel.app',
+    ].filter((s): s is string => Boolean(s));
+
+    if (origin) {
+        return allowedOrigins.some((allowed) => origin.startsWith(allowed));
+    }
+    if (referer) {
+        return allowedOrigins.some((allowed) => referer.startsWith(allowed));
+    }
+    return true;
+}
+
 export default async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
+
+    // CSRF check for all state-changing API routes
+    if (pathname.startsWith('/api/') && !validateCsrf(request)) {
+        return new NextResponse(JSON.stringify({ error: 'CSRF validation failed' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
 
     // Always set x-pathname so layout can render correctly (fixes blank page)
     const requestHeaders = new Headers(request.headers)
@@ -73,7 +103,7 @@ export default async function proxy(request: NextRequest) {
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value, options }) => {
                         request.cookies.set(name, value)
-                        response.cookies.set(name, value, options)
+                        response.cookies.set(name, value, { ...options, sameSite: 'strict' })
                     })
                 }
             }
@@ -106,7 +136,7 @@ export default async function proxy(request: NextRequest) {
             .single()
         onboardingComplete = profile?.onboarding_complete === true
         response.cookies.set('onboarding_complete', String(onboardingComplete), {
-            httpOnly: false,
+            httpOnly: true,
             maxAge: 60 * 60 * 24 * 7,
             path: '/'
         })

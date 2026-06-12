@@ -44,7 +44,7 @@ export function AIInsightsFeed({ analysis }: AIInsightsFeedProps) {
                         <Sparkles className="w-5 h-5 text-sky-400" />
                     </div>
                     <h4 className="font-bold text-lg text-white mb-2">Before the visit?</h4>
-                    <p className="text-[#A8A29E] text-sm mb-6 leading-relaxed">
+                    <p className="text-[#78716C] text-sm mb-6 leading-relaxed">
                         Ask the assistant to turn your results into clear questions and a concise doctor-facing summary.
                     </p>
                     <Link

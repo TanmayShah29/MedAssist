@@ -170,7 +170,7 @@ export default function LandingPage() {
               <h2 className="font-display text-4xl text-[#1C1917] mb-6">
                 You get your results back.
                 <br />
-                <span className="text-[#A8A29E]">Now what?</span>
+                <span className="text-[#78716C]">Now what?</span>
               </h2>
               <div className="space-y-3">
                 {[
@@ -280,7 +280,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-[18px] font-bold text-[#1C1917] mb-3">{item.title}</h3>
                 <p className="text-[14px] text-[#57534E] leading-relaxed mb-4">{item.desc}</p>
-                <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-wider">{item.detail}</p>
+                <p className="text-[11px] font-bold text-[#78716C] uppercase tracking-wider">{item.detail}</p>
               </div>
             ))}
           </div>
@@ -402,7 +402,7 @@ export default function LandingPage() {
                   <div className="flex-shrink-0 text-[#D9D6CD] text-lg">→</div>
                   <div className="flex-shrink-0 rounded-xl border border-dashed border-sky-300 bg-sky-50/50 px-4 py-3">
                     <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-500 mb-1">Next Visit</p>
-                    <p className="text-[12px] font-semibold text-[#A8A29E]">
+                    <p className="text-[12px] font-semibold text-[#78716C]">
                       <span className="landing-type-cursor">_</span>
                     </p>
                   </div>

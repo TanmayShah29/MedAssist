@@ -50,13 +50,25 @@ export async function extractPdfText(
 ): Promise<string> {
   // ── Stage 1: pdf-parse — handles digital/text-based PDFs ─────────────────
   try {
-    const text = await extractWithPdfParse(fileBuffer);
+    // CRITICAL: Prevent OOM/CPU lockup from malicious or hyper-complex PDFs.
+    // We race the parser against a strict 20s timeout.
+    const text = await Promise.race([
+        extractWithPdfParse(fileBuffer),
+        new Promise<string>((_, reject) => 
+            setTimeout(() => reject(new Error('PDF extraction timed out')), 20000)
+        )
+    ]);
+
     if (text.length >= MIN_TEXT_LENGTH) {
       return text;
     }
     // Text too short — PDF may be scanned. Fall through to Stage 2.
-  } catch {
-    // pdf-parse throws on corrupt or password-protected PDFs — fall through.
+  } catch (err) {
+    // If it's a timeout, re-throw to abort immediately.
+    if (err instanceof Error && err.message === 'PDF extraction timed out') {
+        throw err;
+    }
+    // Otherwise, pdf-parse throws on corrupt or password-protected PDFs — fall through.
   }
 
   // ── Stage 2: OCR.space — fallback for scanned/image-based PDFs ───────────
@@ -102,9 +114,25 @@ function loadPdfParse() {
   // API route never crashes before our handler/catch can return JSON.
   const globalScope = globalThis as Record<string, unknown>;
 
-  if (!globalScope["DOMMatrix"]) globalScope["DOMMatrix"] = class {};
-  if (!globalScope["ImageData"]) globalScope["ImageData"] = class {};
-  if (!globalScope["Path2D"]) globalScope["Path2D"] = class {};
+  if (!globalScope["DOMMatrix"]) {
+    globalScope["DOMMatrix"] = class {
+       
+      constructor() {}
+      static fromString() { return null; }
+    } as unknown;
+  }
+  if (!globalScope["ImageData"]) {
+    globalScope["ImageData"] = class {
+       
+      constructor() {}
+    } as unknown;
+  }
+  if (!globalScope["Path2D"]) {
+    globalScope["Path2D"] = class {
+       
+      constructor() {}
+    } as unknown;
+  }
 
   // Use require() since this is server-only code and pdf-parse ships mixed CJS/ESM.
   // eslint-disable-next-line @typescript-eslint/no-require-imports

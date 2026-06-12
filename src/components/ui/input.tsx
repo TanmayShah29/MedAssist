@@ -13,7 +13,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="relative w-full">
                 {startIcon && (
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A8A29E]">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#78716C]">
                         {startIcon}
                     </div>
                 )}
@@ -30,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     {...props}
                 />
                 {endIcon && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A8A29E]">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#78716C]">
                         {endIcon}
                     </div>
                 )}

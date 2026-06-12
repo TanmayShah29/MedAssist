@@ -1,4 +1,5 @@
 import { Biomarker, LabResult } from "@/types/medical";
+import { logger } from "@/lib/logger";
 
 type RawBiomarker = {
   name?: unknown;
@@ -15,6 +16,26 @@ type RawBiomarker = {
   ai_interpretation?: unknown;
 };
 
+import { decrypt } from "@/lib/crypto/encryption";
+
+// Helper to seamlessly decrypt raw_ai_json if it was stored encrypted
+export function decryptRawAiJson(rawAiJson: unknown): unknown {
+  if (!rawAiJson || typeof rawAiJson !== 'object') return rawAiJson;
+  
+  const json = rawAiJson as Record<string, unknown>;
+  if (json.encrypted_payload && typeof json.encrypted_payload === 'string') {
+    try {
+      const decrypted = decrypt(json.encrypted_payload);
+      return JSON.parse(decrypted);
+    } catch (err) {
+      logger.error('Failed to decrypt raw_ai_json payload', err);
+      return null;
+    }
+  }
+  
+  return rawAiJson;
+}
+
 export type LabResultWithAnalysis = LabResult & {
   file_name?: string;
   plain_summary?: string | null;
@@ -22,8 +43,16 @@ export type LabResultWithAnalysis = LabResult & {
 };
 
 function asNumber(value: unknown): number {
+  if (value === null || value === undefined) {
+    logger.warn("asNumber: biomarker value is null/undefined");
+    return 0;
+  }
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
+  if (!Number.isFinite(parsed)) {
+    logger.warn(`asNumber: biomarker value is not a valid number: "${value}"`);
+    return 0;
+  }
+  return parsed;
 }
 
 function asNullableNumber(value: unknown): number | undefined {
@@ -64,7 +93,8 @@ export function normalizeBiomarker(row: Partial<Biomarker>): Biomarker {
 }
 
 export function biomarkersFromReport(report: LabResultWithAnalysis): Biomarker[] {
-  const rawJson = report.raw_ai_json as { biomarkers?: RawBiomarker[] } | null | undefined;
+  const decryptedJson = decryptRawAiJson(report.raw_ai_json);
+  const rawJson = decryptedJson as { biomarkers?: RawBiomarker[] } | null | undefined;
   if (!Array.isArray(rawJson?.biomarkers)) return [];
 
   const createdAt = report.uploaded_at ?? report.created_at ?? new Date(0).toISOString();
