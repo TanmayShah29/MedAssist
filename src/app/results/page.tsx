@@ -17,6 +17,7 @@ import { RangeBar } from '@/components/ui/range-bar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BiomarkerDetailSheet } from '@/components/dashboard/BiomarkerDetailSheet'
 import { useStore } from '@/store/useStore'
+import { logAccessAction } from '@/app/actions/user-data'
 import { labResultSummary, latestUniqueBiomarkers, mergeBiomarkerSources } from '@/lib/medical-data'
 import { getPatientStatus, PATIENT_STATUS } from '@/lib/patient-status'
 

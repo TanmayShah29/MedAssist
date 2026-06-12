@@ -1,7 +1,8 @@
 "use server";
 
 import { getAuthClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { logAuditEvent } from "@/lib/audit-log";
 import { ExtractedLabValue } from "@/lib/onboarding-store";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
