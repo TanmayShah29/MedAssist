@@ -13,14 +13,16 @@ import {
   Settings,
   LogOut,
   Zap,
+  ListChecks,
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { BrandLockup } from "@/components/branding/brand-lockup";
 
 const navItems = [
-  { id: "dashboard", label: "Visit Prep", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
-  { id: "results",   label: "Lab Details", path: "/results",   icon: FlaskConical,    shortcut: "⌘R" },
-  { id: "assistant", label: "Prep Assistant",path: "/assistant", icon: Brain,            shortcut: "⌘A" },
+  { id: "dashboard", label: "Today", path: "/dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
+  { id: "results",   label: "Labs", path: "/results",   icon: FlaskConical,    shortcut: "⌘R" },
+  { id: "plan",      label: "Plan", path: "/plan", icon: ListChecks, shortcut: "⌘L" },
+  { id: "assistant", label: "Assistant",path: "/assistant", icon: Brain,            shortcut: "⌘A" },
   { id: "profile",   label: "Profile",     path: "/profile",   icon: User,            shortcut: "⌘P" },
   { id: "settings",  label: "Settings",    path: "/settings",  icon: Settings,        shortcut: "⌘," },
 ];

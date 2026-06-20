@@ -33,12 +33,17 @@ import { BiomarkerGrid } from '@/components/dashboard/biomarker-grid'
 import { CarePlanSection } from '@/components/dashboard/care-plan-section'
 import { LongitudinalInsightsSection } from '@/components/dashboard/longitudinal-insights-section'
 import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
+import { InsightCard } from '@/components/ui/insight-card'
+import { StatusSummary } from '@/components/ui/status-summary'
+import { ActionItem as PlanActionItem } from '@/components/ui/action-item'
+import { TrustCallout } from '@/components/ui/trust-callout'
 
 import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
 import { labResultSummary, latestUniqueBiomarkers, decryptRawAiJson } from '@/lib/medical-data'
 import { computeBriefCompleteness, PATIENT_STATUS } from '@/lib/patient-status'
 import { TrustLayer } from '@/components/trust-layer'
+import { generateCarePlanItems, getTopTrendChanges, getVisitFocus } from '@/lib/health-companion'
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -310,6 +315,14 @@ export default function DashboardClient({
           })
         : null;
 
+    const visitFocus = getVisitFocus(latestBiomarkers);
+    const topTrendChanges = getTopTrendChanges(latestBiomarkers, displayBiomarkers, latestLabResult?.id);
+    const generatedPlanItems = generateCarePlanItems({
+        biomarkers: latestBiomarkers,
+        reportCount: displayLabResults.length,
+        symptomCount: initialSymptoms.length,
+    }).slice(0, 3);
+
     const handleBiomarkerClick = (b: Biomarker) => {
         setSelectedBiomarkerData(b);
         setShowDetailSheet(true);
@@ -473,6 +486,123 @@ export default function DashboardClient({
                         Show my data
                     </button>
                 </div>
+            )}
+
+            {totalCount > 0 && (
+                <section className="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)] print:hidden">
+                    <div className="app-panel p-5 sm:p-6">
+                        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="min-w-0">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-600">Today</p>
+                                <h2 className="mt-1 font-display text-[30px] leading-tight text-[#1C1917] sm:text-[34px]">
+                                    {visitFocus.title}
+                                </h2>
+                                <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-[#57534E] text-wrap-safe">
+                                    {visitFocus.detail}
+                                </p>
+                            </div>
+                            <div className="w-full lg:w-[18rem]">
+                                <StatusSummary optimal={optimalCount} warning={warningCount} critical={criticalCount} />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                            <InsightCard
+                                tone={criticalCount > 0 ? 'critical' : warningCount > 0 ? 'warning' : 'success'}
+                                eyebrow="Visit focus"
+                                title={criticalCount > 0 ? 'Review soon' : warningCount > 0 ? 'Discuss at visit' : 'Routine review'}
+                                description={criticalCount > 0
+                                    ? `${criticalCount} result${criticalCount === 1 ? '' : 's'} should be reviewed with a qualified clinician.`
+                                    : warningCount > 0
+                                        ? `${warningCount} result${warningCount === 1 ? '' : 's'} may be worth discussing.`
+                                        : 'No current values are marked for discussion.'}
+                                action="Open plan"
+                                onClick={() => router.push('/plan')}
+                            />
+                            <InsightCard
+                                tone="info"
+                                eyebrow="Doctor prep"
+                                title="One-page prep pack"
+                                description="Keep your top discussion points, questions, actions, and key labs in one place."
+                                action="Build pack"
+                                onClick={() => router.push('/plan')}
+                            />
+                            <InsightCard
+                                tone="neutral"
+                                eyebrow="Health record"
+                                title={displayLabResults.length > 1 ? `${displayLabResults.length} reports tracked` : 'Build your baseline'}
+                                description={displayLabResults.length > 1
+                                    ? 'Trend-aware context is available for your latest report.'
+                                    : 'Upload your next report to unlock clearer trend comparisons.'}
+                                action="View labs"
+                                onClick={() => router.push('/results')}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex min-w-0 flex-col gap-5">
+                        <div className="app-panel p-5">
+                            <div className="mb-4 flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">What changed</p>
+                                    <h2 className="text-lg font-bold text-[#1C1917]">Top trends</h2>
+                                </div>
+                                <button
+                                    onClick={() => router.push('/results')}
+                                    className="text-xs font-bold text-sky-600 hover:text-sky-700"
+                                >
+                                    Labs
+                                </button>
+                            </div>
+                            {topTrendChanges.length ? (
+                                <div className="space-y-3">
+                                    {topTrendChanges.map((change) => (
+                                        <InsightCard
+                                            key={change.biomarker.id}
+                                            title={change.title}
+                                            description={change.detail}
+                                            tone={change.biomarker.status === 'critical' ? 'critical' : change.biomarker.status === 'warning' ? 'warning' : 'success'}
+                                            onClick={() => handleBiomarkerClick(change.biomarker)}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm leading-relaxed text-[#57534E]">
+                                    Upload another report to compare changes over time.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="app-panel p-5">
+                            <div className="mb-4 flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Next actions</p>
+                                    <h2 className="text-lg font-bold text-[#1C1917]">Plan preview</h2>
+                                </div>
+                                <button
+                                    onClick={() => router.push('/plan')}
+                                    className="text-xs font-bold text-sky-600 hover:text-sky-700"
+                                >
+                                    Open plan
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {generatedPlanItems.map((item) => (
+                                    <PlanActionItem
+                                        key={item.id}
+                                        title={item.title}
+                                        reason={item.reason}
+                                        kind={item.kind}
+                                        status={item.status}
+                                        timeframe={item.timeframe}
+                                        related={item.related_biomarkers}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <TrustCallout />
+                    </div>
+                </section>
             )}
 
             {/* ── Main dashboard content ── */}

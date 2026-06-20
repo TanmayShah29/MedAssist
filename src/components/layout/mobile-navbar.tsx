@@ -7,9 +7,10 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { BrandMark } from "@/components/branding/brand-lockup";
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "Visit Prep",
-  "/results": "Lab Details",
-  "/assistant": "Prep Assistant",
+  "/dashboard": "Today",
+  "/results": "Labs",
+  "/plan": "Plan",
+  "/assistant": "Assistant",
   "/profile": "Your Profile",
   "/settings": "Settings",
 };

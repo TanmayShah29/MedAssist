@@ -260,6 +260,209 @@ CREATE POLICY "Users can insert own feedback" ON feedback
 CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- HEALTH COMPANION V1: goals, context, plans, insights, exports, sharing
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS health_goals (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  goal_key TEXT NOT NULL,
+  label TEXT NOT NULL,
+  priority INT DEFAULT 0,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE (user_id, goal_key)
+);
+
+CREATE TABLE IF NOT EXISTS onboarding_progress (
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  current_step TEXT NOT NULL DEFAULT 'profile',
+  completed_steps TEXT[] DEFAULT ARRAY[]::TEXT[],
+  draft JSONB DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_context_events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  details JSONB DEFAULT '{}'::jsonb,
+  occurred_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS biomarker_knowledge (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  canonical_name TEXT UNIQUE NOT NULL,
+  category TEXT NOT NULL DEFAULT 'other',
+  plain_english TEXT NOT NULL,
+  common_questions TEXT[] DEFAULT ARRAY[]::TEXT[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS biomarker_aliases (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  biomarker_knowledge_id UUID NOT NULL REFERENCES biomarker_knowledge(id) ON DELETE CASCADE,
+  alias TEXT NOT NULL,
+  normalized_alias TEXT NOT NULL,
+  UNIQUE (normalized_alias)
+);
+
+CREATE TABLE IF NOT EXISTS insights (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  lab_result_id UUID REFERENCES lab_results(id) ON DELETE CASCADE,
+  insight_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  severity TEXT DEFAULT 'info',
+  related_biomarkers TEXT[] DEFAULT ARRAY[]::TEXT[],
+  source TEXT DEFAULT 'generated',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS care_plan_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  reason TEXT,
+  kind TEXT NOT NULL CHECK (kind IN ('ask_doctor', 'monitor', 'lifestyle', 'retest')),
+  status TEXT NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'done', 'dismissed')),
+  timeframe TEXT,
+  related_biomarkers TEXT[] DEFAULT ARRAY[]::TEXT[],
+  source TEXT DEFAULT 'user',
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS habit_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  habit_type TEXT NOT NULL,
+  value TEXT,
+  note TEXT,
+  logged_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS retest_reminders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  due_date DATE,
+  related_biomarkers TEXT[] DEFAULT ARRAY[]::TEXT[],
+  status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'done', 'dismissed')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_notes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT,
+  body TEXT NOT NULL,
+  related_biomarkers TEXT[] DEFAULT ARRAY[]::TEXT[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assistant_artifacts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  artifact_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content JSONB NOT NULL,
+  conversation_id BIGINT REFERENCES conversations(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS exports (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  export_type TEXT NOT NULL,
+  format TEXT NOT NULL,
+  sections TEXT[] DEFAULT ARRAY[]::TEXT[],
+  payload JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS share_links (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  token TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(24), 'hex'),
+  title TEXT NOT NULL,
+  sections TEXT[] DEFAULT ARRAY[]::TEXT[],
+  expires_at TIMESTAMP WITH TIME ZONE,
+  revoked_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE biomarkers ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'uploaded_pdf';
+ALTER TABLE biomarkers ADD COLUMN IF NOT EXISTS source_metadata JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE biomarkers ADD COLUMN IF NOT EXISTS edited_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE biomarkers ADD COLUMN IF NOT EXISTS edited_from JSONB;
+
+ALTER TABLE health_goals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE onboarding_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_context_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE biomarker_knowledge ENABLE ROW LEVEL SECURITY;
+ALTER TABLE biomarker_aliases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE insights ENABLE ROW LEVEL SECURITY;
+ALTER TABLE care_plan_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE habit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE retest_reminders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assistant_artifacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE exports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE share_links ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "health_goals_all" ON health_goals;
+CREATE POLICY "health_goals_all" ON health_goals FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "onboarding_progress_all" ON onboarding_progress;
+CREATE POLICY "onboarding_progress_all" ON onboarding_progress FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "user_context_events_all" ON user_context_events;
+CREATE POLICY "user_context_events_all" ON user_context_events FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "biomarker_knowledge_read" ON biomarker_knowledge;
+CREATE POLICY "biomarker_knowledge_read" ON biomarker_knowledge FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "biomarker_aliases_read" ON biomarker_aliases;
+CREATE POLICY "biomarker_aliases_read" ON biomarker_aliases FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "insights_all" ON insights;
+CREATE POLICY "insights_all" ON insights FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "care_plan_items_all" ON care_plan_items;
+CREATE POLICY "care_plan_items_all" ON care_plan_items FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "habit_logs_all" ON habit_logs;
+CREATE POLICY "habit_logs_all" ON habit_logs FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "retest_reminders_all" ON retest_reminders;
+CREATE POLICY "retest_reminders_all" ON retest_reminders FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "user_notes_all" ON user_notes;
+CREATE POLICY "user_notes_all" ON user_notes FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "assistant_artifacts_all" ON assistant_artifacts;
+CREATE POLICY "assistant_artifacts_all" ON assistant_artifacts FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "exports_all" ON exports;
+CREATE POLICY "exports_all" ON exports FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "share_links_all" ON share_links;
+CREATE POLICY "share_links_all" ON share_links FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_health_goals_user_id ON health_goals(user_id);
+CREATE INDEX IF NOT EXISTS idx_context_events_user_id_occurred ON user_context_events(user_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_insights_user_id_created ON insights(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_care_plan_user_id_status ON care_plan_items(user_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_habit_logs_user_id_logged ON habit_logs(user_id, logged_at DESC);
+CREATE INDEX IF NOT EXISTS idx_exports_user_id_created ON exports(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_share_links_token ON share_links(token);
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- SUPPLEMENTS
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS supplements (

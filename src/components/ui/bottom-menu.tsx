@@ -9,7 +9,7 @@ import {
     MessageSquare,
     FlaskConical,
     User,
-    Settings,
+    ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,11 +23,11 @@ export interface MenuItem {
 }
 
 const DEFAULT_ITEMS: MenuItem[] = [
-    { id: "dashboard", label: "Prep", href: "/dashboard", icon: LayoutDashboard },
+    { id: "dashboard", label: "Today", href: "/dashboard", icon: LayoutDashboard },
     { id: "results",   label: "Labs",   href: "/results",   icon: FlaskConical },
+    { id: "plan",      label: "Plan",   href: "/plan",      icon: ListChecks },
     { id: "assistant", label: "Ask",        href: "/assistant", icon: MessageSquare },
     { id: "profile",   label: "Profile",   href: "/profile",   icon: User },
-    { id: "settings",  label: "Settings",  href: "/settings",  icon: Settings },
 ];
 
 export interface BottomMenuProps {

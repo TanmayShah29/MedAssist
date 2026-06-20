@@ -7,6 +7,7 @@ import "./globals.css";
 const APP_SHELL_ROUTES = [
   "/dashboard",
   "/results",
+  "/plan",
   "/assistant",
   "/profile",
   "/settings",
