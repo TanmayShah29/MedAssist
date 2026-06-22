@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(fileURLToPath(import.meta.url));
+const isDev = process.env.NODE_ENV !== 'production';
 
 // ─── Security Headers ──────────────────────────────────────────────────────
 // Applied to every route. Kept in one place so they're easy to audit.
@@ -15,11 +16,17 @@ const securityHeaders = [
   { key: 'X-XSS-Protection', value: '1; mode=block' },
   // Limit Referer header to origin only on cross-origin requests
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  // Force HTTPS for 2 years, include subdomains, apply for preload list
-  {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload',
-  },
+  // Force HTTPS for 2 years, include subdomains, apply for preload list.
+  // Do not send this on localhost; Safari can apply HTTPS-only policies to
+  // dev subresources and leave the page without its Next/Tailwind assets.
+  ...(isDev
+    ? []
+    : [
+      {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload',
+      },
+    ]),
   // Disable access to sensitive browser APIs
   {
     key: 'Permissions-Policy',
@@ -33,7 +40,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
@@ -43,7 +50,7 @@ const securityHeaders = [
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      "upgrade-insecure-requests",
+      ...(isDev ? [] : ["upgrade-insecure-requests"]),
     ].join('; '),
   },
 ];

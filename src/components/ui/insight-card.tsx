@@ -36,15 +36,15 @@ export function InsightCard({
   return (
     <article
       className={cn(
-        "rounded-[14px] border p-4 shadow-sm transition-all min-w-0",
+        "group rounded-[14px] border p-4 shadow-sm transition-all duration-300 ease-out min-w-0",
         toneClasses[tone],
-        interactive && "cursor-pointer hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-sky-500/20",
+        interactive && "cursor-pointer hover:-translate-y-1 hover:shadow-md focus-within:ring-2 focus-within:ring-sky-500/20",
         className
       )}
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-white/80 text-sky-600 ring-1 ring-black/5">
+        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-white/80 text-sky-600 ring-1 ring-black/5 transition-transform duration-300 group-hover:scale-110">
           {icon ?? <Info className="h-4 w-4" />}
         </div>
         <div className="min-w-0 grow">
@@ -62,14 +62,14 @@ export function InsightCard({
           {action && (
             <button
               type="button"
-              className="mt-3 inline-flex min-h-[36px] items-center gap-1.5 rounded-[9px] text-[13px] font-semibold text-sky-600 hover:text-sky-700"
+              className="mt-3 inline-flex min-h-[36px] items-center gap-1.5 rounded-[9px] text-[13px] font-semibold text-sky-600 transition-colors hover:text-sky-700"
               onClick={(event) => {
                 event.stopPropagation();
                 onClick?.();
               }}
             >
               {action}
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </button>
           )}
         </div>

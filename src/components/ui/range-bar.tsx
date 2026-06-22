@@ -122,8 +122,9 @@ export function RangeBar({ value, min, max, referenceMin, referenceMax, unit, st
                     background: statusColor,
                     border: '2px solid white',
                     boxShadow: `0 0 0 2px ${statusColor}`,
-                    zIndex: 2
-                }} />
+                    zIndex: 2,
+                    transition: 'left 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+                }} className="tick-pop" />
 
                 {/* Value label above indicator */}
                 <div style={{

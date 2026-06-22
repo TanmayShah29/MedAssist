@@ -103,12 +103,12 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
         {questions.length > 0 && !loading && (
           <button
             onClick={copyAll}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-[8px] text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] hover:border-sky-300 hover:text-sky-600 transition-all flex-shrink-0 min-h-[36px] self-start"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-[8px] text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] hover:border-sky-300 hover:text-sky-600 active:scale-95 transition-all duration-200 flex-shrink-0 min-h-[36px] self-start"
             title="Copy all questions"
             style={{ WebkitAppearance: "none" }}
           >
             {copiedAll
-              ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 tick-pop" />
               : <Copy className="w-3.5 h-3.5" />
             }
             {copiedAll ? "Copied!" : "Copy all"}
@@ -137,11 +137,12 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
           questions.map((item, idx) => (
             <div
               key={idx}
-              className="group bg-white border border-[#E8E6DF] rounded-[12px] p-4 transition-all hover:border-sky-200 hover:shadow-sm"
+              className="group bg-white border border-[#E8E6DF] rounded-[12px] p-4 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 stagger-fade-sm"
+              style={{ animationDelay: `${idx * 60}ms` }}
             >
               <div className="flex gap-3">
                 {/* Number */}
-                <span className="w-6 h-6 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-[11px] font-bold text-sky-600 flex-shrink-0 mt-0.5">
+                <span className="w-6 h-6 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-[11px] font-bold text-sky-600 flex-shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110">
                   {idx + 1}
                 </span>
 
@@ -151,12 +152,12 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                     <button
                       onClick={() => copyOne(item.question, idx)}
                       aria-label="Copy question to clipboard"
-                      className="p-2 rounded-[8px] text-[#C5C2B8] hover:text-sky-500 hover:bg-sky-50 transition-all flex-shrink-0 opacity-0 group-hover:opacity-100 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                      className="p-2 rounded-[8px] text-[#C5C2B8] hover:text-sky-500 hover:bg-sky-50 active:scale-90 transition-all duration-200 flex-shrink-0 opacity-0 group-hover:opacity-100 min-h-[36px] min-w-[36px] flex items-center justify-center"
                       title="Copy"
                       style={{ WebkitAppearance: "none" }}
                     >
                       {copiedIdx === idx
-                        ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 tick-pop" />
                         : <ClipboardCopy className="w-3.5 h-3.5" />
                       }
                     </button>

@@ -11,7 +11,7 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
     return (
         <div className="space-y-6">
             {/* Recent Labs Context */}
-            <div className="bg-white rounded-[14px] p-5 lg:p-6 border border-slate-200 shadow-sm min-w-0">
+            <div className="bg-white rounded-[14px] p-5 lg:p-6 border border-slate-200 shadow-sm min-w-0 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
                 <h3 className="flex items-center gap-2 font-sans font-semibold text-slate-900 mb-4 text-wrap-safe">
                     <FileText className="w-4 h-4 text-sky-500" />
                     Recent Context
@@ -19,7 +19,11 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
                 {displayMarkers.length > 0 ? (
                     <div className="space-y-3">
                         {displayMarkers.map((b, i) => (
-                            <div key={i} className="flex flex-col gap-1 text-sm p-3 bg-slate-50 rounded-lg min-w-0 sm:flex-row sm:justify-between sm:items-center">
+                            <div
+                                key={i}
+                                className="flex flex-col gap-1 text-sm p-3 bg-slate-50 rounded-lg min-w-0 sm:flex-row sm:justify-between sm:items-center transition-all duration-200 hover:bg-sky-50/60 hover:-translate-y-0.5 stagger-fade-sm"
+                                style={{ animationDelay: `${i * 60}ms` }}
+                            >
                                 <span className="text-slate-600 text-wrap-safe">{b.name}</span>
                                 <span className={`font-semibold sm:shrink-0 text-wrap-safe ${b.status === 'optimal' ? 'text-emerald-600' :
                                     b.status === 'critical' ? 'text-red-600' : 'text-amber-600'
@@ -38,7 +42,7 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
             </div>
 
             {/* Suggested Questions */}
-            <div className="bg-[#F5F4EF] rounded-[14px] p-5 lg:p-6 border border-[#E8E6DF] min-w-0">
+            <div className="bg-[#F5F4EF] rounded-[14px] p-5 lg:p-6 border border-[#E8E6DF] min-w-0 transition-all duration-300 hover:border-[#D9D6CD]">
                 <h3 className="flex items-center gap-2 font-sans font-semibold text-[#1C1917] mb-4 text-wrap-safe">
                     <HelpCircle className="w-4 h-4 text-sky-500" />
                     Help & Guidance

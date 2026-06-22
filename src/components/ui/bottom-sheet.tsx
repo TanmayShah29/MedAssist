@@ -38,7 +38,7 @@ export function BottomSheet({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F4EF] text-[#57534E]"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F4EF] text-[#57534E] hover:bg-[#EFEDE6] active:scale-90 transition-all duration-200"
                 aria-label="Close sheet"
               >
                 <X className="h-4 w-4" />

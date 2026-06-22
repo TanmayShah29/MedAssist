@@ -94,7 +94,7 @@ export function MedicineCabinet() {
     };
 
     return (
-        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm">
+        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md">
             <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2 min-w-0">
                     <div className="p-2 bg-rose-50 rounded-lg">
@@ -107,10 +107,10 @@ export function MedicineCabinet() {
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="p-2 bg-[#F5F4EF] hover:bg-[#EFEDE6] rounded-full transition-colors"
+                    className="p-2 bg-[#F5F4EF] hover:bg-[#EFEDE6] active:scale-90 rounded-full transition-all duration-200"
                     aria-label={showAddForm ? "Close add medication or supplement form" : "Add medication or supplement"}
                 >
-                    {showAddForm ? <X size={20} className="text-[#57534E]" /> : <Plus size={20} className="text-[#57534E]" />}
+                    {showAddForm ? <X size={20} className="text-[#57534E] transition-transform duration-200 rotate-0" /> : <Plus size={20} className="text-[#57534E] transition-transform duration-200" />}
                 </button>
             </div>
 
@@ -170,10 +170,14 @@ export function MedicineCabinet() {
                 {loading ? (
                     [1, 2].map(i => <div key={i} className="h-16 bg-slate-50 animate-pulse rounded-xl" />)
                 ) : supplements.length > 0 ? (
-                    supplements.map((supp) => (
-                        <div key={supp.id} className="group flex items-center justify-between gap-3 p-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl hover:border-rose-200 transition-colors min-w-0">
+                    supplements.map((supp, idx) => (
+                        <div
+                            key={supp.id}
+                            className="group flex items-center justify-between gap-3 p-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl hover:border-rose-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300 ease-out min-w-0 stagger-fade-sm"
+                            style={{ animationDelay: `${idx * 60}ms` }}
+                        >
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 bg-white rounded-lg border border-[#E8E6DF] flex items-center justify-center">
+                                <div className="w-10 h-10 bg-white rounded-lg border border-[#E8E6DF] flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
                                     <Activity size={18} className="text-rose-500" />
                                 </div>
                                 <div className="min-w-0">
@@ -183,7 +187,7 @@ export function MedicineCabinet() {
                             </div>
                             <button
                                 onClick={() => handleDelete(supp.id)}
-                                className="p-2 text-[#78716C] hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                                className="p-2 text-[#78716C] hover:text-rose-600 hover:bg-rose-50 active:scale-90 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 shrink-0"
                                 aria-label={`Remove ${supp.name}`}
                             >
                                 <Trash2 size={16} />

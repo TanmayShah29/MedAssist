@@ -65,7 +65,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             onBlur={() => setShowTooltip(false)}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
-            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
+            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all duration-300 ease-out ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
             aria-label={onClick ? "Brief completeness details" : undefined}
@@ -82,17 +82,17 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                       onMouseEnter={() => setShowTooltip(true)}
                       onMouseLeave={() => setShowTooltip(false)}
                     >
-                        <Info className="w-3.5 h-3.5" />
+                        <Info className="w-3.5 h-3.5 transition-transform duration-200 hover:scale-110" />
                         <div className={cn(
-                            "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-opacity z-10 normal-case leading-relaxed font-normal",
-                            (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 pointer-events-none md:pointer-events-none'
+                            "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-all duration-200 z-10 normal-case leading-relaxed font-normal",
+                            (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none md:pointer-events-none'
                         )}>
                             A preparation estimate based on lab data, prior reports, symptoms, and medication context. Click to see breakdown.
                         </div>
                     </button>
                 </h3>
                 {onClick && (
-                    <span className="text-[10px] font-semibold text-sky-500 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-semibold text-sky-500 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0.5 group-focus-within:opacity-100">
                         See breakdown →
                     </span>
                 )}

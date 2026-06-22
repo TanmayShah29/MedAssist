@@ -37,8 +37,11 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                         {entities.map((e, i) => (
                             <motion.div
                                 key={i}
-                                whileHover={{ scale: 1.02 }}
-                                className="flex min-w-0 max-w-full items-center px-3 py-2 bg-white border border-[#E8E6DF] rounded-md text-[13px] text-[#1C1917] transition-colors"
+                                initial={{ opacity: 0, y: 6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: i * 0.05, ease: "easeOut" }}
+                                whileHover={{ scale: 1.04, y: -1 }}
+                                className="flex min-w-0 max-w-full items-center px-3 py-2 bg-white border border-[#E8E6DF] rounded-md text-[13px] text-[#1C1917] transition-colors duration-200 hover:border-sky-200 hover:shadow-sm"
                             >
                                 <span className={`w-2 h-2 rounded-full mr-2 ${e.type === 'Symptom' ? 'bg-blue-500' :
                                     e.status === 'critical' ? 'bg-red-500' : 'bg-amber-500'
@@ -56,8 +59,8 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
             <div className="pt-4 border-t border-[#E8E6DF]">
                 <h3 className="text-[11px] uppercase tracking-widest text-[#78716C] font-semibold mb-3">Preparation Progress</h3>
                 <div className="space-y-3">
-                    <div className="flex gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0">
+                    <div className="group flex gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
                             <Brain className="w-4 h-4 text-emerald-500" />
                         </div>
                         <div className="min-w-0">
@@ -66,8 +69,8 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                         </div>
                     </div>
                     {biomarkers.length > 0 && (
-                        <div className="flex gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0">
+                        <div className="group flex gap-3 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E6DF] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
                                 <Activity className="w-4 h-4 text-sky-500" />
                             </div>
                             <div className="min-w-0">
@@ -88,7 +91,11 @@ export function AnalysisPanel({ biomarkers, symptoms, doctorQuestions = [] }: An
                     </h3>
                     <div className="space-y-3">
                         {doctorQuestions.map((q, i) => (
-                            <div key={i} className="p-3 bg-white border border-sky-100 rounded-xl shadow-sm min-w-0">
+                            <div
+                                key={i}
+                                className="p-3 bg-white border border-sky-100 rounded-xl shadow-sm min-w-0 transition-all duration-200 hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 stagger-fade-sm"
+                                style={{ animationDelay: `${i * 60}ms` }}
+                            >
                                 <p className="text-[13px] font-bold text-slate-800 leading-tight mb-1 break-words">
                                     {q.question}
                                 </p>

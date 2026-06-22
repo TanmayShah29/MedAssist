@@ -37,6 +37,14 @@ export function ClientLayout({
       exit: { opacity: 0, y: -6, filter: "blur(2px)" },
       transition: { duration: 0.18, ease: "easeOut" },
     };
+  const standalonePageMotion: MotionProps = prefersReducedMotion
+    ? pageMotion
+    : {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      exit: { opacity: 0 },
+      transition: { duration: 0.18, ease: "easeOut" },
+    };
 
   const [loading, setLoading] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -87,7 +95,7 @@ export function ClientLayout({
       {isStandalone && (
         <div className="min-h-[100dvh] overflow-x-hidden">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={pathname} {...pageMotion}>
+            <motion.div key={pathname} {...standalonePageMotion}>
               {children}
             </motion.div>
           </AnimatePresence>

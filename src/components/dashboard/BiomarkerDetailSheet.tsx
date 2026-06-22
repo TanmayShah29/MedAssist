@@ -85,7 +85,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 <button
                                     onClick={onClose}
                                     aria-label="Close detail panel"
-                                    className="p-3 -m-1 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                    className="p-3 -m-1 hover:bg-gray-100 active:scale-90 rounded-full transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                     style={{ WebkitAppearance: 'none' }}
                                 >
                                     <X className="w-6 h-6 text-[#57534E]" />
@@ -121,11 +121,11 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             </div>
                                             <div className="h-2 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
                                                 <div
-                                                    className={`absolute top-0 bottom-0 left-0 rounded-full ${styles.barClass}`}
-                                                    style={{
-                                                        width: `${Math.max(0, Math.min(100, ((Number(biomarker.value) - biomarker.reference_range_min) / (biomarker.reference_range_max - biomarker.reference_range_min)) * 100))}%`,
-                                                        minWidth: '4px'
-                                                    }}
+                                                className={`absolute top-0 bottom-0 left-0 rounded-full transition-[width] duration-700 ease-out ${styles.barClass}`}
+                                                style={{
+                                                width: `${Math.max(0, Math.min(100, ((Number(biomarker.value) - biomarker.reference_range_min) / (biomarker.reference_range_max - biomarker.reference_range_min)) * 100))}%`,
+                                                minWidth: '4px'
+                                                }}
                                                 />
                                             </div>
                                         </div>
@@ -196,9 +196,9 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     <h3 className="text-lg font-bold font-display text-[#1C1917]">Evidence to review</h3>
                                 </div>
                                 <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px]">
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] transition-all duration-200 hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 group">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600">
+                                            <div className="w-10 h-10 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600 transition-transform duration-200 group-hover:scale-110">
                                                 <Activity size={20} />
                                             </div>
                                             <div>
@@ -208,9 +208,9 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px]">
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] transition-all duration-200 hover:border-emerald-200 hover:shadow-sm hover:-translate-y-0.5 group">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+                                            <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 transition-transform duration-200 group-hover:scale-110">
                                                 <Lightbulb size={20} />
                                             </div>
                                             <div>
@@ -235,8 +235,12 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 </div>
                                 <div className="space-y-3">
                                     {questions.map((question, idx) => (
-                                        <div key={idx} className="flex items-start gap-4 p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-amber-200 transition-colors group">
-                                            <div className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
+                                        <div
+                                            key={idx}
+                                            className="flex items-start gap-4 p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-amber-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 group stagger-fade-sm"
+                                            style={{ animationDelay: `${idx * 60}ms` }}
+                                        >
+                                            <div className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                             </div>
                                             <p className="text-sm text-[#57534E] leading-relaxed grow shrink basis-0">{question}</p>

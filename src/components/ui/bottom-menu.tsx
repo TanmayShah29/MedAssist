@@ -75,11 +75,11 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}
-                                <div className={cn("relative p-2 rounded-[10px] transition-colors", !isActive && "group-hover:bg-[#F5F4EF]")}>
+                                <div className={cn("relative p-2 rounded-[10px] transition-all duration-200", !isActive && "group-hover:bg-[#F5F4EF] group-hover:scale-105")}>
                                     <Icon
                                         size={20}
                                         strokeWidth={isActive ? 2.5 : 2}
-                                        className="transition-colors"
+                                        className="transition-all duration-200"
                                     />
                                     {/* Badge */}
                                     {!!item.badge && item.badge > 0 && (

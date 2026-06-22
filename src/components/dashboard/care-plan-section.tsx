@@ -32,7 +32,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
             className="bg-[#1C1917] rounded-[18px] p-5 lg:p-6 mb-6 text-white shadow-xl relative overflow-hidden min-w-0"
         >
             {/* Background decoration */}
-            <div className="absolute -top-3 -right-3 p-6 opacity-10 pointer-events-none select-none">
+            <div className="absolute -top-3 -right-3 p-6 opacity-10 pointer-events-none select-none landing-breathe">
                 <Sparkles size={96} />
             </div>
 
@@ -48,7 +48,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
 
                 <div className="grid grid-cols-1 gap-4">
                     {nonOptimal.map((b, idx) => (
-                        <PriorityCard key={String(b.id ?? b.name)} biomarker={b} priority={idx + 1} />
+                        <PriorityCard key={String(b.id ?? b.name)} biomarker={b} priority={idx + 1} index={idx} />
                     ))}
                 </div>
             </div>
@@ -56,7 +56,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
     );
 }
 
-function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priority: number }) {
+function PriorityCard({ biomarker: b, priority, index = 0 }: { biomarker: Biomarker; priority: number; index?: number }) {
     const status = getPatientStatus(b.status);
     const badgeClass = b.status === 'critical'
         ? 'bg-red-500/20 border-red-500/30 text-red-400'
@@ -67,14 +67,17 @@ function PriorityCard({ biomarker: b, priority }: { biomarker: Biomarker; priori
         `Your ${b.name} is marked "${status.label}" — ask your clinician what could explain it and when it should be rechecked.`;
 
     return (
-        <div className="bg-white/5 border border-white/10 rounded-[14px] p-4 lg:p-5 hover:bg-white/10 transition-colors group min-w-0">
+        <div
+            className="bg-white/5 border border-white/10 rounded-[14px] p-4 lg:p-5 hover:bg-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-all duration-300 ease-out group min-w-0 stagger-fade-sm"
+            style={{ animationDelay: `${index * 60}ms` }}
+        >
             <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-transform duration-200 group-hover:scale-105 ${badgeClass}`}>
                     {status.label.toUpperCase()}
                 </span>
                 <span className="text-[10px] text-white/40 font-mono shrink-0">PRIORITY {priority}</span>
             </div>
-            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors break-words">
+            <h4 className="text-[15px] font-bold mb-2 group-hover:text-sky-400 transition-colors duration-200 break-words">
                 {b.name}
             </h4>
             <p className="text-sm text-slate-400 leading-relaxed break-words">{recommendation}</p>

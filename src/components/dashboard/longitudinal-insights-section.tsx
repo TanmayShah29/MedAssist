@@ -10,7 +10,7 @@ export function LongitudinalInsightsSection({ insights }: LongitudinalInsightsSe
     if (insights.length === 0) return null;
 
     return (
-        <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm">
+        <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-md">
             <div className="flex items-center gap-2 mb-4">
                 <Activity className="w-5 h-5 text-indigo-500" />
                 <h3 className="text-[18px] font-bold text-[#1C1917]">Trend Context for Your Visit</h3>
@@ -21,7 +21,8 @@ export function LongitudinalInsightsSection({ insights }: LongitudinalInsightsSe
                 {insights.map((insight, idx) => (
                     <div
                         key={idx}
-                        className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF] min-w-0"
+                        className="flex gap-3 items-start bg-white p-4 rounded-lg border border-[#EEF2FF] min-w-0 transition-all duration-300 ease-out hover:border-indigo-200 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm"
+                        style={{ animationDelay: `${idx * 70}ms` }}
                     >
                         <div className="mt-1 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
                         <p className="text-[14px] text-[#475569] leading-relaxed break-words min-w-0">{insight}</p>

@@ -117,7 +117,7 @@ export function BiomarkerGrid({
                                     <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
                                 </div>
                                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
-                                    {catBiomarkers.map(b => {
+                                    {catBiomarkers.map((b, idx) => {
                                         const prev = displayBiomarkers.find(
                                             pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId
                                         );
@@ -131,6 +131,7 @@ export function BiomarkerGrid({
                                                 biomarker={b}
                                                 delta={delta}
                                                 onClick={() => onBiomarkerClick(b)}
+                                                index={idx}
                                             />
                                         );
                                     })}
@@ -148,8 +149,8 @@ export function BiomarkerGrid({
 
 function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
     return (
-        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6">
+        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center stagger-fade">
+            <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6 transition-transform duration-500 hover:scale-105">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#78716C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="1" />
@@ -163,7 +164,7 @@ function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
             </p>
             <button
                 onClick={onUploadClick}
-                className="text-white rounded-[10px] px-6 py-3 font-medium bg-sky-500 hover:bg-sky-600 transition-colors"
+                className="text-white rounded-[10px] px-6 py-3 font-medium bg-sky-500 hover:bg-sky-600 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md"
                 style={{ WebkitAppearance: 'none' }}
             >
                 Upload your first report
@@ -176,10 +177,12 @@ function BiomarkerCard({
     biomarker: b,
     delta,
     onClick,
+    index = 0,
 }: {
     biomarker: Biomarker;
     delta: { diff: number; percent: number } | null;
     onClick: () => void;
+    index?: number;
 }) {
     const style = getPatientStatus(b.status);
 
@@ -200,7 +203,8 @@ function BiomarkerCard({
 
     return (
         <div
-            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all hover:border-sky-200 hover:shadow-md focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0"
+            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0 stagger-fade-sm"
+            style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
             onClick={onClick}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }}}
             onTouchStart={(e) => {
@@ -215,8 +219,8 @@ function BiomarkerCard({
         >
             {/* Plain-English hover overlay */}
             <div
-                className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-200 flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm transform-gpu gpu-accelerate"
-                style={{ WebkitTransition: 'all 0.2s ease-out' }}
+                className="absolute inset-0 bg-sky-500/95 opacity-0 group-hover:opacity-100 group-[.active-tooltip]:opacity-100 transition-all duration-300 ease-out flex items-center justify-center p-4 text-center z-20 pointer-events-none backdrop-blur-sm transform-gpu gpu-accelerate"
+                style={{ WebkitTransition: 'all 0.3s ease-out' }}
             >
                 <p className="text-white text-[11px] font-medium leading-relaxed">
                     {BIOMARKER_DEFINITIONS[b.name] ?? 'Clinical biomarker used to assess specific metabolic or systemic health functions.'}
@@ -225,7 +229,7 @@ function BiomarkerCard({
 
             {/* Top row: badge + value */}
             <div className="flex flex-col items-start gap-2 min-w-0">
-                <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${style.badgeClass}`}>
+                <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-transform duration-200 group-hover:scale-105 ${style.badgeClass}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
                     <span className="truncate">{style.label.toUpperCase()}</span>
                     <span className="sr-only">({style.description})</span>
@@ -269,7 +273,7 @@ function BiomarkerCard({
                         </div>
                         <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
                             <div
-                                className={`absolute top-0 bottom-0 left-0 rounded-full ${style.barClass}`}
+                                className={`absolute top-0 bottom-0 left-0 rounded-full transition-[width] duration-700 ease-out ${style.barClass}`}
                                 style={{ width: `${barPct}%`, minWidth: '4px' }}
                             />
                         </div>

@@ -73,16 +73,16 @@ export function Sidebar({ className }: { className?: string }) {
               href={item.path}
               className={cn(
                 "flex items-center justify-between px-3.5 py-3 rounded-[12px] min-h-[46px]",
-                "text-sm font-medium transition-all duration-150 group",
+                "text-sm font-medium transition-all duration-200 ease-out group",
                 "border-l-2",
                 isActive
                   ? "bg-[#E0F2FE] text-[#0284C7] border-[#0EA5E9] font-semibold"
-                  : "text-[#57534E] hover:bg-[#EFEDE6] hover:text-[#1C1917] border-transparent"
+                  : "text-[#57534E] hover:bg-[#EFEDE6] hover:text-[#1C1917] hover:translate-x-0.5 border-transparent"
               )}
             >
               <div className="flex items-center gap-3">
                 <item.icon
-                  className={cn("w-4 h-4 transition-transform duration-150",
+                  className={cn("w-4 h-4 transition-transform duration-200",
                     isActive ? "text-[#0EA5E9]" : "text-[#78716C] group-hover:text-[#57534E]",
                     "group-hover:scale-110"
                   )}
@@ -92,7 +92,7 @@ export function Sidebar({ className }: { className?: string }) {
               <kbd
                 className={cn(
                   "text-[10px] font-mono px-1.5 py-0.5 rounded bg-transparent",
-                  "opacity-0 group-hover:opacity-100 transition-opacity",
+                  "opacity-0 group-hover:opacity-100 transition-opacity duration-200",
                   isActive ? "text-sky-300" : "text-[#C5C2B8]"
                 )}
               >
@@ -136,7 +136,7 @@ export function Sidebar({ className }: { className?: string }) {
 
         <button
           onClick={handleSignOut}
-          className="text-[#78716C] hover:text-red-500 transition-colors p-2.5 hover:bg-red-50 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="text-[#78716C] hover:text-red-500 hover:bg-red-50 active:scale-90 transition-all duration-200 p-2.5 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
           title="Sign Out"
           style={{ WebkitAppearance: "none" }}
         >

@@ -96,7 +96,7 @@ function LongitudinalComparisonCard({
         .slice(0, 3);
 
     return (
-        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 mb-6">
+        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 mb-6 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade">
             <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                     <h3 className="text-[18px] font-bold text-[#1C1917]">Progress Report</h3>
@@ -117,7 +117,11 @@ function LongitudinalComparisonCard({
                     const isGood = change.status === 'optimal';
                     const color = isGood ? '#059669' : '#DC2626';
                     return (
-                        <div key={idx} className="bg-[#FAF9F6] border border-[#E8E6DF] rounded-[12px] p-4 min-w-0">
+                        <div
+                            key={idx}
+                            className="bg-[#FAF9F6] border border-[#E8E6DF] rounded-[12px] p-4 min-w-0 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm"
+                            style={{ animationDelay: `${idx * 70}ms` }}
+                        >
                             <div className="flex justify-between items-start gap-2 mb-2 min-w-0">
                                 <span className="text-[14px] font-bold text-[#44403C] break-words min-w-0">{change.name}</span>
                                 <span className="text-[12px] font-bold flex items-center gap-1 shrink-0" style={{ color }}>
@@ -142,8 +146,8 @@ function LongitudinalComparisonCard({
 
 function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: () => void }) {
     return (
-        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] px-8 py-12 text-center mb-6">
-            <div className="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center mx-auto mb-4">
+        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] px-8 py-12 text-center mb-6 stagger-fade">
+            <div className="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105">
                 <FileText size={24} color="#0EA5E9" />
             </div>
             <h2 className="font-display text-[28px] text-[#1C1917] mb-3">Ready when you are</h2>
@@ -153,14 +157,14 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                     onClick={onUpload}
-                    className="bg-sky-500 hover:bg-sky-600 text-white rounded-[10px] px-6 py-3 font-semibold text-[15px] transition-colors min-h-[44px]"
+                    className="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[10px] px-6 py-3 font-semibold text-[15px] transition-all duration-200 shadow-sm hover:shadow-md min-h-[44px]"
                     style={{ WebkitAppearance: 'none' }}
                 >
                     Upload my first report
                 </button>
                 <button
                     onClick={onDemo}
-                    className="flex items-center gap-2 justify-center px-5 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 transition-colors min-h-[44px]"
+                    className="flex items-center gap-2 justify-center px-5 py-3 rounded-[10px] border-2 border-sky-500 text-sky-600 font-semibold text-[15px] hover:bg-sky-50 active:scale-95 transition-all duration-200 min-h-[44px]"
                     style={{ WebkitAppearance: 'none' }}
                 >
                     <PlayCircle size={18} />
@@ -410,9 +414,9 @@ export default function DashboardClient({
             {totalCount > 0 && (
                 <div className="flex flex-col xl:flex-row gap-4 mb-8">
                     {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade">
                             <div className="flex items-center gap-4 min-w-0">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-105 ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
                                 </div>
                                 <div className="min-w-0">
@@ -430,7 +434,7 @@ export default function DashboardClient({
                                     { count: warningCount, label: 'Discuss', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-700' },
                                     { count: criticalCount, label: 'Soon', bg: 'bg-red-50 border-red-100', text: 'text-red-700' },
                                 ].map(s => (
-                                    <div key={s.label} className={`text-center px-3 py-1 ${s.bg} rounded-lg border min-w-[58px]`}>
+                                    <div key={s.label} className={`text-center px-3 py-1 ${s.bg} rounded-lg border min-w-[58px] transition-transform duration-200 hover:-translate-y-0.5`}>
                                         <span className={`block text-xs font-bold ${s.text}`}>{s.count}</span>
                                         <span className={`text-[10px] ${s.text} uppercase font-semibold`}>{s.label}</span>
                                     </div>
@@ -440,9 +444,9 @@ export default function DashboardClient({
                     )}
 
                     {latestLabResult && !demoMode && initialLabResults.length > 0 && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0">
+                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade" style={{ animationDelay: '60ms' }}>
                             <div className="flex items-center gap-4 min-w-0">
-                                <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center transition-transform duration-300 hover:scale-105">
                                     <ClipboardList size={24} />
                                 </div>
                                 <div className="min-w-0">
@@ -474,13 +478,13 @@ export default function DashboardClient({
 
             {/* Demo mode banner */}
             {demoMode && (
-                <div className="mb-6 flex flex-col gap-3 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between print:hidden">
+                <div className="mb-6 flex flex-col gap-3 rounded-[12px] border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between print:hidden stagger-fade">
                     <p className="text-sm font-semibold text-amber-900">
                         You&apos;re viewing <strong>sample data</strong> — not your personal results.
                     </p>
                     <button
                         onClick={() => setDemoMode(false)}
-                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 active:scale-95 transition-colors min-h-[44px]"
+                        className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 active:scale-95 transition-all duration-200 hover:shadow-md min-h-[44px]"
                         style={{ WebkitAppearance: 'none' }}
                     >
                         Show my data
@@ -490,7 +494,7 @@ export default function DashboardClient({
 
             {totalCount > 0 && (
                 <section className="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)] print:hidden">
-                    <div className="app-panel p-5 sm:p-6">
+                    <div className="app-panel p-5 sm:p-6 stagger-fade">
                         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div className="min-w-0">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-600">Today</p>
@@ -518,6 +522,7 @@ export default function DashboardClient({
                                         : 'No current values are marked for discussion.'}
                                 action="Open plan"
                                 onClick={() => router.push('/plan')}
+                                className="stagger-fade-sm"
                             />
                             <InsightCard
                                 tone="info"
@@ -526,6 +531,7 @@ export default function DashboardClient({
                                 description="Keep your top discussion points, questions, actions, and key labs in one place."
                                 action="Build pack"
                                 onClick={() => router.push('/plan')}
+                                className="stagger-fade-sm"
                             />
                             <InsightCard
                                 tone="neutral"
@@ -536,12 +542,13 @@ export default function DashboardClient({
                                     : 'Upload your next report to unlock clearer trend comparisons.'}
                                 action="View labs"
                                 onClick={() => router.push('/results')}
+                                className="stagger-fade-sm"
                             />
                         </div>
                     </div>
 
                     <div className="flex min-w-0 flex-col gap-5">
-                        <div className="app-panel p-5">
+                        <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '80ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">What changed</p>
@@ -549,20 +556,21 @@ export default function DashboardClient({
                                 </div>
                                 <button
                                     onClick={() => router.push('/results')}
-                                    className="text-xs font-bold text-sky-600 hover:text-sky-700"
+                                    className="text-xs font-bold text-sky-600 transition-colors duration-200 hover:text-sky-700"
                                 >
                                     Labs
                                 </button>
                             </div>
                             {topTrendChanges.length ? (
                                 <div className="space-y-3">
-                                    {topTrendChanges.map((change) => (
+                                    {topTrendChanges.map((change, idx) => (
                                         <InsightCard
                                             key={change.biomarker.id}
                                             title={change.title}
                                             description={change.detail}
                                             tone={change.biomarker.status === 'critical' ? 'critical' : change.biomarker.status === 'warning' ? 'warning' : 'success'}
                                             onClick={() => handleBiomarkerClick(change.biomarker)}
+                                            className="stagger-fade-sm"
                                         />
                                     ))}
                                 </div>
@@ -573,7 +581,7 @@ export default function DashboardClient({
                             )}
                         </div>
 
-                        <div className="app-panel p-5">
+                        <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '140ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Next actions</p>
@@ -581,7 +589,7 @@ export default function DashboardClient({
                                 </div>
                                 <button
                                     onClick={() => router.push('/plan')}
-                                    className="text-xs font-bold text-sky-600 hover:text-sky-700"
+                                    className="text-xs font-bold text-sky-600 transition-colors duration-200 hover:text-sky-700"
                                 >
                                     Open plan
                                 </button>
@@ -622,12 +630,12 @@ export default function DashboardClient({
 
                         {/* Symptom connections */}
                         {symptomConnections.length > 0 && (
-                            <div className="bg-[#FFF7ED] border border-[#FED7AA] border-l-4 border-l-amber-400 rounded-[14px] p-6">
+                            <div className="bg-[#FFF7ED] border border-[#FED7AA] border-l-4 border-l-amber-400 rounded-[14px] p-6 transition-all duration-300 hover:shadow-md stagger-fade">
                                 <p className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider mb-4">
                                     Your symptoms may be connected to these results
                                 </p>
-                                {symptomConnections.map(conn => (
-                                    <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0">
+                                {symptomConnections.map((conn, idx) => (
+                                    <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0 stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
                                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                                             <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
                                             <span className="text-[12px] text-[#78716C]">may be related to</span>
@@ -643,11 +651,11 @@ export default function DashboardClient({
 
                         {/* Symptom empty state nudge */}
                         {!demoMode && initialSymptoms.length === 0 && totalCount > 0 && (
-                            <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3">
+                            <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3 transition-all duration-300 hover:shadow-sm stagger-fade">
                                 <p className="text-[14px] text-[#57534E]">
                                     Add your symptoms to get more personalised insights.
                                 </p>
-                                <a href="/profile" className="text-[13px] text-sky-500 font-semibold whitespace-nowrap shrink-0">
+                                <a href="/profile" className="text-[13px] text-sky-500 font-semibold whitespace-nowrap shrink-0 transition-all duration-200 hover:text-sky-600 hover:translate-x-0.5">
                                     Add symptoms →
                                 </a>
                             </div>
@@ -700,7 +708,7 @@ export default function DashboardClient({
 
                         {/* Single-report nudge */}
                         {!demoMode && labResults.length === 1 && (
-                            <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4">
+                            <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4 transition-all duration-300 hover:shadow-sm">
                                 <p className="font-semibold text-[#0369A1] text-[15px]">Your prep sheet gets sharper with every report</p>
                                 <p className="text-[#0284C7] text-[13px] mt-1 leading-relaxed">
                                     Upload your next report after your upcoming blood test and MedAssist
@@ -716,9 +724,9 @@ export default function DashboardClient({
                         <ActionItems biomarkers={latestBiomarkers} />
                         <DoctorQuestions biomarkers={latestBiomarkers} />
                         <LongitudinalInsightsSection insights={longitudinalInsights} />
-                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 shadow-sm">
+                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 shadow-sm transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md">
                             <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
+                                <div className="w-10 h-10 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
                                     <MessageSquareText className="w-5 h-5 text-sky-500" />
                                 </div>
                                 <div className="min-w-0">
@@ -728,7 +736,7 @@ export default function DashboardClient({
                                     </p>
                                     <button
                                         onClick={() => router.push('/assistant')}
-                                        className="mt-3 min-h-[40px] rounded-[10px] bg-sky-500 px-4 py-2 text-[13px] font-semibold text-white hover:bg-sky-600 active:scale-95 transition-all"
+                                        className="mt-3 min-h-[40px] rounded-[10px] bg-sky-500 px-4 py-2 text-[13px] font-semibold text-white hover:bg-sky-600 hover:shadow-md active:scale-95 transition-all duration-200"
                                     >
                                         Open prep assistant
                                     </button>
@@ -787,21 +795,24 @@ export default function DashboardClient({
                                     { name: 'Metabolic', weight: 15 },
                                     { name: 'Inflammation', weight: 10 },
                                     { name: 'Vitamins', weight: 5 },
-                                ].map(cat => {
+                                ].map((cat, idx) => {
                                     const catMarkers = latestBiomarkers.filter(b => b.category?.toLowerCase() === cat.name.toLowerCase());
                                     const optimalInCat = catMarkers.filter(b => b.status === 'optimal').length;
                                     const totalInCat = catMarkers.length;
                                     return (
-                                        <div key={cat.name} className="flex flex-col gap-2 p-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-xl">
+                                        <div
+                                            key={cat.name}
+                                            className="flex flex-col gap-2 p-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-xl transition-all duration-200 hover:border-[#D9D6CD] stagger-fade-sm"
+                                            style={{ animationDelay: `${idx * 60}ms` }}
+                                        >
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-bold text-[#44403C] uppercase">{cat.name}</span>
-                
                                             </div>
                                             {totalInCat > 0 ? (
                                                 <div className="flex items-center gap-2">
                                                     <div className="grow h-1.5 bg-[#E8E6DF] rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-emerald-500 rounded-full"
+                                                            className="h-full bg-emerald-500 rounded-full transition-[width] duration-700 ease-out"
                                                             style={{ width: `${(optimalInCat / totalInCat) * 100}%` }}
                                                         />
                                                     </div>
@@ -816,7 +827,7 @@ export default function DashboardClient({
                             </div>
                             <button
                                 onClick={() => setShowScoreModal(false)}
-                                className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black transition-all"
+                                className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black active:scale-[0.98] transition-all duration-200"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Close

@@ -339,7 +339,7 @@ export function AssistantPageInner() {
             >
                 {messages.map((msg) => (
                     <div key={msg.id} role="article" aria-label={`${msg.role} message`} className={cn(
-                        "flex w-full",
+                        "flex w-full stagger-fade-sm",
                         msg.role === "user" ? "justify-end" : "justify-start"
                     )}>
                         {/* MESSAGE BUBBLES */}
@@ -382,7 +382,7 @@ export function AssistantPageInner() {
                                             handleSendMessage(originalMsg.content);
                                         }
                                     }}
-                                    className="mt-2 text-xs font-semibold text-red-600 hover:text-red-700 flex items-center gap-1"
+                                    className="mt-2 text-xs font-semibold text-red-600 hover:text-red-700 transition-colors duration-200 flex items-center gap-1"
                                 >
                                     ↻ Retry
                                 </button>
@@ -457,7 +457,8 @@ export function AssistantPageInner() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 active:scale-95 transition-all shadow-sm disabled:opacity-60 text-left text-wrap-safe shrink-0"
+                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 disabled:opacity-60 text-left text-wrap-safe shrink-0 stagger-fade-sm"
+                                    style={{ animationDelay: `${i * 50}ms` }}
                                     disabled={isProcessing}
                                 >
                                     {q}
@@ -482,16 +483,16 @@ export function AssistantPageInner() {
                         disabled={!inputValue.trim() || isProcessing}
                         aria-label="Send message"
                         className={cn(
-                            "px-4 py-3 text-white rounded-[12px] shadow-md flex items-center justify-center min-w-[50px] min-h-[44px] transition-all active:scale-95",
+                            "px-4 py-3 text-white rounded-[12px] shadow-md flex items-center justify-center min-w-[50px] min-h-[44px] transition-all duration-200 active:scale-95",
                             isProcessing || !inputValue.trim() 
                                 ? "bg-slate-400 cursor-not-allowed opacity-70 shadow-none" 
-                                : "bg-sky-500 hover:bg-sky-600 shadow-sky-500/20"
+                                : "bg-sky-500 hover:bg-sky-600 hover:shadow-lg shadow-sky-500/20"
                         )}
                     >
                         {isProcessing ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                            <Send className="w-4 h-4" />
+                            <Send className="w-4 h-4 transition-transform duration-200" />
                         )}
                     </button>
                 </div>
@@ -521,7 +522,7 @@ export function AssistantPageInner() {
 
                         <button
                             onClick={() => router.back()}
-                            className="btn btn-secondary btn-sm shrink-0"
+                            className="btn btn-secondary btn-sm shrink-0 transition-transform duration-150 active:scale-95"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back
@@ -530,7 +531,7 @@ export function AssistantPageInner() {
 
                     {/* CONTEXT SUMMARY CARD */}
                     {contextData && (
-                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6 hidden lg:block">
+                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6 hidden lg:block transition-all duration-300 hover:border-sky-300 hover:shadow-sm stagger-fade">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
                                 <Activity className="w-3 h-3" />
                                 Current Context
@@ -580,7 +581,7 @@ export function AssistantPageInner() {
                     {/* Mobile Context Toggle Button */}
                     <button
                         onClick={() => setShowContextModal(true)}
-                        className="lg:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 w-12 h-12 bg-sky-500 rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center text-white"
+                        className="lg:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 w-12 h-12 bg-sky-500 rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center text-white hover:shadow-xl active:scale-90 transition-all duration-200"
                     >
                         <Activity className="w-5 h-5" />
                     </button>
@@ -588,12 +589,12 @@ export function AssistantPageInner() {
                     {/* Mobile Context Modal */}
                     {showContextModal && (
                         <div className="lg:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end">
-                            <div className="bg-[#FAFAF7] w-full rounded-t-[24px] max-h-[80vh] overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))]">
+                            <div className="bg-[#FAFAF7] w-full rounded-t-[24px] max-h-[80vh] overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))] stagger-fade">
                                 <div className="sticky top-0 bg-[#FAFAF7] p-4 border-b border-[#E8E6DF] flex justify-between items-center">
                                     <h2 className="font-display text-xl text-[#1C1917]">Health Data</h2>
                                     <button
                                         onClick={() => setShowContextModal(false)}
-                                        className="w-8 h-8 rounded-full bg-[#F5F4EF] flex items-center justify-center text-[#57534E]"
+                                        className="w-8 h-8 rounded-full bg-[#F5F4EF] hover:bg-[#EFEDE6] active:scale-90 flex items-center justify-center text-[#57534E] transition-all duration-200"
                                     >
                                         ✕
                                     </button>

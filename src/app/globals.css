@@ -131,6 +131,7 @@
     border: 1px solid var(--color-border-light);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
+    transition: box-shadow var(--transition-spring), border-color var(--transition-base), transform var(--transition-spring);
   }
 
   /* ── App frame ── */
@@ -245,6 +246,12 @@
     border: 1px solid var(--color-border-light);
     background: rgba(255, 255, 255, 0.64);
     padding: 16px;
+    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-spring);
+  }
+
+  .metric-tile:hover {
+    border-color: var(--color-border-medium);
+    transform: translateY(-1px);
   }
 
   .landing-band {
@@ -396,13 +403,50 @@
   }
 
   .card-hover {
-    transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-fast);
+    transition: box-shadow var(--transition-spring), border-color var(--transition-base), transform var(--transition-spring);
   }
 
   .card-hover:hover {
     box-shadow: var(--shadow-hover);
     border-color: var(--color-border-medium);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+  }
+
+  /* ── App panel hover (used by .app-panel / .app-panel-white containers) ── */
+  .app-panel,
+  .app-panel-white {
+    transition: box-shadow var(--transition-spring), border-color var(--transition-base), transform var(--transition-spring);
+  }
+
+  /* ── Entrance choreography ──────────────────────────────────────────
+     Lightweight, dependency-free fade+rise utilities for app pages
+     (dashboard, results, plan, assistant) so content doesn't just
+     "appear" — mirrors the landing page's .landing-rise / .landing-reveal
+     language but tuned slightly faster for data-dense screens.
+  ───────────────────────────────────────────────────────────────────── */
+  .stagger-fade {
+    animation: staggerFade 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .stagger-fade-sm {
+    animation: staggerFadeSm 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Apply to a direct-children container; each child fades in with an
+     incrementing delay via the --stagger-index custom property. */
+  .stagger-group > * {
+    animation: staggerFade 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--stagger-index, 0) * 60ms);
+  }
+
+  /* ── Number tick (health score, counters) ── */
+  .tick-pop {
+    animation: tickPop 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* ── Soft pulse for live/status dots ── */
+  .soft-pulse {
+    animation: softPulse 2.4s ease-in-out infinite;
   }
 
   .card-dark {
@@ -438,6 +482,7 @@
 
   .btn:active, .active-scale {
     transform: scale(0.96);
+    transition-duration: 100ms;
   }
 
   .btn:disabled,
@@ -1045,6 +1090,52 @@
   }
 }
 
+@keyframes staggerFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes staggerFadeSm {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tickPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes softPulse {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-float,
   .landing-float-slow,
@@ -1063,7 +1154,12 @@
   .landing-data-trace,
   .landing-dot-pulse,
   .landing-meter-fill,
-  .landing-progress {
+  .landing-progress,
+  .stagger-fade,
+  .stagger-fade-sm,
+  .stagger-group > *,
+  .tick-pop,
+  .soft-pulse {
     animation: none !important;
   }
 }

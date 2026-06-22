@@ -170,11 +170,11 @@ export default function PlanPage() {
           description="Turn lab insights into doctor questions, monitoring tasks, retest reminders, and lightweight context logs."
           actions={
             <>
-              <button onClick={loadPlan} disabled={loading} className="btn btn-secondary btn-sm disabled:opacity-50">
+              <button onClick={loadPlan} disabled={loading} className="btn btn-secondary btn-sm disabled:opacity-50 transition-transform duration-150 active:scale-95">
                 <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
                 Refresh
               </button>
-              <button onClick={exportPrep} className="btn btn-primary btn-sm">
+              <button onClick={exportPrep} className="btn btn-primary btn-sm transition-transform duration-150 active:scale-95">
                 <Download className="h-4 w-4" />
                 Export prep
               </button>
@@ -184,7 +184,7 @@ export default function PlanPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,0.9fr)]">
           <main className="flex min-w-0 flex-col gap-6">
-            <section className="app-panel p-5">
+            <section className="app-panel p-5 stagger-fade">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Add action</p>
@@ -210,7 +210,7 @@ export default function PlanPage() {
                   placeholder="Why it matters, what context to bring, or when to revisit it."
                 />
               </div>
-              <button onClick={addItem} disabled={saving} className="mt-4 btn btn-primary disabled:opacity-60">
+              <button onClick={addItem} disabled={saving} className="mt-4 btn btn-primary disabled:opacity-60 transition-transform duration-150 active:scale-95">
                 <Plus className="h-4 w-4" />
                 {saving ? "Adding..." : "Add to plan"}
               </button>
@@ -222,24 +222,25 @@ export default function PlanPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Doctor prep</p>
                   <h2 className="text-xl font-bold text-[#1C1917]">Questions and visit tasks</h2>
                 </div>
-                <span className="rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700">
+                <span className="rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 transition-transform duration-200 hover:scale-105">
                   {doctorItems.length} items
                 </span>
               </div>
               {loading ? (
                 <div className="app-panel p-5 text-sm text-[#57534E]">Loading your plan...</div>
               ) : doctorItems.length ? (
-                doctorItems.map((item) => (
-                  <ActionItem
-                    key={item.id}
-                    title={item.title}
-                    reason={item.reason}
-                    kind={item.kind}
-                    status={item.status}
-                    timeframe={item.timeframe}
-                    related={item.related_biomarkers}
-                    onToggle={() => toggleSavedItem(item)}
-                  />
+                doctorItems.map((item, idx) => (
+                  <div key={item.id} className="stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
+                    <ActionItem
+                      title={item.title}
+                      reason={item.reason}
+                      kind={item.kind}
+                      status={item.status}
+                      timeframe={item.timeframe}
+                      related={item.related_biomarkers}
+                      onToggle={() => toggleSavedItem(item)}
+                    />
+                  </div>
                 ))
               ) : (
                 <InsightCard title="No doctor tasks yet" description="Add a question above or upload a report to generate patient-safe suggestions." />
@@ -252,17 +253,18 @@ export default function PlanPage() {
                 <h2 className="text-xl font-bold text-[#1C1917]">Monitoring, lifestyle, and retest reminders</h2>
               </div>
               {trackingItems.length ? (
-                trackingItems.map((item) => (
-                  <ActionItem
-                    key={item.id}
-                    title={item.title}
-                    reason={item.reason}
-                    kind={item.kind}
-                    status={item.status}
-                    timeframe={item.timeframe}
-                    related={item.related_biomarkers}
-                    onToggle={() => toggleSavedItem(item)}
-                  />
+                trackingItems.map((item, idx) => (
+                  <div key={item.id} className="stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
+                    <ActionItem
+                      title={item.title}
+                      reason={item.reason}
+                      kind={item.kind}
+                      status={item.status}
+                      timeframe={item.timeframe}
+                      related={item.related_biomarkers}
+                      onToggle={() => toggleSavedItem(item)}
+                    />
+                  </div>
                 ))
               ) : (
                 <InsightCard
@@ -283,6 +285,7 @@ export default function PlanPage() {
               description="Create a focused summary with latest report context, top questions, active actions, and key labs."
               action="Create export"
               onClick={exportPrep}
+              className="stagger-fade"
             />
             <InsightCard
               tone="neutral"
@@ -291,21 +294,23 @@ export default function PlanPage() {
               description="Create a revocable share link for selected prep sections. Links expire by default."
               action="Create link"
               onClick={createShareLink}
+              className="stagger-fade"
             />
-            <section className="app-panel p-5">
+            <section className="app-panel p-5 stagger-fade">
               <div className="mb-4 flex items-center gap-2">
                 <Stethoscope className="h-4 w-4 text-sky-500" />
                 <h2 className="text-base font-bold text-[#1C1917]">Health timeline</h2>
               </div>
               {timeline.length ? (
-                timeline.slice(0, 7).map((event) => (
-                  <TimelineItem
-                    key={event.id}
-                    title={event.title}
-                    detail={event.detail}
-                    date={formatDate(event.date)}
-                    icon={<FileText className="h-4 w-4" />}
-                  />
+                timeline.slice(0, 7).map((event, idx) => (
+                  <div key={event.id} className="stagger-fade-sm" style={{ animationDelay: `${idx * 50}ms` }}>
+                    <TimelineItem
+                      title={event.title}
+                      detail={event.detail}
+                      date={formatDate(event.date)}
+                      icon={<FileText className="h-4 w-4" />}
+                    />
+                  </div>
                 ))
               ) : (
                 <p className="text-sm leading-relaxed text-[#57534E]">

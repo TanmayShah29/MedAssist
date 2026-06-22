@@ -250,7 +250,7 @@ export default function ResultsPage() {
                             <button
                                 onClick={() => setRefreshKey((k) => k + 1)}
                                 disabled={loading}
-                                className="btn btn-secondary btn-sm disabled:opacity-50"
+                                className="btn btn-secondary btn-sm disabled:opacity-50 transition-transform duration-150 active:scale-95"
                                 title="Refresh results"
                                 style={{ WebkitAppearance: 'none' }}
                             >
@@ -259,7 +259,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="btn btn-secondary btn-sm"
+                                className="btn btn-secondary btn-sm transition-transform duration-150 active:scale-95"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 <Printer size={16} />
@@ -268,7 +268,7 @@ export default function ResultsPage() {
                             </button>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="btn btn-primary btn-sm"
+                                className="btn btn-primary btn-sm transition-transform duration-150 active:scale-95"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Upload
@@ -282,8 +282,8 @@ export default function ResultsPage() {
 
                 {/* Feature 6: Plain English Summary */}
                 {labResults.length > 0 && (selectedReportId === 'all' || selectedReportId === labResults[0]?.id) && (
-                    <div className="mb-8 p-5 lg:p-6 bg-white border border-sky-100 rounded-2xl shadow-sm relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+                    <div className="mb-8 p-5 lg:p-6 bg-white border border-sky-100 rounded-2xl shadow-sm relative overflow-hidden group transition-all duration-300 hover:border-sky-200 hover:shadow-md stagger-fade">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-all duration-500">
                             <Sparkles size={64} className="text-sky-500" />
                         </div>
                         <div className="relative z-10">
@@ -336,16 +336,16 @@ export default function ResultsPage() {
 
                 {/* ── Status summary row ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6">
-                    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
-                        <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1">{optimalCount}</span>
+                    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px] transition-all duration-300 hover:border-emerald-300 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm">
+                        <span className="text-[32px] font-bold font-display text-[#065F46] block leading-none mb-1 tick-pop">{optimalCount}</span>
                         <span className="text-[12px] font-semibold text-[#065F46] uppercase tracking-wide">{PATIENT_STATUS.optimal.label}</span>
                     </div>
-                    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
-                        <span className="text-[32px] font-bold font-display text-[#92400E] block leading-none mb-1">{warningCount}</span>
+                    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px] transition-all duration-300 hover:border-amber-300 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm" style={{ animationDelay: '60ms' }}>
+                        <span className="text-[32px] font-bold font-display text-[#92400E] block leading-none mb-1 tick-pop">{warningCount}</span>
                         <span className="text-[12px] font-semibold text-[#92400E] uppercase tracking-wide">{PATIENT_STATUS.warning.label}</span>
                     </div>
-                    <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px]">
-                        <span className="text-[32px] font-bold font-display text-[#991B1B] block leading-none mb-1">{criticalCount}</span>
+                    <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[14px] p-4 flex flex-col items-center justify-center min-h-[90px] transition-all duration-300 hover:border-red-300 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm" style={{ animationDelay: '120ms' }}>
+                        <span className="text-[32px] font-bold font-display text-[#991B1B] block leading-none mb-1 tick-pop">{criticalCount}</span>
                         <span className="text-[12px] font-semibold text-[#991B1B] uppercase tracking-wide">{PATIENT_STATUS.critical.label}</span>
                     </div>
                 </div>
@@ -360,9 +360,9 @@ export default function ResultsPage() {
                                     setSelectedCategory(category)
                                     setSelectedBiomarker(null)
                                 }}
-                                className={`px-3.5 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all active:scale-95 min-h-[44px] ${selectedCategory === category
-                                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
-                                    : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF]'
+                                className={`px-3.5 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all duration-200 active:scale-95 min-h-[44px] ${selectedCategory === category
+                                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 scale-[1.02]'
+                                    : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF] hover:border-[#D9D6CD]'
                                     }`}
                             >
                                 {category}
@@ -403,7 +403,7 @@ export default function ResultsPage() {
                                 </p>
                                 <button 
                                     onClick={() => router.push('/dashboard')} 
-                                    className="bg-sky-500 text-white rounded-[10px] px-6 py-2.5 text-[14px] font-bold active:scale-95 transition-transform min-h-[44px]"
+                                    className="bg-sky-500 text-white rounded-[10px] px-6 py-2.5 text-[14px] font-bold active:scale-95 transition-all duration-200 hover:bg-sky-600 hover:shadow-md min-h-[44px]"
                                 >
                                     Go to dashboard
                                 </button>
@@ -418,13 +418,14 @@ export default function ResultsPage() {
                             </div>
                         ) : (
                             <div className="divide-y divide-[#E8E6DF]">
-                                {filteredBiomarkers.map((b) => (
+                                {filteredBiomarkers.map((b, idx) => (
                                     <div
                                         key={b.id}
                                         onClick={() => handleBiomarkerClick(b)}
-                                        className={`flex items-start p-4 cursor-pointer hover:bg-[#EFEDE6] transition-colors active:bg-[#E8E6DF]/50 ${selectedBiomarker?.id === b.id ? 'border-l-[4px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'bg-red-50/30' :
+                                        className={`flex items-start p-4 cursor-pointer transition-all duration-200 hover:bg-[#EFEDE6] active:bg-[#E8E6DF]/50 stagger-fade-sm ${selectedBiomarker?.id === b.id ? 'border-l-[4px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'bg-red-50/30' :
                                                 b.status === 'warning' ? 'bg-amber-50/20' : ''
                                             }`}
+                                        style={{ animationDelay: `${Math.min(idx, 10) * 35}ms` }}
                                     >
                                         <div
                                             role="img"
@@ -487,13 +488,13 @@ export default function ResultsPage() {
                                     <p className="text-[15px] text-[#78716C] font-medium">Select a result to see AI interpretation</p>
                                 </div>
                             ) : (
-                                <div className="app-panel p-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                <div className="app-panel p-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-shadow hover:shadow-md">
                                     <div className="flex justify-between items-start mb-4">
                                         <h2 className="text-[20px] font-bold text-[#1C1917] leading-tight pr-4 text-wrap-safe">{selectedBiomarker.name}</h2>
                                         <button
                                             onClick={() => setSelectedBiomarker(null)}
                                             aria-label="Close details"
-                                            className="text-[#78716C] hover:text-[#1C1917] transition-colors p-1"
+                                            className="text-[#78716C] hover:text-[#1C1917] hover:bg-[#F5F4EF] active:scale-90 transition-all duration-200 p-1 rounded-md"
                                         >
                                             <X size={20} />
                                         </button>
@@ -560,7 +561,7 @@ export default function ResultsPage() {
 
                                     <button
                                         onClick={() => router.push('/assistant')}
-                                        className="w-full bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[12px] py-3 text-[15px] font-bold transition-all shadow-md shadow-sky-500/20"
+                                        className="w-full bg-sky-500 hover:bg-sky-600 active:scale-95 text-white rounded-[12px] py-3 text-[15px] font-bold transition-all duration-200 shadow-md hover:shadow-lg shadow-sky-500/20"
                                     >
                                         Prepare doctor talking point
                                     </button>
@@ -583,7 +584,7 @@ export default function ResultsPage() {
                 <DoctorQuestions biomarkers={questionBiomarkers} className="mt-8" />
 
                 {/* ── Sticky Nudge Bar ── */}
-                <div className="app-panel-white p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div className="app-panel-white p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6 transition-all duration-300 hover:shadow-md">
                     <div className="min-w-0 flex-1 text-center sm:text-left">
                         <p className="font-bold text-lg text-[#1C1917] mb-1">
                             Had a recent blood test?
@@ -594,10 +595,10 @@ export default function ResultsPage() {
                     </div>
                     <button
                         onClick={() => router.push('/dashboard?openUpload=1')}
-                        className="bg-sky-500 text-white rounded-[12px] px-8 py-3 text-[15px] font-bold active:scale-95 transition-all shadow-md shadow-sky-500/10 flex items-center gap-2 w-full sm:w-auto justify-center min-h-[48px]"
+                        className="bg-sky-500 text-white rounded-[12px] px-8 py-3 text-[15px] font-bold active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg hover:bg-sky-600 flex items-center gap-2 w-full sm:w-auto justify-center min-h-[48px]"
                     >
                         Upload report
-                        <ArrowRight size={18} />
+                        <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                     </button>
                 </div>
                 </div>
