@@ -13,16 +13,16 @@ const fadeInUp = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
+    <div className="min-h-[100dvh] bg-[#FDFDFB] font-sans">
       <LandingHeader />
 
       <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
         <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="text-center max-w-3xl mx-auto mb-20">
           <p className="text-[11px] font-black tracking-widest text-violet-600 uppercase mb-4">The Project</p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#1C1917] mb-8 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#0F172A] mb-8 leading-tight">
             Design Engineering for Better Healthcare.
           </h1>
-          <p className="text-lg text-[#57534E] leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-[#475569] leading-relaxed max-w-2xl mx-auto">
             MedAssist was created by Tanmay Shah as a Design Engineering project. The goal was simple: bridge the massive gap between the complex data patients receive and the clarity they actually need.
           </p>
         </motion.div>
@@ -37,11 +37,11 @@ export default function AboutPage() {
             <div className="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center mb-6">
               <Compass className="w-6 h-6 text-sky-600" />
             </div>
-            <h2 className="text-2xl font-bold text-[#1C1917]">The Mission</h2>
-            <p className="text-[#57534E] leading-relaxed">
+            <h2 className="text-2xl font-bold text-[#0F172A]">The Mission</h2>
+            <p className="text-[#475569] leading-relaxed">
               Every day, thousands of patients receive their blood work results through a portal. They are presented with a wall of acronyms (CBC, TSH, BUN) and numbers that mean nothing without a medical degree.
             </p>
-            <p className="text-[#57534E] leading-relaxed">
+            <p className="text-[#475569] leading-relaxed">
               This leads to two terrible outcomes: anxiety-driven late-night Google searches, or complete apathy. MedAssist is designed to sit in the middle—translating those reports into plain English, so patients walk into their 15-minute doctor appointments prepared.
             </p>
           </motion.div>
@@ -55,19 +55,19 @@ export default function AboutPage() {
             <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6">
               <Lightbulb className="w-6 h-6 text-emerald-600" />
             </div>
-            <h2 className="text-2xl font-bold text-[#1C1917]">Design Principles</h2>
+            <h2 className="text-2xl font-bold text-[#0F172A]">Design Principles</h2>
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 font-bold text-sm">1</div>
-                <p className="text-[#57534E]"><strong>Clarity over density.</strong> Never show a number without context. Hide what is optimal; highlight what needs attention.</p>
+                <p className="text-[#475569]"><strong>Clarity over density.</strong> Never show a number without context. Hide what is optimal; highlight what needs attention.</p>
               </li>
               <li className="flex gap-3">
                 <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 font-bold text-sm">2</div>
-                <p className="text-[#57534E]"><strong>Empathetic error states.</strong> Healthcare is scary enough. If a PDF fails to parse, apologize humanly. Don&apos;t throw a 500 error.</p>
+                <p className="text-[#475569]"><strong>Empathetic error states.</strong> Healthcare is scary enough. If a PDF fails to parse, apologize humanly. Don&apos;t throw a 500 error.</p>
               </li>
               <li className="flex gap-3">
                 <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 font-bold text-sm">3</div>
-                <p className="text-[#57534E]"><strong>Augment, never replace.</strong> The AI does not diagnose. It prepares the user to have a better conversation with a real human doctor.</p>
+                <p className="text-[#475569]"><strong>Augment, never replace.</strong> The AI does not diagnose. It prepares the user to have a better conversation with a real human doctor.</p>
               </li>
             </ul>
           </motion.div>
@@ -77,18 +77,18 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white border border-[#E8E6DF] rounded-3xl p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-sm"
+          className="bg-white border border-[#EBEAE4] rounded-3xl p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-sm"
         >
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <User className="w-10 h-10 text-slate-400" />
           </div>
-          <h3 className="text-xl font-bold text-[#1C1917] mb-3">Tanmay Shah</h3>
+          <h3 className="text-xl font-bold text-[#0F172A] mb-3">Tanmay Shah</h3>
           <p className="text-[13px] font-bold text-sky-600 uppercase tracking-wider mb-6">Design Engineer</p>
-          <p className="text-[#57534E] leading-relaxed mb-8">
+          <p className="text-[#475569] leading-relaxed mb-8">
             I built MedAssist as a comprehensive capstone project combining Full-Stack Engineering, UI/UX Design, and Clinical Data parsing. 
           </p>
           <div className="flex justify-center gap-4">
-            <a href="https://github.com/TanmayShah29" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-[#1C1917] text-white rounded-xl text-sm font-bold hover:bg-[#292524] transition-colors">
+            <a href="https://github.com/TanmayShah29" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-[#0F172A] text-white rounded-xl text-sm font-bold hover:bg-[#292524] transition-colors">
               View GitHub
             </a>
           </div>

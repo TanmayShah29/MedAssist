@@ -13,13 +13,13 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
 
     if (soonMarkers.length === 0) {
         return (
-            <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 flex flex-col md:flex-row items-center gap-4 shadow-sm transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade">
+            <div className="bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 flex flex-col md:flex-row items-center gap-4 shadow-sm transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md stagger-fade">
                 <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100 transition-transform duration-300 hover:scale-105">
                     <CheckCircle className="w-6 h-6 text-emerald-500" />
                 </div>
                 <div className="min-w-0">
-                    <h3 className="text-lg font-display font-bold text-[#1C1917] mb-1 break-words">No discuss-soon markers found.</h3>
-                    <p className="text-sm text-[#57534E] break-words">Your one-pager is still useful for confirming what to monitor next with your clinician.</p>
+                    <h3 className="text-lg font-display font-bold text-[#0F172A] mb-1 break-words">No discuss-soon markers found.</h3>
+                    <p className="text-sm text-[#475569] break-words">Your one-pager is still useful for confirming what to monitor next with your clinician.</p>
                 </div>
             </div>
         );
@@ -35,10 +35,10 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                         <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0 border border-red-100">
                             <AlertCircle className="w-5 h-5 text-red-500" />
                         </div>
-                        <h3 className="text-xl font-display font-bold text-[#1C1917] break-words">Discuss Soon With Your Clinician</h3>
+                        <h3 className="text-xl font-display font-bold text-[#0F172A] break-words">Discuss Soon With Your Clinician</h3>
                     </div>
 
-                    <p className="text-sm text-[#57534E] mb-4 break-words">
+                    <p className="text-sm text-[#475569] mb-4 break-words">
                         These values are outside the report range and should be part of your appointment agenda:
                     </p>
 
@@ -58,7 +58,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                 <div className="flex flex-col sm:flex-row xl:flex-col gap-3 shrink-0 w-full xl:w-auto">
                     <Link
                         href={`/assistant?context=${soonMarkers[0].name}`}
-                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1C1917] text-white rounded-[12px] text-sm font-bold hover:bg-black transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98]"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0F172A] text-white rounded-[12px] text-sm font-bold hover:bg-black transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98]"
                     >
                         <MessageSquare className="w-4 h-4" />
                         Rehearse Visit Summary
@@ -67,7 +67,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
                         onClick={() => {
                             document.getElementById('doctor-prep-sheet')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#E8E6DF] text-[#1C1917] rounded-[12px] text-sm font-bold hover:bg-[#F5F4EF] hover:border-[#D9D6CD] transition-all duration-200 active:scale-[0.98]"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#EBEAE4] text-[#0F172A] rounded-[12px] text-sm font-bold hover:bg-[#FFFFFF] hover:border-[#D1CFCD] transition-all duration-200 active:scale-[0.98]"
                     >
                         <ClipboardList className="w-4 h-4" />
                         View Prep Sheet

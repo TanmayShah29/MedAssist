@@ -64,7 +64,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-md bg-[#FAFAF7] shadow-2xl z-50 overflow-y-auto px-safe"
+                        className="fixed right-0 top-0 h-full w-full max-w-md bg-[#FDFDFB] shadow-2xl z-50 overflow-y-auto px-safe"
                         style={{ WebkitOverflowScrolling: 'touch', height: '-webkit-fill-available' }}
                     >
                         <div className="p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
@@ -80,7 +80,7 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                             {styles.label.toUpperCase()}
                                         </div>
                                     </div>
-                                    <h2 className="text-3xl font-bold font-display text-[#1C1917]">{biomarker.name}</h2>
+                                    <h2 className="text-3xl font-bold font-display text-[#0F172A]">{biomarker.name}</h2>
                                 </div>
                                 <button
                                     onClick={onClose}
@@ -88,22 +88,22 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     className="p-3 -m-1 hover:bg-gray-100 active:scale-90 rounded-full transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                     style={{ WebkitAppearance: 'none' }}
                                 >
-                                    <X className="w-6 h-6 text-[#57534E]" />
+                                    <X className="w-6 h-6 text-[#475569]" />
                                 </button>
                             </div>
 
                             {/* Main Value Card */}
-                            <div className="bg-white border border-[#E8E6DF] rounded-2xl p-6 mb-8 shadow-sm">
+                            <div className="bg-white border border-[#EBEAE4] rounded-2xl p-6 mb-8 shadow-sm">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
-                                        <p className="text-sm text-[#78716C] font-medium mb-1">CURRENT VALUE</p>
+                                        <p className="text-sm text-[#94A3B8] font-medium mb-1">CURRENT VALUE</p>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-bold text-[#1C1917] font-display">{biomarker.value}</span>
-                                            <span className="text-lg text-[#57534E]">{biomarker.unit}</span>
+                                            <span className="text-4xl font-bold text-[#0F172A] font-display">{biomarker.value}</span>
+                                            <span className="text-lg text-[#475569]">{biomarker.unit}</span>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-[#78716C] font-bold uppercase mb-1">STABILITY</p>
+                                        <p className="text-[10px] text-[#94A3B8] font-bold uppercase mb-1">STABILITY</p>
                                         <div className="flex items-center gap-1 text-emerald-600 font-semibold text-sm">
                                             <TrendingUp className="w-4 h-4" />
                                             Stable
@@ -114,12 +114,12 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                 {biomarker.reference_range_min !== undefined && biomarker.reference_range_min !== null &&
                                     biomarker.reference_range_max !== undefined && biomarker.reference_range_max !== null &&
                                     biomarker.reference_range_max > biomarker.reference_range_min && (
-                                        <div className="mt-4 pt-4 border-t border-[#E8E6DF]">
-                                            <div className="flex justify-between text-xs text-[#78716C] font-medium mb-2">
+                                        <div className="mt-4 pt-4 border-t border-[#EBEAE4]">
+                                            <div className="flex justify-between text-xs text-[#94A3B8] font-medium mb-2">
                                                 <span>Min: {biomarker.reference_range_min}</span>
                                                 <span>Max: {biomarker.reference_range_max}</span>
                                             </div>
-                                            <div className="h-2 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
+                                            <div className="h-2 w-full bg-[#EBEAE4] rounded-full relative overflow-hidden">
                                                 <div
                                                 className={`absolute top-0 bottom-0 left-0 rounded-full transition-[width] duration-700 ease-out ${styles.barClass}`}
                                                 style={{
@@ -138,10 +138,10 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
                                         <Info className="w-4 h-4 text-violet-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">Understanding this value</h3>
+                                    <h3 className="text-lg font-bold font-display text-[#0F172A]">Understanding this value</h3>
                                 </div>
                                 <div className="bg-violet-50/50 border border-violet-100 rounded-2xl p-5">
-                                    <p className="text-[15px] text-[#57534E] leading-relaxed italic">
+                                    <p className="text-[15px] text-[#475569] leading-relaxed italic">
                                         &ldquo;{biomarker.ai_interpretation || "Our AI is analyzing the details of this specific biomarker. Please check back shortly."}&rdquo;
                                     </p>
                                 </div>
@@ -154,12 +154,12 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                         <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
                                             <Activity className="w-4 h-4 text-sky-600" />
                                         </div>
-                                        <h3 className="text-lg font-bold font-display text-[#1C1917]">Historical Trend</h3>
+                                        <h3 className="text-lg font-bold font-display text-[#0F172A]">Historical Trend</h3>
                                     </div>
                                 </div>
 
                                 {trendData.length > 1 ? (
-                                    <div className="bg-white border border-[#E8E6DF] rounded-2xl p-4 h-48">
+                                    <div className="bg-white border border-[#EBEAE4] rounded-2xl p-4 h-48">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <LineChart data={trendData}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F1EF" vertical={false} />
@@ -172,17 +172,17 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                                 <Line
                                                     type="monotone"
                                                     dataKey="value"
-                                                    stroke="#0EA5E9"
+                                                    stroke="#0369A1"
                                                     strokeWidth={3}
-                                                    dot={{ fill: '#0EA5E9', r: 4, strokeWidth: 2, stroke: 'white' }}
+                                                    dot={{ fill: '#0369A1', r: 4, strokeWidth: 2, stroke: 'white' }}
                                                     activeDot={{ r: 6 }}
                                                 />
                                             </LineChart>
                                         </ResponsiveContainer>
                                     </div>
                                 ) : (
-                                    <div className="bg-[#F5F4EF] border border-dashed border-[#E8E6DF] rounded-2xl p-8 text-center">
-                                        <p className="text-sm text-[#78716C]">More reports needed to generate a trend chart</p>
+                                    <div className="bg-[#FFFFFF] border border-dashed border-[#EBEAE4] rounded-2xl p-8 text-center">
+                                        <p className="text-sm text-[#94A3B8]">More reports needed to generate a trend chart</p>
                                     </div>
                                 )}
                             </div>
@@ -193,35 +193,35 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
                                         <ChevronRight className="w-4 h-4 text-sky-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">Evidence to review</h3>
+                                    <h3 className="text-lg font-bold font-display text-[#0F172A]">Evidence to review</h3>
                                 </div>
                                 <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] transition-all duration-200 hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 group">
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#EBEAE4] rounded-[14px] transition-all duration-200 hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 group">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600 transition-transform duration-200 group-hover:scale-110">
                                                 <Activity size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-[#1C1917]">Exact value and range</p>
-                                                <p className="text-[11px] text-[#78716C]">{biomarker.value} {biomarker.unit}{biomarker.reference_range_min != null && biomarker.reference_range_max != null ? ` · range ${biomarker.reference_range_min}-${biomarker.reference_range_max} ${biomarker.unit}` : " · no range found in report"}</p>
+                                                <p className="text-[14px] font-bold text-[#0F172A]">Exact value and range</p>
+                                                <p className="text-[11px] text-[#94A3B8]">{biomarker.value} {biomarker.unit}{biomarker.reference_range_min != null && biomarker.reference_range_max != null ? ` · range ${biomarker.reference_range_min}-${biomarker.reference_range_max} ${biomarker.unit}` : " · no range found in report"}</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-white border border-[#E8E6DF] rounded-[14px] transition-all duration-200 hover:border-emerald-200 hover:shadow-sm hover:-translate-y-0.5 group">
+                                    <div className="flex items-center justify-between p-4 bg-white border border-[#EBEAE4] rounded-[14px] transition-all duration-200 hover:border-emerald-200 hover:shadow-sm hover:-translate-y-0.5 group">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 transition-transform duration-200 group-hover:scale-110">
                                                 <Lightbulb size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-[#1C1917]">Why this may matter</p>
-                                                <p className="text-[11px] text-[#78716C]">{styles.description}</p>
+                                                <p className="text-[14px] font-bold text-[#0F172A]">Why this may matter</p>
+                                                <p className="text-[11px] text-[#94A3B8]">{styles.description}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <p className="mt-4 text-[11px] text-[#78716C] leading-relaxed">
-                                    <strong className="text-[#57534E]">Note:</strong> This is appointment context, not a diagnosis or treatment recommendation.
+                                <p className="mt-4 text-[11px] text-[#94A3B8] leading-relaxed">
+                                    <strong className="text-[#475569]">Note:</strong> This is appointment context, not a diagnosis or treatment recommendation.
                                 </p>
                             </div>
 
@@ -231,28 +231,28 @@ export function BiomarkerDetailSheet({ isOpen, onClose, biomarker, history }: Pr
                                     <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                                         <Lightbulb className="w-4 h-4 text-amber-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold font-display text-[#1C1917]">What to ask</h3>
+                                    <h3 className="text-lg font-bold font-display text-[#0F172A]">What to ask</h3>
                                 </div>
                                 <div className="space-y-3">
                                     {questions.map((question, idx) => (
                                         <div
                                             key={idx}
-                                            className="flex items-start gap-4 p-4 bg-white border border-[#E8E6DF] rounded-[14px] hover:border-amber-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 group stagger-fade-sm"
+                                            className="flex items-start gap-4 p-4 bg-white border border-[#EBEAE4] rounded-[14px] hover:border-amber-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 group stagger-fade-sm"
                                             style={{ animationDelay: `${idx * 60}ms` }}
                                         >
                                             <div className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                             </div>
-                                            <p className="text-sm text-[#57534E] leading-relaxed grow shrink basis-0">{question}</p>
+                                            <p className="text-sm text-[#475569] leading-relaxed grow shrink basis-0">{question}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Footer Note */}
-                            <div className="mt-8 pt-8 border-t border-[#E8E6DF] text-center bg-amber-50/30 rounded-b-2xl -mx-6 px-6 pb-8">
+                            <div className="mt-8 pt-8 border-t border-[#EBEAE4] text-center bg-amber-50/30 rounded-b-2xl -mx-6 px-6 pb-8">
                                 <AlertCircle className="w-5 h-5 text-amber-600 mx-auto mb-3" />
-                                <p className="text-[11px] text-[#78716C] leading-relaxed">
+                                <p className="text-[11px] text-[#94A3B8] leading-relaxed">
                                     <strong className="text-[#44403C]">Medical safety:</strong> MedAssist is educational, AI can make mistakes, and it does not provide diagnoses, treatment advice, or prescriptions. Discuss results with a qualified healthcare professional. For urgent symptoms, seek urgent or emergency care.
                                 </p>
                             </div>

@@ -37,8 +37,8 @@ export function ActionItem({
   return (
     <article
       className={cn(
-        "rounded-[14px] border border-[#E8E6DF] bg-white p-4 shadow-sm transition-all duration-300 ease-out",
-        "hover:border-[#D9D6CD] hover:shadow-md hover:-translate-y-0.5",
+        "rounded-[14px] border border-[#EBEAE4] bg-white p-4 shadow-sm transition-all duration-300 ease-out",
+        "hover:border-[#D1CFCD] hover:shadow-md hover:-translate-y-0.5",
         done && "opacity-60",
         className
       )}
@@ -47,7 +47,7 @@ export function ActionItem({
         <button
           type="button"
           onClick={onToggle}
-          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#FAFAF7] text-[#78716C] transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90"
+          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#FDFDFB] text-[#94A3B8] transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90"
           aria-label={done ? "Mark action not done" : "Mark action done"}
           disabled={!onToggle}
         >
@@ -63,14 +63,14 @@ export function ActionItem({
               <Icon className="h-3 w-3" />
               {meta.label}
             </span>
-            {timeframe && <span className="text-[11px] font-semibold text-[#78716C]">{timeframe}</span>}
+            {timeframe && <span className="text-[11px] font-semibold text-[#94A3B8]">{timeframe}</span>}
           </div>
-          <h3 className={cn("mt-2 text-[15px] font-bold leading-tight text-[#1C1917] text-wrap-safe transition-all duration-300", done && "line-through")}>{title}</h3>
-          {reason && <p className="mt-1 text-[13px] leading-relaxed text-[#57534E] text-wrap-safe">{reason}</p>}
+          <h3 className={cn("mt-2 text-[15px] font-bold leading-tight text-[#0F172A] text-wrap-safe transition-all duration-300", done && "line-through")}>{title}</h3>
+          {reason && <p className="mt-1 text-[13px] leading-relaxed text-[#475569] text-wrap-safe">{reason}</p>}
           {!!related?.length && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {related.map((item) => (
-                <span key={item} className="rounded-full border border-[#E8E6DF] bg-[#FAFAF7] px-2 py-0.5 text-[11px] font-semibold text-[#57534E] transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
+                <span key={item} className="rounded-full border border-[#EBEAE4] bg-[#FDFDFB] px-2 py-0.5 text-[11px] font-semibold text-[#475569] transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
                   {item}
                 </span>
               ))}

@@ -102,11 +102,11 @@ function LongitudinalComparisonCard({
         .slice(0, 3);
 
     return (
-        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 mb-6 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade">
+        <div className="bg-white border border-[#EBEAE4] rounded-[18px] p-6 mb-6 transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md stagger-fade">
             <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                    <h3 className="text-[18px] font-bold text-[#1C1917]">Progress Report</h3>
-                    <p className="text-[12px] text-[#78716C] mt-0.5 break-words">
+                    <h3 className="text-[18px] font-bold text-[#0F172A]">Progress Report</h3>
+                    <p className="text-[12px] text-[#94A3B8] mt-0.5 break-words">
                         Changes from{' '}
                         {new Date(previousReportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                         {' '}to{' '}
@@ -125,7 +125,7 @@ function LongitudinalComparisonCard({
                     return (
                         <div
                             key={idx}
-                            className="bg-[#FAF9F6] border border-[#E8E6DF] rounded-[12px] p-4 min-w-0 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm"
+                            className="bg-[#FAF9F6] border border-[#EBEAE4] rounded-[12px] p-4 min-w-0 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-sm hover:-translate-y-0.5 stagger-fade-sm"
                             style={{ animationDelay: `${idx * 70}ms` }}
                         >
                             <div className="flex justify-between items-start gap-2 mb-2 min-w-0">
@@ -136,10 +136,10 @@ function LongitudinalComparisonCard({
                                 </span>
                             </div>
                             <div className="flex items-baseline gap-1 min-w-0">
-                                <span className="text-[20px] font-extrabold text-[#1C1917] break-words min-w-0">{change.currentValue}</span>
-                                <span className="text-[12px] text-[#78716C] break-words min-w-0">{change.unit}</span>
+                                <span className="text-[20px] font-extrabold text-[#0F172A] break-words min-w-0">{change.currentValue}</span>
+                                <span className="text-[12px] text-[#94A3B8] break-words min-w-0">{change.unit}</span>
                             </div>
-                            <p className="text-[11px] text-[#78716C] mt-1">Was {change.previousValue} {change.unit}</p>
+                            <p className="text-[11px] text-[#94A3B8] mt-1">Was {change.previousValue} {change.unit}</p>
                         </div>
                     );
                 })}
@@ -152,12 +152,12 @@ function LongitudinalComparisonCard({
 
 function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: () => void }) {
     return (
-        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] px-8 py-12 text-center mb-6 stagger-fade">
-            <div className="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105">
-                <FileText size={24} color="#0EA5E9" />
+        <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[18px] px-8 py-12 text-center mb-6 stagger-fade">
+            <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105">
+                <FileText size={24} color="#0369A1" />
             </div>
-            <h2 className="font-display text-[28px] text-[#1C1917] mb-3">Ready when you are</h2>
-            <p className="text-[15px] text-[#57534E] max-w-sm mx-auto mb-6 leading-relaxed">
+            <h2 className="font-display text-[28px] text-[#0F172A] mb-3">Ready when you are</h2>
+            <p className="text-[15px] text-[#475569] max-w-sm mx-auto mb-6 leading-relaxed">
                 Upload your first lab report and MedAssist will turn it into an appointment-ready brief: key results, trends, and questions to bring to your doctor.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -177,7 +177,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
                     Try with sample lab report
                 </button>
             </div>
-            <p className="text-[12px] text-[#78716C] mt-3">
+            <p className="text-[12px] text-[#94A3B8] mt-3">
                 Supports digital PDF lab reports · Prep sheet generated in under a minute
             </p>
         </div>
@@ -383,13 +383,13 @@ export default function DashboardClient({
                 <div className="lg:hidden flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 min-w-0">
                         {profile?.first_name && (
-                            <h1 className="text-[16px] font-bold text-[#1C1917] truncate">
+                            <h1 className="text-[16px] font-bold text-[#0F172A] truncate">
                                 Welcome, {profile.first_name}
                             </h1>
                         )}
                     </div>
                     {lastUpdated && (
-                        <p className="text-[11px] sm:text-[12px] font-bold text-[#78716C] uppercase tracking-wider ml-auto text-right leading-tight flex items-center justify-end gap-1">
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider ml-auto text-right leading-tight flex items-center justify-end gap-1">
                             <Lock size={10} className="text-emerald-500" />
                             Synced {lastUpdated}
                         </p>
@@ -426,14 +426,14 @@ export default function DashboardClient({
             {totalCount > 0 && (
                 <div className="flex flex-col xl:flex-row gap-4 mb-8">
                     {(criticalCount > 0 || warningCount > 0) && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade">
+                        <div className="grow shrink basis-0 bg-white border border-[#EBEAE4] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md stagger-fade">
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-105 ${criticalCount > 0 ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}>
                                     <Activity size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917] text-wrap-safe">Appointment Focus</h3>
-                                    <p className="text-xs text-[#57534E] text-wrap-safe">
+                                    <h3 className="text-sm font-bold text-[#0F172A] text-wrap-safe">Appointment Focus</h3>
+                                    <p className="text-xs text-[#475569] text-wrap-safe">
                                         {criticalCount > 0
                                             ? `${criticalCount} ${PATIENT_STATUS.critical.label.toLowerCase()} marker${criticalCount === 1 ? '' : 's'} to review with your clinician`
                                             : `${warningCount} marker${warningCount === 1 ? '' : 's'} to discuss or monitor`}
@@ -456,14 +456,14 @@ export default function DashboardClient({
                     )}
 
                     {latestLabResult && !demoMode && initialLabResults.length > 0 && (
-                        <div className="grow shrink basis-0 bg-white border border-[#E8E6DF] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md stagger-fade" style={{ animationDelay: '60ms' }}>
+                        <div className="grow shrink basis-0 bg-white border border-[#EBEAE4] rounded-[18px] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm min-w-0 transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md stagger-fade" style={{ animationDelay: '60ms' }}>
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center transition-transform duration-300 hover:scale-105">
                                     <ClipboardList size={24} />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-sm font-bold text-[#1C1917] font-sans text-wrap-safe">Visit Context</h3>
-                                    <p className="text-xs text-[#57534E] text-wrap-safe">
+                                    <h3 className="text-sm font-bold text-[#0F172A] font-sans text-wrap-safe">Visit Context</h3>
+                                    <p className="text-xs text-[#475569] text-wrap-safe">
                                         Last test was{' '}
                                         {Math.floor(
                                             (Date.now() - new Date(latestLabResult.uploaded_at ?? latestLabResult.created_at ?? 0).getTime()) /
@@ -510,10 +510,10 @@ export default function DashboardClient({
                         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div className="min-w-0">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-600">Today</p>
-                                <h2 className="mt-1 font-display text-[30px] leading-tight text-[#1C1917] sm:text-[34px]">
+                                <h2 className="mt-1 font-display text-[30px] leading-tight text-[#0F172A] sm:text-[34px]">
                                     {visitFocus.title}
                                 </h2>
-                                <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-[#57534E] text-wrap-safe">
+                                <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-[#475569] text-wrap-safe">
                                     {visitFocus.detail}
                                 </p>
                             </div>
@@ -563,8 +563,8 @@ export default function DashboardClient({
                         <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '80ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">What changed</p>
-                                    <h2 className="text-lg font-bold text-[#1C1917]">Top trends</h2>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">What changed</p>
+                                    <h2 className="text-lg font-bold text-[#0F172A]">Top trends</h2>
                                 </div>
                                 <button
                                     onClick={() => router.push('/results')}
@@ -587,7 +587,7 @@ export default function DashboardClient({
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm leading-relaxed text-[#57534E]">
+                                <p className="text-sm leading-relaxed text-[#475569]">
                                     Upload another report to compare changes over time.
                                 </p>
                             )}
@@ -596,8 +596,8 @@ export default function DashboardClient({
                         <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '140ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Next actions</p>
-                                    <h2 className="text-lg font-bold text-[#1C1917]">Plan preview</h2>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Next actions</p>
+                                    <h2 className="text-lg font-bold text-[#0F172A]">Plan preview</h2>
                                 </div>
                                 <button
                                     onClick={() => router.push('/plan')}
@@ -650,12 +650,12 @@ export default function DashboardClient({
                                     <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0 stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
                                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                                             <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
-                                            <span className="text-[12px] text-[#78716C]">may be related to</span>
+                                            <span className="text-[12px] text-[#94A3B8]">may be related to</span>
                                             {conn.relatedBiomarkers?.map(b => (
-                                                <span key={b} className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-md px-2 py-0.5 text-[12px] text-[#57534E]">{b}</span>
+                                                <span key={b} className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-md px-2 py-0.5 text-[12px] text-[#475569]">{b}</span>
                                             ))}
                                         </div>
-                                        <p className="text-[13px] text-[#57534E] leading-relaxed">{conn.explanation}</p>
+                                        <p className="text-[13px] text-[#475569] leading-relaxed">{conn.explanation}</p>
                                     </div>
                                 ))}
                             </div>
@@ -664,7 +664,7 @@ export default function DashboardClient({
                         {/* Symptom empty state nudge */}
                         {!demoMode && initialSymptoms.length === 0 && totalCount > 0 && (
                             <div className="bg-[#FFFBEB] border border-[#FDE68A] border-l-4 border-l-amber-400 rounded-[10px] px-4 py-3 flex justify-between items-center gap-3 transition-all duration-300 hover:shadow-sm stagger-fade">
-                                <p className="text-[14px] text-[#57534E]">
+                                <p className="text-[14px] text-[#475569]">
                                     Add your symptoms to get more personalised insights.
                                 </p>
                                 <a href="/profile" className="text-[13px] text-sky-500 font-semibold whitespace-nowrap shrink-0 transition-all duration-200 hover:text-sky-600 hover:translate-x-0.5">
@@ -702,7 +702,7 @@ export default function DashboardClient({
 
                         {/* AI Insights */}
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
                             <AIInsightsFeed analysis={{ summary: latestSummary }} />
                         </div>
 
@@ -720,9 +720,9 @@ export default function DashboardClient({
 
                         {/* Single-report nudge */}
                         {!demoMode && labResults.length === 1 && (
-                            <div className="bg-[#E0F2FE] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4 transition-all duration-300 hover:shadow-sm">
+                            <div className="bg-[#F0F9FF] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4 transition-all duration-300 hover:shadow-sm">
                                 <p className="font-semibold text-[#0369A1] text-[15px]">Your prep sheet gets sharper with every report</p>
-                                <p className="text-[#0284C7] text-[13px] mt-1 leading-relaxed">
+                                <p className="text-[#0369A1] text-[13px] mt-1 leading-relaxed">
                                     Upload your next report after your upcoming blood test and MedAssist
                                     will turn it into trend-aware questions — like whether your hemoglobin is improving.
                                 </p>
@@ -736,14 +736,14 @@ export default function DashboardClient({
                         <ActionItems biomarkers={latestBiomarkers} />
                         <DoctorQuestions biomarkers={latestBiomarkers} />
                         <LongitudinalInsightsSection insights={longitudinalInsights} />
-                        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-5 shadow-sm transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md">
+                        <div className="bg-white border border-[#EBEAE4] rounded-[18px] p-5 shadow-sm transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md">
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
                                     <MessageSquareText className="w-5 h-5 text-sky-500" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-[16px] font-bold text-[#1C1917] leading-tight">Need to rehearse the visit?</h3>
-                                    <p className="text-[13px] text-[#57534E] mt-1 leading-relaxed">
+                                    <h3 className="text-[16px] font-bold text-[#0F172A] leading-tight">Need to rehearse the visit?</h3>
+                                    <p className="text-[13px] text-[#475569] mt-1 leading-relaxed">
                                         Ask the prep assistant to turn your results into a 30-second doctor summary.
                                     </p>
                                     <button
@@ -756,7 +756,7 @@ export default function DashboardClient({
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
                             <MedicineCabinet />
                         </div>
                         <TrustLayer variant="full" />
@@ -797,8 +797,8 @@ export default function DashboardClient({
                             className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 opacity-50" />
-                            <h3 className="font-display text-2xl text-[#1C1917] mb-3 relative">Brief Completeness</h3>
-                            <p className="text-sm text-[#57534E] mb-6 relative">
+                            <h3 className="font-display text-2xl text-[#0F172A] mb-3 relative">Brief Completeness</h3>
+                            <p className="text-sm text-[#475569] mb-6 relative">
                                 This score estimates how complete your appointment brief is, not how healthy you are.
                             </p>
                             <div className="space-y-3 mb-6 relative">
@@ -814,7 +814,7 @@ export default function DashboardClient({
                                     return (
                                         <div
                                             key={cat.name}
-                                            className="flex flex-col gap-2 p-3 bg-[#F5F4EF] border border-[#E8E6DF] rounded-xl transition-all duration-200 hover:border-[#D9D6CD] stagger-fade-sm"
+                                            className="flex flex-col gap-2 p-3 bg-[#FFFFFF] border border-[#EBEAE4] rounded-xl transition-all duration-200 hover:border-[#D1CFCD] stagger-fade-sm"
                                             style={{ animationDelay: `${idx * 60}ms` }}
                                         >
                                             <div className="flex justify-between items-center">
@@ -822,7 +822,7 @@ export default function DashboardClient({
                                             </div>
                                             {totalInCat > 0 ? (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="grow h-1.5 bg-[#E8E6DF] rounded-full overflow-hidden">
+                                                    <div className="grow h-1.5 bg-[#EBEAE4] rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-emerald-500 rounded-full transition-[width] duration-700 ease-out"
                                                             style={{ width: `${(optimalInCat / totalInCat) * 100}%` }}
@@ -831,7 +831,7 @@ export default function DashboardClient({
                                                     <span className="text-[10px] font-bold text-emerald-600">{optimalInCat}/{totalInCat}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-[10px] text-[#78716C] italic">Not in latest report</span>
+                                                <span className="text-[10px] text-[#94A3B8] italic">Not in latest report</span>
                                             )}
                                         </div>
                                     );
@@ -839,7 +839,7 @@ export default function DashboardClient({
                             </div>
                             <button
                                 onClick={() => setShowScoreModal(false)}
-                                className="w-full py-3 bg-[#1C1917] text-white rounded-xl font-bold hover:bg-black active:scale-[0.98] transition-all duration-200"
+                                className="w-full py-3 bg-[#0F172A] text-white rounded-xl font-bold hover:bg-black active:scale-[0.98] transition-all duration-200"
                                 style={{ WebkitAppearance: 'none' }}
                             >
                                 Close
@@ -850,17 +850,17 @@ export default function DashboardClient({
             </AnimatePresence>
 
             {/* Medical Disclaimer */}
-            <div className="mt-12 py-8 border-t border-[#E8E6DF] text-center">
+            <div className="mt-12 py-8 border-t border-[#EBEAE4] text-center">
                 <div className="max-w-2xl mx-auto flex flex-col items-center gap-3">
                     <div className="p-2 bg-amber-50 rounded-full">
                         <AlertCircle className="w-5 h-5 text-amber-600" />
                     </div>
-                    <p className="text-[13px] text-[#78716C] leading-relaxed">
+                    <p className="text-[13px] text-[#94A3B8] leading-relaxed">
                         <strong className="text-[#44403C]">Medical Disclaimer:</strong> MedAssist is an educational tool
                         and does not provide medical diagnoses, treatment advice, or prescriptions. Always consult with a
                         qualified healthcare professional before making any health decisions.
                     </p>
-                    <p className="text-[11px] text-[#78716C]">
+                    <p className="text-[11px] text-[#94A3B8]">
                         &copy; {new Date().getFullYear()} MedAssist. All rights reserved.
                     </p>
                 </div>

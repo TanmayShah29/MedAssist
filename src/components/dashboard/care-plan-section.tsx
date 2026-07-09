@@ -29,7 +29,7 @@ export function CarePlanSection({ latestBiomarkers }: CarePlanSectionProps) {
     return (
         <div
             id="personalized-care-plan"
-            className="bg-[#1C1917] rounded-[18px] p-5 lg:p-6 mb-6 text-white shadow-xl relative overflow-hidden min-w-0"
+            className="bg-[#0F172A] rounded-[18px] p-5 lg:p-6 mb-6 text-white shadow-xl relative overflow-hidden min-w-0"
         >
             {/* Background decoration */}
             <div className="absolute -top-3 -right-3 p-6 opacity-10 pointer-events-none select-none landing-breathe">

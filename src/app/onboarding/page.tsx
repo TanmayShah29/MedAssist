@@ -57,10 +57,10 @@ export default function OnboardingPage() {
     }, [router]);
 
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">
+        <div className="min-h-[100dvh] bg-[#FDFDFB] flex flex-col">
 
             {/* Header */}
-            <div className="border-b border-[#E8E6DF] bg-[#F5F4EF]/92">
+            <div className="border-b border-[#EBEAE4] bg-[#FFFFFF]/92">
                 <div className="max-w-4xl mx-auto px-6 py-4">
 
                     {/* Logo */}
@@ -70,10 +70,10 @@ export default function OnboardingPage() {
                             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-sky-600">
                                 Step {currentStep} of {STEP_LABELS.length}
                             </p>
-                            <p className="text-sm font-semibold text-[#1C1917] mt-1">
+                            <p className="text-sm font-semibold text-[#0F172A] mt-1">
                                 {STEP_CONTEXT[currentStep - 1]?.title}
                             </p>
-                            <p className="text-xs leading-relaxed text-[#57534E] mt-1">
+                            <p className="text-xs leading-relaxed text-[#475569] mt-1">
                                 {STEP_CONTEXT[currentStep - 1]?.detail}
                             </p>
                         </div>
@@ -94,14 +94,14 @@ export default function OnboardingPage() {
                                         <motion.div
                                             animate={{
                                                 backgroundColor: isComplete
-                                                    ? "#10B981"
+                                                    ? "#059669"
                                                     : isActive
-                                                        ? "#0EA5E9"
-                                                        : "#E8E6DF",
+                                                        ? "#0369A1"
+                                                        : "#EBEAE4",
                                             }}
                                             className="w-7 h-7 rounded-full flex items-center 
                                  justify-center text-xs font-semibold"
-                                            style={{ color: isComplete || isActive ? "white" : "#57534E" }}
+                                            style={{ color: isComplete || isActive ? "white" : "#475569" }}
                                         >
                                             {isComplete ? (
                                                 <Check className="w-3.5 h-3.5" />
@@ -114,7 +114,7 @@ export default function OnboardingPage() {
                       whitespace-nowrap 
                       ${isActive ? "text-sky-600"
                                                 : isComplete ? "text-emerald-600"
-                                                    : "text-[#57534E]"}`}>
+                                                    : "text-[#475569]"}`}>
                                             {label}
                                         </span>
                                     </div>
@@ -123,7 +123,7 @@ export default function OnboardingPage() {
                                     {!isLast && (
                                         <motion.div
                                             animate={{
-                                                backgroundColor: isComplete ? "#10B981" : "#E8E6DF",
+                                                backgroundColor: isComplete ? "#059669" : "#EBEAE4",
                                             }}
                                             className="grow shrink basis-0 h-0.5 mb-4 mx-1"
                                         />

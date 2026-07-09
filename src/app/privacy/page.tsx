@@ -9,18 +9,18 @@ export default function PrivacyPage() {
             maxWidth: 680,
             margin: '0 auto',
             padding: '48px 24px',
-            background: '#FAFAF7',
+            background: '#FDFDFB',
             minHeight: '100dvh'
         }}>
             <h1 style={{
                 fontFamily: 'Instrument Serif',
                 fontSize: 36,
-                color: '#1C1917',
+                color: '#0F172A',
                 margin: '0 0 8px 0'
             }}>
                 Privacy Policy
             </h1>
-            <p style={{ color: '#78716C', fontSize: 13, margin: '0 0 40px 0' }}>
+            <p style={{ color: '#94A3B8', fontSize: 13, margin: '0 0 40px 0' }}>
                 Last updated: February 2026
             </p>
 
@@ -54,14 +54,14 @@ export default function PrivacyPage() {
                     <h2 style={{
                         fontSize: 18,
                         fontWeight: 600,
-                        color: '#1C1917',
+                        color: '#0F172A',
                         margin: '0 0 8px 0'
                     }}>
                         {section.title}
                     </h2>
                     <p style={{
                         fontSize: 15,
-                        color: '#57534E',
+                        color: '#475569',
                         lineHeight: 1.7,
                         margin: 0
                     }}>

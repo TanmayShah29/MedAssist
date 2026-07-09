@@ -7,11 +7,11 @@ import { BrandLockup } from "@/components/branding/brand-lockup";
 
 /* ─── DESIGN TOKENS ────────────────────────────────────────────────────── */
 const T = {
-  page: "#FAFAF7", card: "#F5F4EF", cardHover: "#EFEDE6",
-  border: "#E8E6DF", borderMed: "#D9D6CD",
-  text: "#1C1917", textSec: "#57534E", textMuted: "#78716C",
-  brand: "#0EA5E9", brandHover: "#0284C7",
-  optimal: "#10B981", warning: "#F59E0B", critical: "#EF4444",
+  page: "#FDFDFB", card: "#FFFFFF", cardHover: "#FAFAFA",
+  border: "#EBEAE4", borderMed: "#D1CFCD",
+  text: "#0F172A", textSec: "#475569", textMuted: "#94A3B8",
+  brand: "#0369A1", brandHover: "#0369A1",
+  optimal: "#059669", warning: "#F59E0B", critical: "#EF4444",
   optimalBg: "#F0FDF4", optimalBorder: "#BBF7D0", optimalText: "#065F46",
   warningBg: "#FFFBEB", warningBorder: "#FDE68A", warningText: "#92400E",
   criticalBg: "#FFF1F2", criticalBorder: "#FECDD3", criticalText: "#991B1B",
@@ -168,8 +168,8 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
           <BrandLockup showTagline markClassName="h-[34px] w-[34px]" />
           {/* Live dot */}
           <div style={{ position: "relative", width: 8, height: 8 }}>
-            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#10B981", opacity: 0.5, animation: "pulse 2s ease infinite" }} />
-            <div style={{ position: "relative", width: 8, height: 8, borderRadius: "50%", background: "#10B981" }} />
+            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#059669", opacity: 0.5, animation: "pulse 2s ease infinite" }} />
+            <div style={{ position: "relative", width: 8, height: 8, borderRadius: "50%", background: "#059669" }} />
           </div>
         </div>
         <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 100, fontSize: 10, fontWeight: 700, color: "#92400E" }}>
@@ -187,7 +187,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
               width: "100%", display: "flex", alignItems: "center", gap: 11,
               padding: "9px 12px", borderRadius: 10, border: "none",
               cursor: "pointer", marginBottom: 2,
-              background: active ? "#E0F2FE" : "transparent",
+              background: active ? "#F0F9FF" : "transparent",
               color: active ? T.brand : T.textSec,
               fontWeight: active ? 700 : 500,
               fontSize: 14, transition: "all 0.15s",
@@ -210,7 +210,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
       <div style={{ margin: "0 10px 10px", padding: "12px 14px", background: "#0F172A", borderRadius: 12, border: "1px solid #1E293B" }}>
         <p style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8 }}>Prep Engine</p>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0 }} />
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#059669", flexShrink: 0 }} />
           <span style={{ fontSize: 11, color: "#94A3B8" }}>Private prep active</span>
           <span style={{ marginLeft: "auto", fontSize: 9, color: "#475569" }}>online</span>
         </div>
@@ -236,7 +236,7 @@ const Sidebar = ({ className = "", currentPage, onNavigate }: { className?: stri
 const HealthScoreRing = ({ score }: { score: number }) => {
   const r = 54; const circ = 2 * Math.PI * r;
   const dash = (score / 100) * circ;
-  const color = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "#EF4444";
+  const color = score >= 80 ? "#059669" : score >= 60 ? "#F59E0B" : "#EF4444";
   const label = score >= 80 ? "Good" : score >= 60 ? "Fair" : "Poor";
 
   return (
@@ -654,7 +654,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{b.name}</span>
-                  <span style={{ fontSize: 11, background: "#E0F2FE", color: "#0369A1", padding: "1px 7px", borderRadius: 6 }}>{b.category}</span>
+                  <span style={{ fontSize: 11, background: "#F0F9FF", color: "#0369A1", padding: "1px 7px", borderRadius: 6 }}>{b.category}</span>
                 </div>
                 <div style={{ fontSize: 14, color: T.textSec }}>{b.value} {b.unit} <span style={{ fontSize: 11, color: T.textMuted }}>(ref: {b.ref_min}–{b.ref_max})</span></div>
                 <RangeBar value={b.value} min={b.ref_min} max={b.ref_max} status={b.status} />
@@ -853,11 +853,11 @@ const AssistantPage = () => {
         {/* Context Panel */}
         <div className="demo-assistant-context" style={{ overflowY: "auto", padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Patient Summary */}
-          <div style={{ background: "#E0F2FE", border: "1px solid #BAE6FD", borderRadius: 16, padding: 18 }}>
+          <div style={{ background: "#F0F9FF", border: "1px solid #BAE6FD", borderRadius: 16, padding: 18 }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: "#0369A1", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Patient Context</p>
             <p className="font-display" style={{ fontSize: 20, color: "#0C4A6E" }}>{DEMO_PROFILE.first_name} {DEMO_PROFILE.last_name}</p>
             <p style={{ fontSize: 13, color: "#0369A1", marginTop: 4 }}>{DEMO_PROFILE.age}yo {DEMO_PROFILE.sex} · Blood type {DEMO_PROFILE.blood_type}</p>
-            <p style={{ fontSize: 12, color: "#0284C7", marginTop: 6 }}>Symptoms: Fatigue, Low Energy</p>
+            <p style={{ fontSize: 12, color: "#0369A1", marginTop: 6 }}>Symptoms: Fatigue, Low Energy</p>
           </div>
 
           {/* Quick Stats */}
@@ -919,7 +919,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Report History Banner */}
-      <div style={{ background: "#E0F2FE", border: "1px solid #BAE6FD", borderRadius: 18, padding: 20, marginBottom: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
+      <div style={{ background: "#F0F9FF", border: "1px solid #BAE6FD", borderRadius: 18, padding: 20, marginBottom: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
         <div style={{ padding: 12, background: "#BAE6FD", borderRadius: 12 }}><Icon path={Icons.fileText} size={22} color="#0369A1" /></div>
         <div>
           <h3 style={{ fontSize: 17, fontWeight: 600, color: "#0C4A6E" }}>Report History</h3>
@@ -1220,7 +1220,7 @@ export default function DemoPage() {
           <nav className="demo-bottom-nav" style={{
             display: 'none',
             position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: '#FFF', borderTop: '1px solid #E8E6DF',
+            background: '#FFF', borderTop: '1px solid #EBEAE4',
             padding: '8px 16px',
             justifyContent: 'space-around', zIndex: 50,
           }}>
@@ -1235,8 +1235,8 @@ export default function DemoPage() {
                   padding: '8px 12px', border: 'none', background: 'transparent',
                   cursor: 'pointer', minWidth: 44, minHeight: 44,
                 }}>
-                  <Icon path={iconPath} size={22} color={active ? T.brand : '#78716C'} />
-                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? T.brand : '#78716C' }}>{labels[id]}</span>
+                  <Icon path={iconPath} size={22} color={active ? T.brand : '#94A3B8'} />
+                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? T.brand : '#94A3B8' }}>{labels[id]}</span>
                 </button>
               );
             })}

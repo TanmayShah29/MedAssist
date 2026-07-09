@@ -12,7 +12,7 @@ const config: Config = {
     theme: {
         extend: {
             backgroundColor: {
-                page: '#FAFAF7',
+                page: '#FDFDFB',
             },
             fontFamily: {
                 display: ['"Instrument Serif"', 'Georgia', 'serif'],
@@ -25,11 +25,11 @@ const config: Config = {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 cream: {
-                    50: '#FAFAF7',
-                    100: '#F5F4EF',
-                    200: '#EFEDE6',
-                    300: '#E8E6DF',
-                    400: '#D9D6CD',
+                    50: '#FDFDFB',
+                    100: '#FFFFFF',
+                    200: '#FAFAFA',
+                    300: '#EBEAE4',
+                    400: '#D1CFCD',
                     500: '#C5C2B8',
                 },
                 primary: {

@@ -41,7 +41,7 @@ function StepProgress({ current }: { current: number }) {
                         <div className="flex flex-col items-center gap-1">
                             <motion.div
                                 animate={{
-                                    backgroundColor: isComplete ? "#10B981" : isActive ? "#0EA5E9" : "#E2E8F0",
+                                    backgroundColor: isComplete ? "#059669" : isActive ? "#0369A1" : "#E2E8F0",
                                     scale: isActive ? 1.1 : 1,
                                 }}
                                 transition={{ duration: 0.2 }}
@@ -60,7 +60,7 @@ function StepProgress({ current }: { current: number }) {
                         {idx < STEPS.length - 1 && (
                             <motion.div
                                 className="grow shrink basis-0 h-0.5 mb-4 rounded-full"
-                                animate={{ backgroundColor: current > step.id ? "#10B981" : "#E2E8F0" }}
+                                animate={{ backgroundColor: current > step.id ? "#059669" : "#E2E8F0" }}
                                 transition={{ duration: 0.3 }}
                             />
                         )}
@@ -233,7 +233,7 @@ function StepUpload({ file, onFile }: {
     return (
         <div className="space-y-4">
             <motion.div
-                animate={{ borderColor: dragging ? "#0EA5E9" : "#E2E8F0" }}
+                animate={{ borderColor: dragging ? "#0369A1" : "#E2E8F0" }}
                 onDragOver={e => { e.preventDefault(); setDragging(true); }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}

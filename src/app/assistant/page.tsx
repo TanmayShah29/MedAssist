@@ -315,14 +315,14 @@ export function AssistantPageInner() {
             {/* Welcome Banner (No Results) */}
             {biomarkers.length === 0 && (
                 <div style={{
-                    background: '#F5F4EF',
-                    borderBottom: '1px solid #E8E6DF',
+                    background: '#FFFFFF',
+                    borderBottom: '1px solid #EBEAE4',
                     padding: 24,
                 }}>
-                    <p style={{ fontSize: 15, color: '#1C1917', fontWeight: 600, margin: '0 0 8px 0' }}>
+                    <p style={{ fontSize: 15, color: '#0F172A', fontWeight: 600, margin: '0 0 8px 0' }}>
                         Welcome to your AI health assistant
                     </p>
-                    <p style={{ fontSize: 14, color: '#57534E', margin: 0, lineHeight: 1.6 }}>
+                    <p style={{ fontSize: 14, color: '#475569', margin: 0, lineHeight: 1.6 }}>
                         I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.
                     </p>
                 </div>
@@ -358,14 +358,14 @@ export function AssistantPageInner() {
                                 </p>
                             </div>
                         ) : msg.role === "typing" ? (
-                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                            <div className="bg-[#FDFDFB] border border-[#EBEAE4] text-sm text-[#475569] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-1">
-                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                        <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                     </div>
-                                    <span className="text-xs text-[#78716C]">Thinking...</span>
+                                    <span className="text-xs text-[#94A3B8]">Thinking...</span>
                                 </div>
                             </div>
                         ) : msg.isError ? (
@@ -388,7 +388,7 @@ export function AssistantPageInner() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 [&_*]:break-words">
+                            <div className="bg-[#FDFDFB] border border-[#EBEAE4] text-sm text-[#475569] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0 [&_*]:break-words">
                                                 <ReactMarkdown
                                                     rehypePlugins={[rehypeSanitize]}
                                                     components={{
@@ -407,14 +407,14 @@ export function AssistantPageInner() {
                 ))}
                 {isProcessing && messages[messages.length - 1]?.role !== 'typing' && (
                     <div className="flex w-full justify-start">
-                        <div className="bg-[#FAFAF7] border border-[#E8E6DF] text-sm text-[#57534E] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
+                        <div className="bg-[#FDFDFB] border border-[#EBEAE4] text-sm text-[#475569] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
                             <div className="flex items-center gap-2">
                                 <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-[#78716C] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                 </div>
-                                <span className="text-xs text-[#78716C]">Thinking...</span>
+                                <span className="text-xs text-[#94A3B8]">Thinking...</span>
                             </div>
                         </div>
                     </div>
@@ -423,7 +423,7 @@ export function AssistantPageInner() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-[#E8E6DF] p-4 bg-[#FAFAF7] sticky bottom-0 z-10"
+            <div className="border-t border-[#EBEAE4] p-4 bg-[#FDFDFB] sticky bottom-0 z-10"
                  style={{ paddingBottom: 'max(1rem, calc(1rem + env(safe-area-inset-bottom, 0px)))' }}>
                 {/* Suggested Questions */}
                 {messages.filter(m => m.role === 'user').length === 0 && (
@@ -457,7 +457,7 @@ export function AssistantPageInner() {
                                     onClick={() => {
                                         handleSendMessage(q);
                                     }}
-                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#E8E6DF] rounded-full text-[13px] text-[#57534E] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 disabled:opacity-60 text-left text-wrap-safe shrink-0 stagger-fade-sm"
+                                    className="px-3.5 py-2.5 min-h-[44px] max-w-full bg-white border border-[#EBEAE4] rounded-full text-[13px] text-[#475569] hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 disabled:opacity-60 text-left text-wrap-safe shrink-0 stagger-fade-sm"
                                     style={{ animationDelay: `${i * 50}ms` }}
                                     disabled={isProcessing}
                                 >
@@ -496,7 +496,7 @@ export function AssistantPageInner() {
                         )}
                     </button>
                 </div>
-                <p className="text-[11px] text-[#78716C] text-center mt-3">
+                <p className="text-[11px] text-[#94A3B8] text-center mt-3">
                     Educational only. AI can make mistakes; discuss results with a qualified clinician.
                 </p>
             </div>
@@ -531,7 +531,7 @@ export function AssistantPageInner() {
 
                     {/* CONTEXT SUMMARY CARD */}
                     {contextData && (
-                        <div className="bg-[#E0F2FE] rounded-[18px] border border-[#BAE6FD] p-5 mb-6 hidden lg:block transition-all duration-300 hover:border-sky-300 hover:shadow-sm stagger-fade">
+                        <div className="bg-[#F0F9FF] rounded-[18px] border border-[#BAE6FD] p-5 mb-6 hidden lg:block transition-all duration-300 hover:border-sky-300 hover:shadow-sm stagger-fade">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-600 mb-2 flex items-center gap-1">
                                 <Activity className="w-3 h-3" />
                                 Current Context
@@ -589,19 +589,19 @@ export function AssistantPageInner() {
                     {/* Mobile Context Modal */}
                     {showContextModal && (
                         <div className="lg:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end">
-                            <div className="bg-[#FAFAF7] w-full rounded-t-[24px] max-h-[80vh] overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))] stagger-fade">
-                                <div className="sticky top-0 bg-[#FAFAF7] p-4 border-b border-[#E8E6DF] flex justify-between items-center">
-                                    <h2 className="font-display text-xl text-[#1C1917]">Health Data</h2>
+                            <div className="bg-[#FDFDFB] w-full rounded-t-[24px] max-h-[80vh] overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))] stagger-fade">
+                                <div className="sticky top-0 bg-[#FDFDFB] p-4 border-b border-[#EBEAE4] flex justify-between items-center">
+                                    <h2 className="font-display text-xl text-[#0F172A]">Health Data</h2>
                                     <button
                                         onClick={() => setShowContextModal(false)}
-                                        className="w-8 h-8 rounded-full bg-[#F5F4EF] hover:bg-[#EFEDE6] active:scale-90 flex items-center justify-center text-[#57534E] transition-all duration-200"
+                                        className="w-8 h-8 rounded-full bg-[#FFFFFF] hover:bg-[#FAFAFA] active:scale-90 flex items-center justify-center text-[#475569] transition-all duration-200"
                                     >
                                         ✕
                                     </button>
                                 </div>
                                 <div className="p-4 space-y-4">
                                     <AssistantSidebar biomarkers={biomarkers} />
-                                    <div className="bg-[#F5F4EF] rounded-[14px] border border-[#E8E6DF] overflow-hidden">
+                                    <div className="bg-[#FFFFFF] rounded-[14px] border border-[#EBEAE4] overflow-hidden">
                                         <AnalysisPanel
                                             biomarkers={biomarkers}
                                             symptoms={symptoms}
@@ -622,8 +622,8 @@ export function AssistantPageInner() {
 export default function AssistantPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-[100dvh] bg-[#FAFAF7] flex items-center justify-center">
-                <div className="animate-pulse rounded-xl bg-[#E8E6DF] h-8 w-48" />
+            <div className="min-h-[100dvh] bg-[#FDFDFB] flex items-center justify-center">
+                <div className="animate-pulse rounded-xl bg-[#EBEAE4] h-8 w-48" />
             </div>
         }>
             <AssistantPageInner />

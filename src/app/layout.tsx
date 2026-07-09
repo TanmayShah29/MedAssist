@@ -78,10 +78,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0EA5E9" />
+        <meta name="theme-color" content="#0369A1" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
       </head>
-      <body className="bg-[#FAFAF7] font-sans overflow-x-hidden">
+      <body className="bg-[#FDFDFB] font-sans overflow-x-hidden">
         <ClientLayout 
           initialPathname={null}
           appShellRoutes={APP_SHELL_ROUTES}

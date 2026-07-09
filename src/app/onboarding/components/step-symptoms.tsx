@@ -22,16 +22,16 @@ export function StepSymptoms() {
                       text-sky-500 mb-2">
                     Step 2 of 5
                 </p>
-                <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                <h2 className="font-display text-3xl text-[#0F172A] mb-2">
                     How are you feeling?
                 </h2>
-                <p className="text-[#57534E] text-sm leading-relaxed">
+                <p className="text-[#475569] text-sm leading-relaxed">
                     Pick anything you would naturally mention to your doctor. You can add medications and supplements from the visit brief after upload.
                 </p>
             </div>
 
             {/* Data flow explanation */}
-            <div className="bg-[#E0F2FE] rounded-[12px] border border-[#BAE6FD] p-4 flex gap-3 shrink-0 relative">
+            <div className="bg-[#F0F9FF] rounded-[12px] border border-[#BAE6FD] p-4 flex gap-3 shrink-0 relative">
                 <div className="w-5 h-5 rounded-full bg-sky-100 flex items-center 
                         justify-center shrink-0 mt-0.5">
                     <span className="text-sky-600 text-[10px] font-bold">i</span>
@@ -50,7 +50,7 @@ export function StepSymptoms() {
             {/* Symptom chips */}
             <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                      text-[#78716C] mb-3">
+                      text-[#94A3B8] mb-3">
                     Select all that apply
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -66,7 +66,7 @@ export function StepSymptoms() {
                                     "text-sm font-medium border transition-all",
                                     selected
                                         ? "bg-sky-500 text-white border-sky-500 shadow-sm shadow-sky-200"
-                                        : "bg-[#F5F4EF] text-[#57534E] border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50"
+                                        : "bg-[#FFFFFF] text-[#475569] border-[#EBEAE4] hover:border-sky-300 hover:bg-sky-50/50"
                                 )}
                             >
                                 {selected && <Check className="w-3 h-3" />}
@@ -82,13 +82,13 @@ export function StepSymptoms() {
                 <motion.div
                     initial={{ opacity: 0.01, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-[#F5F4EF] rounded-[12px] border border-[#E8E6DF] p-4"
+                    className="bg-[#FFFFFF] rounded-[12px] border border-[#EBEAE4] p-4"
                 >
-                    <p className="text-xs font-semibold text-[#1C1917] mb-2">
+                    <p className="text-xs font-semibold text-[#0F172A] mb-2">
                         {selectedSymptoms.length} symptom
                         {selectedSymptoms.length > 1 ? "s" : ""} selected
                     </p>
-                    <p className="text-xs text-[#57534E]">
+                    <p className="text-xs text-[#475569]">
                         These will be used as context, not as a diagnosis.
                     </p>
                 </motion.div>
@@ -99,8 +99,8 @@ export function StepSymptoms() {
                 <button
                     onClick={() => setStep(1)}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px]
-                     text-sm font-medium text-[#57534E] 
-                     hover:bg-[#E8E6DF] transition-colors"
+                     text-sm font-medium text-[#475569] 
+                     hover:bg-[#EBEAE4] transition-colors"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     Back

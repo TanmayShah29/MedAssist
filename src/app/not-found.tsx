@@ -5,9 +5,9 @@ import { BrandLockup, BrandMark } from "@/components/branding/brand-lockup";
 
 export default function NotFound() {
   return (
-    <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col">
+    <div className="min-h-[100dvh] bg-[#FDFDFB] flex flex-col">
       {/* Minimal header */}
-      <header className="h-16 flex items-center px-6 border-b border-[#E8E6DF]">
+      <header className="h-16 flex items-center px-6 border-b border-[#EBEAE4]">
         <Link href="/" className="group">
           <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
         </Link>
@@ -17,7 +17,7 @@ export default function NotFound() {
       <main className="flex-1 flex flex-col items-center justify-center px-6 text-center">
         {/* Big number */}
         <div className="relative mb-8">
-          <p className="font-display text-[160px] leading-none font-bold text-[#E8E6DF] select-none">
+          <p className="font-display text-[160px] leading-none font-bold text-[#EBEAE4] select-none">
             404
           </p>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -27,10 +27,10 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="font-display text-3xl text-[#1C1917] mb-3">
+        <h1 className="font-display text-3xl text-[#0F172A] mb-3">
           Page not found
         </h1>
-        <p className="text-[#57534E] text-[15px] max-w-sm leading-relaxed mb-8">
+        <p className="text-[#475569] text-[15px] max-w-sm leading-relaxed mb-8">
           The page you're looking for doesn't exist, was moved, or you may not have access to it.
         </p>
 
@@ -45,7 +45,7 @@ export default function NotFound() {
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-6 py-3 bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[10px] font-semibold text-sm hover:border-[#D9D6CD] hover:text-[#1C1917] transition-all min-h-[44px]"
+            className="flex items-center gap-2 px-6 py-3 bg-[#FFFFFF] text-[#475569] border border-[#EBEAE4] rounded-[10px] font-semibold text-sm hover:border-[#D1CFCD] hover:text-[#0F172A] transition-all min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4" />
             Go back
@@ -53,7 +53,7 @@ export default function NotFound() {
         </div>
 
         {/* Legal note */}
-        <p className="text-[11px] text-[#78716C] mt-12">
+        <p className="text-[11px] text-[#94A3B8] mt-12">
           If you believe this is an error, please contact support.
         </p>
       </main>

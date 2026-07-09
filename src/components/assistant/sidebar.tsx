@@ -42,12 +42,12 @@ export function AssistantSidebar({ biomarkers }: AssistantSidebarProps) {
             </div>
 
             {/* Suggested Questions */}
-            <div className="bg-[#F5F4EF] rounded-[14px] p-5 lg:p-6 border border-[#E8E6DF] min-w-0 transition-all duration-300 hover:border-[#D9D6CD]">
-                <h3 className="flex items-center gap-2 font-sans font-semibold text-[#1C1917] mb-4 text-wrap-safe">
+            <div className="bg-[#FFFFFF] rounded-[14px] p-5 lg:p-6 border border-[#EBEAE4] min-w-0 transition-all duration-300 hover:border-[#D1CFCD]">
+                <h3 className="flex items-center gap-2 font-sans font-semibold text-[#0F172A] mb-4 text-wrap-safe">
                     <HelpCircle className="w-4 h-4 text-sky-500" />
                     Help & Guidance
                 </h3>
-                <div className="space-y-2 text-sm text-[#57534E] leading-relaxed text-wrap-safe">
+                <div className="space-y-2 text-sm text-[#475569] leading-relaxed text-wrap-safe">
                     <p>You can ask things like:</p>
                     <ul className="list-disc ml-4 space-y-1">
                         <li>"What should I ask about Vitamin D?"</li>

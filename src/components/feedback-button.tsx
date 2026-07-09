@@ -64,13 +64,13 @@ export function FeedbackButton() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0.01, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="bg-white border border-[#E8E6DF] shadow-xl rounded-[16px] p-4 w-72 mb-4 origin-bottom-right"
+                        className="bg-white border border-[#EBEAE4] shadow-xl rounded-[16px] p-4 w-72 mb-4 origin-bottom-right"
                     >
                         <div className="flex justify-between items-center mb-3">
-                            <h3 className="text-sm font-semibold text-[#1C1917]">Send Feedback</h3>
+                            <h3 className="text-sm font-semibold text-[#0F172A]">Send Feedback</h3>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-[#78716C] hover:text-[#1C1917] transition-colors p-1"
+                                className="text-[#94A3B8] hover:text-[#0F172A] transition-colors p-1"
                                 aria-label="Close"
                             >
                                 <X size={16} />
@@ -81,7 +81,7 @@ export function FeedbackButton() {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Found a bug? Have a suggestion?"
-                                className="w-full text-sm bg-[#FAFAF7] border border-[#E8E6DF] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#1C1917] placeholder:text-[#78716C]"
+                                className="w-full text-sm bg-[#FDFDFB] border border-[#EBEAE4] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#0F172A] placeholder:text-[#94A3B8]"
                                 required
                             />
                             <button
@@ -102,7 +102,7 @@ export function FeedbackButton() {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full shadow-lg shadow-sky-500/20 flex items-center justify-center transition-all duration-200 ${isOpen ? 'bg-[#1C1917] hover:bg-[#292524] text-white' : 'bg-sky-500 hover:bg-sky-600 hover:-translate-y-0.5 text-white'}`}
+                className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full shadow-lg shadow-sky-500/20 flex items-center justify-center transition-all duration-200 ${isOpen ? 'bg-[#0F172A] hover:bg-[#292524] text-white' : 'bg-sky-500 hover:bg-sky-600 hover:-translate-y-0.5 text-white'}`}
                 aria-label="Feedback"
             >
                 {isOpen ? <X size={22} /> : <HelpCircle size={22} />}

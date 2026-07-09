@@ -13,16 +13,16 @@ const fadeInUp = {
 
 export default function SecurityPage() {
   return (
-    <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
+    <div className="min-h-[100dvh] bg-[#FDFDFB] font-sans">
       <LandingHeader />
 
       <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
         <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
           <p className="text-[11px] font-black tracking-widest text-emerald-600 uppercase mb-4">Security & Privacy</p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#1C1917] mb-8 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#0F172A] mb-8 leading-tight">
             Built on the principle of data sovereignty.
           </h1>
-          <p className="text-lg text-[#57534E] leading-relaxed mb-12 max-w-2xl">
+          <p className="text-lg text-[#475569] leading-relaxed mb-12 max-w-2xl">
             Health data is the most sensitive data a person has. We engineered MedAssist to prioritize security at the infrastructure level, not just as an afterthought.
           </p>
         </motion.div>
@@ -56,13 +56,13 @@ export default function SecurityPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white border border-[#E8E6DF] rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white border border-[#EBEAE4] rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6">
                 <item.icon className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold text-[#1C1917] mb-3">{item.title}</h3>
-              <p className="text-[#57534E] leading-relaxed">{item.desc}</p>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-3">{item.title}</h3>
+              <p className="text-[#475569] leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -77,8 +77,8 @@ export default function SecurityPage() {
             <Lock className="w-8 h-8 text-sky-600" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-[#1C1917] mb-2">Private by Design</h3>
-            <p className="text-[#57534E] leading-relaxed">
+            <h3 className="text-xl font-bold text-[#0F172A] mb-2">Private by Design</h3>
+            <p className="text-[#475569] leading-relaxed">
               We collect only the minimum data required to provide actionable clinical insights. If you ever have questions about our data practices, our engineering team is an open book.
             </p>
           </div>

@@ -19,20 +19,20 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 px-4 py-2 bg-white border border-[#E8E6DF] rounded-full hover:border-sky-200 transition-all shadow-sm group"
+                className="flex items-center gap-3 px-4 py-2 bg-white border border-[#EBEAE4] rounded-full hover:border-sky-200 transition-all shadow-sm group"
             >
                 <div className="w-8 h-8 rounded-full bg-sky-50 flex items-center justify-center text-sky-600 border border-sky-100">
                     <User size={18} />
                 </div>
                 <div className="text-left hidden sm:block">
-                    <p className="text-[12px] font-bold text-[#1C1917] leading-none">
+                    <p className="text-[12px] font-bold text-[#0F172A] leading-none">
                         {currentProfile?.first_name} {currentProfile?.last_name}
                     </p>
-                    <p className="text-[10px] text-[#78716C] uppercase tracking-wider font-medium mt-0.5">
+                    <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-medium mt-0.5">
                         {currentProfile?.parent_id ? "FAMILY PROFILE" : "PRIMARY ACCOUNT"}
                     </p>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-[#78716C] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-[#94A3B8] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <AnimatePresence>
@@ -49,10 +49,10 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                             initial={{ opacity: 0.01, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0.01, y: 10, scale: 0.95 }}
-                            className="absolute right-0 mt-2 w-64 bg-white border border-[#E8E6DF] rounded-2xl shadow-xl z-50 overflow-hidden"
+                            className="absolute right-0 mt-2 w-64 bg-white border border-[#EBEAE4] rounded-2xl shadow-xl z-50 overflow-hidden"
                         >
-                            <div className="p-3 border-b border-[#F1F1EF] bg-[#FAFAF7]">
-                                <p className="text-[10px] font-bold text-[#78716C] uppercase tracking-widest px-2">Switch Profile</p>
+                            <div className="p-3 border-b border-[#F1F1EF] bg-[#FDFDFB]">
+                                <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest px-2">Switch Profile</p>
                             </div>
 
                             <div className="p-2 max-h-80 overflow-y-auto">
@@ -72,11 +72,11 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                                                 <User size={16} />
                                             </div>
                                             <div className="text-left">
-                                                <p className={`text-sm font-bold ${currentProfile?.id === profile.id ? 'text-sky-700' : 'text-[#1C1917]'
+                                                <p className={`text-sm font-bold ${currentProfile?.id === profile.id ? 'text-sky-700' : 'text-[#0F172A]'
                                                     }`}>
                                                     {profile.first_name} {profile.last_name}
                                                 </p>
-                                                <p className="text-[10px] text-[#78716C]">
+                                                <p className="text-[10px] text-[#94A3B8]">
                                                     {profile.parent_id ? "Sub-profile" : "Primary"}
                                                 </p>
                                             </div>
@@ -88,7 +88,7 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                                 ))}
                             </div>
 
-                            <div className="p-2 border-t border-[#F1F1EF] bg-[#FAFAF7]">
+                            <div className="p-2 border-t border-[#F1F1EF] bg-[#FDFDFB]">
                                 <button
                                     onClick={() => {
                                         onAddProfile();

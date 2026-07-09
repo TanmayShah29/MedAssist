@@ -44,8 +44,8 @@ function SettingsRow({
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold break-words ${danger ? "text-red-700" : "text-[#1C1917]"}`}>{title}</p>
-        {description && <p className="text-[12px] text-[#78716C] mt-0.5 leading-relaxed break-words">{description}</p>}
+        <p className={`text-sm font-semibold break-words ${danger ? "text-red-700" : "text-[#0F172A]"}`}>{title}</p>
+        {description && <p className="text-[12px] text-[#94A3B8] mt-0.5 leading-relaxed break-words">{description}</p>}
         {children && <div className="mt-3">{children}</div>}
       </div>
     </div>
@@ -162,13 +162,13 @@ export default function SettingsPage() {
                   placeholder="New password"
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 pr-10 bg-white border border-[#E8E6DF] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-h-[44px] transition-all"
+                  className="w-full px-3 py-2.5 pr-10 bg-white border border-[#EBEAE4] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-h-[44px] transition-all"
                   style={{ WebkitAppearance: "none" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#78716C] hover:text-[#57534E] transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors"
                   style={{ WebkitAppearance: "none" }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -185,7 +185,7 @@ export default function SettingsPage() {
             </form>
           </SettingsRow>
 
-          <hr className="border-[#E8E6DF] mx-5" />
+          <hr className="border-[#EBEAE4] mx-5" />
 
           <SettingsRow
             icon={Lock}
@@ -216,7 +216,7 @@ export default function SettingsPage() {
             <button
               onClick={handleExportData}
               disabled={isExporting}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#E8E6DF] text-[#1C1917] rounded-[10px] text-sm font-semibold hover:bg-[#EFEDE6] transition-colors disabled:opacity-50 min-h-[44px]"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#EBEAE4] text-[#0F172A] rounded-[10px] text-sm font-semibold hover:bg-[#FAFAFA] transition-colors disabled:opacity-50 min-h-[44px]"
               style={{ WebkitAppearance: "none" }}
             >
               <Download className="w-4 h-4 text-emerald-500" />
@@ -288,8 +288,8 @@ export default function SettingsPage() {
                 <Shield className="w-4 h-4 text-sky-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#1C1917]">MedAssist</p>
-                <p className="text-[11px] text-[#78716C]">Health Intelligence Platform</p>
+                <p className="text-sm font-semibold text-[#0F172A]">MedAssist</p>
+                <p className="text-[11px] text-[#94A3B8]">Health Intelligence Platform</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-[#C5C2B8]" />

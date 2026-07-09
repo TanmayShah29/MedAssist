@@ -39,10 +39,10 @@ export function StepTour() {
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
                 <CheckCircle2 size={32} />
             </div>
-            <h2 className="font-display text-4xl leading-tight text-[#1C1917]">
+            <h2 className="font-display text-4xl leading-tight text-[#0F172A]">
                 {analysisResult ? "Your first prep sheet is ready" : "Your workspace is ready"}
             </h2>
-            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-[#57534E]">
+            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-[#475569]">
                 {analysisResult
                     ? `We found ${analysisResult.biomarkers.length} biomarkers. Start with the one-page brief, then review trends and ask follow-up questions.`
                     : 'Your profile is set up. The dashboard will guide you to upload your first report when you are ready.'}
@@ -53,10 +53,10 @@ export function StepTour() {
                     { icon: TrendingUp, title: "Trends", text: "What changed over time" },
                     { icon: MessageSquareText, title: "Questions", text: "What to ask your doctor" },
                 ].map((item) => (
-                    <div key={item.title} className="rounded-[14px] border border-[#E8E6DF] bg-white/70 p-4 text-left">
+                    <div key={item.title} className="rounded-[14px] border border-[#EBEAE4] bg-white/70 p-4 text-left">
                         <item.icon className="mb-3 h-5 w-5 text-sky-500" />
-                        <p className="text-sm font-bold text-[#1C1917]">{item.title}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-[#57534E]">{item.text}</p>
+                        <p className="text-sm font-bold text-[#0F172A]">{item.title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[#475569]">{item.text}</p>
                     </div>
                 ))}
             </div>

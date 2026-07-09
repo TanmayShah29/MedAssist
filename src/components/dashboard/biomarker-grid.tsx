@@ -103,8 +103,8 @@ export function BiomarkerGrid({
     return (
         <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#78716C] uppercase tracking-tighter">
+                <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#94A3B8] uppercase tracking-tighter">
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} />{PATIENT_STATUS.optimal.label}: {optimalCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} />{PATIENT_STATUS.warning.label}: {warningCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} />{PATIENT_STATUS.critical.label}: {criticalCount}</span>
@@ -128,8 +128,8 @@ export function BiomarkerGrid({
                     {attentionNeeded.length > 0 && (
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
-                                <h4 className="text-[14px] font-bold text-[#1C1917]">Requires Attention</h4>
-                                <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
+                                <h4 className="text-[14px] font-bold text-[#0F172A]">Requires Attention</h4>
+                                <div className="h-[1px] grow shrink basis-0 bg-[#EBEAE4] ml-3" />
                             </div>
                             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
                                 {attentionNeeded.map(({ b, delta }, idx) => (
@@ -147,18 +147,18 @@ export function BiomarkerGrid({
 
                     {/* Optimal & Stable Section (Collapsible) */}
                     {optimalStable.length > 0 && (
-                        <div className="space-y-4 pt-4 border-t border-[#E8E6DF]/60">
+                        <div className="space-y-4 pt-4 border-t border-[#EBEAE4]/60">
                             <button 
                                 onClick={() => setShowOptimal(!showOptimal)}
                                 className="w-full flex items-center justify-between group py-2"
                             >
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                                    <h4 className="text-[14px] font-bold text-[#57534E] group-hover:text-[#1C1917] transition-colors">
+                                    <h4 className="text-[14px] font-bold text-[#475569] group-hover:text-[#0F172A] transition-colors">
                                         Optimal & Stable ({optimalStable.length})
                                     </h4>
                                 </div>
-                                <div className="flex items-center gap-2 text-[12px] font-semibold text-[#78716C] group-hover:text-[#1C1917] transition-colors">
+                                <div className="flex items-center gap-2 text-[12px] font-semibold text-[#94A3B8] group-hover:text-[#0F172A] transition-colors">
                                     {showOptimal ? 'Hide details' : 'Show details'}
                                     {showOptimal ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                 </div>
@@ -189,17 +189,17 @@ export function BiomarkerGrid({
 
 function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
     return (
-        <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center stagger-fade">
-            <div className="w-16 h-16 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-6 transition-transform duration-500 hover:scale-105">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#78716C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center stagger-fade">
+            <div className="w-16 h-16 bg-[#EBEAE4] rounded-full flex items-center justify-center mb-6 transition-transform duration-500 hover:scale-105">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="1" />
                     <line x1="9" y1="12" x2="15" y2="12" />
                     <line x1="9" y1="16" x2="15" y2="16" />
                 </svg>
             </div>
-            <h3 className="text-[20px] font-semibold text-[#1C1917] mb-3 font-display">No lab results yet</h3>
-            <p className="text-[15px] text-[#57534E] max-w-md mx-auto mb-6 leading-relaxed">
+            <h3 className="text-[20px] font-semibold text-[#0F172A] mb-3 font-display">No lab results yet</h3>
+            <p className="text-[15px] text-[#475569] max-w-md mx-auto mb-6 leading-relaxed">
                 Upload your first lab report to build a doctor-ready visit brief.
             </p>
             <button
@@ -243,7 +243,7 @@ function BiomarkerCard({
 
     return (
         <div
-            className="bg-white border border-[#E8E6DF] rounded-[14px] p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0 stagger-fade-sm"
+            className="bg-white border border-[#EBEAE4] rounded-[14px] p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0 stagger-fade-sm"
             style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
             onClick={onClick}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }}}
@@ -275,7 +275,7 @@ function BiomarkerCard({
                     <span className="sr-only">({style.description})</span>
                 </div>
                 <div className="min-w-0 max-w-full">
-                    <div className="text-[15px] font-bold text-[#1C1917] break-words leading-tight">
+                    <div className="text-[15px] font-bold text-[#0F172A] break-words leading-tight">
                         {b.value} <span className="text-[10px] font-normal text-gray-500 break-words">{b.unit}</span>
                     </div>
                     {delta ? (
@@ -292,26 +292,26 @@ function BiomarkerCard({
                             {Math.abs(delta.percent)}% from last
                         </div>
                     ) : (
-                        <div className="text-[9px] font-bold text-[#78716C] uppercase tracking-tighter">No previous data</div>
+                        <div className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-tighter">No previous data</div>
                     )}
                 </div>
             </div>
 
             {/* Name + interpretation */}
             <div className="grow shrink basis-0 flex flex-col min-w-0">
-                <span className="text-[15px] font-bold text-[#1C1917] block mb-1 break-words">{b.name}</span>
-                <p className="text-[11px] text-[#78716C] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
+                <span className="text-[15px] font-bold text-[#0F172A] block mb-1 break-words">{b.name}</span>
+                <p className="text-[11px] text-[#94A3B8] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
                     {b.ai_interpretation || 'Clinical data point extracted from report.'}
                 </p>
 
                 {/* Range bar */}
                 {showBar && (
                     <div className="mt-3">
-                        <div className="flex justify-between gap-2 text-[10px] text-[#78716C] font-medium mb-1 min-w-0">
+                        <div className="flex justify-between gap-2 text-[10px] text-[#94A3B8] font-medium mb-1 min-w-0">
                             <span className="min-w-0 break-words">{rangeMin}</span>
                             <span className="min-w-0 break-words text-right">{rangeMax} {b.unit}</span>
                         </div>
-                        <div className="h-1.5 w-full bg-[#E8E6DF] rounded-full relative overflow-hidden">
+                        <div className="h-1.5 w-full bg-[#EBEAE4] rounded-full relative overflow-hidden">
                             <div
                                 className={`absolute top-0 bottom-0 left-0 rounded-full transition-[width] duration-700 ease-out ${style.barClass}`}
                                 style={{ width: `${barPct}%`, minWidth: '4px' }}

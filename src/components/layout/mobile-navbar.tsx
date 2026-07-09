@@ -27,7 +27,7 @@ export function MobileNavbar() {
   const { initials } = useUserProfile();
 
   return (
-    <header className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-[#FAFAF7]/90 backdrop-blur-xl border-b border-[#E8E6DF] flex flex-col">
+    <header className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-[#FDFDFB]/90 backdrop-blur-xl border-b border-[#EBEAE4] flex flex-col">
       {/* iOS notch spacer */}
       <div className="w-full safe-area-top" />
 
@@ -37,7 +37,7 @@ export function MobileNavbar() {
           <Link href="/dashboard" className="flex-shrink-0">
             <BrandMark className="h-7 w-7 rounded-[9px]" />
           </Link>
-          <span className="font-display text-[15px] text-[#1C1917] tracking-tight font-bold truncate max-w-[160px]">
+          <span className="font-display text-[15px] text-[#0F172A] tracking-tight font-bold truncate max-w-[160px]">
             {getTitle(pathname)}
           </span>
         </div>

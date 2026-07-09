@@ -37,7 +37,7 @@ export function ConfirmDialog({
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-title"
-            className="relative w-full max-w-md rounded-[18px] border border-[#E8E6DF] bg-[#FAFAF7] p-5 shadow-2xl"
+            className="relative w-full max-w-md rounded-[18px] border border-[#EBEAE4] bg-[#FDFDFB] p-5 shadow-2xl"
             initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
@@ -45,7 +45,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={onCancel}
-              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-[#78716C] hover:bg-[#F5F4EF]"
+              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#FFFFFF]"
               aria-label="Close confirmation"
             >
               <X className="h-4 w-4" />
@@ -55,12 +55,12 @@ export function ConfirmDialog({
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <h2 id="confirm-title" className="text-lg font-bold text-[#1C1917]">{title}</h2>
-                <p className="mt-1 text-sm leading-relaxed text-[#57534E]">{description}</p>
+                <h2 id="confirm-title" className="text-lg font-bold text-[#0F172A]">{title}</h2>
+                <p className="mt-1 text-sm leading-relaxed text-[#475569]">{description}</p>
               </div>
             </div>
             <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <button type="button" onClick={onCancel} className="min-h-[44px] rounded-[10px] border border-[#E8E6DF] bg-white px-4 py-2 text-sm font-semibold text-[#57534E]">
+              <button type="button" onClick={onCancel} className="min-h-[44px] rounded-[10px] border border-[#EBEAE4] bg-white px-4 py-2 text-sm font-semibold text-[#475569]">
                 {cancelLabel}
               </button>
               <button

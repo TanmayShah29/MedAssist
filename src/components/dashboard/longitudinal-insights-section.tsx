@@ -13,7 +13,7 @@ export function LongitudinalInsightsSection({ insights }: LongitudinalInsightsSe
         <div className="bg-[#FBFCFE] border border-[#E0E7FF] rounded-[18px] p-6 mb-6 shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-md">
             <div className="flex items-center gap-2 mb-4">
                 <Activity className="w-5 h-5 text-indigo-500" />
-                <h3 className="text-[18px] font-bold text-[#1C1917]">Trend Context for Your Visit</h3>
+                <h3 className="text-[18px] font-bold text-[#0F172A]">Trend Context for Your Visit</h3>
                 <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-auto">Beta</span>
             </div>
 

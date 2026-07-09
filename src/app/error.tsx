@@ -18,9 +18,9 @@ export default function ErrorPage({
     }, [error]);
 
     return (
-        <div className="flex min-h-[100dvh] flex-col bg-[#FAFAF7]">
+        <div className="flex min-h-[100dvh] flex-col bg-[#FDFDFB]">
             {/* Minimal brand header */}
-            <header className="h-16 flex items-center px-6 border-b border-[#E8E6DF]">
+            <header className="h-16 flex items-center px-6 border-b border-[#EBEAE4]">
                 <Link href="/" className="group">
                     <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
                 </Link>
@@ -33,16 +33,16 @@ export default function ErrorPage({
                     <AlertTriangle className="h-8 w-8 text-red-500" />
                 </div>
 
-                <h1 className="font-display text-3xl text-[#1C1917] mb-3">
+                <h1 className="font-display text-3xl text-[#0F172A] mb-3">
                     Something went wrong
                 </h1>
-                <p className="text-[#57534E] text-[15px] max-w-sm leading-relaxed mb-8">
+                <p className="text-[#475569] text-[15px] max-w-sm leading-relaxed mb-8">
                     We hit an unexpected error. Our team has been notified — you can try again or head back to your dashboard.
                 </p>
 
                 {/* Error digest for support */}
                 {error.digest && (
-                    <p className="text-[11px] font-mono text-[#78716C] bg-[#F5F4EF] border border-[#E8E6DF] px-3 py-1.5 rounded-full mb-8">
+                    <p className="text-[11px] font-mono text-[#94A3B8] bg-[#FFFFFF] border border-[#EBEAE4] px-3 py-1.5 rounded-full mb-8">
                         Error ID: {error.digest}
                     </p>
                 )}
@@ -57,14 +57,14 @@ export default function ErrorPage({
                     </button>
                     <Link
                         href="/dashboard"
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[10px] font-semibold text-sm hover:border-[#D9D6CD] hover:text-[#1C1917] transition-all min-h-[44px]"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-[#FFFFFF] text-[#475569] border border-[#EBEAE4] rounded-[10px] font-semibold text-sm hover:border-[#D1CFCD] hover:text-[#0F172A] transition-all min-h-[44px]"
                     >
                         <LayoutDashboard className="w-4 h-4" />
                         Back to Dashboard
                     </Link>
                 </div>
 
-                <p className="text-[11px] text-[#78716C] mt-12">
+                <p className="text-[11px] text-[#94A3B8] mt-12">
                     If this keeps happening, please contact support.
                 </p>
             </main>

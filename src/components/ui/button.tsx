@@ -21,25 +21,25 @@ const buttonVariants = cva(
       variant: {
         /** Sky-500 filled — primary CTA */
         primary:
-          "bg-[#0EA5E9] text-white shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:bg-[#0284C7] hover:shadow-[0_4px_18px_rgba(14,165,233,0.35)]",
+          "bg-[#0369A1] text-white shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:bg-[#0369A1] hover:shadow-[0_4px_18px_rgba(14,165,233,0.35)]",
         /** Bordered, subtle fill on hover */
         secondary:
-          "bg-[#F5F4EF] text-[#1C1917] border-2 border-[#E8E6DF] hover:border-[#0EA5E9] hover:bg-[#E0F2FE] hover:text-[#0EA5E9]",
+          "bg-[#FFFFFF] text-[#0F172A] border-2 border-[#EBEAE4] hover:border-[#0369A1] hover:bg-[#F0F9FF] hover:text-[#0369A1]",
         /** No background, transparent */
         ghost:
-          "bg-transparent text-[#57534E] border border-transparent hover:bg-[#EFEDE6] hover:text-[#1C1917] hover:border-[#E8E6DF]",
+          "bg-transparent text-[#475569] border border-transparent hover:bg-[#FAFAFA] hover:text-[#0F172A] hover:border-[#EBEAE4]",
         /** Danger / destructive */
         danger:
           "bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600",
         /** Outlined brand */
         outline:
-          "bg-transparent text-[#0EA5E9] border-2 border-[#0EA5E9] hover:bg-[#E0F2FE]",
+          "bg-transparent text-[#0369A1] border-2 border-[#0369A1] hover:bg-[#F0F9FF]",
         /** Dark surface — for use on dark backgrounds */
         dark:
           "bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:border-white/40",
         /** Icon-only button — square */
         icon:
-          "bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] shadow-sm hover:bg-[#EFEDE6] hover:text-[#1C1917] hover:shadow-md",
+          "bg-[#FFFFFF] text-[#475569] border border-[#EBEAE4] shadow-sm hover:bg-[#FAFAFA] hover:text-[#0F172A] hover:shadow-md",
       },
       size: {
         sm: "text-[13px] min-h-[36px] h-9 px-3.5 py-2 rounded-[8px] gap-1.5",

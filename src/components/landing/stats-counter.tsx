@@ -81,7 +81,7 @@ export function StatsCounter() {
               duration={1400 + i * 150}
             />
           </div>
-          <div className="text-[12px] font-medium text-[#78716C] uppercase tracking-wider">
+          <div className="text-[12px] font-medium text-[#94A3B8] uppercase tracking-wider">
             {s.label}
           </div>
         </div>

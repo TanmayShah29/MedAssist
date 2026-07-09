@@ -22,16 +22,16 @@ export function ProgressStepper({
                   "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
                   complete && "bg-emerald-500 text-white",
                   active && "bg-sky-500 text-white",
-                  !complete && !active && "bg-[#E8E6DF] text-[#57534E]"
+                  !complete && !active && "bg-[#EBEAE4] text-[#475569]"
                 )}
               >
                 {complete ? <Check className="h-3.5 w-3.5" /> : stepNumber}
               </div>
-              <span className={cn("mt-1 whitespace-nowrap text-[9px] font-bold", active ? "text-sky-600" : "text-[#78716C]")}>
+              <span className={cn("mt-1 whitespace-nowrap text-[9px] font-bold", active ? "text-sky-600" : "text-[#94A3B8]")}>
                 {step}
               </span>
             </div>
-            {index < steps.length - 1 && <div className={cn("mx-1 mb-4 h-0.5 grow", complete ? "bg-emerald-500" : "bg-[#E8E6DF]")} />}
+            {index < steps.length - 1 && <div className={cn("mx-1 mb-4 h-0.5 grow", complete ? "bg-emerald-500" : "bg-[#EBEAE4]")} />}
           </div>
         );
       })}

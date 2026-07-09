@@ -40,7 +40,7 @@ export function LandingHeader() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#E8E6DF]/80 bg-[#FAFAF7]/[0.98] transition-shadow duration-200 ${
+        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#EBEAE4]/80 bg-[#FDFDFB]/[0.98] transition-shadow duration-200 ${
           scrolled
             ? "shadow-sm shadow-stone-900/[0.05]"
             : "shadow-none"
@@ -52,9 +52,9 @@ export function LandingHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            <Link href="#how-it-works" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-3 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">How it works</Link>
-            <Link href="#features" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-3 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Features</Link>
-            <Link href="#security" className="text-sm font-medium text-[#57534E] hover:text-[#1C1917] px-3 py-2 rounded-lg hover:bg-[#F5F4EF] transition-all">Security</Link>
+            <Link href="#how-it-works" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">How it works</Link>
+            <Link href="#features" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">Features</Link>
+            <Link href="#security" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">Security</Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -65,14 +65,14 @@ export function LandingHeader() {
               <button
                 type="button"
                 onClick={handleResetSession}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-[#57534E] hover:text-red-600 transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-[#475569] hover:text-red-600 transition-colors"
               >
                 <LogOut size={14} />
                 Sign out
               </button>
             )}
             {!isSignedIn && (
-              <Link href="/auth?mode=login" className="hidden sm:block text-sm font-semibold text-[#57534E] hover:text-[#1C1917] px-4 py-2 transition-colors">
+              <Link href="/auth?mode=login" className="hidden sm:block text-sm font-semibold text-[#475569] hover:text-[#0F172A] px-4 py-2 transition-colors">
                 Sign in
               </Link>
             )}
@@ -88,20 +88,20 @@ export function LandingHeader() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-label="Toggle navigation menu"
               aria-expanded={menuOpen}
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-lg hover:bg-[#F5F4EF] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-lg hover:bg-[#FFFFFF] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/30"
             >
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
-              <span className={`block w-5 h-0.5 bg-[#57534E] transition-transform duration-200 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-[#475569] transition-transform duration-200 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-[#475569] transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-[#475569] transition-transform duration-200 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
             </button>
           </div>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden bg-[#FAFAF7] border-t border-[#E8E6DF] px-6 py-4 space-y-1">
-            <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">How it works</Link>
-            <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Features</Link>
-            <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#57534E] py-3 border-b border-[#F0EEE8]">Security</Link>
+          <div className="md:hidden bg-[#FDFDFB] border-t border-[#EBEAE4] px-6 py-4 space-y-1">
+            <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">How it works</Link>
+            <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">Features</Link>
+            <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">Security</Link>
             <Link href="/demo" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-sky-600 py-3 border-b border-[#F0EEE8]">Live Demo</Link>
             {showResetSession && (
               <button
@@ -113,7 +113,7 @@ export function LandingHeader() {
               </button>
             )}
             {!isSignedIn && (
-              <Link href="/auth?mode=login" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-[#57534E] py-3">
+              <Link href="/auth?mode=login" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-[#475569] py-3">
                 Sign in
               </Link>
             )}

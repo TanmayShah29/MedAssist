@@ -41,12 +41,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                         <AlertTriangle className="h-6 w-6 text-red-600" />
                     </div>
                     <div className="space-y-2">
-                        <h2 className="font-display text-2xl text-[#1C1917]">Something went wrong</h2>
-                        <p className="mx-auto max-w-sm text-sm leading-relaxed text-[#57534E]">
+                        <h2 className="font-display text-2xl text-[#0F172A]">Something went wrong</h2>
+                        <p className="mx-auto max-w-sm text-sm leading-relaxed text-[#475569]">
                             We encountered an unexpected error. Our team has been notified.
                         </p>
                         {this.state.errorId && (
-                            <p className="inline-flex rounded-[8px] border border-[#E8E6DF] bg-[#F5F4EF] px-2 py-1 font-mono text-xs text-[#78716C]">
+                            <p className="inline-flex rounded-[8px] border border-[#EBEAE4] bg-[#FFFFFF] px-2 py-1 font-mono text-xs text-[#94A3B8]">
                                 Reference: {this.state.errorId}
                             </p>
                         )}

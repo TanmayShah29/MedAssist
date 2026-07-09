@@ -132,10 +132,10 @@ export function DoctorVisitPrep({
                             <Sparkles className="w-3 h-3" />
                             Doctor Visit Prep
                         </p>
-                        <h2 className="text-[21px] font-bold text-[#1C1917] leading-tight text-wrap-safe">
+                        <h2 className="text-[21px] font-bold text-[#0F172A] leading-tight text-wrap-safe">
                             Your appointment one-pager
                         </h2>
-                        <p className="text-[12px] text-[#78716C] mt-1">
+                        <p className="text-[12px] text-[#94A3B8] mt-1">
                             Generated from your latest results{prep.reportCount > 1 ? ` and ${prep.reportCount - 1} prior report${prep.reportCount > 2 ? "s" : ""}` : ""}.
                         </p>
                     </div>
@@ -144,7 +144,7 @@ export function DoctorVisitPrep({
                 <div className="flex gap-2 print:hidden">
                     <button
                         onClick={copyPrep}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8E6DF] bg-white px-3 py-2 text-[12px] font-semibold text-[#57534E] hover:border-sky-300 hover:text-sky-600 hover:shadow-sm active:scale-95 transition-all duration-200 min-h-[40px]"
+                        className="inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-[#EBEAE4] bg-white px-3 py-2 text-[12px] font-semibold text-[#475569] hover:border-sky-300 hover:text-sky-600 hover:shadow-sm active:scale-95 transition-all duration-200 min-h-[40px]"
                     >
                         <Copy className="w-3.5 h-3.5" />
                         Copy
@@ -159,21 +159,21 @@ export function DoctorVisitPrep({
                 </div>
             </div>
 
-            <p className="text-[14px] leading-relaxed text-[#57534E] mb-5 text-wrap-safe">
+            <p className="text-[14px] leading-relaxed text-[#475569] mb-5 text-wrap-safe">
                 {prep.summary}
             </p>
 
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4 transition-colors duration-300 hover:border-[#D9D6CD]">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Top things to discuss</h3>
+                <div className="rounded-[14px] border border-[#EBEAE4] bg-[#FDFDFB] p-4 transition-colors duration-300 hover:border-[#D1CFCD]">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-3">Top things to discuss</h3>
                     <div className="space-y-2">
                         {prep.flagged.length > 0 ? prep.flagged.map((b, idx) => (
                             <div
                                 key={b.id}
-                                className="flex flex-col items-start gap-2 rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2 min-w-0 sm:flex-row sm:justify-between transition-all duration-200 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm stagger-fade-sm"
+                                className="flex flex-col items-start gap-2 rounded-[10px] bg-white border border-[#EBEAE4] px-3 py-2 min-w-0 sm:flex-row sm:justify-between transition-all duration-200 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm stagger-fade-sm"
                                 style={{ animationDelay: `${idx * 50}ms` }}
                             >
-                                <span className="min-w-0 text-[13px] font-semibold text-[#1C1917] break-words">{b.name}</span>
+                                <span className="min-w-0 text-[13px] font-semibold text-[#0F172A] break-words">{b.name}</span>
                                 <span className={cn(
                                     "max-w-full rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-wrap-safe sm:shrink-0 border",
                                     getPatientStatus(b.status).badgeClass
@@ -182,41 +182,41 @@ export function DoctorVisitPrep({
                                 </span>
                             </div>
                         )) : (
-                            <p className="text-[13px] text-[#78716C]">No flagged biomarkers in the latest report.</p>
+                            <p className="text-[13px] text-[#94A3B8]">No flagged biomarkers in the latest report.</p>
                         )}
                     </div>
                 </div>
 
-                <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4 transition-colors duration-300 hover:border-[#D9D6CD]">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">What changed</h3>
+                <div className="rounded-[14px] border border-[#EBEAE4] bg-[#FDFDFB] p-4 transition-colors duration-300 hover:border-[#D1CFCD]">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-3">What changed</h3>
                     <div className="space-y-2">
                         {prep.changes.length > 0 ? prep.changes.map((change, idx) => (
                             <div
                                 key={change.name}
-                                className="rounded-[10px] bg-white border border-[#E8E6DF] px-3 py-2 transition-all duration-200 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm stagger-fade-sm"
+                                className="rounded-[10px] bg-white border border-[#EBEAE4] px-3 py-2 transition-all duration-200 hover:border-sky-200 hover:-translate-y-0.5 hover:shadow-sm stagger-fade-sm"
                                 style={{ animationDelay: `${idx * 50}ms` }}
                             >
                                 <div className="flex flex-col gap-1 min-w-0 sm:flex-row sm:items-center sm:justify-between">
-                                    <span className="min-w-0 text-[13px] font-semibold text-[#1C1917] break-words">{change.name}</span>
+                                    <span className="min-w-0 text-[13px] font-semibold text-[#0F172A] break-words">{change.name}</span>
                                     <span className={cn("text-[12px] font-bold sm:shrink-0", change.percent > 0 ? "text-amber-600" : "text-emerald-600")}>
                                         {change.percent > 0 ? "+" : ""}{change.percent}%
                                     </span>
                                 </div>
-                                <p className="text-[11px] text-[#78716C] mt-0.5 break-words">{change.previous} to {change.current}</p>
+                                <p className="text-[11px] text-[#94A3B8] mt-0.5 break-words">{change.previous} to {change.current}</p>
                             </div>
                         )) : (
-                            <p className="text-[13px] text-[#78716C]">Upload another report to turn this into a trend review.</p>
+                            <p className="text-[13px] text-[#94A3B8]">Upload another report to turn this into a trend review.</p>
                         )}
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 mt-4 xl:grid-cols-2">
-                <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4 transition-colors duration-300 hover:border-[#D9D6CD]">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Ask your doctor</h3>
+                <div className="rounded-[14px] border border-[#EBEAE4] bg-[#FDFDFB] p-4 transition-colors duration-300 hover:border-[#D1CFCD]">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-3">Ask your doctor</h3>
                     <ol className="space-y-2">
                         {prep.questions.map((question, index) => (
-                            <li key={question} className="flex gap-2 text-[13px] text-[#57534E] leading-relaxed">
+                            <li key={question} className="flex gap-2 text-[13px] text-[#475569] leading-relaxed">
                                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[10px] font-bold text-sky-600">{index + 1}</span>
                                 <span className="text-wrap-safe">{question}</span>
                             </li>
@@ -224,11 +224,11 @@ export function DoctorVisitPrep({
                     </ol>
                 </div>
 
-                <div className="rounded-[14px] border border-[#E8E6DF] bg-[#FAFAF7] p-4 transition-colors duration-300 hover:border-[#D9D6CD]">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#78716C] mb-3">Bring with you</h3>
+                <div className="rounded-[14px] border border-[#EBEAE4] bg-[#FDFDFB] p-4 transition-colors duration-300 hover:border-[#D1CFCD]">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] mb-3">Bring with you</h3>
                     <ul className="space-y-2">
                         {prep.checklist.map(item => (
-                            <li key={item} className="flex gap-2 text-[13px] text-[#57534E] leading-relaxed">
+                            <li key={item} className="flex gap-2 text-[13px] text-[#475569] leading-relaxed">
                                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500" />
                                 <span className="text-wrap-safe">{item}</span>
                             </li>

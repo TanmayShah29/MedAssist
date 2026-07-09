@@ -18,8 +18,8 @@ interface HealthScoreOverviewProps {
 }
 
 function getScoreLabel(score: number): { label: string; color: string; bg: string; ring: string } {
-    if (score >= 85) return { label: "Ready to review", color: "#065F46", bg: "#ECFDF5", ring: "#10B981" };
-    if (score >= 70) return { label: "Almost ready", color: "#0C4A6E", bg: "#E0F2FE", ring: "#0EA5E9" };
+    if (score >= 85) return { label: "Ready to review", color: "#065F46", bg: "#ECFDF5", ring: "#059669" };
+    if (score >= 70) return { label: "Almost ready", color: "#0C4A6E", bg: "#F0F9FF", ring: "#0369A1" };
     if (score >= 45) return { label: "Add more context", color: "#78350F", bg: "#FFFBEB", ring: "#F59E0B" };
     return { label: "Start your brief", color: "#991B1B", bg: "#FFF1F2", ring: "#EF4444" };
 }
@@ -65,18 +65,18 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             onBlur={() => setShowTooltip(false)}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
-            className={`bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all duration-300 ease-out ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
+            className={`bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all duration-300 ease-out ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
             aria-label={onClick ? "Brief completeness details" : undefined}
         >
             <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
-                <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
+                <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
                     Brief Completeness
                     <button
                       type="button"
                       aria-label="About brief completeness"
-                      className="cursor-help text-[#78716C] hover:text-[#57534E] relative"
+                      className="cursor-help text-[#94A3B8] hover:text-[#475569] relative"
                       onFocus={() => setShowTooltip(true)}
                       onBlur={() => setShowTooltip(false)}
                       onMouseEnter={() => setShowTooltip(true)}
@@ -84,7 +84,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                     >
                         <Info className="w-3.5 h-3.5 transition-transform duration-200 hover:scale-110" />
                         <div className={cn(
-                            "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#E8E6DF] shadow-md rounded-lg text-[11px] text-[#57534E] transition-all duration-200 z-10 normal-case leading-relaxed font-normal",
+                            "absolute left-0 bottom-6 w-52 p-3 bg-white border border-[#EBEAE4] shadow-md rounded-lg text-[11px] text-[#475569] transition-all duration-200 z-10 normal-case leading-relaxed font-normal",
                             (showTooltip || (onClick && typeof window !== 'undefined' && 'ontouchstart' in window)) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none md:pointer-events-none'
                         )}>
                             A preparation estimate based on lab data, prior reports, symptoms, and medication context. Click to see breakdown.
@@ -102,7 +102,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                 {/* SVG Ring Gauge */}
                 <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
                     <svg width={120} height={120} style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx={60} cy={60} r={r} fill="none" stroke="#E8E6DF" strokeWidth={9} />
+                        <circle cx={60} cy={60} r={r} fill="none" stroke="#EBEAE4" strokeWidth={9} />
                         <circle
                             cx={60} cy={60} r={r}
                             fill="none"
@@ -114,8 +114,8 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="font-display text-3xl font-bold text-[#1C1917] leading-none">{displayScore}</span>
-                        <span className="text-[10px] font-bold text-[#78716C] mt-0.5">/ 100</span>
+                        <span className="font-display text-3xl font-bold text-[#0F172A] leading-none">{displayScore}</span>
+                        <span className="text-[10px] font-bold text-[#94A3B8] mt-0.5">/ 100</span>
                     </div>
                 </div>
 
@@ -128,16 +128,16 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                         {scoreInfo.label}
                     </span>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} /> {PATIENT_STATUS.optimal.label}</span>
-                        <span className="font-bold text-[#1C1917]">{optimalCount}</span>
+                        <span className="text-[#475569] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} /> {PATIENT_STATUS.optimal.label}</span>
+                        <span className="font-bold text-[#0F172A]">{optimalCount}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} /> {PATIENT_STATUS.warning.label}</span>
-                        <span className="font-bold text-[#1C1917]">{warningCount}</span>
+                        <span className="text-[#475569] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} /> {PATIENT_STATUS.warning.label}</span>
+                        <span className="font-bold text-[#0F172A]">{warningCount}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px]">
-                        <span className="text-[#57534E] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} /> {PATIENT_STATUS.critical.label}</span>
-                        <span className="font-bold text-[#1C1917]">{criticalCount}</span>
+                        <span className="text-[#475569] flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} /> {PATIENT_STATUS.critical.label}</span>
+                        <span className="font-bold text-[#0F172A]">{criticalCount}</span>
                     </div>
                 </div>
             </div>

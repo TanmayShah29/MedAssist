@@ -45,7 +45,7 @@ export function DebugTraceView({ labResult }: DebugTraceViewProps) {
     ];
 
     return (
-        <div className="mb-8 border border-[#E8E6DF] rounded-2xl bg-white shadow-sm overflow-hidden">
+        <div className="mb-8 border border-[#EBEAE4] rounded-2xl bg-white shadow-sm overflow-hidden">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-6 py-4 flex items-center justify-between bg-zinc-900 text-white hover:bg-zinc-800 transition-colors"

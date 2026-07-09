@@ -32,7 +32,7 @@ function SkeletonText({ lines = 3, className }: { lines?: number; className?: st
 /** Skeleton for a biomarker card */
 function BiomarkerCardSkeleton() {
   return (
-    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[14px] p-4 min-h-[120px]">
+    <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[14px] p-4 min-h-[120px]">
       <div className="flex justify-between items-start mb-3">
         <Skeleton className="h-5 w-16 rounded-full" />
         <Skeleton className="h-4 w-12 rounded" />
@@ -46,7 +46,7 @@ function BiomarkerCardSkeleton() {
 /** Skeleton for the health score ring card */
 function HealthScoreSkeleton() {
   return (
-    <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 h-full">
+    <div className="bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 h-full">
       <Skeleton className="h-4 w-32 mb-4" />
       <div className="flex items-center gap-6">
         <Skeleton className="w-[120px] h-[120px] rounded-full flex-shrink-0" />
@@ -63,7 +63,7 @@ function HealthScoreSkeleton() {
 /** Skeleton for a card with a header and body text */
 function CardSkeleton({ rows = 4 }: { rows?: number }) {
   return (
-    <div className="bg-[#F5F4EF] border border-[#E8E6DF] rounded-[18px] p-6">
+    <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[18px] p-6">
       <Skeleton className="h-5 w-40 mb-2" />
       <Skeleton className="h-3 w-24 mb-5" />
       <SkeletonText lines={rows} />

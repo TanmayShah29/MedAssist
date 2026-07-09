@@ -187,8 +187,8 @@ export default function PlanPage() {
             <section className="app-panel p-5 stagger-fade">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Add action</p>
-                  <h2 className="mt-1 text-xl font-bold text-[#1C1917]">What should this plan help you remember?</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Add action</p>
+                  <h2 className="mt-1 text-xl font-bold text-[#0F172A]">What should this plan help you remember?</h2>
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
@@ -219,15 +219,15 @@ export default function PlanPage() {
             <section className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Doctor prep</p>
-                  <h2 className="text-xl font-bold text-[#1C1917]">Questions and visit tasks</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Doctor prep</p>
+                  <h2 className="text-xl font-bold text-[#0F172A]">Questions and visit tasks</h2>
                 </div>
                 <span className="rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 transition-transform duration-200 hover:scale-105">
                   {doctorItems.length} items
                 </span>
               </div>
               {loading ? (
-                <div className="app-panel p-5 text-sm text-[#57534E]">Loading your plan...</div>
+                <div className="app-panel p-5 text-sm text-[#475569]">Loading your plan...</div>
               ) : doctorItems.length ? (
                 doctorItems.map((item, idx) => (
                   <div key={item.id} className="stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
@@ -249,8 +249,8 @@ export default function PlanPage() {
 
             <section className="space-y-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Track next</p>
-                <h2 className="text-xl font-bold text-[#1C1917]">Monitoring, lifestyle, and retest reminders</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Track next</p>
+                <h2 className="text-xl font-bold text-[#0F172A]">Monitoring, lifestyle, and retest reminders</h2>
               </div>
               {trackingItems.length ? (
                 trackingItems.map((item, idx) => (
@@ -299,7 +299,7 @@ export default function PlanPage() {
             <section className="app-panel p-5 stagger-fade">
               <div className="mb-4 flex items-center gap-2">
                 <Stethoscope className="h-4 w-4 text-sky-500" />
-                <h2 className="text-base font-bold text-[#1C1917]">Health timeline</h2>
+                <h2 className="text-base font-bold text-[#0F172A]">Health timeline</h2>
               </div>
               {timeline.length ? (
                 timeline.slice(0, 7).map((event, idx) => (
@@ -313,7 +313,7 @@ export default function PlanPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm leading-relaxed text-[#57534E]">
+                <p className="text-sm leading-relaxed text-[#475569]">
                   Upload reports, add actions, and export prep packs to build your longitudinal record.
                 </p>
               )}

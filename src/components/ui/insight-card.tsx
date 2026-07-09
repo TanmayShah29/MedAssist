@@ -3,7 +3,7 @@ import { ArrowRight, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const toneClasses = {
-  neutral: "border-[#E8E6DF] bg-white",
+  neutral: "border-[#EBEAE4] bg-white",
   info: "border-sky-100 bg-sky-50/70",
   success: "border-emerald-100 bg-emerald-50/70",
   warning: "border-amber-100 bg-amber-50/70",
@@ -49,13 +49,13 @@ export function InsightCard({
         </div>
         <div className="min-w-0 grow">
           {eyebrow && (
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">
               {eyebrow}
             </p>
           )}
-          <h3 className="text-[15px] font-bold leading-tight text-[#1C1917] text-wrap-safe">{title}</h3>
+          <h3 className="text-[15px] font-bold leading-tight text-[#0F172A] text-wrap-safe">{title}</h3>
           {description && (
-            <div className="mt-1.5 text-[13px] leading-relaxed text-[#57534E] text-wrap-safe">
+            <div className="mt-1.5 text-[13px] leading-relaxed text-[#475569] text-wrap-safe">
               {description}
             </div>
           )}

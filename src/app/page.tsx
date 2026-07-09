@@ -62,8 +62,8 @@ function HeroWorkflowScene() {
             <Upload className="h-4 w-4 text-sky-500" />
           </div>
           <div className="rounded-[12px] border border-dashed border-sky-200 bg-sky-50/60 p-3.5">
-            <p className="text-sm font-bold text-[#1C1917]">Blood work PDF</p>
-            <p className="mt-1 text-xs text-[#78716C]">CBC, CMP, lipids, A1C</p>
+            <p className="text-sm font-bold text-[#0F172A]">Blood work PDF</p>
+            <p className="mt-1 text-xs text-[#94A3B8]">CBC, CMP, lipids, A1C</p>
           </div>
         </motion.div>
 
@@ -107,8 +107,8 @@ function HeroWorkflowScene() {
             <p className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700">Ready</p>
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </div>
-          <p className="text-sm font-bold text-[#1C1917]">3 doctor questions drafted</p>
-          <p className="mt-2 text-xs leading-relaxed text-[#57534E]">A focused one-page brief for the appointment.</p>
+          <p className="text-sm font-bold text-[#0F172A]">3 doctor questions drafted</p>
+          <p className="mt-2 text-xs leading-relaxed text-[#475569]">A focused one-page brief for the appointment.</p>
         </motion.div>
       </div>
     </motion.div>
@@ -121,13 +121,13 @@ function MobileHeroPreview() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, duration: 0.5 }}
-      className="mt-8 rounded-[16px] border border-[#E8E6DF] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden"
+      className="mt-8 rounded-[16px] border border-[#EBEAE4] bg-white/82 p-4 shadow-xl shadow-stone-900/5 lg:hidden"
     >
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">Live preview</p>
         <Brain className="h-4 w-4 text-violet-500" />
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E8E6DF]">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#EBEAE4]">
         <motion.div 
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
@@ -138,11 +138,11 @@ function MobileHeroPreview() {
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-[12px] bg-amber-50 p-3">
           <p className="text-[10px] font-bold uppercase text-amber-700">Discuss</p>
-          <p className="mt-1 text-sm font-bold text-[#1C1917]">Glucose +15%</p>
+          <p className="mt-1 text-sm font-bold text-[#0F172A]">Glucose +15%</p>
         </div>
         <div className="rounded-[12px] bg-emerald-50 p-3">
           <p className="text-[10px] font-bold uppercase text-emerald-700">Ready</p>
-          <p className="mt-1 text-sm font-bold text-[#1C1917]">3 questions</p>
+          <p className="mt-1 text-sm font-bold text-[#0F172A]">3 questions</p>
         </div>
       </div>
     </motion.div>
@@ -162,16 +162,16 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   return (
-    <div ref={containerRef} className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
+    <div ref={containerRef} className="min-h-[100dvh] bg-[#FDFDFB] font-sans">
 
       <LandingHeader />
 
       {/* ── HERO ── */}
       <section className="relative min-h-[100dvh] px-4 pb-10 pt-20 sm:px-6 sm:pt-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FAFAF7_46%,#EAF8FF_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,#FCFCF9_0%,#FDFDFB_46%,#EAF8FF_100%)]" />
         <div className="absolute inset-0 opacity-[0.28] landing-grid-drift" />
         <div className="absolute left-0 right-0 top-16 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent landing-pulse-line" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAFAF7] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FDFDFB] to-transparent" />
 
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity }}
@@ -189,7 +189,7 @@ export default function LandingPage() {
               </Pill>
             </motion.div>
 
-            <motion.h1 variants={fadeInUp} className="font-display text-[42px] sm:text-6xl lg:text-[68px] xl:text-[74px] text-[#1C1917] leading-[0.98] mb-5 max-w-full text-balance">
+            <motion.h1 variants={fadeInUp} className="font-display text-[42px] sm:text-6xl lg:text-[68px] xl:text-[74px] text-[#0F172A] leading-[0.98] mb-5 max-w-full text-balance">
               Lab reports, translated into doctor-ready{" "}
               <span className="relative inline-block">
                 clarity.
@@ -202,7 +202,7 @@ export default function LandingPage() {
               </span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="text-[16px] sm:text-[17px] text-[#57534E] leading-relaxed mb-7 max-w-2xl mx-auto overflow-wrap-anywhere">
+            <motion.p variants={fadeInUp} className="text-[16px] sm:text-[17px] text-[#475569] leading-relaxed mb-7 max-w-2xl mx-auto overflow-wrap-anywhere">
               Upload a blood work PDF. MedAssist explains what changed, prioritizes what matters, and creates a one-page appointment brief with questions you can bring to your doctor.
             </motion.p>
 
@@ -216,7 +216,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/auth?mode=signup"
-                className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#1C1917] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#E8E6DF] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
+                className="flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center justify-center gap-2 text-[#0F172A] px-7 py-3.5 rounded-[12px] text-[15px] font-bold border-2 border-[#EBEAE4] hover:border-sky-300 hover:bg-sky-50/50 transition-all active:scale-95"
               >
                 Create free account
               </Link>
@@ -229,7 +229,7 @@ export default function LandingPage() {
                 { icon: Shield, label: "No report training" },
                 { icon: CheckCircle2, label: "Export your data" },
               ].map(t => (
-                <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#57534E] bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-full shadow-sm">
+                <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#475569] bg-white border border-[#EBEAE4] px-3 py-1.5 rounded-full shadow-sm">
                   <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                 </span>
               ))}
@@ -241,7 +241,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── STATS BAR (animated count-up) ── */}
-      <section className="py-10 border-y border-[#E8E6DF] bg-white relative z-10">
+      <section className="py-10 border-y border-[#EBEAE4] bg-white relative z-10">
         <div className="max-w-5xl mx-auto px-6">
           <StatsCounter />
         </div>
@@ -259,10 +259,10 @@ export default function LandingPage() {
             >
               <motion.div variants={fadeInUp}>
                 <Pill className="bg-red-50 border border-red-100 text-red-600 mb-6">Without MedAssist</Pill>
-                <h2 className="font-display text-4xl text-[#1C1917] mb-6">
+                <h2 className="font-display text-4xl text-[#0F172A] mb-6">
                   You get your results back.
                   <br />
-                  <span className="text-[#78716C]">Now what?</span>
+                  <span className="text-[#94A3B8]">Now what?</span>
                 </h2>
               </motion.div>
               <div className="space-y-3">
@@ -275,12 +275,12 @@ export default function LandingPage() {
                   <motion.div
                     key={i}
                     variants={fadeInUp}
-                    className="flex items-start gap-3 p-4 bg-white border-l-2 border-l-red-200 border border-[#E8E6DF] rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md"
+                    className="flex items-start gap-3 p-4 bg-white border-l-2 border-l-red-200 border border-[#EBEAE4] rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md"
                   >
                     <div className="w-5 h-5 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <div className="w-1.5 h-0.5 rounded-full bg-red-400" />
                     </div>
-                    <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
+                    <p className="text-[14px] text-[#475569] leading-relaxed">{p}</p>
                   </motion.div>
                 ))}
               </div>
@@ -294,7 +294,7 @@ export default function LandingPage() {
             >
               <motion.div variants={fadeInUp}>
                 <Pill className="bg-emerald-50 border border-emerald-100 text-emerald-700 mb-6">With MedAssist</Pill>
-                <h2 className="font-display text-4xl text-[#1C1917] mb-6">
+                <h2 className="font-display text-4xl text-[#0F172A] mb-6">
                   Instant clarity.
                   <br />
                   <span className="text-emerald-500">Plain English.</span>
@@ -313,7 +313,7 @@ export default function LandingPage() {
                     className="flex items-start gap-3 p-4 bg-white border-l-2 border-l-emerald-400 border border-emerald-100 rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md"
                   >
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-[14px] text-[#57534E] leading-relaxed">{p}</p>
+                    <p className="text-[14px] text-[#475569] leading-relaxed">{p}</p>
                   </motion.div>
                 ))}
               </div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how-it-works" className="py-24 px-6 bg-white border-y border-[#E8E6DF]">
+      <section id="how-it-works" className="py-24 px-6 bg-white border-y border-[#EBEAE4]">
         <div className="max-w-5xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -332,8 +332,8 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-4">How it works</Pill>
-            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">From PDF to appointment prep in 3 steps</h2>
-            <p className="text-lg text-[#57534E] max-w-xl mx-auto">No setup. No medical jargon. Just upload and walk in prepared.</p>
+            <h2 className="font-display text-4xl lg:text-5xl text-[#0F172A] mb-4">From PDF to appointment prep in 3 steps</h2>
+            <p className="text-lg text-[#475569] max-w-xl mx-auto">No setup. No medical jargon. Just upload and walk in prepared.</p>
           </motion.div>
 
           <motion.div 
@@ -387,12 +387,12 @@ export default function LandingPage() {
                   {item.icon}
                 </div>
                 <div className="absolute top-6 right-6 flex items-center justify-center">
-                  <span className="text-[11px] font-black text-[#D9D6CD] font-mono">{item.step}</span>
+                  <span className="text-[11px] font-black text-[#D1CFCD] font-mono">{item.step}</span>
                   <span className="absolute w-5 h-5 rounded-full bg-sky-400/15 animate-ping" />
                 </div>
-                <h3 className="text-[18px] font-bold text-[#1C1917] mb-3">{item.title}</h3>
-                <p className="text-[14px] text-[#57534E] leading-relaxed mb-4">{item.desc}</p>
-                <p className="text-[11px] font-bold text-[#78716C] uppercase tracking-wider">{item.detail}</p>
+                <h3 className="text-[18px] font-bold text-[#0F172A] mb-3">{item.title}</h3>
+                <p className="text-[14px] text-[#475569] leading-relaxed mb-4">{item.desc}</p>
+                <p className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider">{item.detail}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -408,9 +408,9 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Pill className="bg-[#F5F4EF] border border-[#E8E6DF] text-[#57534E] mb-4">Everything included</Pill>
-            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-4">Your complete clinical dashboard</h2>
-            <p className="text-lg text-[#57534E] max-w-xl mx-auto">One place for everything your health reports tell you.</p>
+            <Pill className="bg-[#FFFFFF] border border-[#EBEAE4] text-[#475569] mb-4">Everything included</Pill>
+            <h2 className="font-display text-4xl lg:text-5xl text-[#0F172A] mb-4">Your complete clinical dashboard</h2>
+            <p className="text-lg text-[#475569] max-w-xl mx-auto">One place for everything your health reports tell you.</p>
           </motion.div>
 
           <motion.div 
@@ -427,8 +427,8 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-sky-200 transition-all">
                 <ClipboardList className="w-6 h-6 text-sky-600" />
               </div>
-              <h3 className="text-[20px] font-bold text-[#1C1917] mb-2">Doctor Visit Prep</h3>
-              <p className="text-[14px] text-[#57534E] leading-relaxed mb-6 max-w-sm">A printable one-page brief with key results, notable changes, and appointment questions — personalised to your exact biomarkers.</p>
+              <h3 className="text-[20px] font-bold text-[#0F172A] mb-2">Doctor Visit Prep</h3>
+              <p className="text-[14px] text-[#475569] leading-relaxed mb-6 max-w-sm">A printable one-page brief with key results, notable changes, and appointment questions — personalised to your exact biomarkers.</p>
               {/* Mini visit brief preview */}
               <div className="bg-white/80 rounded-2xl border border-sky-100/80 p-4 shadow-sm backdrop-blur-sm max-w-sm">
                 <div className="flex items-center justify-between mb-3">
@@ -452,8 +452,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-200 transition-all">
                 <TrendingUp className="w-5 h-5 text-emerald-600" />
               </div>
-              <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">Trend Tracking</h3>
-              <p className="text-[13px] text-[#57534E] leading-relaxed">Charts and comparisons across every upload.</p>
+              <h3 className="text-[16px] font-bold text-[#0F172A] mb-2">Trend Tracking</h3>
+              <p className="text-[13px] text-[#475569] leading-relaxed">Charts and comparisons across every upload.</p>
               {/* Mini bar chart */}
               <div className="flex items-end gap-1 mt-5 h-10">
                 {[40, 60, 45, 75, 55, 90, 70].map((h, idx) => (
@@ -475,8 +475,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-violet-200 transition-all">
                 <Brain className="w-5 h-5 text-violet-600" />
               </div>
-              <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">AI Explanations</h3>
-              <p className="text-[13px] text-[#57534E] leading-relaxed">Every biomarker explained in plain English. No medical degree required.</p>
+              <h3 className="text-[16px] font-bold text-[#0F172A] mb-2">AI Explanations</h3>
+              <p className="text-[13px] text-[#475569] leading-relaxed">Every biomarker explained in plain English. No medical degree required.</p>
             </motion.div>
 
             {/* Streaming Assistant */}
@@ -485,8 +485,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-amber-200 transition-all">
                 <Sparkles className="w-5 h-5 text-amber-600" />
               </div>
-              <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">Streaming Assistant</h3>
-              <p className="text-[13px] text-[#57534E] leading-relaxed">Ask follow-up questions and see context-aware answers stream in real time.</p>
+              <h3 className="text-[16px] font-bold text-[#0F172A] mb-2">Streaming Assistant</h3>
+              <p className="text-[13px] text-[#475569] leading-relaxed">Ask follow-up questions and see context-aware answers stream in real time.</p>
             </motion.div>
 
             {/* Doctor Questions */}
@@ -495,8 +495,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-200 transition-all">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               </div>
-              <h3 className="text-[16px] font-bold text-[#1C1917] mb-2">Doctor Questions</h3>
-              <p className="text-[13px] text-[#57534E] leading-relaxed">AI-generated questions tailored to your results, ready to print and bring.</p>
+              <h3 className="text-[16px] font-bold text-[#0F172A] mb-2">Doctor Questions</h3>
+              <p className="text-[13px] text-[#475569] leading-relaxed">AI-generated questions tailored to your results, ready to print and bring.</p>
             </motion.div>
 
             {/* Health Memory — full width */}
@@ -507,8 +507,8 @@ export default function LandingPage() {
                   <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-indigo-200 transition-all">
                     <Shield className="w-6 h-6 text-indigo-600" />
                   </div>
-                  <h3 className="text-[18px] font-bold text-[#1C1917] mb-1">Health Memory</h3>
-                  <p className="text-[13px] text-[#57534E] leading-relaxed max-w-xs">Conversations and uploaded reports stay in context so answers get more personal over time.</p>
+                  <h3 className="text-[18px] font-bold text-[#0F172A] mb-1">Health Memory</h3>
+                  <p className="text-[13px] text-[#475569] leading-relaxed max-w-xs">Conversations and uploaded reports stay in context so answers get more personal over time.</p>
                 </div>
                 {/* Memory timeline strip */}
                 <div className="flex-1 flex items-center gap-3 overflow-x-auto scrollbar-hide pb-1">
@@ -519,16 +519,16 @@ export default function LandingPage() {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className={`flex-shrink-0 rounded-xl border px-4 py-3 transition-all ${item.active ? "bg-indigo-50 border-indigo-200 shadow-sm" : "bg-white/60 border-[#E8E6DF]"}`}
+                      className={`flex-shrink-0 rounded-xl border px-4 py-3 transition-all ${item.active ? "bg-indigo-50 border-indigo-200 shadow-sm" : "bg-white/60 border-[#EBEAE4]"}`}
                     >
                       <p className="text-[9px] font-black uppercase tracking-[0.12em] text-indigo-600 mb-1">{item.label}</p>
-                      <p className="text-[12px] font-semibold text-[#1C1917]">{item.status}</p>
+                      <p className="text-[12px] font-semibold text-[#0F172A]">{item.status}</p>
                     </div>
                   ))}
-                  <div className="flex-shrink-0 text-[#D9D6CD] text-lg">→</div>
+                  <div className="flex-shrink-0 text-[#D1CFCD] text-lg">→</div>
                   <div className="flex-shrink-0 rounded-xl border border-dashed border-sky-300 bg-sky-50/50 px-4 py-3">
                     <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-500 mb-1">Next Visit</p>
-                    <p className="text-[12px] font-semibold text-[#78716C]">
+                    <p className="text-[12px] font-semibold text-[#94A3B8]">
                       <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }}>_</motion.span>
                     </p>
                   </div>
@@ -611,7 +611,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── SECURITY ── */}
-      <section id="security" className="py-24 px-6 bg-white border-y border-[#E8E6DF]">
+      <section id="security" className="py-24 px-6 bg-white border-y border-[#EBEAE4]">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div 
@@ -622,12 +622,12 @@ export default function LandingPage() {
             >
               <motion.div variants={fadeInUp}>
                 <Pill className="bg-emerald-50 border border-emerald-100 text-emerald-700 mb-6">Privacy & Security</Pill>
-                <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-6">
+                <h2 className="font-display text-4xl lg:text-5xl text-[#0F172A] mb-6">
                   Your health data is
                   <br />
                   <span className="text-emerald-500">yours alone.</span>
                 </h2>
-                <p className="text-[#57534E] text-lg mb-10 leading-relaxed">
+                <p className="text-[#475569] text-lg mb-10 leading-relaxed">
                   We built MedAssist with the assumption that health data is the most sensitive data there is. Every decision reflects that.
                 </p>
               </motion.div>
@@ -643,8 +643,8 @@ export default function LandingPage() {
                       <Icon className={`w-5 h-5 ${color.split(" ")[0]}`} />
                     </div>
                     <div>
-                      <h4 className="text-[15px] font-bold text-[#1C1917] mb-1">{title}</h4>
-                      <p className="text-[13px] text-[#57534E] leading-relaxed">{desc}</p>
+                      <h4 className="text-[15px] font-bold text-[#0F172A] mb-1">{title}</h4>
+                      <p className="text-[13px] text-[#475569] leading-relaxed">{desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -703,8 +703,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
           >
             <Pill className="bg-sky-50 border border-sky-200 text-sky-700 mb-6">Track over time</Pill>
-            <h2 className="font-display text-4xl lg:text-5xl text-[#1C1917] mb-5">Consistency builds clarity</h2>
-            <p className="text-lg text-[#57534E] max-w-xl mx-auto mb-14 leading-relaxed">
+            <h2 className="font-display text-4xl lg:text-5xl text-[#0F172A] mb-5">Consistency builds clarity</h2>
+            <p className="text-lg text-[#475569] max-w-xl mx-auto mb-14 leading-relaxed">
               One report tells you where you are. A timeline tells you where you&apos;re going.
             </p>
           </motion.div>
@@ -728,13 +728,13 @@ export default function LandingPage() {
                 key={s.n}
                 variants={fadeInUp}
                 whileHover={{ y: -5 }}
-                className="bg-white border border-[#E8E6DF] rounded-[20px] overflow-hidden text-center shadow-sm"
+                className="bg-white border border-[#EBEAE4] rounded-[20px] overflow-hidden text-center shadow-sm"
               >
                 <div className={`h-[3px] w-full ${s.colorTop}`} />
                 <div className="p-7">
                   <div className={`inline-block text-[11px] font-black px-3 py-1 rounded-full ${s.colorPill} mb-5 uppercase tracking-wider`}>{s.n}</div>
-                  <h3 className="text-[17px] font-bold text-[#1C1917] mb-3">{s.title}</h3>
-                  <p className="text-[13px] text-[#57534E] leading-relaxed">{s.desc}</p>
+                  <h3 className="text-[17px] font-bold text-[#0F172A] mb-3">{s.title}</h3>
+                  <p className="text-[13px] text-[#475569] leading-relaxed">{s.desc}</p>
                 </div>
               </motion.div>
             ))}

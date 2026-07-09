@@ -128,7 +128,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Completion card */}
-            <div className="rounded-[14px] border border-[#BAE6FD] bg-[#E0F2FE]/75 p-6">
+            <div className="rounded-[14px] border border-[#BAE6FD] bg-[#F0F9FF]/75 p-6">
                 <div className="flex items-start gap-4">
                     <div className="p-3 bg-sky-100 rounded-lg text-sky-600">
                         <FileText size={24} />
@@ -154,7 +154,7 @@ export default function ProfilePage() {
                     {/* Personal Information */}
                     <div className="app-panel p-5 flex flex-col">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-                            <p className="text-base font-semibold text-[#1C1917]">
+                            <p className="text-base font-semibold text-[#0F172A]">
                                 Personal Information
                             </p>
                             <button
@@ -167,25 +167,25 @@ export default function ProfilePage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">First Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">First Name</label>
                                 <input
                                     type="text"
                                     value={profile?.first_name || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, first_name: e.target.value } : null)}
-                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                    className="w-full text-sm font-medium text-[#0F172A] bg-white border border-[#EBEAE4] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Last Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Last Name</label>
                                 <input
                                     type="text"
                                     value={profile?.last_name || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, last_name: e.target.value } : null)}
-                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                    className="w-full text-sm font-medium text-[#0F172A] bg-white border border-[#EBEAE4] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Age</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Age</label>
                                 <input
                                     type="number"
                                     value={profile?.age || ''}
@@ -193,15 +193,15 @@ export default function ProfilePage() {
                                         const nextAge = e.target.value === '' ? undefined : parseInt(e.target.value, 10);
                                         setProfile(prev => prev ? { ...prev, age: Number.isFinite(nextAge) ? nextAge : undefined } : null);
                                     }}
-                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                    className="w-full text-sm font-medium text-[#0F172A] bg-white border border-[#EBEAE4] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Sex</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Sex</label>
                                 <select
                                     value={profile?.sex || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, sex: e.target.value } : null)}
-                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                    className="w-full text-sm font-medium text-[#0F172A] bg-white border border-[#EBEAE4] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 >
                                     <option value="">Select...</option>
                                     <option value="male">Male</option>
@@ -210,13 +210,13 @@ export default function ProfilePage() {
                                 </select>
                             </div>
                             <div className="sm:col-span-1">
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] block mb-1">Blood Type</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Blood Type</label>
                                 <input
                                     type="text"
                                     value={profile?.blood_type || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, blood_type: e.target.value } : null)}
                                     placeholder="e.g. O+, A-"
-                                    className="w-full text-sm font-medium text-[#1C1917] bg-white border border-[#E8E6DF] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                    className="w-full text-sm font-medium text-[#0F172A] bg-white border border-[#EBEAE4] rounded-[10px] px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -225,33 +225,33 @@ export default function ProfilePage() {
                     {/* Report List */}
                     <div className="app-panel p-5 flex flex-col grow shrink basis-0">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-                            <p className="text-base font-semibold text-[#1C1917]">
+                            <p className="text-base font-semibold text-[#0F172A]">
                                 Uploaded Reports
                             </p>
                             <button
                                 onClick={() => router.push('/dashboard?openUpload=1')}
-                                className="min-h-[44px] rounded-[8px] border border-[#E8E6DF] bg-white px-3 py-2 text-xs font-semibold text-sky-500 transition-colors hover:border-sky-200 hover:text-sky-600 sm:min-h-[36px]"
+                                className="min-h-[44px] rounded-[8px] border border-[#EBEAE4] bg-white px-3 py-2 text-xs font-semibold text-sky-500 transition-colors hover:border-sky-200 hover:text-sky-600 sm:min-h-[36px]"
                             >
                                 + Upload new
                             </button>
                         </div>
                         <div className="space-y-2.5">
                             {reports.length > 0 ? reports.map(report => (
-                                <div key={report.id} className="flex items-center gap-3 p-3 bg-[#FAFAF7] rounded-[10px] border border-[#E8E6DF] transition-colors hover:bg-white group cursor-pointer" onClick={() => router.push('/results')}>
+                                <div key={report.id} className="flex items-center gap-3 p-3 bg-[#FDFDFB] rounded-[10px] border border-[#EBEAE4] transition-colors hover:bg-white group cursor-pointer" onClick={() => router.push('/results')}>
                                     <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-500 transition-colors">
                                         <FileText className="w-4 h-4 text-sky-500 group-hover:text-white transition-colors" />
                                     </div>
                                     <div className="grow shrink basis-0 min-w-0">
-                                        <p className="text-sm font-medium text-[#1C1917] truncate">
+                                        <p className="text-sm font-medium text-[#0F172A] truncate">
                                             {report.summary || 'Blood Panel Report'}
                                         </p>
-                                        <p className="text-xs text-[#78716C] mt-0.5">
+                                        <p className="text-xs text-[#94A3B8] mt-0.5">
                                             {new Date(report.uploaded_at).toLocaleDateString(undefined, {
                                                 year: 'numeric', month: 'short', day: 'numeric'
                                             })}
                                         </p>
                                     </div>
-                                    <div className="hidden text-xs text-[#78716C] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
+                                    <div className="hidden text-xs text-[#94A3B8] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
                                         View Details
                                         <ChevronRight size={14} />
                                     </div>
@@ -261,16 +261,16 @@ export default function ProfilePage() {
                                             handleDeleteReport(report.id);
                                         }}
                                         aria-label="Delete report"
-                                        className="p-2 text-[#78716C] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                        className="p-2 text-[#94A3B8] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                         title="Delete report"
                                     >
                                         <Trash2 size={14} />
                                     </button>
                                 </div>
                             )) : (
-                                <div className="text-center py-6 bg-white border border-[#E8E6DF] border-dashed rounded-[10px]">
+                                <div className="text-center py-6 bg-white border border-[#EBEAE4] border-dashed rounded-[10px]">
                                     <FileText className="w-6 h-6 text-[#D6D3C9] mx-auto mb-2" />
-                                    <p className="text-sm text-[#78716C] font-medium">No reports uploaded yet.</p>
+                                    <p className="text-sm text-[#94A3B8] font-medium">No reports uploaded yet.</p>
                                 </div>
                             )}
                         </div>
@@ -282,7 +282,7 @@ export default function ProfilePage() {
                     {/* Health Summary - Only showing real symptoms */}
                     <div className="app-panel p-5 flex flex-col grow shrink basis-0">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-                            <p className="text-base font-semibold text-[#1C1917]">
+                            <p className="text-base font-semibold text-[#0F172A]">
                                 Health Context
                             </p>
                             <button
@@ -295,23 +295,23 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-2">
                                     Reported Symptoms
                                 </p>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {symptoms.length > 0 ? symptoms.map(s => (
-                                        <span key={s} className="min-w-0 text-xs font-medium bg-white border border-[#E8E6DF] px-3 py-1.5 rounded-[8px] text-[#57534E] shadow-sm flex items-center gap-2 group">
+                                        <span key={s} className="min-w-0 text-xs font-medium bg-white border border-[#EBEAE4] px-3 py-1.5 rounded-[8px] text-[#475569] shadow-sm flex items-center gap-2 group">
                                             {s}
-                                            <button onClick={() => handleToggleSymptom(s)} aria-label={`Remove ${s}`} className="text-[#78716C] hover:text-red-500 transition-colors">
+                                            <button onClick={() => handleToggleSymptom(s)} aria-label={`Remove ${s}`} className="text-[#94A3B8] hover:text-red-500 transition-colors">
                                                 <X size={12} />
                                             </button>
                                         </span>
                                     )) : (
-                                        <p className="text-sm text-[#78716C] italic">No symptoms selected.</p>
+                                        <p className="text-sm text-[#94A3B8] italic">No symptoms selected.</p>
                                     )}
                                 </div>
 
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#78716C] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-2">
                                     Quick Add
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -323,7 +323,7 @@ export default function ProfilePage() {
                                                 "min-h-[36px] text-xs px-2.5 py-1 rounded-md border transition-all",
                                                 symptoms.includes(opt.label)
                                                     ? "bg-sky-500 text-white border-sky-500"
-                                                    : "bg-white text-[#57534E] border-[#E8E6DF] hover:border-sky-300"
+                                                    : "bg-white text-[#475569] border-[#EBEAE4] hover:border-sky-300"
                                             )}
                                         >
                                             {opt.label}

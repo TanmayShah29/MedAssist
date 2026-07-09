@@ -254,8 +254,8 @@ export function StepUpload() {
             <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-6">
                 <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">Step 1 of 4</p>
-                    <h2 className="font-display text-3xl text-[#1C1917] mb-2">Enter lab values manually</h2>
-                    <p className="text-[#57534E] text-sm leading-relaxed">
+                    <h2 className="font-display text-3xl text-[#0F172A] mb-2">Enter lab values manually</h2>
+                    <p className="text-[#475569] text-sm leading-relaxed">
                         Add the values you want help interpreting. Start with the abnormal or confusing ones if you do not want to enter the whole report.
                     </p>
                 </div>
@@ -267,13 +267,13 @@ export function StepUpload() {
                                 placeholder="Name (e.g. Glucose)"
                                 value={row.name}
                                 onChange={(e) => updateManualRow(row.id, "name", e.target.value)}
-                                className="min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                className="min-w-0 rounded-lg border border-[#EBEAE4] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                             />
                             <div className="w-full">
                                 <select
                                     value={row.unit}
                                     onChange={(e) => updateManualRow(row.id, "unit", e.target.value)}
-                                    className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
+                                    className="w-full rounded-lg border border-[#EBEAE4] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
                                 >
                                     <option value="" disabled>Unit</option>
                                     {COMMON_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -283,7 +283,7 @@ export function StepUpload() {
                                 aria-label="Remove value"
                                 type="button"
                                 onClick={() => removeManualRow(row.id)}
-                                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#78716C] transition-colors hover:bg-red-50 hover:text-red-600"
+                                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#94A3B8] transition-colors hover:bg-red-50 hover:text-red-600"
                             >
                                 <Trash2 size={18} />
                             </button>
@@ -301,7 +301,7 @@ export function StepUpload() {
                 <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                     <button
                         onClick={() => setShowManualEntry(false)}
-                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-sm font-medium text-[#57534E] hover:bg-[#E8E6DF] transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-sm font-medium text-[#475569] hover:bg-[#EBEAE4] transition-colors"
                     >
                         <ChevronLeft className="w-4 h-4" />
                         Back
@@ -310,7 +310,7 @@ export function StepUpload() {
                         {isManualSubmitting && (
                             <button
                                 onClick={handleCancelManual}
-                                className="text-sm font-medium text-[#78716C] hover:text-red-500 transition-colors"
+                                className="text-sm font-medium text-[#94A3B8] hover:text-red-500 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -322,7 +322,7 @@ export function StepUpload() {
                             className={cn(
                                 "flex items-center gap-2 px-6 py-3 rounded-[10px] text-sm font-semibold transition-all",
                                 isManualSubmitting
-                                    ? "bg-[#E8E6DF] text-[#78716C] cursor-wait"
+                                    ? "bg-[#EBEAE4] text-[#94A3B8] cursor-wait"
                                     : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
                             )}
                         >
@@ -351,10 +351,10 @@ export function StepUpload() {
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">
                         Step 1 of 4
                     </p>
-                    <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                    <h2 className="font-display text-3xl text-[#0F172A] mb-2">
                         Upload your lab report
                     </h2>
-                    <p className="text-[#57534E] text-sm leading-relaxed">
+                    <p className="text-[#475569] text-sm leading-relaxed">
                         The fastest path is a digital PDF. If your report is scanned or you do not have it yet, you still have a route forward.
                     </p>
                 </div>
@@ -363,15 +363,15 @@ export function StepUpload() {
                     {/* Option 1 — Upload now */}
                     <div
                         onClick={() => setShowOptions(false)}
-                        className="bg-[#F5F4EF] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-500 group"
+                        className="bg-[#FFFFFF] border-2 border-[#EBEAE4] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-500 group"
                     >
                         <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-[#78716C] group-hover:text-sky-500 transition-colors" />
+                            <FileText className="w-8 h-8 text-[#94A3B8] group-hover:text-sky-500 transition-colors" />
                         </div>
-                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-sky-600 transition-colors">
+                        <h3 className="text-[16px] font-semibold text-[#0F172A] mb-2 group-hover:text-sky-600 transition-colors">
                             Upload my report now
                         </h3>
-                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                        <p className="text-[13px] text-[#475569] mb-4 leading-relaxed">
                             Best for digital reports. Takes about 20-40 seconds after upload.
                         </p>
                         <span className="inline-block bg-sky-500 text-white rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-600 transition-colors shadow-sm shadow-sky-500/20">
@@ -387,10 +387,10 @@ export function StepUpload() {
                         <div className="flex justify-center mb-3">
                             <PenLine className="w-8 h-8 text-sky-500 group-hover:text-sky-600 transition-colors" />
                         </div>
-                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-sky-600 transition-colors">
+                        <h3 className="text-[16px] font-semibold text-[#0F172A] mb-2 group-hover:text-sky-600 transition-colors">
                             Enter values manually
                         </h3>
-                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                        <p className="text-[13px] text-[#475569] mb-4 leading-relaxed">
                             Best for screenshots, scanned PDFs, or a few values from a portal.
                         </p>
                         <span className="inline-block bg-sky-100 text-sky-700 rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-sky-200 transition-colors">
@@ -401,19 +401,19 @@ export function StepUpload() {
                     {/* Option 3 — Not yet */}
                     <div
                         onClick={handleSkip}
-                        className="bg-[#FAFAF7] border-2 border-[#E8E6DF] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D9D6CD] group sm:col-span-2"
+                        className="bg-[#FDFDFB] border-2 border-[#EBEAE4] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D1CFCD] group sm:col-span-2"
                     >
                         <div className="flex justify-center mb-3">
-                            <Calendar className="w-8 h-8 text-[#78716C] group-hover:text-[#57534E] transition-colors" />
+                            <Calendar className="w-8 h-8 text-[#94A3B8] group-hover:text-[#475569] transition-colors" />
                         </div>
-                        <h3 className="text-[16px] font-semibold text-[#1C1917] mb-2 group-hover:text-[#57534E] transition-colors">
+                        <h3 className="text-[16px] font-semibold text-[#0F172A] mb-2 group-hover:text-[#475569] transition-colors">
                             I don&apos;t have one yet
                         </h3>
-                        <p className="text-[13px] text-[#57534E] mb-4 leading-relaxed">
+                        <p className="text-[13px] text-[#475569] mb-4 leading-relaxed">
                             Finish setup now. The dashboard will prompt you to upload later.
                         </p>
                         <span 
-                            className="inline-block bg-[#F5F4EF] text-[#57534E] border border-[#E8E6DF] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#E8E6DF] transition-colors"
+                            className="inline-block bg-[#FFFFFF] text-[#475569] border border-[#EBEAE4] rounded-[8px] px-4 py-1.5 text-[13px] font-semibold group-hover:bg-[#EBEAE4] transition-colors"
                         >
                             Continue without report
                         </span>
@@ -425,8 +425,8 @@ export function StepUpload() {
                     <button
                         onClick={() => setStep(2)}
                         className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px]
-                         text-sm font-medium text-[#57534E] 
-                         hover:bg-[#E8E6DF] transition-colors"
+                         text-sm font-medium text-[#475569] 
+                         hover:bg-[#EBEAE4] transition-colors"
                     >
                         <ChevronLeft className="w-4 h-4" />
                         Back
@@ -444,10 +444,10 @@ export function StepUpload() {
                       text-sky-500 mb-2">
                     Step 1 of 4
                 </p>
-                <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                <h2 className="font-display text-3xl text-[#0F172A] mb-2">
                     Upload your lab report
                 </h2>
-                <p className="text-[#57534E] text-sm leading-relaxed">
+                <p className="text-[#475569] text-sm leading-relaxed">
                     We will read the PDF, show you the extracted values for review, then build your prep dashboard.
                 </p>
             </div>
@@ -464,7 +464,7 @@ export function StepUpload() {
                         "flex flex-col items-center justify-center cursor-pointer transition-all",
                         isDragging
                             ? "border-sky-500 bg-sky-50"
-                            : "border-[#E8E6DF] bg-[#F5F4EF] hover:border-sky-300 hover:bg-[#F0F9FF]"
+                            : "border-[#EBEAE4] bg-[#FFFFFF] hover:border-sky-300 hover:bg-[#F0F9FF]"
                     )}
                 >
                     <input
@@ -478,10 +478,10 @@ export function StepUpload() {
                           shadow-sm flex items-center justify-center mb-4">
                         <Upload className="w-5 h-5 text-sky-500" />
                     </div>
-                    <p className="text-sm font-semibold text-[#1C1917] mb-1">
+                    <p className="text-sm font-semibold text-[#0F172A] mb-1">
                         Click to upload or drag & drop
                     </p>
-                    <p className="text-xs text-[#78716C] mb-4">
+                    <p className="text-xs text-[#94A3B8] mb-4">
                         PDF up to 10MB
                     </p>
                     <a
@@ -497,7 +497,7 @@ export function StepUpload() {
                 <motion.div
                     initial={{ opacity: 0.01, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white border border-[#E8E6DF] rounded-[16px] p-4 
+                    className="bg-white border border-[#EBEAE4] rounded-[16px] p-4 
                      flex items-center gap-4 relative shadow-sm"
                 >
                     <div className="w-12 h-12 rounded-[12px] bg-emerald-50 
@@ -505,10 +505,10 @@ export function StepUpload() {
                         <FileText className="w-6 h-6 text-emerald-500" />
                     </div>
                     <div className="grow shrink basis-0 min-w-0">
-                        <p className="text-sm font-semibold text-[#1C1917] truncate">
+                        <p className="text-sm font-semibold text-[#0F172A] truncate">
                             {uploadedFile.name}
                         </p>
-                        <p className="text-xs text-[#78716C]">
+                        <p className="text-xs text-[#94A3B8]">
                             {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • Ready to analyze
                         </p>
                     </div>
@@ -519,7 +519,7 @@ export function StepUpload() {
                         }}
                         className="p-2 hover:bg-slate-50 rounded-full transition-colors"
                     >
-                        <X className="w-4 h-4 text-[#78716C]" />
+                        <X className="w-4 h-4 text-[#94A3B8]" />
                     </button>
                 </motion.div>
             )}
@@ -529,16 +529,16 @@ export function StepUpload() {
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 8,
-                background: '#F5F4EF',
-                border: '1px solid #E8E6DF',
+                background: '#FFFFFF',
+                border: '1px solid #EBEAE4',
                 borderRadius: 10,
                 padding: '12px 16px',
                 marginTop: 16
             }}>
-                <Lock size={14} color="#78716C" style={{ marginTop: 2, flexShrink: 0 }} />
+                <Lock size={14} color="#94A3B8" style={{ marginTop: 2, flexShrink: 0 }} />
                 <p style={{
                     fontSize: 12,
-                    color: '#78716C',
+                    color: '#94A3B8',
                     margin: 0,
                     lineHeight: 1.6
                 }}>
@@ -553,8 +553,8 @@ export function StepUpload() {
                 <button
                     onClick={() => setShowOptions(true)}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px]
-                     text-sm font-medium text-[#57534E] 
-                     hover:bg-[#E8E6DF] transition-colors"
+                     text-sm font-medium text-[#475569] 
+                     hover:bg-[#EBEAE4] transition-colors"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     Back
@@ -574,7 +574,7 @@ export function StepUpload() {
                         "text-sm font-semibold transition-all",
                         uploadedFile
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#E8E6DF] text-[#78716C] cursor-not-allowed"
+                            : "bg-[#EBEAE4] text-[#94A3B8] cursor-not-allowed"
                     )}
                 >
                     Review extracted values

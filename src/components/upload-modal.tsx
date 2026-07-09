@@ -368,13 +368,13 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                         exit={{ opacity: 0.01, scale: 0.95, y: 20 }}
                         className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-2rem)] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto px-4"
                     >
-                        <div className="bg-[#FAFAF7] rounded-[24px] shadow-2xl overflow-hidden border border-[#E8E6DF]">
-                            <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b border-[#E8E6DF] bg-white">
+                        <div className="bg-[#FDFDFB] rounded-[24px] shadow-2xl overflow-hidden border border-[#EBEAE4]">
+                            <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b border-[#EBEAE4] bg-white">
                                 <div>
-                                    <h2 className="text-xl font-bold font-display text-[#1C1917]">
+                                    <h2 className="text-xl font-bold font-display text-[#0F172A]">
                                         Add results for visit prep
                                     </h2>
-                                    <p className="mt-1 text-xs leading-relaxed text-[#57534E]">
+                                    <p className="mt-1 text-xs leading-relaxed text-[#475569]">
                                         Add results, include symptoms if useful, then review your new prep sheet.
                                     </p>
                                 </div>
@@ -387,7 +387,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                             }
                                             onClose();
                                         }}
-                                        className="p-2 hover:bg-[#F5F4EF] rounded-full transition-colors text-[#78716C] hover:text-[#1C1917]"
+                                        className="p-2 hover:bg-[#FFFFFF] rounded-full transition-colors text-[#94A3B8] hover:text-[#0F172A]"
                                         aria-label="Close"
                                     >
                                         <X size={20} />
@@ -395,7 +395,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-3 border-b border-[#E8E6DF] bg-[#FAFAF7] px-5 py-3 text-center sm:px-6">
+                            <div className="grid grid-cols-3 border-b border-[#EBEAE4] bg-[#FDFDFB] px-5 py-3 text-center sm:px-6">
                                 {[
                                     ["1", "Add results"],
                                     ["2", "AI explains"],
@@ -405,7 +405,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-50 text-[10px] font-bold text-sky-600 ring-1 ring-sky-100">
                                             {num}
                                         </span>
-                                        <span className="hidden text-[11px] font-semibold text-[#57534E] sm:inline">
+                                        <span className="hidden text-[11px] font-semibold text-[#475569] sm:inline">
                                             {label}
                                         </span>
                                     </div>
@@ -413,7 +413,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                             </div>
 
                             {/* Tabs: Upload PDF | Enter manually */}
-                            <div className="flex border-b border-[#E8E6DF] bg-white">
+                            <div className="flex border-b border-[#EBEAE4] bg-white">
                                 <button
                                     type="button"
                                     onClick={() => { setTab('upload'); setError(null); setErrorCode(null); }}
@@ -421,7 +421,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         'grow shrink basis-0 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
                                         tab === 'upload'
                                             ? 'text-sky-600 border-b-2 border-sky-500 bg-sky-50/50'
-                                            : 'text-[#57534E] hover:bg-[#F5F4EF]'
+                                            : 'text-[#475569] hover:bg-[#FFFFFF]'
                                     )}
                                 >
                                     <Upload size={18} />
@@ -434,7 +434,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                         'grow shrink basis-0 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors',
                                         tab === 'manual'
                                             ? 'text-sky-600 border-b-2 border-sky-500 bg-sky-50/50'
-                                            : 'text-[#57534E] hover:bg-[#F5F4EF]'
+                                            : 'text-[#475569] hover:bg-[#FFFFFF]'
                                     )}
                                 >
                                     <PenLine size={18} />
@@ -443,9 +443,9 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                             </div>
 
                             {/* Symptoms section common to both tabs */}
-                            <div className="px-5 pt-5 pb-2 sm:px-6 sm:pt-6 border-b border-[#E8E6DF] bg-white">
-                                <p className="text-sm font-semibold text-[#1C1917] mb-1">Any current symptoms? <span className="font-normal text-[#78716C]">(optional)</span></p>
-                                <p className="mb-3 text-xs leading-relaxed text-[#57534E]">Symptoms help the prep sheet suggest more specific doctor questions.</p>
+                            <div className="px-5 pt-5 pb-2 sm:px-6 sm:pt-6 border-b border-[#EBEAE4] bg-white">
+                                <p className="text-sm font-semibold text-[#0F172A] mb-1">Any current symptoms? <span className="font-normal text-[#94A3B8]">(optional)</span></p>
+                                <p className="mb-3 text-xs leading-relaxed text-[#475569]">Symptoms help the prep sheet suggest more specific doctor questions.</p>
                                 <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto pr-2 pb-2">
                                     {COMMON_SYMPTOMS.map((symptom) => {
                                         const isSelected = selectedSymptoms.includes(symptom);
@@ -464,7 +464,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     "px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors border",
                                                     isSelected
                                                         ? "bg-sky-100 border-sky-300 text-sky-800"
-                                                        : "bg-white border-[#E8E6DF] text-[#57534E] hover:bg-[#F5F4EF]"
+                                                        : "bg-white border-[#EBEAE4] text-[#475569] hover:bg-[#FFFFFF]"
                                                 )}
                                             >
                                                 {symptom}
@@ -523,7 +523,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 onClick={() => document.getElementById('modal-file-upload')?.click()}
                                                 className={cn(
                                                     "border-2 border-dashed rounded-[20px] p-6 sm:p-10 text-center transition-all cursor-pointer relative overflow-hidden group bg-white",
-                                                    isDragging ? "border-sky-500 bg-sky-50/50" : "border-[#D9D6CD] hover:border-sky-400 hover:bg-sky-50/30"
+                                                    isDragging ? "border-sky-500 bg-sky-50/50" : "border-[#D1CFCD] hover:border-sky-400 hover:bg-sky-50/30"
                                                 )}
                                             >
                                                 <input
@@ -536,13 +536,13 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 <div className="flex flex-col items-center gap-4 relative z-10">
                                                     <div className={cn(
                                                         "w-16 h-16 rounded-full flex items-center justify-center transition-colors",
-                                                        isDragging ? "bg-sky-100 text-sky-600" : "bg-[#F5F4EF] text-[#78716C] group-hover:text-sky-500 group-hover:bg-sky-50"
+                                                        isDragging ? "bg-sky-100 text-sky-600" : "bg-[#FFFFFF] text-[#94A3B8] group-hover:text-sky-500 group-hover:bg-sky-50"
                                                     )}>
                                                         <Upload className="w-8 h-8" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-[16px] font-semibold text-[#1C1917] mb-1">Click or drag PDF here</p>
-                                                        <p className="text-[14px] text-[#78716C] mb-3">Digital PDFs work best · Maximum file size 10MB</p>
+                                                        <p className="text-[16px] font-semibold text-[#0F172A] mb-1">Click or drag PDF here</p>
+                                                        <p className="text-[14px] text-[#94A3B8] mb-3">Digital PDFs work best · Maximum file size 10MB</p>
                                                         <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full text-[11px] font-semibold mb-2">
                                                             <Lock size={12} />
                                                             <span>Secure, encrypted upload</span>
@@ -559,13 +559,13 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="bg-white border text-center justify-center border-[#E8E6DF] rounded-[20px] p-8 flex flex-col items-center gap-6">
+                                            <div className="bg-white border text-center justify-center border-[#EBEAE4] rounded-[20px] p-8 flex flex-col items-center gap-6">
                                                 <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center">
                                                     <FileText className="w-8 h-8 text-sky-500" />
                                                 </div>
                                                 <div className="text-center">
-                                                    <h3 className="font-semibold text-[#1C1917] truncate max-w-[250px] mx-auto text-lg mb-1">{file.name}</h3>
-                                                    <p className="text-[#78716C] text-sm">{(file.size / 1024 / 1024).toFixed(2)} MB • PDF Document</p>
+                                                    <h3 className="font-semibold text-[#0F172A] truncate max-w-[250px] mx-auto text-lg mb-1">{file.name}</h3>
+                                                    <p className="text-[#94A3B8] text-sm">{(file.size / 1024 / 1024).toFixed(2)} MB • PDF Document</p>
                                                 </div>
                                                 <button
                                                     onClick={handleUpload}
@@ -592,17 +592,17 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     )}
                                                 </button>
                                                 {isProcessing && (
-                                                    <button onClick={handleCancel} className="text-sm text-[#78716C] hover:text-red-500 font-medium transition-colors">
+                                                    <button onClick={handleCancel} className="text-sm text-[#94A3B8] hover:text-red-500 font-medium transition-colors">
                                                         Cancel Analysis
                                                     </button>
                                                 )}
                                                 {isProcessing && processStage === 'analyzing' && elapsedSeconds > 10 && (
-                                                    <p className="text-xs text-[#78716C] text-center leading-relaxed">
+                                                    <p className="text-xs text-[#94A3B8] text-center leading-relaxed">
                                                         Still working — larger or scanned reports can take up to a minute. Please keep this open.
                                                     </p>
                                                 )}
                                                 {!isProcessing && (
-                                                    <button onClick={() => setFile(null)} className="text-sm text-[#78716C] hover:text-[#1C1917] font-medium transition-colors">
+                                                    <button onClick={() => setFile(null)} className="text-sm text-[#94A3B8] hover:text-[#0F172A] font-medium transition-colors">
                                                         Choose a different file
                                                     </button>
                                                 )}
@@ -613,7 +613,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
                                 {tab === 'manual' && (
                                     <div className="space-y-4">
-                                        <p className="text-sm leading-relaxed text-[#57534E]">
+                                        <p className="text-sm leading-relaxed text-[#475569]">
                                             Add the values you want interpreted. You can enter a full panel or just the markers you want help preparing for.
                                         </p>
                                         <div className="space-y-3 max-h-[280px] overflow-y-auto">
@@ -628,7 +628,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             placeholder="Name (e.g. Glucose)"
                                                             value={row.name}
                                                             onChange={(e) => updateManualRow(row.id, 'name', e.target.value)}
-                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                            className="w-full rounded-lg border border-[#EBEAE4] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                                                         />
                                                     </div>
                                                     <div className="w-[calc(50%-2rem)] min-w-24 sm:w-20 sm:min-w-0">
@@ -640,7 +640,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             placeholder="Value"
                                                             value={row.value}
                                                             onChange={(e) => updateManualRow(row.id, 'value', e.target.value)}
-                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                                                            className="w-full rounded-lg border border-[#EBEAE4] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                                                         />
                                                     </div>
                                                     <div className="w-[calc(50%-2rem)] min-w-24 sm:w-20 sm:min-w-0">
@@ -649,7 +649,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             id={`unit-${row.id}`}
                                                             value={row.unit}
                                                             onChange={(e) => updateManualRow(row.id, 'unit', e.target.value)}
-                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
+                                                            className="w-full rounded-lg border border-[#EBEAE4] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
                                                         >
                                                             <option value="" disabled>Unit</option>
                                                             {COMMON_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -658,7 +658,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     <button
                                                         type="button"
                                                         onClick={() => removeManualRow(row.id)}
-                                                        className="p-2 text-[#78716C] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-2 text-[#94A3B8] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                         aria-label="Remove biomarker"
                                                     >
                                                         <Trash2 size={18} />
@@ -704,7 +704,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                             )}
                                         </button>
                                         {isProcessing && (
-                                            <button onClick={handleCancel} className="w-full text-center mt-2 text-sm text-[#78716C] hover:text-red-500 font-medium transition-colors">
+                                            <button onClick={handleCancel} className="w-full text-center mt-2 text-sm text-[#94A3B8] hover:text-red-500 font-medium transition-colors">
                                                 Cancel Analysis
                                             </button>
                                         )}

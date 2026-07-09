@@ -175,8 +175,8 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
                             >
                                 <defs>
                                     <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.3} />
-                                        <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
+                                        <stop offset="0%" stopColor="#0369A1" stopOpacity={0.3} />
+                                        <stop offset="100%" stopColor="#0369A1" stopOpacity={0} />
                                     </linearGradient>
                                     {/* Phase 7: Glow filter for the line */}
                                     <filter id="glow" height="200%">
@@ -207,7 +207,7 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} stroke="#000000" />
                                 <Tooltip
                                     content={<CustomTooltip />}
-                                    cursor={{ stroke: '#0EA5E9', strokeWidth: 1, strokeDasharray: '4 4', opacity: 0.5 }}
+                                    cursor={{ stroke: '#0369A1', strokeWidth: 1, strokeDasharray: '4 4', opacity: 0.5 }}
                                 />
 
                                 {enrichedData.map((entry, index) => (
@@ -239,7 +239,7 @@ export function WellnessTrendChart({ data, supplements = [], className }: Wellne
                                 <Area
                                     type="monotone"
                                     dataKey="score"
-                                    stroke="#0EA5E9"
+                                    stroke="#0369A1"
                                     fillOpacity={1}
                                     fill="url(#colorScore)"
                                     strokeWidth={2}

@@ -43,7 +43,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[100] lg:hidden",
-                "bg-[#FAFAF7]/96 backdrop-blur-2xl border-t border-[#E8E6DF]",
+                "bg-[#FDFDFB]/96 backdrop-blur-2xl border-t border-[#EBEAE4]",
                 "pb-[env(safe-area-inset-bottom)]",
                 "gpu-accelerate shadow-[0_-4px_24px_rgba(28,25,23,0.06)]",
                 className
@@ -63,7 +63,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             className={cn(
                                 "flex flex-col items-center gap-1 group relative flex-1 min-h-[54px] justify-center",
                                 "transition-all duration-150 active:scale-90",
-                                isActive ? "text-sky-500" : "text-[#78716C]"
+                                isActive ? "text-sky-500" : "text-[#94A3B8]"
                             )}
                         >
                             {/* Active background pill */}
@@ -75,7 +75,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}
-                                <div className={cn("relative p-2 rounded-[10px] transition-all duration-200", !isActive && "group-hover:bg-[#F5F4EF] group-hover:scale-105")}>
+                                <div className={cn("relative p-2 rounded-[10px] transition-all duration-200", !isActive && "group-hover:bg-[#FFFFFF] group-hover:scale-105")}>
                                     <Icon
                                         size={20}
                                         strokeWidth={isActive ? 2.5 : 2}
@@ -92,7 +92,7 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
 
                             <span className={cn(
                                 "text-[10px] font-bold transition-colors leading-none",
-                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#78716C]"
+                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#94A3B8]"
                             )}>
                                 {item.label}
                             </span>

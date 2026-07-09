@@ -142,11 +142,11 @@ function AuthContent() {
                     <Mail className="w-6 h-6" />
                 </div>
                 <div className="text-center mb-6">
-                    <h1 className="font-display text-3xl text-[#1C1917] mb-2">
+                    <h1 className="font-display text-3xl text-[#0F172A] mb-2">
                         Check your email
                     </h1>
-                    <p className="text-sm text-[#57534E] leading-relaxed">
-                        We sent a confirmation link to <span className="font-semibold text-[#1C1917]">{confirmationEmail}</span>. Open it to finish creating your account and continue onboarding.
+                    <p className="text-sm text-[#475569] leading-relaxed">
+                        We sent a confirmation link to <span className="font-semibold text-[#0F172A]">{confirmationEmail}</span>. Open it to finish creating your account and continue onboarding.
                     </p>
                 </div>
                 <button
@@ -164,7 +164,7 @@ function AuthContent() {
                         setConfirmationEmail("");
                         setMode("login");
                     }}
-                    className="mt-4 w-full text-sm text-[#57534E] hover:text-[#1C1917] transition-colors"
+                    className="mt-4 w-full text-sm text-[#475569] hover:text-[#0F172A] transition-colors"
                 >
                     Back to sign in
                 </button>
@@ -175,10 +175,10 @@ function AuthContent() {
     return (
         <div className="w-full max-w-md app-panel-white p-8">
             <div className="text-center mb-8">
-                <h1 className="font-display text-3xl text-[#1C1917] mb-2">
+                <h1 className="font-display text-3xl text-[#0F172A] mb-2">
                     {mode === 'login' ? 'Welcome Back' : 'Create Account'}
                 </h1>
-                <p className="text-[#57534E]">
+                <p className="text-[#475569]">
                     {mode === 'login'
                         ? 'Enter your details to access your visit prep dashboard'
                         : 'Start preparing for clearer doctor conversations'}
@@ -187,7 +187,7 @@ function AuthContent() {
 
             <form onSubmit={handleAuth} className="space-y-4">
                 <div>
-                    <label htmlFor="auth-email" className="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5 ml-1">
+                    <label htmlFor="auth-email" className="block text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1.5 ml-1">
                         Email Address
                     </label>
                     <input
@@ -199,14 +199,14 @@ function AuthContent() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-3 rounded-[12px] bg-[#FAFAF7] border border-[#E8E6DF] 
-                                 text-[#1C1917] placeholder:text-[#78716C] focus:outline-none focus:ring-2 
+                        className="w-full px-4 py-3 rounded-[12px] bg-[#FDFDFB] border border-[#EBEAE4] 
+                                 text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="name@example.com"
                     />
                 </div>
                 <div>
-                    <label htmlFor="auth-password" className="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5 ml-1">
+                    <label htmlFor="auth-password" className="block text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1.5 ml-1">
                         Password
                     </label>
                     <input
@@ -217,8 +217,8 @@ function AuthContent() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="w-full px-4 py-3 rounded-[12px] bg-[#FAFAF7] border border-[#E8E6DF] 
-                                 text-[#1C1917] placeholder:text-[#78716C] focus:outline-none focus:ring-2 
+                        className="w-full px-4 py-3 rounded-[12px] bg-[#FDFDFB] border border-[#EBEAE4] 
+                                 text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 
                                  focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         placeholder="••••••••"
                     />
@@ -233,11 +233,11 @@ function AuthContent() {
                                 id="terms"
                                 checked={agreedToTerms}
                                 onChange={e => setAgreedToTerms(e.target.checked)}
-                                className="peer h-5 w-5 cursor-pointer rounded-[6px] border-2 border-[#D9D6CD] bg-white shadow-sm transition-all checked:border-sky-500 checked:bg-sky-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30"
+                                className="peer h-5 w-5 cursor-pointer rounded-[6px] border-2 border-[#D1CFCD] bg-white shadow-sm transition-all checked:border-sky-500 checked:bg-sky-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30"
                             />
                                 <Check className="pointer-events-none absolute h-3.5 w-3.5 text-white opacity-0 transition-opacity peer-checked:opacity-100" />
                             </span>
-                            <span className="text-[13px] leading-relaxed text-[#57534E]">
+                            <span className="text-[13px] leading-relaxed text-[#475569]">
                                 I agree to the{' '}
                                 <a href="/terms" target="_blank" className="font-medium text-sky-500 no-underline hover:text-sky-600">
                                     Terms of Service
@@ -281,7 +281,7 @@ function AuthContent() {
                         url.searchParams.set('mode', mode === 'login' ? 'signup' : 'login');
                         window.history.pushState({}, '', url.toString());
                     }}
-                    className="text-sm text-[#57534E] hover:text-[#1C1917] transition-colors"
+                    className="text-sm text-[#475569] hover:text-[#0F172A] transition-colors"
                 >
                     {mode === 'login'
                         ? "Don't have an account? Sign up"
@@ -289,9 +289,9 @@ function AuthContent() {
                 </button>
             </div>
 
-            <div className="mt-6 flex justify-center gap-6 text-xs text-[#78716C]">
-                <Link href="/terms" className="hover:text-[#57534E] transition-colors">Terms of Service</Link>
-                <Link href="/privacy" className="hover:text-[#57534E] transition-colors">Privacy Policy</Link>
+            <div className="mt-6 flex justify-center gap-6 text-xs text-[#94A3B8]">
+                <Link href="/terms" className="hover:text-[#475569] transition-colors">Terms of Service</Link>
+                <Link href="/privacy" className="hover:text-[#475569] transition-colors">Privacy Policy</Link>
             </div>
         </div>
     );
@@ -299,7 +299,7 @@ function AuthContent() {
 
 export default function AuthPage() {
     return (
-        <div className="min-h-[100dvh] bg-[#FAFAF7] flex flex-col justify-center items-center p-4 relative overflow-hidden">
+        <div className="min-h-[100dvh] bg-[#FDFDFB] flex flex-col justify-center items-center p-4 relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(224,242,254,0.72),rgba(250,250,247,0))]" />
             <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 z-10 group">
                 <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
@@ -308,7 +308,7 @@ export default function AuthPage() {
             <div className="relative grid w-full max-w-5xl grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1fr)]">
                 <aside className="hidden lg:block">
                     <p className="section-label mb-3 text-sky-600">What happens next</p>
-                    <h2 className="font-display text-5xl leading-tight text-[#1C1917]">
+                    <h2 className="font-display text-5xl leading-tight text-[#0F172A]">
                         From account to visit prep in a few minutes.
                     </h2>
                     <div className="mt-8 space-y-4">
@@ -320,7 +320,7 @@ export default function AuthPage() {
                         ].map((item) => (
                             <div key={item} className="flex items-start gap-3">
                                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-                                <p className="text-sm leading-relaxed text-[#57534E]">{item}</p>
+                                <p className="text-sm leading-relaxed text-[#475569]">{item}</p>
                             </div>
                         ))}
                     </div>

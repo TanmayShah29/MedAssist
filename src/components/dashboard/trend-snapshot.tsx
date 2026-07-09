@@ -14,11 +14,11 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
 
     if (!hasHistory || latestBiomarkers.length === 0) {
         return (
-            <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 flex items-center justify-center text-center shadow-sm h-full min-h-[160px] transition-all duration-300 hover:border-[#D9D6CD]">
+            <div className="bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 flex items-center justify-center text-center shadow-sm h-full min-h-[160px] transition-all duration-300 hover:border-[#D1CFCD]">
                 <div>
-                    <Activity className="w-8 h-8 text-[#78716C] mx-auto mb-3 opacity-50" />
-                    <h3 className="text-[15px] font-bold text-[#57534E] mb-1">Upload another report</h3>
-                    <p className="text-[13px] text-[#78716C]">Give your next visit trend context instead of a single snapshot.</p>
+                    <Activity className="w-8 h-8 text-[#94A3B8] mx-auto mb-3 opacity-50" />
+                    <h3 className="text-[15px] font-bold text-[#475569] mb-1">Upload another report</h3>
+                    <p className="text-[13px] text-[#94A3B8]">Give your next visit trend context instead of a single snapshot.</p>
                 </div>
             </div>
         );
@@ -38,7 +38,7 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
             const direction = diff > 0 ? 'Up' : 'Down';
             const icon = diff > 0 ? TrendingUp : TrendingDown;
 
-            let color = 'text-[#57534E]';
+            let color = 'text-[#475569]';
             if (current.status === 'optimal' && diff !== 0) color = 'text-emerald-500';
             else if (current.status === 'critical') color = 'text-red-500';
             else if (current.status === 'warning') color = 'text-amber-500';
@@ -49,8 +49,8 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
         .slice(0, 4); // Show up to 4
 
     return (
-        <div className="bg-[#FAFAF7] border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm h-full transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md">
-            <h3 className="text-[10px] font-semibold uppercase text-[#78716C] tracking-wider mb-4">Visit Trend Snapshot</h3>
+        <div className="bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 shadow-sm h-full transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md">
+            <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider mb-4">Visit Trend Snapshot</h3>
             <div className="space-y-3 min-w-0">
                 {trends.map((item, idx) => {
                     if (!item) return null;
@@ -58,10 +58,10 @@ export function TrendSnapshot({ latestBiomarkers, history, latestLabResult }: Tr
                     return (
                         <div
                             key={idx}
-                            className="flex justify-between items-center gap-3 py-2 border-b border-[#E8E6DF]/50 last:border-0 min-w-0 transition-colors duration-200 hover:border-sky-100 stagger-fade-sm"
+                            className="flex justify-between items-center gap-3 py-2 border-b border-[#EBEAE4]/50 last:border-0 min-w-0 transition-colors duration-200 hover:border-sky-100 stagger-fade-sm"
                             style={{ animationDelay: `${idx * 50}ms` }}
                         >
-                            <span className="text-[14px] font-bold text-[#1C1917] break-words min-w-0">{item.name}</span>
+                            <span className="text-[14px] font-bold text-[#0F172A] break-words min-w-0">{item.name}</span>
                             <div className={`flex items-center justify-end gap-1.5 text-[13px] font-bold shrink-0 ${item.color}`}>
                                 <Icon className="w-4 h-4" />
                                 {item.label}{item.pct > 0 ? ` ${item.pct}%` : ''}

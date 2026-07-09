@@ -94,23 +94,23 @@ export function MedicineCabinet() {
     };
 
     return (
-        <div className="bg-white border border-[#E8E6DF] rounded-[18px] p-6 shadow-sm transition-all duration-300 hover:border-[#D9D6CD] hover:shadow-md">
+        <div className="bg-white border border-[#EBEAE4] rounded-[18px] p-6 shadow-sm transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md">
             <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2 min-w-0">
                     <div className="p-2 bg-rose-50 rounded-lg">
                         <Pill className="w-5 h-5 text-rose-600" />
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-[18px] font-bold text-[#1C1917] truncate">Medication Context</h3>
-                        <p className="text-[12px] text-[#78716C] truncate">Track medications & supplements for your clinician</p>
+                        <h3 className="text-[18px] font-bold text-[#0F172A] truncate">Medication Context</h3>
+                        <p className="text-[12px] text-[#94A3B8] truncate">Track medications & supplements for your clinician</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="p-2 bg-[#F5F4EF] hover:bg-[#EFEDE6] active:scale-90 rounded-full transition-all duration-200"
+                    className="p-2 bg-[#FFFFFF] hover:bg-[#FAFAFA] active:scale-90 rounded-full transition-all duration-200"
                     aria-label={showAddForm ? "Close add medication or supplement form" : "Add medication or supplement"}
                 >
-                    {showAddForm ? <X size={20} className="text-[#57534E] transition-transform duration-200 rotate-0" /> : <Plus size={20} className="text-[#57534E] transition-transform duration-200" />}
+                    {showAddForm ? <X size={20} className="text-[#475569] transition-transform duration-200 rotate-0" /> : <Plus size={20} className="text-[#475569] transition-transform duration-200" />}
                 </button>
             </div>
 
@@ -125,40 +125,40 @@ export function MedicineCabinet() {
                     >
                         <div className="grid grid-cols-1 gap-3">
                             <div>
-                                <label className="text-[11px] font-bold text-[#78716C] uppercase mb-1 block">Medication or Supplement</label>
+                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Medication or Supplement</label>
                                 <input
                                     type="text"
                                     required
                                     value={newSupp.name}
                                     onChange={e => setNewSupp({ ...newSupp, name: e.target.value })}
                                     placeholder="e.g. Vitamin D3, Metformin"
-                                    className="w-full px-3 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-lg text-sm"
+                                    className="w-full px-3 py-2 bg-[#FFFFFF] border border-[#EBEAE4] rounded-lg text-sm"
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-bold text-[#78716C] uppercase mb-1 block">Dosage</label>
+                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Dosage</label>
                                 <input
                                     type="text"
                                     value={newSupp.dosage}
                                     onChange={e => setNewSupp({ ...newSupp, dosage: e.target.value })}
                                     placeholder="e.g. 5000 IU"
-                                    className="w-full px-3 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-lg text-sm"
+                                    className="w-full px-3 py-2 bg-[#FFFFFF] border border-[#EBEAE4] rounded-lg text-sm"
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-bold text-[#78716C] uppercase mb-1 block">Start Date</label>
+                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Start Date</label>
                                 <input
                                     type="date"
                                     required
                                     value={newSupp.start_date}
                                     onChange={e => setNewSupp({ ...newSupp, start_date: e.target.value })}
-                                    className="w-full px-3 py-2 bg-[#F5F4EF] border border-[#E8E6DF] rounded-lg text-sm"
+                                    className="w-full px-3 py-2 bg-[#FFFFFF] border border-[#EBEAE4] rounded-lg text-sm"
                                 />
                             </div>
                         </div>
                         <button
                             type="submit"
-                            className="w-full py-2.5 bg-[#1C1917] text-white rounded-lg font-bold text-sm hover:bg-black transition-colors"
+                            className="w-full py-2.5 bg-[#0F172A] text-white rounded-lg font-bold text-sm hover:bg-black transition-colors"
                         >
                             Add to visit context
                         </button>
@@ -173,21 +173,21 @@ export function MedicineCabinet() {
                     supplements.map((supp, idx) => (
                         <div
                             key={supp.id}
-                            className="group flex items-center justify-between gap-3 p-3 bg-[#FAFAF7] border border-[#E8E6DF] rounded-xl hover:border-rose-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300 ease-out min-w-0 stagger-fade-sm"
+                            className="group flex items-center justify-between gap-3 p-3 bg-[#FDFDFB] border border-[#EBEAE4] rounded-xl hover:border-rose-200 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300 ease-out min-w-0 stagger-fade-sm"
                             style={{ animationDelay: `${idx * 60}ms` }}
                         >
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 bg-white rounded-lg border border-[#E8E6DF] flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
+                                <div className="w-10 h-10 bg-white rounded-lg border border-[#EBEAE4] flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
                                     <Activity size={18} className="text-rose-500" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h4 className="text-sm font-bold text-[#1C1917] truncate">{supp.name}</h4>
-                                    <p className="text-[11px] text-[#57534E] truncate">{supp.dosage || "No dosage"} · Started {new Date(supp.start_date).toLocaleDateString()}</p>
+                                    <h4 className="text-sm font-bold text-[#0F172A] truncate">{supp.name}</h4>
+                                    <p className="text-[11px] text-[#475569] truncate">{supp.dosage || "No dosage"} · Started {new Date(supp.start_date).toLocaleDateString()}</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => handleDelete(supp.id)}
-                                className="p-2 text-[#78716C] hover:text-rose-600 hover:bg-rose-50 active:scale-90 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 shrink-0"
+                                className="p-2 text-[#94A3B8] hover:text-rose-600 hover:bg-rose-50 active:scale-90 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 shrink-0"
                                 aria-label={`Remove ${supp.name}`}
                             >
                                 <Trash2 size={16} />
@@ -195,16 +195,16 @@ export function MedicineCabinet() {
                         </div>
                     ))
                 ) : (
-                    <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#E8E6DF]">
-                        <p className="text-[12px] text-[#78716C]">No medications or supplements logged yet.</p>
+                    <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#EBEAE4]">
+                        <p className="text-[12px] text-[#94A3B8]">No medications or supplements logged yet.</p>
                     </div>
                 )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#E8E6DF]">
+            <div className="mt-6 pt-4 border-t border-[#EBEAE4]">
                 <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-rose-400 mt-0.5" />
-                    <p className="text-[11px] text-[#78716C] leading-relaxed">
+                    <p className="text-[11px] text-[#94A3B8] leading-relaxed">
                         Start dates are shown as context on biomarker trend charts. Review medication or supplement changes with your clinician.
                     </p>
                 </div>

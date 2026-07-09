@@ -19,16 +19,16 @@ export function StepBasicInfo() {
                       text-sky-500 mb-2">
                     Step 1 of 5
                 </p>
-                <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                <h2 className="font-display text-3xl text-[#0F172A] mb-2">
                     Tell us about yourself
                 </h2>
-                <p className="text-[#57534E] text-sm leading-relaxed">
+                <p className="text-[#475569] text-sm leading-relaxed">
                     Start with the details that affect reference ranges. You can update this later from your profile.
                 </p>
             </div>
 
             {/* Why we ask — data flow explanation */}
-            <div className="bg-[#E0F2FE] rounded-[12px] border border-[#BAE6FD] 
+            <div className="bg-[#F0F9FF] rounded-[12px] border border-[#BAE6FD] 
                       p-4 flex gap-3">
                 <div className="w-5 h-5 rounded-full bg-sky-100 flex items-center 
                         justify-center flex-shrink-0 mt-0.5">
@@ -50,7 +50,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
+                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
                             First name *
                         </label>
                         <input
@@ -59,16 +59,16 @@ export function StepBasicInfo() {
                             value={basicInfo.firstName}
                             onChange={e => setBasicInfo({ firstName: e.target.value })}
                             placeholder="John"
-                            className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
-                         rounded-[10px] text-[16px] text-[#1C1917] 
-                         placeholder-[#78716C]
+                            className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#EBEAE4]
+                         rounded-[10px] text-[16px] text-[#0F172A] 
+                         placeholder-[#94A3B8]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
+                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
                             Last name
                         </label>
                         <input
@@ -77,9 +77,9 @@ export function StepBasicInfo() {
                             value={basicInfo.lastName}
                             onChange={e => setBasicInfo({ lastName: e.target.value })}
                             placeholder="Doe"
-                            className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
-                         rounded-[10px] text-[16px] text-[#1C1917] 
-                         placeholder-[#78716C]
+                            className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#EBEAE4]
+                         rounded-[10px] text-[16px] text-[#0F172A] 
+                         placeholder-[#94A3B8]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
@@ -89,7 +89,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
+                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
                             Age *
                         </label>
                         <input
@@ -101,16 +101,16 @@ export function StepBasicInfo() {
                             onChange={e => setBasicInfo({ age: parseInt(e.target.value, 10) || "" })}
                             placeholder="32"
                             min="1" max="120"
-                            className="w-full px-4 py-3 bg-[#F5F4EF] border border-[#E8E6DF]
-                         rounded-[10px] text-[16px] text-[#1C1917]
-                         placeholder-[#78716C]
+                            className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#EBEAE4]
+                         rounded-[10px] text-[16px] text-[#0F172A]
+                         placeholder-[#94A3B8]
                          focus:outline-none focus:border-sky-400 
                          focus:ring-2 focus:ring-sky-100 transition-all"
                         />
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#78716C] mb-1.5 block">
+                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
                             Biological sex *
                         </label>
                         <div className="flex gap-2">
@@ -123,7 +123,7 @@ export function StepBasicInfo() {
                                         "border transition-all capitalize",
                                         basicInfo.sex === s
                                             ? "bg-sky-500 text-white border-sky-500"
-                                            : "bg-[#F5F4EF] text-[#57534E] border-[#E8E6DF] hover:border-sky-300"
+                                            : "bg-[#FFFFFF] text-[#475569] border-[#EBEAE4] hover:border-sky-300"
                                     )}
                                 >
                                     {s}
@@ -135,7 +135,7 @@ export function StepBasicInfo() {
 
                 <div>
                     <label className="text-[10px] font-semibold uppercase 
-                             tracking-[0.12em] text-[#78716C] mb-1.5 block">
+                             tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
                         Blood type
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ export function StepBasicInfo() {
                                     "px-3 py-2 rounded-[8px] text-sm font-medium border transition-all",
                                     basicInfo.bloodType === bt
                                         ? "bg-sky-500 text-white border-sky-500"
-                                        : "bg-[#F5F4EF] text-[#57534E] border-[#E8E6DF] hover:border-sky-300"
+                                        : "bg-[#FFFFFF] text-[#475569] border-[#EBEAE4] hover:border-sky-300"
                                 )}
                             >
                                 {bt}
@@ -172,7 +172,7 @@ export function StepBasicInfo() {
                         "text-sm font-semibold transition-all",
                         canAdvance
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#E8E6DF] text-[#78716C] cursor-not-allowed"
+                            : "bg-[#EBEAE4] text-[#94A3B8] cursor-not-allowed"
                     )}
                 >
                     Continue

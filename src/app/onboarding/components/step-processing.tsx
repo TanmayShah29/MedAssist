@@ -188,10 +188,10 @@ function ReviewExtractedValues({
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">
                     Review extracted data
                 </p>
-                <h2 className="font-display text-3xl text-[#1C1917] mb-2">
+                <h2 className="font-display text-3xl text-[#0F172A] mb-2">
                     Confirm what we found
                 </h2>
-                <p className="text-sm text-[#57534E] max-w-2xl">
+                <p className="text-sm text-[#475569] max-w-2xl">
                     AI can misread PDFs. Confirm the values now so the dashboard starts from data you trust.
                 </p>
             </div>
@@ -211,8 +211,8 @@ function ReviewExtractedValues({
                 </div>
             </div>
 
-            <div className="rounded-[16px] border border-[#E8E6DF] bg-white overflow-hidden shadow-sm">
-                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#F5F4EF] border-b border-[#E8E6DF] text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">
+            <div className="rounded-[16px] border border-[#EBEAE4] bg-white overflow-hidden shadow-sm">
+                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#FFFFFF] border-b border-[#EBEAE4] text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">
                     <span>Name</span>
                     <span>Value</span>
                     <span>Unit</span>
@@ -222,12 +222,12 @@ function ReviewExtractedValues({
 
                 <div className="max-h-[420px] overflow-y-auto">
                     {rows.map((row, index) => (
-                        <div key={`${row.name}-${index}`} className="grid grid-cols-1 md:grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 p-4 border-b border-[#E8E6DF] last:border-b-0">
+                        <div key={`${row.name}-${index}`} className="grid grid-cols-1 md:grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 p-4 border-b border-[#EBEAE4] last:border-b-0">
                             <input
                                 value={row.name}
                                 onChange={(e) => updateRow(index, { name: e.target.value })}
                                 placeholder="Biomarker"
-                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                                className="rounded-[10px] border border-[#EBEAE4] bg-[#FDFDFB] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             />
                             <input
                                 value={valueInputs[index] ?? ""}
@@ -240,12 +240,12 @@ function ReviewExtractedValues({
                                 }}
                                 inputMode="decimal"
                                 placeholder="Value"
-                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                                className="rounded-[10px] border border-[#EBEAE4] bg-[#FDFDFB] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             />
                             <select
                                 value={row.unit}
                                 onChange={(e) => updateRow(index, { unit: e.target.value })}
-                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                                className="rounded-[10px] border border-[#EBEAE4] bg-[#FDFDFB] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             >
                                 <option value="" disabled>Unit</option>
                                 <option value="mg/dL">mg/dL</option>
@@ -273,7 +273,7 @@ function ReviewExtractedValues({
                             <select
                                 value={row.status}
                                 onChange={(e) => updateRow(index, { status: e.target.value as ExtractedLabValue["status"] })}
-                                className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm capitalize focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                                className="rounded-[10px] border border-[#EBEAE4] bg-[#FDFDFB] px-3 py-2 text-sm capitalize focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             >
                                 <option value="optimal">{PATIENT_STATUS.optimal.label}</option>
                                 <option value="warning">{PATIENT_STATUS.warning.label}</option>
@@ -282,7 +282,7 @@ function ReviewExtractedValues({
                             <button
                                 type="button"
                                 onClick={() => removeRow(index)}
-                                className="h-10 w-10 rounded-[10px] text-[#78716C] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
+                                className="h-10 w-10 rounded-[10px] text-[#94A3B8] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
                                 aria-label={`Remove ${row.name || "row"}`}
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -309,8 +309,8 @@ function ReviewExtractedValues({
 
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#78716C]">Brief completeness</p>
-                    <p className="font-display text-3xl text-[#1C1917]">{reviewedScore}<span className="text-sm text-[#57534E] font-sans"> / 100</span></p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Brief completeness</p>
+                    <p className="font-display text-3xl text-[#0F172A]">{reviewedScore}<span className="text-sm text-[#475569] font-sans"> / 100</span></p>
                 </div>
                 <button
                     onClick={saveReviewed}
@@ -566,7 +566,7 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
                             <h3 className="font-display text-lg font-bold text-[#991B1B] mb-1">
                                 {errorData.title}
                             </h3>
-                            <p className="text-sm text-[#57534E] leading-relaxed">
+                            <p className="text-sm text-[#475569] leading-relaxed">
                                 {errorData.detail}
                             </p>
                         </div>
@@ -601,14 +601,14 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
                     )}
 
                     {errorData.isImageBased && (
-                        <p className="mt-3 text-[13px] text-[#57534E] text-center">
+                        <p className="mt-3 text-[13px] text-[#475569] text-center">
                             You can go back and enter your lab values manually instead.
                         </p>
                     )}
                     <button
                         onClick={goBackToUpload}
                         className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 
-                                   rounded-[10px] text-[#57534E] hover:bg-white/50
+                                   rounded-[10px] text-[#475569] hover:bg-white/50
                                    text-sm font-semibold transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -646,7 +646,7 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
             {/* Vertical Stepper */}
             <div className="space-y-6 relative">
                 {/* Vertical Line */}
-                <div className="absolute left-[15px] top-[15px] bottom-[15px] w-[2px] bg-[#E8E6DF] z-0" />
+                <div className="absolute left-[15px] top-[15px] bottom-[15px] w-[2px] bg-[#EBEAE4] z-0" />
 
                 {stages.map((stage, index) => {
                     const isActive = index === currentStageIndex;
@@ -663,7 +663,7 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
                                     "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 transition-colors duration-300",
                                     isActive && "bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200",
                                     isCompleted && "bg-emerald-500 border-emerald-500 text-white",
-                                    isPending && "bg-white border-[#E8E6DF] text-[#78716C]"
+                                    isPending && "bg-white border-[#EBEAE4] text-[#94A3B8]"
                                 )}
                             >
                                 {isCompleted ? <Check className="w-4 h-4" /> : stage.step}
@@ -676,11 +676,11 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
                             )}>
                                 <h3 className={cn(
                                     "text-[15px] font-medium leading-none mb-1.5",
-                                    isActive ? "text-sky-700 font-bold" : "text-[#1C1917]"
+                                    isActive ? "text-sky-700 font-bold" : "text-[#0F172A]"
                                 )}>
                                     {stage.label}
                                 </h3>
-                                <p className="text-[13px] text-[#57534E] leading-snug">
+                                <p className="text-[13px] text-[#475569] leading-snug">
                                     {stage.detail}
                                 </p>
                             </div>
@@ -690,10 +690,10 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
             </div>
 
             <div className="mt-12 text-center">
-                <p className="text-xs text-[#78716C] font-medium">This usually takes 20–40 seconds</p>
+                <p className="text-xs text-[#94A3B8] font-medium">This usually takes 20–40 seconds</p>
                 <button
                     onClick={state === 'uploading' || state === 'analyzing' || state === 'finalizing' ? handleCancel : goBackToUpload}
-                    className="mt-4 text-sm text-[#57534E] hover:text-[#1C1917] font-medium flex items-center gap-1.5 mx-auto"
+                    className="mt-4 text-sm text-[#475569] hover:text-[#0F172A] font-medium flex items-center gap-1.5 mx-auto"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     {state === 'uploading' || state === 'analyzing' || state === 'finalizing' ? 'Cancel Analysis' : 'Upload a different file'}

@@ -36,7 +36,7 @@ export function BrandedLoading({
             </div>
             <div className="space-y-3">
               {Array.from({ length: rows }).map((_, i) => (
-                <div key={i} className="rounded-[14px] border border-[#ECE8DE] bg-[#FAFAF7]/80 p-4">
+                <div key={i} className="rounded-[14px] border border-[#ECE8DE] bg-[#FDFDFB]/80 p-4">
                   <div className="mb-3 flex items-center justify-between gap-4">
                     <div className="brand-skeleton h-4 w-36 rounded-full" />
                     <div className="brand-skeleton h-5 w-16 rounded-full" />

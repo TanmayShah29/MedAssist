@@ -328,7 +328,7 @@ export default function ResultsPage() {
                                 );
                             })}
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#78716C]">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]">
                             <TrendingUp size={16} className="rotate-90" />
                         </div>
                     </div>
@@ -362,7 +362,7 @@ export default function ResultsPage() {
                                 }}
                                 className={`px-3.5 py-2 rounded-[12px] text-[14px] font-semibold capitalize whitespace-nowrap transition-all duration-200 active:scale-95 min-h-[44px] ${selectedCategory === category
                                     ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 scale-[1.02]'
-                                    : 'bg-white text-[#57534E] border border-[#E8E6DF] hover:bg-[#F5F4EF] hover:border-[#D9D6CD]'
+                                    : 'bg-white text-[#475569] border border-[#EBEAE4] hover:bg-[#FFFFFF] hover:border-[#D1CFCD]'
                                     }`}
                             >
                                 {category}
@@ -370,7 +370,7 @@ export default function ResultsPage() {
                         ))}
                     </div>
                     <div className="relative w-full xl:w-80 xl:shrink-0">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#78716C]" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                         <input
                             type="text"
                             placeholder="Search biomarkers..."
@@ -394,11 +394,11 @@ export default function ResultsPage() {
                             </div>
                         ) : biomarkers.length === 0 && selectedCategory === 'all' ? (
                             <div className="py-16 px-8 text-center flex flex-col items-center justify-center">
-                                <div className="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
-                                    <ClipboardList size={24} color="#0EA5E9" />
+                                <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mb-4">
+                                    <ClipboardList size={24} color="#0369A1" />
                                 </div>
-                                <h3 className="text-xl font-bold text-[#1C1917] mb-2">No results yet</h3>
-                                <p className="text-[15px] text-[#57534E] mb-6 max-w-xs mx-auto">
+                                <h3 className="text-xl font-bold text-[#0F172A] mb-2">No results yet</h3>
+                                <p className="text-[15px] text-[#475569] mb-6 max-w-xs mx-auto">
                                     Upload a lab report from your dashboard to see your biomarkers here.
                                 </p>
                                 <button 
@@ -410,19 +410,19 @@ export default function ResultsPage() {
                             </div>
                         ) : filteredBiomarkers.length === 0 ? (
                             <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
-                                <div className="w-12 h-12 bg-[#E8E6DF] rounded-full flex items-center justify-center mb-4">
-                                    <Search className="w-6 h-6 text-[#78716C]" />
+                                <div className="w-12 h-12 bg-[#EBEAE4] rounded-full flex items-center justify-center mb-4">
+                                    <Search className="w-6 h-6 text-[#94A3B8]" />
                                 </div>
-                                <p className="text-[15px] text-[#57534E] font-medium">No results found.</p>
-                                <p className="text-[13px] text-[#78716C] mt-1">Try a different search or filter.</p>
+                                <p className="text-[15px] text-[#475569] font-medium">No results found.</p>
+                                <p className="text-[13px] text-[#94A3B8] mt-1">Try a different search or filter.</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-[#E8E6DF]">
+                            <div className="divide-y divide-[#EBEAE4]">
                                 {filteredBiomarkers.map((b, idx) => (
                                     <div
                                         key={b.id}
                                         onClick={() => handleBiomarkerClick(b)}
-                                        className={`flex items-start p-4 cursor-pointer transition-all duration-200 hover:bg-[#EFEDE6] active:bg-[#E8E6DF]/50 stagger-fade-sm ${selectedBiomarker?.id === b.id ? 'border-l-[4px] border-l-sky-500 bg-[#EFEDE6]' : ''} ${b.status === 'critical' ? 'bg-red-50/30' :
+                                        className={`flex items-start p-4 cursor-pointer transition-all duration-200 hover:bg-[#FAFAFA] active:bg-[#EBEAE4]/50 stagger-fade-sm ${selectedBiomarker?.id === b.id ? 'border-l-[4px] border-l-sky-500 bg-[#FAFAFA]' : ''} ${b.status === 'critical' ? 'bg-red-50/30' :
                                                 b.status === 'warning' ? 'bg-amber-50/20' : ''
                                             }`}
                                         style={{ animationDelay: `${Math.min(idx, 10) * 35}ms` }}
@@ -436,23 +436,23 @@ export default function ResultsPage() {
 
                                         <div className="grow shrink basis-0 min-w-0">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                <span className="text-[15px] font-bold text-[#1C1917] text-wrap-safe" title={b.name}>{b.name}</span>
-                                                <span className="text-[11px] font-bold bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider shrink-0">
+                                                <span className="text-[15px] font-bold text-[#0F172A] text-wrap-safe" title={b.name}>{b.name}</span>
+                                                <span className="text-[11px] font-bold bg-[#F0F9FF] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider shrink-0">
                                                     {b.category}
                                                 </span>
                                             </div>
-                                            <div className="text-[15px] font-medium text-[#57534E] leading-relaxed">
+                                            <div className="text-[15px] font-medium text-[#475569] leading-relaxed">
                                                 {b.value !== null && b.value !== undefined ? `${b.value} ${b.unit || ''}` : 'Value unavailable'}
                                                 {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) ? (
-                                                    <span className="text-[12px] text-[#78716C] ml-0 block sm:ml-2 sm:inline font-normal">
+                                                    <span className="text-[12px] text-[#94A3B8] ml-0 block sm:ml-2 sm:inline font-normal">
                                                         (ref: {b.reference_range_min ?? 'N/A'}–{b.reference_range_max ?? 'N/A'})
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[12px] text-[#78716C] ml-0 block sm:ml-2 sm:inline font-normal">(ref: N/A)</span>
+                                                    <span className="text-[12px] text-[#94A3B8] ml-0 block sm:ml-2 sm:inline font-normal">(ref: N/A)</span>
                                                 )}
                                             </div>
                                             {getBiomarkerReportDate(b) && (
-                                                <p className="text-[11px] text-[#78716C] mt-0.5 font-medium">
+                                                <p className="text-[11px] text-[#94A3B8] mt-0.5 font-medium">
                                                     From report {mounted ? new Date(getBiomarkerReportDate(b)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                                 </p>
                                             )}
@@ -485,33 +485,33 @@ export default function ResultsPage() {
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
                                 <div className="app-panel p-8 text-center h-[200px] flex items-center justify-center">
-                                    <p className="text-[15px] text-[#78716C] font-medium">Select a result to see AI interpretation</p>
+                                    <p className="text-[15px] text-[#94A3B8] font-medium">Select a result to see AI interpretation</p>
                                 </div>
                             ) : (
                                 <div className="app-panel p-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-shadow hover:shadow-md">
                                     <div className="flex justify-between items-start mb-4">
-                                        <h2 className="text-[20px] font-bold text-[#1C1917] leading-tight pr-4 text-wrap-safe">{selectedBiomarker.name}</h2>
+                                        <h2 className="text-[20px] font-bold text-[#0F172A] leading-tight pr-4 text-wrap-safe">{selectedBiomarker.name}</h2>
                                         <button
                                             onClick={() => setSelectedBiomarker(null)}
                                             aria-label="Close details"
-                                            className="text-[#78716C] hover:text-[#1C1917] hover:bg-[#F5F4EF] active:scale-90 transition-all duration-200 p-1 rounded-md"
+                                            className="text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#FFFFFF] active:scale-90 transition-all duration-200 p-1 rounded-md"
                                         >
                                             <X size={20} />
                                         </button>
                                     </div>
 
-                                    <div className={`bg-white border border-[#E8E6DF] rounded-[12px] p-5 mb-4 text-center shadow-sm min-w-0 ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
+                                    <div className={`bg-white border border-[#EBEAE4] rounded-[12px] p-5 mb-4 text-center shadow-sm min-w-0 ${selectedBiomarker.status === 'optimal' ? 'text-emerald-500' :
                                         selectedBiomarker.status === 'warning' ? 'text-amber-500' : 'text-red-500'
                                         }`}>
                                         <div className="text-[30px] sm:text-[36px] font-bold font-display leading-none mb-1 text-wrap-safe">
                                             {selectedBiomarker.value !== null && selectedBiomarker.value !== undefined ? `${selectedBiomarker.value} ${selectedBiomarker.unit || ''}` : 'N/A'}
                                         </div>
                                         {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) ? (
-                                            <p className="text-[13px] text-[#78716C] font-medium">
+                                            <p className="text-[13px] text-[#94A3B8] font-medium">
                                                 Reference: {selectedBiomarker.reference_range_min ?? 'N/A'} – {selectedBiomarker.reference_range_max ?? 'N/A'}
                                             </p>
                                         ) : (
-                                            <p className="text-[13px] text-[#78716C] font-medium">Reference: N/A</p>
+                                            <p className="text-[13px] text-[#94A3B8] font-medium">Reference: N/A</p>
                                         )}
                                     </div>
 
@@ -521,12 +521,12 @@ export default function ResultsPage() {
                                         {getPatientStatus(selectedBiomarker.status).printLabel}
                                     </div>
 
-                                    <h3 className="text-[11px] font-bold uppercase text-[#78716C] mb-3 tracking-widest">WHY THIS MAY MATTER</h3>
-                                    <p className="text-[15px] text-[#57534E] leading-relaxed mb-8 text-wrap-safe">
+                                    <h3 className="text-[11px] font-bold uppercase text-[#94A3B8] mb-3 tracking-widest">WHY THIS MAY MATTER</h3>
+                                    <p className="text-[15px] text-[#475569] leading-relaxed mb-8 text-wrap-safe">
                                         {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
                                     </p>
 
-                                    <h3 className="text-[11px] font-bold uppercase text-[#78716C] mb-4 tracking-widest flex items-center gap-2">
+                                    <h3 className="text-[11px] font-bold uppercase text-[#94A3B8] mb-4 tracking-widest flex items-center gap-2">
                                         <TrendingUp size={14} className="text-sky-500" />
                                         HISTORICAL TREND
                                     </h3>
@@ -543,17 +543,17 @@ export default function ResultsPage() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="h-full w-full border-2 border-dashed border-[#E8E6DF] rounded-xl flex flex-col items-center justify-center p-6 text-center bg-white/30">
-                                                <Info size={28} className="text-[#78716C] mb-3 opacity-30" />
-                                                <p className="text-[12px] text-[#78716C] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to add context.</p>
+                                            <div className="h-full w-full border-2 border-dashed border-[#EBEAE4] rounded-xl flex flex-col items-center justify-center p-6 text-center bg-white/30">
+                                                <Info size={28} className="text-[#94A3B8] mb-3 opacity-30" />
+                                                <p className="text-[12px] text-[#94A3B8] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to add context.</p>
                                             </div>
                                         )}
                                     </div>
 
-                                    <div className="flex justify-between items-center py-4 border-t border-[#E8E6DF] mb-4">
-                                        <span className="text-[12px] text-[#78716C] font-bold uppercase tracking-wider">AI Confidence</span>
+                                    <div className="flex justify-between items-center py-4 border-t border-[#EBEAE4] mb-4">
+                                        <span className="text-[12px] text-[#94A3B8] font-bold uppercase tracking-wider">AI Confidence</span>
                                         <div className="flex items-center gap-4">
-                                            <span className="text-[13px] font-bold text-[#1C1917]">
+                                            <span className="text-[13px] font-bold text-[#0F172A]">
                                                 {selectedBiomarker.confidence !== null && selectedBiomarker.confidence !== undefined ? `${Math.round(selectedBiomarker.confidence * 100)}%` : '—'}
                                             </span>
                                         </div>
@@ -586,10 +586,10 @@ export default function ResultsPage() {
                 {/* ── Sticky Nudge Bar ── */}
                 <div className="app-panel-white p-6 mt-10 flex flex-col sm:flex-row justify-between items-center gap-6 transition-all duration-300 hover:shadow-md">
                     <div className="min-w-0 flex-1 text-center sm:text-left">
-                        <p className="font-bold text-lg text-[#1C1917] mb-1">
+                        <p className="font-bold text-lg text-[#0F172A] mb-1">
                             Had a recent blood test?
                         </p>
-                        <p className="text-[14px] text-[#57534E] leading-relaxed">
+                        <p className="text-[14px] text-[#475569] leading-relaxed">
                             Upload it now so MedAssist can compare changes and sharpen your next appointment prep sheet.
                         </p>
                     </div>

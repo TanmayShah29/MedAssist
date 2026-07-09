@@ -13,16 +13,16 @@ const fadeInUp = {
 
 export default function EngineeringPage() {
   return (
-    <div className="min-h-[100dvh] bg-[#FAFAF7] font-sans">
+    <div className="min-h-[100dvh] bg-[#FDFDFB] font-sans">
       <LandingHeader />
 
       <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
         <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
           <p className="text-[11px] font-black tracking-widest text-sky-600 uppercase mb-4">Architecture & Methodology</p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#1C1917] mb-8 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#0F172A] mb-8 leading-tight">
             How MedAssist turns unstructured PDFs into clinical intelligence.
           </h1>
-          <p className="text-lg text-[#57534E] leading-relaxed mb-12 max-w-2xl">
+          <p className="text-lg text-[#475569] leading-relaxed mb-12 max-w-2xl">
             This project was built for a Design Engineering capstone to solve a specific clinical UX problem: the gap between receiving lab results and understanding them. Here is how the pipeline works.
           </p>
         </motion.div>
@@ -65,7 +65,7 @@ export default function EngineeringPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15, duration: 0.5 }}
-              className="flex flex-col sm:flex-row gap-6 p-6 bg-white border border-[#E8E6DF] rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+              className="flex flex-col sm:flex-row gap-6 p-6 bg-white border border-[#EBEAE4] rounded-2xl shadow-sm hover:shadow-md transition-shadow"
             >
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 border ${item.color}`}>
                 <item.icon className="w-6 h-6" />
@@ -73,9 +73,9 @@ export default function EngineeringPage() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-[10px] font-black text-slate-400 font-mono">STEP 0{item.step}</span>
-                  <h3 className="text-lg font-bold text-[#1C1917]">{item.title}</h3>
+                  <h3 className="text-lg font-bold text-[#0F172A]">{item.title}</h3>
                 </div>
-                <p className="text-[#57534E] leading-relaxed text-[15px]">{item.desc}</p>
+                <p className="text-[#475569] leading-relaxed text-[15px]">{item.desc}</p>
               </div>
             </motion.div>
           ))}

@@ -27,18 +27,18 @@ export function BottomSheet({
             onClick={onClose}
           />
           <motion.div
-            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-hidden rounded-t-[24px] border border-[#E8E6DF] bg-[#FAFAF7] shadow-2xl"
+            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-hidden rounded-t-[24px] border border-[#EBEAE4] bg-[#FDFDFB] shadow-2xl"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 340, damping: 34 }}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E8E6DF] bg-[#FAFAF7] px-4 py-3">
-              <h2 className="font-display text-xl font-bold text-[#1C1917]">{title}</h2>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#EBEAE4] bg-[#FDFDFB] px-4 py-3">
+              <h2 className="font-display text-xl font-bold text-[#0F172A]">{title}</h2>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F4EF] text-[#57534E] hover:bg-[#EFEDE6] active:scale-90 transition-all duration-200"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FFFFFF] text-[#475569] hover:bg-[#FAFAFA] active:scale-90 transition-all duration-200"
                 aria-label="Close sheet"
               >
                 <X className="h-4 w-4" />
