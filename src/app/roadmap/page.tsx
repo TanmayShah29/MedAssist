@@ -107,15 +107,15 @@ export default function RoadmapPage() {
                   <ul className="space-y-3">
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                      LLM Tokens for clinical reasoning and summarization.
+                      <span>LLM Tokens for clinical reasoning and summarization.</span>
                     </li>
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                      OCR processing for complex, multi-page tabular PDFs.
+                      <span>OCR processing for complex, multi-page tabular PDFs.</span>
                     </li>
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                      Secure, encrypted HIPAA-compliant database storage.
+                      <span>Secure, encrypted HIPAA-compliant database storage.</span>
                     </li>
                   </ul>
                 </div>
@@ -128,15 +128,15 @@ export default function RoadmapPage() {
                   <ul className="space-y-3">
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                      <strong className="text-[#0F172A]">Free Tier:</strong> 1 free lab report analysis to experience the value and prepare for an urgent visit.
+                      <span><strong className="text-[#0F172A] mr-1">Free Tier:</strong> 1 free lab report analysis to experience the value and prepare for an urgent visit.</span>
                     </li>
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                      <strong className="text-[#0F172A]">Pay-per-report:</strong> A low flat fee (e.g. $4.99) for one-off analyses.
+                      <span><strong className="text-[#0F172A] mr-1">Pay-per-report:</strong> A low flat fee (e.g. $4.99) for one-off analyses.</span>
                     </li>
                     <li className="text-[14px] text-[#475569] flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                      <strong className="text-[#0F172A]">Pro Subscription:</strong> For users with chronic conditions needing continuous tracking and integrations.
+                      <span><strong className="text-[#0F172A] mr-1">Pro Subscription:</strong> For users with chronic conditions needing continuous tracking and integrations.</span>
                     </li>
                   </ul>
                 </div>
