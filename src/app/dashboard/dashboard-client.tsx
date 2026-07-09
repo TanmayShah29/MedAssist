@@ -17,6 +17,7 @@ import {
     TrendingUp,
     TrendingDown,
     MessageSquareText,
+    Lock,
 } from 'lucide-react'
 
 import { MedicalDisclaimer } from '@/components/medical-disclaimer'
@@ -53,6 +54,11 @@ function getDelta(current: number | string, previous: number | string | null | u
     const prev = parseFloat(String(previous));
     if (isNaN(curr) || isNaN(prev) || prev === 0) return null;
     const diff = curr - prev;
+    
+    if (Math.abs(prev) < 1 && Math.abs(diff) < 1) {
+        return { diff, percent: 0 };
+    }
+    
     const percent = Math.round((diff / prev) * 100);
     return { diff, percent };
 }
@@ -363,7 +369,10 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated ? (
-                        <p className="app-subtitle">Last report: {lastUpdated}</p>
+                        <p className="app-subtitle flex items-center gap-1.5">
+                            Last synced securely on {lastUpdated} 
+                            <Lock size={12} className="text-emerald-500" />
+                        </p>
                     ) : (
                         <p className="app-subtitle">
                             {initialLabResults.length > 0 ? 'Welcome back, ' : 'Welcome, '}
@@ -380,7 +389,10 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated && (
-                        <p className="text-[11px] sm:text-[12px] font-bold text-[#78716C] uppercase tracking-wider ml-auto text-right leading-tight">Report: {lastUpdated}</p>
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#78716C] uppercase tracking-wider ml-auto text-right leading-tight flex items-center justify-end gap-1">
+                            <Lock size={10} className="text-emerald-500" />
+                            Synced {lastUpdated}
+                        </p>
                     )}
                     {isOffline && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[10px] font-bold animate-pulse ml-2">

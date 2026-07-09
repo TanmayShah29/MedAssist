@@ -138,7 +138,7 @@ function getDelta(current: Biomarker, previous?: Biomarker) {
   if (!previous) return null;
   const curr = parseFloat(String(current.value));
   const prev = parseFloat(String(previous.value));
-  if (!Number.isFinite(curr) || !Number.isFinite(prev) || prev === 0) return null;
+  if (!Number.isFinite(curr) || !Number.isFinite(prev) || prev === 0 || prev < 1) return null;
   const percent = Math.round(((curr - prev) / prev) * 100);
   if (Math.abs(percent) < 5) return null;
   return { percent, direction: percent > 0 ? "rose" : "fell" };

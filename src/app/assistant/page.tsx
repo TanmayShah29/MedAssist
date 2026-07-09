@@ -32,7 +32,7 @@ type ContextData = {
     title: string;
     value?: string;
     trend?: string;
-    status: "optimal" | "warning" | "critical";
+    status: "optimal" | "warning" | "critical" | "unranged";
     relatedMarkers?: { name: string; status: string }[];
 };
 

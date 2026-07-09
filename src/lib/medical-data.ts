@@ -1,5 +1,6 @@
 import { Biomarker, LabResult } from "@/types/medical";
 import { logger } from "@/lib/logger";
+import { reconcileStatus } from "@/lib/range-check";
 
 type RawBiomarker = {
   name?: unknown;
@@ -61,11 +62,28 @@ function asNullableNumber(value: unknown): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function normalizeStatus(value: unknown): Biomarker["status"] {
-  if (value === "critical" || value === "warning" || value === "optimal") return value;
-  if (value === "action" || value === "high" || value === "low") return "critical";
-  if (value === "monitor" || value === "borderline") return "warning";
-  return "optimal";
+function normalizeStatus(
+  value: unknown,
+  range: { value: number; unit: string; referenceMin?: number; referenceMax?: number }
+): Biomarker["status"] {
+  // Legacy/AI-provided status strings are mapped to our canonical set only as a
+  // fallback label for reconcileStatus to consider; the deterministic range check
+  // always has final say, and 'unranged' is never silently upgraded to 'optimal'.
+  let candidate: string | undefined;
+  if (value === "critical" || value === "warning" || value === "optimal" || value === "unranged") {
+    candidate = value;
+  } else if (value === "action" || value === "high" || value === "low") {
+    candidate = "critical";
+  } else if (value === "monitor" || value === "borderline") {
+    candidate = "warning";
+  }
+
+  return reconcileStatus(candidate, {
+    value: range.value,
+    unit: range.unit,
+    referenceMin: range.referenceMin ?? null,
+    referenceMax: range.referenceMax ?? null,
+  });
 }
 
 function normalizeCategory(value: unknown): string {
@@ -74,16 +92,20 @@ function normalizeCategory(value: unknown): string {
 }
 
 export function normalizeBiomarker(row: Partial<Biomarker>): Biomarker {
+  const value = asNumber(row.value);
+  const unit = String(row.unit ?? "");
+  const reference_range_min = asNullableNumber(row.reference_range_min);
+  const reference_range_max = asNullableNumber(row.reference_range_max);
   return {
     ...row,
     id: row.id ?? `${row.name}-${row.lab_result_id ?? row.created_at ?? "biomarker"}`,
     name: String(row.name ?? "Unknown biomarker"),
-    value: asNumber(row.value),
-    unit: String(row.unit ?? ""),
-    status: normalizeStatus(row.status),
+    value,
+    unit,
+    status: normalizeStatus(row.status, { value, unit, referenceMin: reference_range_min, referenceMax: reference_range_max }),
     category: normalizeCategory(row.category),
-    reference_range_min: asNullableNumber(row.reference_range_min),
-    reference_range_max: asNullableNumber(row.reference_range_max),
+    reference_range_min,
+    reference_range_max,
     ai_interpretation: row.ai_interpretation,
     confidence: asNullableNumber(row.confidence),
     lab_result_id: row.lab_result_id ? String(row.lab_result_id) : undefined,
@@ -109,7 +131,7 @@ export function biomarkersFromReport(report: LabResultWithAnalysis): Biomarker[]
         name,
         value: b.value as number | string,
         unit: typeof b.unit === "string" ? b.unit : "",
-        status: normalizeStatus(b.status),
+        status: b.status as Biomarker["status"] | undefined,
         category: normalizeCategory(b.category),
         reference_range_min: asNullableNumber(b.reference_range_min ?? b.referenceMin),
         reference_range_max: asNullableNumber(b.reference_range_max ?? b.referenceMax),

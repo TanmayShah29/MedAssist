@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Biomarker } from '@/types/medical'
 import { getPatientStatus, PATIENT_STATUS } from '@/lib/patient-status';
 
@@ -51,6 +53,11 @@ function getDelta(current: number | string, previous: number | string | null | u
     const prev = parseFloat(String(previous));
     if (isNaN(curr) || isNaN(prev) || prev === 0) return null;
     const diff = curr - prev;
+    
+    if (Math.abs(prev) < 1 && Math.abs(diff) < 1) {
+        return { diff, percent: 0 };
+    }
+    
     const percent = Math.round((diff / prev) * 100);
     return { diff, percent };
 }
@@ -76,6 +83,23 @@ export function BiomarkerGrid({
     onBiomarkerClick,
     onUploadClick,
 }: BiomarkerGridProps) {
+    const [showOptimal, setShowOptimal] = useState(false);
+
+    // Process all biomarkers first to compute deltas
+    const processedBiomarkers = latestBiomarkers.map(b => {
+        const prev = displayBiomarkers.find(pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId);
+        const delta = getDelta(parseFloat(String(b.value)), prev?.value !== undefined ? parseFloat(String(prev.value)) : undefined);
+        return { b, delta };
+    });
+
+    // Determine which need attention vs which are stable
+    const attentionNeeded = processedBiomarkers.filter(({ b, delta }) => 
+        b.status !== 'optimal' || (delta && Math.abs(delta.percent) >= 5)
+    );
+    const optimalStable = processedBiomarkers.filter(({ b, delta }) => 
+        b.status === 'optimal' && (!delta || Math.abs(delta.percent) < 5)
+    );
+
     return (
         <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
@@ -100,45 +124,61 @@ export function BiomarkerGrid({
                 </div>
             ) : (
                 <div className="space-y-8">
-                    {CATEGORIES.map(cat => {
-                        const catBiomarkers = latestBiomarkers.filter(b => {
-                            const bCat = b.category?.toLowerCase() || 'other';
-                            if (cat === 'other') {
-                                return !(['hematology', 'metabolic', 'lipids', 'thyroid', 'inflammation', 'vitamins', 'vitals'] as string[]).includes(bCat);
-                            }
-                            return bCat === cat;
-                        });
-                        if (catBiomarkers.length === 0) return null;
-
-                        return (
-                            <div key={cat} className="space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <h4 className="text-[14px] font-bold text-[#1C1917] capitalize">{cat}</h4>
-                                    <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
-                                </div>
-                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
-                                    {catBiomarkers.map((b, idx) => {
-                                        const prev = displayBiomarkers.find(
-                                            pb => pb.name === b.name && pb.lab_result_id !== latestLabResultId
-                                        );
-                                        const delta = getDelta(
-                                            parseFloat(String(b.value)),
-                                            prev?.value !== undefined ? parseFloat(String(prev.value)) : undefined
-                                        );
-                                        return (
-                                            <BiomarkerCard
-                                                key={b.id}
-                                                biomarker={b}
-                                                delta={delta}
-                                                onClick={() => onBiomarkerClick(b)}
-                                                index={idx}
-                                            />
-                                        );
-                                    })}
-                                </div>
+                    {/* Requires Attention Section */}
+                    {attentionNeeded.length > 0 && (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <h4 className="text-[14px] font-bold text-[#1C1917]">Requires Attention</h4>
+                                <div className="h-[1px] grow shrink basis-0 bg-[#E8E6DF] ml-3" />
                             </div>
-                        );
-                    })}
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4">
+                                {attentionNeeded.map(({ b, delta }, idx) => (
+                                    <BiomarkerCard
+                                        key={b.id}
+                                        biomarker={b}
+                                        delta={delta}
+                                        onClick={() => onBiomarkerClick(b)}
+                                        index={idx}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Optimal & Stable Section (Collapsible) */}
+                    {optimalStable.length > 0 && (
+                        <div className="space-y-4 pt-4 border-t border-[#E8E6DF]/60">
+                            <button 
+                                onClick={() => setShowOptimal(!showOptimal)}
+                                className="w-full flex items-center justify-between group py-2"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                    <h4 className="text-[14px] font-bold text-[#57534E] group-hover:text-[#1C1917] transition-colors">
+                                        Optimal & Stable ({optimalStable.length})
+                                    </h4>
+                                </div>
+                                <div className="flex items-center gap-2 text-[12px] font-semibold text-[#78716C] group-hover:text-[#1C1917] transition-colors">
+                                    {showOptimal ? 'Hide details' : 'Show details'}
+                                    {showOptimal ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                </div>
+                            </button>
+                            
+                            {showOptimal && (
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 md:gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    {optimalStable.map(({ b, delta }, idx) => (
+                                        <BiomarkerCard
+                                            key={b.id}
+                                            biomarker={b}
+                                            delta={delta}
+                                            onClick={() => onBiomarkerClick(b)}
+                                            index={idx}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </>

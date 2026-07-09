@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const BiomarkerStatusSchema = z.enum(["optimal", "warning", "critical"]);
+export const BiomarkerStatusSchema = z.enum(["optimal", "warning", "critical", "unranged"]);
 export const BiomarkerCategorySchema = z.string().transform(val => {
     const valid = ["hematology", "inflammation", "metabolic", "vitamins", "other"] as const;
     const lowered = val.toLowerCase().trim();
@@ -14,7 +14,9 @@ export const BiomarkerSchema = z.object({
         .regex(/^[a-zA-Z0-9\s\-\.\(\)\/\,\'\+]+$/, "Biomarker name contains invalid characters")
         .transform((s) => s.trim()),
     value: z.coerce.number().refine((n) => !Number.isNaN(n), "Value must be a number"),
-    unit: z.string().default("unit"),
+    // No default: a missing/blank unit is meaningful (it means we cannot score this
+    // biomarker against any range), so we must not silently coerce it to a placeholder.
+    unit: z.string().optional().nullable().transform((v) => (v ?? "").trim()),
     referenceMin: z.union([z.coerce.number(), z.null(), z.undefined()]).optional().nullable().transform((v) => (v === undefined || v === null || Number.isNaN(Number(v)) ? null : Number(v))),
     referenceMax: z.union([z.coerce.number(), z.null(), z.undefined()]).optional().nullable().transform((v) => (v === undefined || v === null || Number.isNaN(Number(v)) ? null : Number(v))),
     status: BiomarkerStatusSchema,

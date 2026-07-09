@@ -8,13 +8,14 @@ import { Check, AlertCircle, RotateCcw, ArrowLeft, ArrowRight, Loader2, ChevronL
 import { cn } from "@/lib/utils";
 import { saveProfileFromSession, saveReviewedReportFromSession } from "@/app/actions/user-data";
 import { computeBriefCompleteness, PATIENT_STATUS } from "@/lib/patient-status";
+import { ContextForm } from "./context-form";
 
 // Real processing stages related to API lifecycle
 type ProcessingState = "uploading" | "analyzing" | "finalizing" | "complete" | "error";
 type DebugPayload = Record<string, unknown> | string | null | undefined;
 
-const IMAGE_BASED_MSG = 'This file appears to be image-based. Please upload a digital lab report or enter values manually.';
-const GENERIC_PROCESSING_MSG = 'We could not analyze this report right now. Please try again in a moment, or enter the values manually.';
+const IMAGE_BASED_MSG = 'This file appears to be a scanned image. We work best with digital PDFs. You can upload a different file or enter your values manually.';
+const GENERIC_PROCESSING_MSG = 'We hit an unexpected bump while analyzing your report. Please try again in a moment, or skip ahead to enter values manually.';
 
 function deriveReviewedScore(biomarkers: ExtractedLabValue[]) {
     if (biomarkers.length === 0) return 0;
@@ -34,16 +35,16 @@ function deriveRiskLevel(biomarkers: ExtractedLabValue[]): "low" | "moderate" | 
 
 const getErrorMessage = (error: string, debug?: DebugPayload) => {
     if (/missing required environment variables|supabase_service_role_key|environment variables|\.env\.local/i.test(error))
-        return { title: 'Analysis unavailable', detail: GENERIC_PROCESSING_MSG, canRetry: true, debug }
+        return { title: 'Something didn\'t go quite right', detail: GENERIC_PROCESSING_MSG, canRetry: true, debug }
     if (error.includes('Rate limit') || error.includes('429'))
-        return { title: 'High Traffic / Rate Limit', detail: 'The AI service is currently busy (Rate Limit). Please wait a moment and try again.', canRetry: true, debug }
+        return { title: 'We\'re a bit backed up', detail: 'The AI service is currently busy helping other patients. Please wait a moment and try again.', canRetry: true, debug }
     if (error.includes('Unauthorized') || error.includes('401'))
-        return { title: 'Session expired', detail: 'Your session has expired. Please sign in again.', canRetry: false, redirect: '/auth?mode=login', debug }
+        return { title: 'Session expired', detail: 'Your secure session has expired. Please sign in again to continue.', canRetry: false, redirect: '/auth?mode=login', debug }
     if (error.includes('invalid format'))
-        return { title: 'AI parsing error', detail: 'The AI had trouble reading this report format. Try a different PDF.', canRetry: true, debug }
+        return { title: 'We couldn\'t read your report clearly', detail: 'The AI had trouble reading this report format. The text might be blurry or the format might be tricky. Try a different PDF, or enter your values manually.', canRetry: true, debug }
     if (error.includes('image-based') || error === IMAGE_BASED_MSG)
-        return { title: 'Image-based PDF', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true, debug }
-    return { title: 'Something went wrong', detail: error, canRetry: true, debug }
+        return { title: 'This looks like a scanned image', detail: IMAGE_BASED_MSG, canRetry: true, isImageBased: true, debug }
+    return { title: 'Something didn\'t go quite right', detail: 'We encountered an unexpected bump while analyzing your report. Let\'s try that again.', canRetry: true, debug }
 }
 
 async function readDebuggableJson(response: Response) {
@@ -241,12 +242,34 @@ function ReviewExtractedValues({
                                 placeholder="Value"
                                 className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             />
-                            <input
+                            <select
                                 value={row.unit}
                                 onChange={(e) => updateRow(index, { unit: e.target.value })}
-                                placeholder="Unit"
                                 className="rounded-[10px] border border-[#E8E6DF] bg-[#FAFAF7] px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-                            />
+                            >
+                                <option value="" disabled>Unit</option>
+                                <option value="mg/dL">mg/dL</option>
+                                <option value="g/dL">g/dL</option>
+                                <option value="IU/L">IU/L</option>
+                                <option value="U/L">U/L</option>
+                                <option value="mEq/L">mEq/L</option>
+                                <option value="mmol/L">mmol/L</option>
+                                <option value="µg/dL">µg/dL</option>
+                                <option value="ng/mL">ng/mL</option>
+                                <option value="pg/mL">pg/mL</option>
+                                <option value="%">%</option>
+                                <option value="cells/mcL">cells/mcL</option>
+                                <option value="fL">fL</option>
+                                <option value="pg">pg</option>
+                                <option value="10^3/µL">10^3/µL</option>
+                                <option value="10^6/µL">10^6/µL</option>
+                                <option value="mL/min/1.73m2">mL/min/1.73m2</option>
+                                <option value="g/L">g/L</option>
+                                <option value="µIU/mL">µIU/mL</option>
+                                <option value="nmol/L">nmol/L</option>
+                                <option value="pmol/L">pmol/L</option>
+                                <option value="unit">unit</option>
+                            </select>
                             <select
                                 value={row.status}
                                 onChange={(e) => updateRow(index, { status: e.target.value as ExtractedLabValue["status"] })}
@@ -311,12 +334,21 @@ function ReviewExtractedValues({
     );
 }
 
-export function StepProcessing() {
+export function StepProcessing({ currentStep }: { currentStep?: number }) {
     const { setStep, completeStep, setAnalysisResult, analysisResult } = useOnboardingStore();
     const [state, setState] = useState<ProcessingState>("uploading");
     const [currentStageIndex, setCurrentStageIndex] = useState(0);
     const [errorData, setErrorData] = useState<{ title: string, detail: string, canRetry: boolean, redirect?: string, isImageBased?: boolean, debug?: DebugPayload } | null>(null);
     const hasStarted = useRef(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    const handleCancel = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+        goBackToUpload();
+    };
 
     // New stages configuration with durations
     const stages = useMemo(() => [
@@ -391,10 +423,13 @@ export function StepProcessing() {
 
             setState("analyzing");
 
+            abortControllerRef.current = new AbortController();
+
             clientStage = "fetch /api/analyze-report";
             const response = await fetch("/api/analyze-report", {
                 method: "POST",
                 body: formData,
+                signal: abortControllerRef.current.signal,
             });
 
             clientStage = "read /api/analyze-report response";
@@ -490,6 +525,7 @@ export function StepProcessing() {
             }
 
         } catch (err: unknown) {
+            if ((err as Error).name === 'AbortError') return;
             const debugFromError = (err as { debug?: DebugPayload }).debug;
             setErrorData(getErrorMessage((err as Error).message || "Network error", {
                 clientStage,
@@ -583,8 +619,17 @@ export function StepProcessing() {
         );
     }
 
-    if (state === "complete" && analysisResult) {
+    if (state === "complete" && analysisResult && currentStep === 3) {
         return <ReviewExtractedValues analysisResult={analysisResult} onComplete={onComplete} />;
+    }
+
+    if (currentStep === 2) {
+        return (
+            <ContextForm onComplete={() => {
+                completeStep(2);
+                setStep(3);
+            }} />
+        );
     }
 
     // Processing State (Default)
@@ -647,11 +692,11 @@ export function StepProcessing() {
             <div className="mt-12 text-center">
                 <p className="text-xs text-[#78716C] font-medium">This usually takes 20–40 seconds</p>
                 <button
-                    onClick={goBackToUpload}
+                    onClick={state === 'uploading' || state === 'analyzing' || state === 'finalizing' ? handleCancel : goBackToUpload}
                     className="mt-4 text-sm text-[#57534E] hover:text-[#1C1917] font-medium flex items-center gap-1.5 mx-auto"
                 >
                     <ChevronLeft className="w-4 h-4" />
-                    Upload a different file
+                    {state === 'uploading' || state === 'analyzing' || state === 'finalizing' ? 'Cancel Analysis' : 'Upload a different file'}
                 </button>
             </div>
         </div>

@@ -15,7 +15,9 @@ export interface Biomarker {
     name: string;
     value: number | string; // Bug 4: DB stores as TEXT; use parseFloat() for arithmetic
     unit: string;
-    status: 'optimal' | 'warning' | 'critical';
+    // 'unranged' = no usable printed reference range (and/or unit) was found on the
+    // report — this is a distinct, visible state, never silently treated as 'optimal'.
+    status: 'optimal' | 'warning' | 'critical' | 'unranged';
     category: string;
     reference_range_min?: number;
     reference_range_max?: number;

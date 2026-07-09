@@ -6,11 +6,18 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Upload, X, FileText, Lock, PenLine, Plus, Trash2, Loader2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { logger } from "@/lib/logger";
 
 const GENERIC_ANALYSIS_ERROR = "We could not analyze these results right now. Please try again in a moment.";
+
+const COMMON_UNITS = [
+    "mg/dL", "g/dL", "IU/L", "U/L", "mEq/L", "mmol/L",
+    "µg/dL", "ng/mL", "pg/mL", "%", "cells/mcL",
+    "fL", "pg", "10^3/µL", "10^6/µL", "mL/min/1.73m2",
+    "g/L", "µIU/mL", "nmol/L", "pmol/L", "unit"
+];
 
 function nextId() {
     return `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -108,6 +115,16 @@ export function StepUpload() {
     ]);
     const [isManualSubmitting, setIsManualSubmitting] = useState(false);
 
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    const handleCancelManual = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+        setIsManualSubmitting(false);
+    };
+
     // If user has already selected a file (e.g. went back and forth), default to upload view.
     useEffect(() => {
         if (uploadedFile && showOptions && !showManualEntry) {
@@ -122,20 +139,27 @@ export function StepUpload() {
         setManualRows((p) => (p.length > 1 ? p.filter((r) => r.id !== id) : p));
 
     const onSubmitManualEntry = async () => {
-        const biomarkers = manualRows
+        const validRows = manualRows
             .map((r) => ({ name: r.name.trim(), value: parseFloat(r.value), unit: r.unit.trim() || "unit" }))
             .filter((b) => b.name && !Number.isNaN(b.value));
-        if (biomarkers.length === 0) {
+        
+        if (validRows.length === 0) {
             toast.error("Add at least one biomarker with name and value.");
             return;
         }
         setIsManualSubmitting(true);
+        abortControllerRef.current = new AbortController();
+
         try {
             const formData = new FormData();
-            formData.append("manualPayload", JSON.stringify({ biomarkers }));
+            formData.append("manualPayload", JSON.stringify({ biomarkers: validRows }));
             formData.append("symptoms", JSON.stringify(selectedSymptoms));
 
-            const res = await fetch("/api/analyze-report", { method: "POST", body: formData });
+            const res = await fetch("/api/analyze-report", { 
+                method: "POST", 
+                body: formData,
+                signal: abortControllerRef.current.signal,
+            });
             const data = await readJsonWithRawBody(res);
             if (!res.ok) {
                 toast.error(patientSafeError(data.error || "Analysis failed"));
@@ -180,9 +204,10 @@ export function StepUpload() {
                 logger.error("Failed to save profile during manual entry:", err);
             }
 
-            completeStep(3);
-            setStep(5);
+            completeStep(1);
+            setStep(2);
         } catch (err) {
+            if ((err as Error).name === 'AbortError') return;
             toast.error(patientSafeError((err as Error).message || "Something went wrong"));
         } finally {
             setIsManualSubmitting(false);
@@ -195,7 +220,7 @@ export function StepUpload() {
         }
         try {
             setUploadedFile(null);
-            completeStep(3);
+            completeStep(1);
 
             // Dynamically import to avoid circular deps in a client component
             const { saveProfileFromSession, completeOnboarding } = await import("@/app/actions/user-data");
@@ -228,7 +253,7 @@ export function StepUpload() {
         return (
             <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-6">
                 <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">Step 3 of 5</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">Step 1 of 4</p>
                     <h2 className="font-display text-3xl text-[#1C1917] mb-2">Enter lab values manually</h2>
                     <p className="text-[#57534E] text-sm leading-relaxed">
                         Add the values you want help interpreting. Start with the abnormal or confusing ones if you do not want to enter the whole report.
@@ -236,29 +261,24 @@ export function StepUpload() {
                 </div>
                 <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
                     {manualRows.map((row) => (
-                        <div key={row.id} className="grid grid-cols-[minmax(0,1fr)_84px_84px_40px] gap-2 items-center max-[420px]:grid-cols-[minmax(0,1fr)_40px]">
+                        <div key={row.id} className="grid grid-cols-[1fr_80px_40px] gap-2 items-center">
                             <input
                                 type="text"
                                 placeholder="Name (e.g. Glucose)"
                                 value={row.name}
                                 onChange={(e) => updateManualRow(row.id, "name", e.target.value)}
-                                className="min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 max-[420px]:col-span-2"
+                                className="min-w-0 rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                             />
-                            <input
-                                type="text"
-                                inputMode="decimal"
-                                placeholder="Value"
-                                value={row.value}
-                                onChange={(e) => updateManualRow(row.id, "value", e.target.value)}
-                                className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Unit"
-                                value={row.unit}
-                                onChange={(e) => updateManualRow(row.id, "unit", e.target.value)}
-                                className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                            />
+                            <div className="w-full">
+                                <select
+                                    value={row.unit}
+                                    onChange={(e) => updateManualRow(row.id, "unit", e.target.value)}
+                                    className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
+                                >
+                                    <option value="" disabled>Unit</option>
+                                    {COMMON_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                                </select>
+                            </div>
                             <button
                                 aria-label="Remove value"
                                 type="button"
@@ -286,29 +306,39 @@ export function StepUpload() {
                         <ChevronLeft className="w-4 h-4" />
                         Back
                     </button>
-                    <motion.button
-                        onClick={onSubmitManualEntry}
-                        disabled={isManualSubmitting}
-                        whileTap={{ scale: 0.97 }}
-                        className={cn(
-                            "flex items-center gap-2 px-6 py-3 rounded-[10px] text-sm font-semibold transition-all",
-                            isManualSubmitting
-                                ? "bg-[#E8E6DF] text-[#78716C] cursor-wait"
-                                : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
+                    <div className="flex items-center gap-4">
+                        {isManualSubmitting && (
+                            <button
+                                onClick={handleCancelManual}
+                                className="text-sm font-medium text-[#78716C] hover:text-red-500 transition-colors"
+                            >
+                                Cancel
+                            </button>
                         )}
-                    >
-                        {isManualSubmitting ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                Analyzing...
-                            </>
-                        ) : (
-                            <>
-                        Analyze these values
-                                <ChevronRight className="w-4 h-4" />
-                            </>
-                        )}
-                    </motion.button>
+                        <motion.button
+                            onClick={onSubmitManualEntry}
+                            disabled={isManualSubmitting}
+                            whileTap={{ scale: 0.97 }}
+                            className={cn(
+                                "flex items-center gap-2 px-6 py-3 rounded-[10px] text-sm font-semibold transition-all",
+                                isManualSubmitting
+                                    ? "bg-[#E8E6DF] text-[#78716C] cursor-wait"
+                                    : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
+                            )}
+                        >
+                            {isManualSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Analyzing...
+                                </>
+                            ) : (
+                                <>
+                                    Analyze these values
+                                    <ChevronRight className="w-4 h-4" />
+                                </>
+                            )}
+                        </motion.button>
+                    </div>
                 </div>
             </div>
         );
@@ -319,7 +349,7 @@ export function StepUpload() {
             <div className="max-w-lg mx-auto w-full px-6 py-10 flex flex-col gap-8">
                 <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-500 mb-2">
-                        Step 3 of 5
+                        Step 1 of 4
                     </p>
                     <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                         Upload your lab report
@@ -412,7 +442,7 @@ export function StepUpload() {
             <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
                       text-sky-500 mb-2">
-                    Step 3 of 5
+                    Step 1 of 4
                 </p>
                 <h2 className="font-display text-3xl text-[#1C1917] mb-2">
                     Upload your lab report
@@ -533,8 +563,8 @@ export function StepUpload() {
                 <motion.button
                     onClick={() => {
                         if (uploadedFile) {
-                            completeStep(3);
-                            setStep(4);
+                            completeStep(1);
+                            setStep(2);
                         }
                     }}
                     disabled={!uploadedFile}

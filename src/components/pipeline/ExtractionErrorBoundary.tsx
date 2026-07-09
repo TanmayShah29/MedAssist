@@ -48,12 +48,15 @@ export class ExtractionErrorBoundary extends Component<Props, State> {
                         <AlertCircle className="w-12 h-12 text-red-500" />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <h2 className="text-xl font-bold text-gray-900">
-                            {isExtractionError ? "Extraction Error" : "Something went wrong"}
+                            {isExtractionError ? "We couldn't read your report clearly" : "Something didn't go quite right"}
                         </h2>
-                        <p className="text-sm text-gray-600">
-                            {this.state.error?.message || "We encountered an unexpected issue while analyzing your report."}
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                            {isExtractionError 
+                                ? "The AI had trouble extracting values from your PDF. The text might be blurry or the format might be tricky. Let's try again, or you can skip this step and enter your values manually."
+                                : "We encountered an unexpected bump while analyzing your report. Let's try that again."
+                            }
                         </p>
                     </div>
 

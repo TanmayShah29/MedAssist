@@ -1,10 +1,10 @@
 import type { Biomarker } from "@/types/medical";
 
-export type InternalBiomarkerStatus = "optimal" | "warning" | "critical";
+export type InternalBiomarkerStatus = "optimal" | "warning" | "critical" | "unranged";
 
 export type PatientStatusMeta = {
-  label: "In range" | "Discuss" | "Discuss soon";
-  shortLabel: "In range" | "Discuss" | "Soon";
+  label: "In range" | "Discuss" | "Discuss soon" | "No range on report";
+  shortLabel: "In range" | "Discuss" | "Soon" | "No range";
   printLabel: string;
   description: string;
   priority: number;
@@ -16,7 +16,7 @@ export type PatientStatusMeta = {
   barClass: string;
 };
 
-const FALLBACK_STATUS: InternalBiomarkerStatus = "optimal";
+const FALLBACK_STATUS: InternalBiomarkerStatus = "unranged";
 
 export const PATIENT_STATUS: Record<InternalBiomarkerStatus, PatientStatusMeta> = {
   optimal: {
@@ -58,10 +58,23 @@ export const PATIENT_STATUS: Record<InternalBiomarkerStatus, PatientStatusMeta> 
     borderClass: "border-red-100",
     barClass: "bg-red-500",
   },
+  unranged: {
+    label: "No range on report",
+    shortLabel: "No range",
+    printLabel: "No reference range printed",
+    description: "This report didn't print a reference range (or unit) for this value, so it isn't scored as in-range or out-of-range.",
+    priority: -1,
+    dotClass: "bg-stone-400",
+    badgeClass: "bg-stone-50 text-stone-600 border-stone-200",
+    textClass: "text-stone-600",
+    bgClass: "bg-stone-50",
+    borderClass: "border-stone-200",
+    barClass: "bg-stone-400",
+  },
 };
 
 export function normalizePatientStatus(status: string | null | undefined): InternalBiomarkerStatus {
-  return status === "warning" || status === "critical" || status === "optimal"
+  return status === "warning" || status === "critical" || status === "optimal" || status === "unranged"
     ? status
     : FALLBACK_STATUS;
 }

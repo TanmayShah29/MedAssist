@@ -14,25 +14,20 @@ import { StepTour } from "./components/step-tour";
 import { ExtractionErrorBoundary } from "@/components/pipeline/ExtractionErrorBoundary";
 
 const STEP_LABELS = [
-    "Profile",
+    "Upload",
     "Context",
-    "Report",
     "Review",
     "Ready",
 ];
 
 const STEP_CONTEXT = [
     {
-        title: "Set your clinical baseline",
-        detail: "Reference ranges can depend on age and biological sex. This makes the first analysis less generic.",
-    },
-    {
-        title: "Add symptoms and medication context",
-        detail: "Symptoms are optional, and medications or supplements can be added after upload to make the visit brief more useful.",
-    },
-    {
         title: "Choose how to bring in results",
         detail: "Upload a PDF, enter values manually, or skip and add a report later from the dashboard.",
+    },
+    {
+        title: "Add your clinical context",
+        detail: "Age, biological sex, and symptoms help us interpret the markers accurately.",
     },
     {
         title: "Check the extraction before saving",
@@ -151,15 +146,13 @@ export default function OnboardingPage() {
                         transition={{ duration: 0.2 }}
                         className="grow shrink basis-0 flex flex-col"
                     >
-                        {currentStep === 1 && <StepBasicInfo />}
-                        {currentStep === 2 && <StepSymptoms />}
-                        {currentStep === 3 && <StepUpload />}
-                        {currentStep === 4 && (
+                        {currentStep === 1 && <StepUpload />}
+                        {(currentStep === 2 || currentStep === 3) && (
                             <ExtractionErrorBoundary>
-                                <StepProcessing />
+                                <StepProcessing currentStep={currentStep} />
                             </ExtractionErrorBoundary>
                         )}
-                        {currentStep === 5 && <StepTour />}
+                        {currentStep === 4 && <StepTour />}
                     </motion.div>
                 </AnimatePresence>
             </div>

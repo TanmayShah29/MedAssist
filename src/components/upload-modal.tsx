@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, AlertCircle, PenLine, Plus, Trash2, RotateCcw } from 'lucide-react';
+import { Upload, X, FileText, AlertCircle, PenLine, Plus, Trash2, RotateCcw, Lock } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 import { TrustLayer } from '@/components/trust-layer';
@@ -18,6 +18,13 @@ const COMMON_BIOMARKERS = [
     "Hemoglobin", "Hematocrit", "RBC", "WBC", "Platelets",
     "TSH", "T3", "T4", "Vitamin D", "Vitamin B12",
     "CRP", "ESR", "Ferritin"
+];
+
+const COMMON_UNITS = [
+    "mg/dL", "g/dL", "IU/L", "U/L", "mEq/L", "mmol/L",
+    "µg/dL", "ng/mL", "pg/mL", "%", "cells/mcL",
+    "fL", "pg", "10^3/µL", "10^6/µL", "mL/min/1.73m2",
+    "g/L", "µIU/mL", "nmol/L", "pmol/L", "unit"
 ];
 
 const COMMON_SYMPTOMS = [
@@ -78,6 +85,39 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
     const [error, setError] = useState<string | null>(null);
     const [errorCode, setErrorCode] = useState<string | null>(null);
     const [_uploadSuccess, setUploadSuccess] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const analyzingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    const handleCancel = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+        setIsProcessing(false);
+        setProcessStage(null);
+        setProgress(0);
+        setError("Analysis was cancelled.");
+        stopAnalyzingProgress();
+    };
+
+    const stopAnalyzingProgress = () => {
+        if (analyzingIntervalRef.current) {
+            clearInterval(analyzingIntervalRef.current);
+            analyzingIntervalRef.current = null;
+        }
+    };
+
+    const startAnalyzingProgress = () => {
+        setElapsedSeconds(0);
+        stopAnalyzingProgress();
+        analyzingIntervalRef.current = setInterval(() => {
+            setElapsedSeconds((s) => s + 1);
+            // Crawl slowly toward 55% while the real request is in flight, so the bar
+            // never looks frozen during the 20-40s PDF analysis window.
+            setProgress((p) => (p < 55 ? p + 1 : p));
+        }, 1000);
+    };
     const [manualRows, setManualRows] = useState<ManualRow[]>([
         { id: nextId(), name: '', value: '', unit: 'mg/dL' },
     ]);
@@ -85,6 +125,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
     useEffect(() => {
         if (!isOpen) {
+            stopAnalyzingProgress();
             setTimeout(() => {
                 setFile(null);
                 setError(null);
@@ -92,12 +133,16 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setIsProcessing(false);
                 setProcessStage(null);
                 setProgress(0);
+                setElapsedSeconds(0);
                 setManualRows([{ id: nextId(), name: '', value: '', unit: 'mg/dL' }]);
                 setSelectedSymptoms([]);
                 setTab('upload');
             }, 300);
         }
     }, [isOpen]);
+
+    // Safety net: clear the interval if the component unmounts mid-analysis.
+    useEffect(() => () => stopAnalyzingProgress(), []);
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -155,13 +200,18 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             setTimeout(() => setProgress(20), 100);
             setProcessStage('analyzing');
+            startAnalyzingProgress();
+
+            abortControllerRef.current = new AbortController();
 
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
                 body: formData,
+                signal: abortControllerRef.current.signal,
             });
 
-            setTimeout(() => setProgress(60), 200);
+            stopAnalyzingProgress();
+            setProgress(60);
 
             const data = await readJsonWithRawBody(response);
 
@@ -196,6 +246,8 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setProgress(0);
             }, 800);
         } catch (err: unknown) {
+            stopAnalyzingProgress();
+            if ((err as Error).name === 'AbortError') return;
             setError(patientSafeError((err as Error).message || 'Something went wrong processing your report.'));
             setErrorCode(null);
             setIsProcessing(false);
@@ -246,9 +298,12 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
 
             setTimeout(() => setProgress(50), 200);
 
+            abortControllerRef.current = new AbortController();
+
             const response = await fetch('/api/analyze-report', {
                 method: 'POST',
                 body: formData,
+                signal: abortControllerRef.current.signal,
             });
 
             setTimeout(() => setProgress(70), 400);
@@ -281,6 +336,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                 setProgress(0);
             }, 800);
         } catch (err: unknown) {
+            if ((err as Error).name === 'AbortError') return;
             setError(patientSafeError((err as Error).message || 'Something went wrong.'));
             setIsProcessing(false);
             setProcessStage(null);
@@ -486,12 +542,16 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-[16px] font-semibold text-[#1C1917] mb-1">Click or drag PDF here</p>
-                                                        <p className="text-[14px] text-[#78716C] mb-4">Digital PDFs work best · Maximum file size 10MB</p>
+                                                        <p className="text-[14px] text-[#78716C] mb-3">Digital PDFs work best · Maximum file size 10MB</p>
+                                                        <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full text-[11px] font-semibold mb-2">
+                                                            <Lock size={12} />
+                                                            <span>Secure, encrypted upload</span>
+                                                        </div>
                                                         <a
                                                             href="/samples/sample-report.pdf"
                                                             download
                                                             onClick={(e) => e.stopPropagation()}
-                                                            className="text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100 transition-colors"
+                                                            className="text-xs font-bold text-sky-600 hover:text-sky-700 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100 transition-colors mt-2"
                                                         >
                                                             Need a test file? Download sample
                                                         </a>
@@ -522,7 +582,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                             </div>
                                                             <span className="text-sm whitespace-nowrap">
                                                                 {processStage === 'uploading' && 'Uploading...'}
-                                                                {processStage === 'analyzing' && 'Analyzing...'}
+                                                                {processStage === 'analyzing' && (elapsedSeconds > 12 ? 'Still analyzing...' : 'Analyzing...')}
                                                                 {processStage === 'saving' && 'Saving...'}
                                                                 {processStage === 'complete' && 'Done!'}
                                                             </span>
@@ -531,6 +591,16 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                         'Analyze and save'
                                                     )}
                                                 </button>
+                                                {isProcessing && (
+                                                    <button onClick={handleCancel} className="text-sm text-[#78716C] hover:text-red-500 font-medium transition-colors">
+                                                        Cancel Analysis
+                                                    </button>
+                                                )}
+                                                {isProcessing && processStage === 'analyzing' && elapsedSeconds > 10 && (
+                                                    <p className="text-xs text-[#78716C] text-center leading-relaxed">
+                                                        Still working — larger or scanned reports can take up to a minute. Please keep this open.
+                                                    </p>
+                                                )}
                                                 {!isProcessing && (
                                                     <button onClick={() => setFile(null)} className="text-sm text-[#78716C] hover:text-[#1C1917] font-medium transition-colors">
                                                         Choose a different file
@@ -575,14 +645,15 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                     </div>
                                                     <div className="w-[calc(50%-2rem)] min-w-24 sm:w-20 sm:min-w-0">
                                                         <label htmlFor={`unit-${row.id}`} className="sr-only">Unit</label>
-                                                        <input
+                                                        <select
                                                             id={`unit-${row.id}`}
-                                                            type="text"
-                                                            placeholder="Unit"
                                                             value={row.unit}
                                                             onChange={(e) => updateManualRow(row.id, 'unit', e.target.value)}
-                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                                                        />
+                                                            className="w-full rounded-lg border border-[#E8E6DF] px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
+                                                        >
+                                                            <option value="" disabled>Unit</option>
+                                                            {COMMON_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                                                        </select>
                                                     </div>
                                                     <button
                                                         type="button"
@@ -632,6 +703,11 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
                                                 'Analyze and save'
                                             )}
                                         </button>
+                                        {isProcessing && (
+                                            <button onClick={handleCancel} className="w-full text-center mt-2 text-sm text-[#78716C] hover:text-red-500 font-medium transition-colors">
+                                                Cancel Analysis
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>

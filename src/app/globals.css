@@ -2,26 +2,26 @@
 
 @theme {
   /* ── Colour palette ── */
-  --color-page: #FAFAF7;
-  --color-card: #F5F4EF;
-  --color-card-hover: #EFEDE6;
-  --color-border-light: #E8E6DF;
-  --color-border-medium: #D9D6CD;
-  --color-text-primary: #1C1917;
-  --color-text-secondary: #57534E;
-  --color-text-muted: #78716C;
-  --color-brand-primary: #0EA5E9;
-  --color-brand-primary-hover: #0284C7;
-  --color-brand-subtle: #E0F2FE;
-  --color-status-optimal: #10B981;
+  --color-page: #FDFDFB;
+  --color-card: #FFFFFF;
+  --color-card-hover: #FAFAFA;
+  --color-border-light: #EBEAE4;
+  --color-border-medium: #D1CFCD;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-brand-primary: #0284C7;
+  --color-brand-primary-hover: #0369A1;
+  --color-brand-subtle: #F0F9FF;
+  --color-status-optimal: #059669;
   --color-status-optimal-bg: #ECFDF5;
   --color-status-optimal-border: #A7F3D0;
-  --color-status-warning: #F59E0B;
+  --color-status-warning: #D97706;
   --color-status-warning-bg: #FFFBEB;
   --color-status-warning-border: #FDE68A;
-  --color-status-critical: #EF4444;
-  --color-status-critical-bg: #FEF2F2;
-  --color-status-critical-border: #FECACA;
+  --color-status-critical: #E11D48;
+  --color-status-critical-bg: #FFF1F2;
+  --color-status-critical-border: #FFE4E6;
 
   /* ── Typography ── */
   --font-display: var(--font-instrument, Georgia, "Times New Roman", serif);
@@ -71,6 +71,7 @@
       linear-gradient(180deg, #FCFCF9 0%, var(--color-page) 34rem);
     color: var(--color-text-primary);
     font-family: var(--font-sans);
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Prevent iOS Safari bounce effect */
@@ -88,6 +89,7 @@
     font-family: var(--font-display);
     /* Safari font-variant parser fix */
     font-variant-ligatures: common-ligatures;
+    letter-spacing: -0.02em;
   }
 
   /* Standardizing backgrounds without !important to allow Tailwind overrides */
@@ -847,12 +849,13 @@
   .skeleton-shimmer {
     background: linear-gradient(
       90deg,
-      var(--color-card) 25%,
-      var(--color-card-hover) 50%,
-      var(--color-card) 75%
+      rgba(245, 244, 239, 0.6) 25%,
+      rgba(239, 237, 230, 0.8) 50%,
+      rgba(245, 244, 239, 0.6) 75%
     );
     background-size: 200% 100%;
-    animation: shimmer 1.5s ease-in-out infinite;
+    animation: shimmer 2.5s ease-in-out infinite alternate, softPulse 2s ease-in-out infinite;
+    border-radius: var(--radius-md);
   }
 
   /* Safari scroll container fix */
