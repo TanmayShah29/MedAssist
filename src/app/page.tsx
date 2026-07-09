@@ -10,7 +10,7 @@ import {
 import { LandingHeader } from "@/components/landing/landing-header";
 import { StatsCounter } from "@/components/landing/stats-counter";
 import { BrandLockup } from "@/components/branding/brand-lockup";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useRef } from "react";
 
 // ── Tiny helpers ─────────────────────────────────────────────────────────
@@ -24,12 +24,12 @@ function Pill({ children, className = "" }: { children: ReactNode; className?: s
 }
 
 // ── Framer Motion Variants ───────────────────────────────────────────────
-const fadeInUp = {
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
