@@ -40,7 +40,7 @@ export function LandingHeader() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-[80] border-b border-[#EBEAE4]/80 bg-[#FDFDFB]/[0.98] transition-shadow duration-200 ${
+        className={`absolute left-0 right-0 top-0 z-[80] border-b border-[#EBEAE4]/80 bg-[#FDFDFB]/[0.98] transition-shadow duration-200 ${
           scrolled
             ? "shadow-sm shadow-stone-900/[0.05]"
             : "shadow-none"
@@ -52,9 +52,10 @@ export function LandingHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            <Link href="#how-it-works" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">How it works</Link>
-            <Link href="#features" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">Features</Link>
-            <Link href="#security" className="text-sm font-medium text-[#475569] hover:text-[#0F172A] px-3 py-2 rounded-lg hover:bg-[#FFFFFF] transition-all">Security</Link>
+            <Link href="/about" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-white transition-all">About</Link>
+            <Link href="/engineering" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-white transition-all">Engineering</Link>
+            <Link href="/security" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-white transition-all">Security</Link>
+            <Link href="/roadmap" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-white transition-all">Roadmap</Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -99,9 +100,10 @@ export function LandingHeader() {
 
         {menuOpen && (
           <div className="md:hidden bg-[#FDFDFB] border-t border-[#EBEAE4] px-6 py-4 space-y-1">
-            <Link href="#how-it-works" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">How it works</Link>
-            <Link href="#features" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">Features</Link>
-            <Link href="#security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-[#475569] py-3 border-b border-[#F0EEE8]">Security</Link>
+            <Link href="/about" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-slate-600 py-3 border-b border-slate-200">About</Link>
+            <Link href="/engineering" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-slate-600 py-3 border-b border-slate-200">Engineering</Link>
+            <Link href="/security" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-slate-600 py-3 border-b border-slate-200">Security</Link>
+            <Link href="/roadmap" onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-slate-600 py-3 border-b border-slate-200">Roadmap</Link>
             <Link href="/demo" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-sky-600 py-3 border-b border-[#F0EEE8]">Live Demo</Link>
             {showResetSession && (
               <button
@@ -132,7 +134,7 @@ export function LandingHeader() {
       </header>
 
       {accountState === "stale" && (
-        <div className="fixed left-0 right-0 top-[72px] z-[70] border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+        <div className="absolute left-0 right-0 top-[72px] z-[70] border-y border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-amber-900">
               Your previous account session looks expired or deleted. Sign out to start fresh.
