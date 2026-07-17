@@ -95,7 +95,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
           </div>
           <div className="min-w-0">
             <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight break-words">Ask Your Doctor</h3>
-            <p className="text-[12px] text-[#94A3B8] break-words">Personalized questions for your next visit</p>
+            <p className="text-[12px] text-[#64748B] break-words">Personalized questions for your next visit</p>
           </div>
         </div>
 
@@ -117,7 +117,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
 
         {/* Loading indicator */}
         {loading && (
-          <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] self-start">
+          <div className="flex items-center gap-2 text-[11px] text-[#64748B] self-start">
             <div className="w-3 h-3 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin" />
             <span>Generating…</span>
           </div>
@@ -166,7 +166,7 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
                   {item.context && (
                     <div className="flex items-start gap-1.5 mt-2">
                       <Info className="w-3.5 h-3.5 text-sky-300 mt-0.5 flex-shrink-0" />
-                      <p className="text-[12px] text-[#94A3B8] leading-relaxed break-words min-w-0">{item.context}</p>
+                      <p className="text-[12px] text-[#64748B] leading-relaxed break-words min-w-0">{item.context}</p>
                     </div>
                   )}
                 </div>
@@ -175,14 +175,14 @@ export function DoctorQuestions({ biomarkers, className }: DoctorQuestionsProps)
           ))
         ) : (
           <div className="py-8 text-center border-2 border-dashed border-[#EBEAE4] rounded-[12px]">
-            <p className="text-[13px] text-[#94A3B8]">Your results look stable — no specific questions generated.</p>
+            <p className="text-[13px] text-[#64748B]">Your results look stable — no specific questions generated.</p>
           </div>
         )}
       </div>
 
       {/* Footer disclaimer */}
       <div className="mt-5 pt-4 border-t border-[#EBEAE4]">
-        <p className="text-[11px] text-[#94A3B8] leading-relaxed">
+        <p className="text-[11px] text-[#64748B] leading-relaxed">
           <strong>Note:</strong> Questions are AI-generated from your values to support a more productive clinician conversation. They are not a diagnosis or treatment advice.
         </p>
       </div>

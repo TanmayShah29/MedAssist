@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { HelpCircle, X, Send } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { isAppShellRoute } from "@/lib/app-shell";
 
 export function FeedbackButton() {
     const pathname = usePathname();
@@ -48,9 +49,7 @@ export function FeedbackButton() {
         return null;
     }
 
-    const needsMobileNavOffset = ["/dashboard", "/results", "/assistant", "/profile", "/settings"].some((route) =>
-        pathname?.startsWith(route)
-    );
+    const needsMobileNavOffset = isAppShellRoute(pathname);
     const positionClass = needsMobileNavOffset
         ? "bottom-24 md:bottom-6 right-4 sm:right-6"
         : "bottom-5 right-4 sm:bottom-6 sm:right-6";
@@ -70,7 +69,7 @@ export function FeedbackButton() {
                             <h3 className="text-sm font-semibold text-[#0F172A]">Send Feedback</h3>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-[#94A3B8] hover:text-[#0F172A] transition-colors p-1"
+                                className="text-[#64748B] hover:text-[#0F172A] transition-colors p-1"
                                 aria-label="Close"
                             >
                                 <X size={16} />
@@ -81,7 +80,7 @@ export function FeedbackButton() {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Found a bug? Have a suggestion?"
-                                className="w-full text-sm bg-[#FDFDFB] border border-[#EBEAE4] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#0F172A] placeholder:text-[#94A3B8]"
+                                className="w-full text-sm bg-[#FDFDFB] border border-[#EBEAE4] rounded-[10px] p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 mb-3 text-[#0F172A] placeholder:text-[#64748B]"
                                 required
                             />
                             <button

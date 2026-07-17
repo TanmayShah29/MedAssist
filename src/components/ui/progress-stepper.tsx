@@ -27,7 +27,7 @@ export function ProgressStepper({
               >
                 {complete ? <Check className="h-3.5 w-3.5" /> : stepNumber}
               </div>
-              <span className={cn("mt-1 whitespace-nowrap text-[9px] font-bold", active ? "text-sky-600" : "text-[#94A3B8]")}>
+              <span className={cn("mt-1 whitespace-nowrap text-[9px] font-bold", active ? "text-sky-600" : "text-[#64748B]")}>
                 {step}
               </span>
             </div>

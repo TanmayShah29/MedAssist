@@ -28,11 +28,11 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                     <p className="text-[12px] font-bold text-[#0F172A] leading-none">
                         {currentProfile?.first_name} {currentProfile?.last_name}
                     </p>
-                    <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-medium mt-0.5">
+                    <p className="text-[10px] text-[#64748B] uppercase tracking-wider font-medium mt-0.5">
                         {currentProfile?.parent_id ? "FAMILY PROFILE" : "PRIMARY ACCOUNT"}
                     </p>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-[#94A3B8] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-[#64748B] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <AnimatePresence>
@@ -52,7 +52,7 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                             className="absolute right-0 mt-2 w-64 bg-white border border-[#EBEAE4] rounded-2xl shadow-xl z-50 overflow-hidden"
                         >
                             <div className="p-3 border-b border-[#F1F1EF] bg-[#FDFDFB]">
-                                <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest px-2">Switch Profile</p>
+                                <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest px-2">Switch Profile</p>
                             </div>
 
                             <div className="p-2 max-h-80 overflow-y-auto">
@@ -76,7 +76,7 @@ export function ProfileSwitcher({ currentProfile, profiles, onProfileSelect, onA
                                                     }`}>
                                                     {profile.first_name} {profile.last_name}
                                                 </p>
-                                                <p className="text-[10px] text-[#94A3B8]">
+                                                <p className="text-[10px] text-[#64748B]">
                                                     {profile.parent_id ? "Sub-profile" : "Primary"}
                                                 </p>
                                             </div>

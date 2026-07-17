@@ -103,8 +103,8 @@ export function BiomarkerGrid({
     return (
         <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#94A3B8] uppercase tracking-tighter">
+                <h3 className="text-[10px] font-semibold uppercase text-[#64748B] tracking-wider">LATEST CLINICAL BIOMARKERS</h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-[#64748B] uppercase tracking-tighter">
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.optimal.dotClass}`} />{PATIENT_STATUS.optimal.label}: {optimalCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.warning.dotClass}`} />{PATIENT_STATUS.warning.label}: {warningCount}</span>
                     <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${PATIENT_STATUS.critical.dotClass}`} />{PATIENT_STATUS.critical.label}: {criticalCount}</span>
@@ -158,7 +158,7 @@ export function BiomarkerGrid({
                                         Optimal & Stable ({optimalStable.length})
                                     </h4>
                                 </div>
-                                <div className="flex items-center gap-2 text-[12px] font-semibold text-[#94A3B8] group-hover:text-[#0F172A] transition-colors">
+                                <div className="flex items-center gap-2 text-[12px] font-semibold text-[#64748B] group-hover:text-[#0F172A] transition-colors">
                                     {showOptimal ? 'Hide details' : 'Show details'}
                                     {showOptimal ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                 </div>
@@ -276,7 +276,7 @@ function BiomarkerCard({
                 </div>
                 <div className="min-w-0 max-w-full">
                     <div className="text-[15px] font-bold text-[#0F172A] break-words leading-tight">
-                        {b.value} <span className="text-[10px] font-normal text-gray-500 break-words">{b.unit}</span>
+                        {b.value} <span className="text-[10px] font-normal text-[#64748B] break-words">{b.unit}</span>
                     </div>
                     {delta ? (
                         <div className={`text-[10px] font-bold flex items-center gap-1 text-wrap-safe ${deltaColor}`}>
@@ -292,7 +292,7 @@ function BiomarkerCard({
                             {Math.abs(delta.percent)}% from last
                         </div>
                     ) : (
-                        <div className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-tighter">No previous data</div>
+                        <div className="text-[9px] font-bold text-[#64748B] uppercase tracking-tighter">No previous data</div>
                     )}
                 </div>
             </div>
@@ -300,14 +300,14 @@ function BiomarkerCard({
             {/* Name + interpretation */}
             <div className="grow shrink basis-0 flex flex-col min-w-0">
                 <span className="text-[15px] font-bold text-[#0F172A] block mb-1 break-words">{b.name}</span>
-                <p className="text-[11px] text-[#94A3B8] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
+                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed italic mb-auto break-words min-h-[34px]">
                     {b.ai_interpretation || 'Clinical data point extracted from report.'}
                 </p>
 
                 {/* Range bar */}
                 {showBar && (
                     <div className="mt-3">
-                        <div className="flex justify-between gap-2 text-[10px] text-[#94A3B8] font-medium mb-1 min-w-0">
+                        <div className="flex justify-between gap-2 text-[10px] text-[#64748B] font-medium mb-1 min-w-0">
                             <span className="min-w-0 break-words">{rangeMin}</span>
                             <span className="min-w-0 break-words text-right">{rangeMax} {b.unit}</span>
                         </div>

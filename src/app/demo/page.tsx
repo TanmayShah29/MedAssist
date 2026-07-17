@@ -10,7 +10,7 @@ const T = {
   page: "#FDFDFB", card: "#FFFFFF", cardHover: "#FAFAFA",
   border: "#EBEAE4", borderMed: "#D1CFCD",
   text: "#0F172A", textSec: "#475569", textMuted: "#94A3B8",
-  brand: "#0369A1", brandHover: "#0369A1",
+  brand: "#0ea5e9", brandHover: "#0ea5e9",
   optimal: "#059669", warning: "#F59E0B", critical: "#EF4444",
   optimalBg: "#F0FDF4", optimalBorder: "#BBF7D0", optimalText: "#065F46",
   warningBg: "#FFFBEB", warningBorder: "#FDE68A", warningText: "#92400E",
@@ -654,7 +654,7 @@ const ResultsPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{b.name}</span>
-                  <span style={{ fontSize: 11, background: "#F0F9FF", color: "#0369A1", padding: "1px 7px", borderRadius: 6 }}>{b.category}</span>
+                  <span style={{ fontSize: 11, background: "#F0F9FF", color: "#0ea5e9", padding: "1px 7px", borderRadius: 6 }}>{b.category}</span>
                 </div>
                 <div style={{ fontSize: 14, color: T.textSec }}>{b.value} {b.unit} <span style={{ fontSize: 11, color: T.textMuted }}>(ref: {b.ref_min}–{b.ref_max})</span></div>
                 <RangeBar value={b.value} min={b.ref_min} max={b.ref_max} status={b.status} />
@@ -854,10 +854,10 @@ const AssistantPage = () => {
         <div className="demo-assistant-context" style={{ overflowY: "auto", padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Patient Summary */}
           <div style={{ background: "#F0F9FF", border: "1px solid #BAE6FD", borderRadius: 16, padding: 18 }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: "#0369A1", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Patient Context</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: "#0ea5e9", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Patient Context</p>
             <p className="font-display" style={{ fontSize: 20, color: "#0C4A6E" }}>{DEMO_PROFILE.first_name} {DEMO_PROFILE.last_name}</p>
-            <p style={{ fontSize: 13, color: "#0369A1", marginTop: 4 }}>{DEMO_PROFILE.age}yo {DEMO_PROFILE.sex} · Blood type {DEMO_PROFILE.blood_type}</p>
-            <p style={{ fontSize: 12, color: "#0369A1", marginTop: 6 }}>Symptoms: Fatigue, Low Energy</p>
+            <p style={{ fontSize: 13, color: "#0ea5e9", marginTop: 4 }}>{DEMO_PROFILE.age}yo {DEMO_PROFILE.sex} · Blood type {DEMO_PROFILE.blood_type}</p>
+            <p style={{ fontSize: 12, color: "#0ea5e9", marginTop: 6 }}>Symptoms: Fatigue, Low Energy</p>
           </div>
 
           {/* Quick Stats */}
@@ -920,10 +920,10 @@ const ProfilePage = () => {
 
       {/* Report History Banner */}
       <div style={{ background: "#F0F9FF", border: "1px solid #BAE6FD", borderRadius: 18, padding: 20, marginBottom: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <div style={{ padding: 12, background: "#BAE6FD", borderRadius: 12 }}><Icon path={Icons.fileText} size={22} color="#0369A1" /></div>
+        <div style={{ padding: 12, background: "#BAE6FD", borderRadius: 12 }}><Icon path={Icons.fileText} size={22} color="#0ea5e9" /></div>
         <div>
           <h3 style={{ fontSize: 17, fontWeight: 600, color: "#0C4A6E" }}>Report History</h3>
-          <p style={{ fontSize: 13, color: "#0369A1", marginTop: 4, lineHeight: 1.6 }}>Great job keeping your health records up to date. Consistent tracking allows for more accurate trend analysis.</p>
+          <p style={{ fontSize: 13, color: "#0ea5e9", marginTop: 4, lineHeight: 1.6 }}>Great job keeping your health records up to date. Consistent tracking allows for more accurate trend analysis.</p>
         </div>
       </div>
 

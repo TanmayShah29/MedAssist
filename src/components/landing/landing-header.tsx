@@ -7,8 +7,9 @@ import { Activity, LogOut } from "lucide-react";
 import { signOutAndResetMedAssist } from "@/lib/account-session";
 import { useLandingAccount } from "@/components/landing/use-landing-account";
 import { BrandLockup } from "@/components/branding/brand-lockup";
+import { cn } from "@/lib/utils";
 
-export function LandingHeader() {
+export function LandingHeader({ variant = "sticky" }: { variant?: "overlay" | "sticky" }) {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,11 +41,11 @@ export function LandingHeader() {
   return (
     <>
       <header
-        className={`absolute left-0 right-0 top-0 z-[80] border-b border-[#EBEAE4]/80 bg-[#FDFDFB]/[0.98] transition-shadow duration-200 ${
-          scrolled
-            ? "shadow-sm shadow-stone-900/[0.05]"
-            : "shadow-none"
-        }`}
+        className={cn(
+          "left-0 right-0 top-0 z-[80] border-b border-[#EBEAE4]/80 bg-[#FDFDFB]/[0.98] backdrop-blur-md transition-shadow duration-200",
+          variant === "overlay" ? "absolute" : "sticky",
+          scrolled ? "shadow-sm shadow-stone-900/[0.05]" : "shadow-none"
+        )}
       >
         <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="group">

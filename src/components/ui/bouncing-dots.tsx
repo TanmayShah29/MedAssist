@@ -42,7 +42,7 @@ export function BouncingDots({
                         <motion.div
                             key={index}
                             className={cn(
-                                "w-2.5 h-2.5 bg-sky-500 rounded-full",
+                                "w-2.5 h-2.5 bg-[var(--color-brand-primary)] rounded-full",
                                 // Changed bg-foreground to bg-sky-500 for brand consistency
                                 className
                             )}
@@ -58,7 +58,7 @@ export function BouncingDots({
                     ))}
             </div>
             {message && (
-                <div className="text-xs text-slate-400 font-mono">
+                <div className="text-xs text-[#64748B] font-mono">
                     {message}
                 </div>
             )}

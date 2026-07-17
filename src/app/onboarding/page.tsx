@@ -96,7 +96,7 @@ export default function OnboardingPage() {
                                                 backgroundColor: isComplete
                                                     ? "#059669"
                                                     : isActive
-                                                        ? "#0369A1"
+                                                        ? "#0ea5e9"
                                                         : "#EBEAE4",
                                             }}
                                             className="w-7 h-7 rounded-full flex items-center 

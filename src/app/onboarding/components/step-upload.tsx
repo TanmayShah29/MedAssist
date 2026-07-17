@@ -283,7 +283,7 @@ export function StepUpload() {
                                 aria-label="Remove value"
                                 type="button"
                                 onClick={() => removeManualRow(row.id)}
-                                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#94A3B8] transition-colors hover:bg-red-50 hover:text-red-600"
+                                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#64748B] transition-colors hover:bg-red-50 hover:text-red-600"
                             >
                                 <Trash2 size={18} />
                             </button>
@@ -310,7 +310,7 @@ export function StepUpload() {
                         {isManualSubmitting && (
                             <button
                                 onClick={handleCancelManual}
-                                className="text-sm font-medium text-[#94A3B8] hover:text-red-500 transition-colors"
+                                className="text-sm font-medium text-[#64748B] hover:text-red-500 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -322,7 +322,7 @@ export function StepUpload() {
                             className={cn(
                                 "flex items-center gap-2 px-6 py-3 rounded-[10px] text-sm font-semibold transition-all",
                                 isManualSubmitting
-                                    ? "bg-[#EBEAE4] text-[#94A3B8] cursor-wait"
+                                    ? "bg-[#EBEAE4] text-[#64748B] cursor-wait"
                                     : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
                             )}
                         >
@@ -366,7 +366,7 @@ export function StepUpload() {
                         className="bg-[#FFFFFF] border-2 border-[#EBEAE4] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-sky-500 group"
                     >
                         <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-[#94A3B8] group-hover:text-sky-500 transition-colors" />
+                            <FileText className="w-8 h-8 text-[#64748B] group-hover:text-sky-500 transition-colors" />
                         </div>
                         <h3 className="text-[16px] font-semibold text-[#0F172A] mb-2 group-hover:text-sky-600 transition-colors">
                             Upload my report now
@@ -404,7 +404,7 @@ export function StepUpload() {
                         className="bg-[#FDFDFB] border-2 border-[#EBEAE4] rounded-[14px] p-6 cursor-pointer transition-all duration-150 text-center hover:border-[#D1CFCD] group sm:col-span-2"
                     >
                         <div className="flex justify-center mb-3">
-                            <Calendar className="w-8 h-8 text-[#94A3B8] group-hover:text-[#475569] transition-colors" />
+                            <Calendar className="w-8 h-8 text-[#64748B] group-hover:text-[#475569] transition-colors" />
                         </div>
                         <h3 className="text-[16px] font-semibold text-[#0F172A] mb-2 group-hover:text-[#475569] transition-colors">
                             I don&apos;t have one yet
@@ -481,7 +481,7 @@ export function StepUpload() {
                     <p className="text-sm font-semibold text-[#0F172A] mb-1">
                         Click to upload or drag & drop
                     </p>
-                    <p className="text-xs text-[#94A3B8] mb-4">
+                    <p className="text-xs text-[#64748B] mb-4">
                         PDF up to 10MB
                     </p>
                     <a
@@ -508,7 +508,7 @@ export function StepUpload() {
                         <p className="text-sm font-semibold text-[#0F172A] truncate">
                             {uploadedFile.name}
                         </p>
-                        <p className="text-xs text-[#94A3B8]">
+                        <p className="text-xs text-[#64748B]">
                             {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • Ready to analyze
                         </p>
                     </div>
@@ -519,7 +519,7 @@ export function StepUpload() {
                         }}
                         className="p-2 hover:bg-slate-50 rounded-full transition-colors"
                     >
-                        <X className="w-4 h-4 text-[#94A3B8]" />
+                        <X className="w-4 h-4 text-[#64748B]" />
                     </button>
                 </motion.div>
             )}
@@ -574,7 +574,7 @@ export function StepUpload() {
                         "text-sm font-semibold transition-all",
                         uploadedFile
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#EBEAE4] text-[#94A3B8] cursor-not-allowed"
+                            : "bg-[#EBEAE4] text-[#64748B] cursor-not-allowed"
                     )}
                 >
                     Review extracted values

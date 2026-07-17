@@ -106,7 +106,7 @@ function LongitudinalComparisonCard({
             <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                     <h3 className="text-[18px] font-bold text-[#0F172A]">Progress Report</h3>
-                    <p className="text-[12px] text-[#94A3B8] mt-0.5 break-words">
+                    <p className="text-[12px] text-[#64748B] mt-0.5 break-words">
                         Changes from{' '}
                         {new Date(previousReportDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                         {' '}to{' '}
@@ -137,9 +137,9 @@ function LongitudinalComparisonCard({
                             </div>
                             <div className="flex items-baseline gap-1 min-w-0">
                                 <span className="text-[20px] font-extrabold text-[#0F172A] break-words min-w-0">{change.currentValue}</span>
-                                <span className="text-[12px] text-[#94A3B8] break-words min-w-0">{change.unit}</span>
+                                <span className="text-[12px] text-[#64748B] break-words min-w-0">{change.unit}</span>
                             </div>
-                            <p className="text-[11px] text-[#94A3B8] mt-1">Was {change.previousValue} {change.unit}</p>
+                            <p className="text-[11px] text-[#64748B] mt-1">Was {change.previousValue} {change.unit}</p>
                         </div>
                     );
                 })}
@@ -154,7 +154,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
     return (
         <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[18px] px-8 py-12 text-center mb-6 stagger-fade">
             <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105">
-                <FileText size={24} color="#0369A1" />
+                <FileText size={24} color="#0ea5e9" />
             </div>
             <h2 className="font-display text-[28px] text-[#0F172A] mb-3">Ready when you are</h2>
             <p className="text-[15px] text-[#475569] max-w-sm mx-auto mb-6 leading-relaxed">
@@ -177,7 +177,7 @@ function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: ()
                     Try with sample lab report
                 </button>
             </div>
-            <p className="text-[12px] text-[#94A3B8] mt-3">
+            <p className="text-[12px] text-[#64748B] mt-3">
                 Supports digital PDF lab reports · Prep sheet generated in under a minute
             </p>
         </div>
@@ -389,7 +389,7 @@ export default function DashboardClient({
                         )}
                     </div>
                     {lastUpdated && (
-                        <p className="text-[11px] sm:text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider ml-auto text-right leading-tight flex items-center justify-end gap-1">
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#64748B] uppercase tracking-wider ml-auto text-right leading-tight flex items-center justify-end gap-1">
                             <Lock size={10} className="text-emerald-500" />
                             Synced {lastUpdated}
                         </p>
@@ -505,6 +505,11 @@ export default function DashboardClient({
             )}
 
             {totalCount > 0 && (
+                <>
+                    <section className="mb-8 print:hidden stagger-fade">
+                        <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
+                    </section>
+
                 <section className="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)] print:hidden">
                     <div className="app-panel p-5 sm:p-6 stagger-fade">
                         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -563,7 +568,7 @@ export default function DashboardClient({
                         <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '80ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">What changed</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">What changed</p>
                                     <h2 className="text-lg font-bold text-[#0F172A]">Top trends</h2>
                                 </div>
                                 <button
@@ -596,7 +601,7 @@ export default function DashboardClient({
                         <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '140ms' }}>
                             <div className="mb-4 flex items-center justify-between gap-3">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Next actions</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">Next actions</p>
                                     <h2 className="text-lg font-bold text-[#0F172A]">Plan preview</h2>
                                 </div>
                                 <button
@@ -623,6 +628,7 @@ export default function DashboardClient({
                         <TrustCallout />
                     </div>
                 </section>
+                </>
             )}
 
             {/* ── Main dashboard content ── */}
@@ -637,7 +643,6 @@ export default function DashboardClient({
                     {/* ── LEFT: Main clinical column ── */}
                     <div className="flex flex-col gap-6 min-w-0">
                         <MedicalDisclaimer variant="compact" className="mb-2" />
-                        <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
                         <PriorityAlertCard biomarkers={latestBiomarkers} />
 
                         {/* Symptom connections */}
@@ -650,7 +655,7 @@ export default function DashboardClient({
                                     <div key={conn.symptom} className="mb-4 pb-4 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0 stagger-fade-sm" style={{ animationDelay: `${idx * 60}ms` }}>
                                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                                             <span className="bg-amber-400 text-white rounded-md px-2.5 py-0.5 text-[12px] font-semibold">{conn.symptom}</span>
-                                            <span className="text-[12px] text-[#94A3B8]">may be related to</span>
+                                            <span className="text-[12px] text-[#64748B]">may be related to</span>
                                             {conn.relatedBiomarkers?.map(b => (
                                                 <span key={b} className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-md px-2 py-0.5 text-[12px] text-[#475569]">{b}</span>
                                             ))}
@@ -702,7 +707,7 @@ export default function DashboardClient({
 
                         {/* AI Insights */}
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#64748B] mb-4 tracking-wider">APPOINTMENT CONTEXT</h3>
                             <AIInsightsFeed analysis={{ summary: latestSummary }} />
                         </div>
 
@@ -721,8 +726,8 @@ export default function DashboardClient({
                         {/* Single-report nudge */}
                         {!demoMode && labResults.length === 1 && (
                             <div className="bg-[#F0F9FF] border border-[#BAE6FD] border-l-4 border-l-sky-400 rounded-[14px] px-5 py-4 transition-all duration-300 hover:shadow-sm">
-                                <p className="font-semibold text-[#0369A1] text-[15px]">Your prep sheet gets sharper with every report</p>
-                                <p className="text-[#0369A1] text-[13px] mt-1 leading-relaxed">
+                                <p className="font-semibold text-[#0ea5e9] text-[15px]">Your prep sheet gets sharper with every report</p>
+                                <p className="text-[#0ea5e9] text-[13px] mt-1 leading-relaxed">
                                     Upload your next report after your upcoming blood test and MedAssist
                                     will turn it into trend-aware questions — like whether your hemoglobin is improving.
                                 </p>
@@ -756,7 +761,7 @@ export default function DashboardClient({
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
+                            <h3 className="text-[10px] font-semibold uppercase text-[#64748B] mb-4 tracking-wider">MEDICATION CONTEXT</h3>
                             <MedicineCabinet />
                         </div>
                         <TrustLayer variant="full" />
@@ -831,7 +836,7 @@ export default function DashboardClient({
                                                     <span className="text-[10px] font-bold text-emerald-600">{optimalInCat}/{totalInCat}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-[10px] text-[#94A3B8] italic">Not in latest report</span>
+                                                <span className="text-[10px] text-[#64748B] italic">Not in latest report</span>
                                             )}
                                         </div>
                                     );
@@ -855,12 +860,12 @@ export default function DashboardClient({
                     <div className="p-2 bg-amber-50 rounded-full">
                         <AlertCircle className="w-5 h-5 text-amber-600" />
                     </div>
-                    <p className="text-[13px] text-[#94A3B8] leading-relaxed">
+                    <p className="text-[13px] text-[#64748B] leading-relaxed">
                         <strong className="text-[#44403C]">Medical Disclaimer:</strong> MedAssist is an educational tool
                         and does not provide medical diagnoses, treatment advice, or prescriptions. Always consult with a
                         qualified healthcare professional before making any health decisions.
                     </p>
-                    <p className="text-[11px] text-[#94A3B8]">
+                    <p className="text-[11px] text-[#64748B]">
                         &copy; {new Date().getFullYear()} MedAssist. All rights reserved.
                     </p>
                 </div>

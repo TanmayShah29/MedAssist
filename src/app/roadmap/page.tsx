@@ -101,7 +101,7 @@ export default function RoadmapPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Server className="w-4 h-4 text-[#94A3B8]" />
+                    <Server className="w-4 h-4 text-[#64748B]" />
                     <h4 className="text-[14px] font-bold text-[#0F172A]">The Costs</h4>
                   </div>
                   <ul className="space-y-3">
@@ -122,7 +122,7 @@ export default function RoadmapPage() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-4 h-4 text-[#94A3B8]" />
+                    <Sparkles className="w-4 h-4 text-[#64748B]" />
                     <h4 className="text-[14px] font-bold text-[#0F172A]">The Model</h4>
                   </div>
                   <ul className="space-y-3">
@@ -155,7 +155,7 @@ export default function RoadmapPage() {
 
       {/* Footer */}
       <footer className="border-t border-[#EBEAE4] bg-white py-10 px-6 text-center">
-        <p className="text-[13px] text-[#94A3B8]">
+        <p className="text-[13px] text-[#64748B]">
           © 2026 MedAssist. Built by Tanmay Shah for Design Engineering.
         </p>
       </footer>

@@ -49,7 +49,7 @@ export function InsightCard({
         </div>
         <div className="min-w-0 grow">
           {eyebrow && (
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">
               {eyebrow}
             </p>
           )}

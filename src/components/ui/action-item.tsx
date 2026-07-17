@@ -47,7 +47,7 @@ export function ActionItem({
         <button
           type="button"
           onClick={onToggle}
-          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#FDFDFB] text-[#94A3B8] transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90"
+          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#FDFDFB] text-[#64748B] transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 active:scale-90"
           aria-label={done ? "Mark action not done" : "Mark action done"}
           disabled={!onToggle}
         >
@@ -63,7 +63,7 @@ export function ActionItem({
               <Icon className="h-3 w-3" />
               {meta.label}
             </span>
-            {timeframe && <span className="text-[11px] font-semibold text-[#94A3B8]">{timeframe}</span>}
+            {timeframe && <span className="text-[11px] font-semibold text-[#64748B]">{timeframe}</span>}
           </div>
           <h3 className={cn("mt-2 text-[15px] font-bold leading-tight text-[#0F172A] text-wrap-safe transition-all duration-300", done && "line-through")}>{title}</h3>
           {reason && <p className="mt-1 text-[13px] leading-relaxed text-[#475569] text-wrap-safe">{reason}</p>}

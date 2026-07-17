@@ -18,14 +18,14 @@ export const tokens = {
     text: {
         primary: '#0F172A',  // main headings — warm near-black
         secondary: '#475569',  // body text — warm gray
-        muted: '#94A3B8',  // captions, labels — warm muted
+        muted: '#64748B',  // captions, labels — WCAG AA on light bg
         subtle: '#D6D3D1',  // placeholders, dividers
         onDark: '#F1F5F9',  // text on dark sections
         onDarkMuted: '#94A3B8', // muted text on dark sections
     },
     brand: {
-        primary: '#0369A1',  // sky-500 — interactive, CTAs, links
-        primaryHover: '#0369A1', // sky-600
+        primary: '#0ea5e9',  // sky-500 — interactive, CTAs, links
+        primaryHover: '#0284C7', // sky-600
         primarySoft: '#F0F9FF', // sky-100 — soft backgrounds
     },
     status: {

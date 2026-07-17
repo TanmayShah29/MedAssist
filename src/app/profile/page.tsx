@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FileText, ChevronRight, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { FileText, ChevronRight, Trash2, X, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
@@ -125,6 +126,15 @@ export default function ProfilePage() {
                     <h1 className="app-title">Clinical Profile</h1>
                     <p className="app-subtitle">{profile?.first_name} {profile?.last_name} · Patient</p>
                 </div>
+                <div className="app-actions">
+                    <Link
+                        href="/settings"
+                        className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border-2 border-[#EBEAE4] bg-white px-4 py-2 text-sm font-semibold text-[#475569] transition-all hover:border-sky-200 hover:bg-[#F0F9FF] hover:text-[#0ea5e9] active:scale-[0.98]"
+                    >
+                        <Settings size={16} />
+                        <span className="hidden sm:inline">Settings</span>
+                    </Link>
+                </div>
             </div>
 
             {/* Completion card */}
@@ -167,7 +177,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">First Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] block mb-1">First Name</label>
                                 <input
                                     type="text"
                                     value={profile?.first_name || ''}
@@ -176,7 +186,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Last Name</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] block mb-1">Last Name</label>
                                 <input
                                     type="text"
                                     value={profile?.last_name || ''}
@@ -185,7 +195,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Age</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] block mb-1">Age</label>
                                 <input
                                     type="number"
                                     value={profile?.age || ''}
@@ -197,7 +207,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Sex</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] block mb-1">Sex</label>
                                 <select
                                     value={profile?.sex || ''}
                                     onChange={(e) => setProfile(prev => prev ? { ...prev, sex: e.target.value } : null)}
@@ -210,7 +220,7 @@ export default function ProfilePage() {
                                 </select>
                             </div>
                             <div className="sm:col-span-1">
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] block mb-1">Blood Type</label>
+                                <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] block mb-1">Blood Type</label>
                                 <input
                                     type="text"
                                     value={profile?.blood_type || ''}
@@ -245,13 +255,13 @@ export default function ProfilePage() {
                                         <p className="text-sm font-medium text-[#0F172A] truncate">
                                             {report.summary || 'Blood Panel Report'}
                                         </p>
-                                        <p className="text-xs text-[#94A3B8] mt-0.5">
+                                        <p className="text-xs text-[#64748B] mt-0.5">
                                             {new Date(report.uploaded_at).toLocaleDateString(undefined, {
                                                 year: 'numeric', month: 'short', day: 'numeric'
                                             })}
                                         </p>
                                     </div>
-                                    <div className="hidden text-xs text-[#94A3B8] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
+                                    <div className="hidden text-xs text-[#64748B] group-hover:text-sky-500 font-medium flex-shrink-0 transition-colors items-center gap-1 sm:flex">
                                         View Details
                                         <ChevronRight size={14} />
                                     </div>
@@ -261,7 +271,7 @@ export default function ProfilePage() {
                                             handleDeleteReport(report.id);
                                         }}
                                         aria-label="Delete report"
-                                        className="p-2 text-[#94A3B8] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                        className="p-2 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                                         title="Delete report"
                                     >
                                         <Trash2 size={14} />
@@ -270,7 +280,7 @@ export default function ProfilePage() {
                             )) : (
                                 <div className="text-center py-6 bg-white border border-[#EBEAE4] border-dashed rounded-[10px]">
                                     <FileText className="w-6 h-6 text-[#D6D3C9] mx-auto mb-2" />
-                                    <p className="text-sm text-[#94A3B8] font-medium">No reports uploaded yet.</p>
+                                    <p className="text-sm text-[#64748B] font-medium">No reports uploaded yet.</p>
                                 </div>
                             )}
                         </div>
@@ -295,23 +305,23 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-2">
                                     Reported Symptoms
                                 </p>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {symptoms.length > 0 ? symptoms.map(s => (
                                         <span key={s} className="min-w-0 text-xs font-medium bg-white border border-[#EBEAE4] px-3 py-1.5 rounded-[8px] text-[#475569] shadow-sm flex items-center gap-2 group">
                                             {s}
-                                            <button onClick={() => handleToggleSymptom(s)} aria-label={`Remove ${s}`} className="text-[#94A3B8] hover:text-red-500 transition-colors">
+                                            <button onClick={() => handleToggleSymptom(s)} aria-label={`Remove ${s}`} className="text-[#64748B] hover:text-red-500 transition-colors">
                                                 <X size={12} />
                                             </button>
                                         </span>
                                     )) : (
-                                        <p className="text-sm text-[#94A3B8] italic">No symptoms selected.</p>
+                                        <p className="text-sm text-[#64748B] italic">No symptoms selected.</p>
                                     )}
                                 </div>
 
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-2">
                                     Quick Add
                                 </p>
                                 <div className="flex flex-wrap gap-2">

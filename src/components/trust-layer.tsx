@@ -14,7 +14,7 @@ export function TrustLayer({ variant = 'full', className }: TrustLayerProps) {
         return (
             <div
                 className={cn(
-                    'flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#94A3B8]',
+                    'flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#64748B]',
                     className
                 )}
             >
@@ -37,7 +37,7 @@ export function TrustLayer({ variant = 'full', className }: TrustLayerProps) {
                 className
             )}
         >
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#94A3B8]">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748B]">
                 Important information
             </p>
             <ul className="space-y-2 text-[13px] text-[#475569]">

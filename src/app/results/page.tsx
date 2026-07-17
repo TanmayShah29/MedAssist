@@ -328,7 +328,7 @@ export default function ResultsPage() {
                                 );
                             })}
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748B]">
                             <TrendingUp size={16} className="rotate-90" />
                         </div>
                     </div>
@@ -370,7 +370,7 @@ export default function ResultsPage() {
                         ))}
                     </div>
                     <div className="relative w-full xl:w-80 xl:shrink-0">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                         <input
                             type="text"
                             placeholder="Search biomarkers..."
@@ -395,7 +395,7 @@ export default function ResultsPage() {
                         ) : biomarkers.length === 0 && selectedCategory === 'all' ? (
                             <div className="py-16 px-8 text-center flex flex-col items-center justify-center">
                                 <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mb-4">
-                                    <ClipboardList size={24} color="#0369A1" />
+                                    <ClipboardList size={24} color="#0ea5e9" />
                                 </div>
                                 <h3 className="text-xl font-bold text-[#0F172A] mb-2">No results yet</h3>
                                 <p className="text-[15px] text-[#475569] mb-6 max-w-xs mx-auto">
@@ -411,10 +411,10 @@ export default function ResultsPage() {
                         ) : filteredBiomarkers.length === 0 ? (
                             <div className="py-12 px-8 text-center flex flex-col items-center justify-center">
                                 <div className="w-12 h-12 bg-[#EBEAE4] rounded-full flex items-center justify-center mb-4">
-                                    <Search className="w-6 h-6 text-[#94A3B8]" />
+                                    <Search className="w-6 h-6 text-[#64748B]" />
                                 </div>
                                 <p className="text-[15px] text-[#475569] font-medium">No results found.</p>
-                                <p className="text-[13px] text-[#94A3B8] mt-1">Try a different search or filter.</p>
+                                <p className="text-[13px] text-[#64748B] mt-1">Try a different search or filter.</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-[#EBEAE4]">
@@ -437,22 +437,22 @@ export default function ResultsPage() {
                                         <div className="grow shrink basis-0 min-w-0">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                 <span className="text-[15px] font-bold text-[#0F172A] text-wrap-safe" title={b.name}>{b.name}</span>
-                                                <span className="text-[11px] font-bold bg-[#F0F9FF] text-[#0369A1] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider shrink-0">
+                                                <span className="text-[11px] font-bold bg-[#F0F9FF] text-[#0ea5e9] px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider shrink-0">
                                                     {b.category}
                                                 </span>
                                             </div>
                                             <div className="text-[15px] font-medium text-[#475569] leading-relaxed">
                                                 {b.value !== null && b.value !== undefined ? `${b.value} ${b.unit || ''}` : 'Value unavailable'}
                                                 {(b.reference_range_min !== undefined || b.reference_range_max !== undefined) ? (
-                                                    <span className="text-[12px] text-[#94A3B8] ml-0 block sm:ml-2 sm:inline font-normal">
+                                                    <span className="text-[12px] text-[#64748B] ml-0 block sm:ml-2 sm:inline font-normal">
                                                         (ref: {b.reference_range_min ?? 'N/A'}–{b.reference_range_max ?? 'N/A'})
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[12px] text-[#94A3B8] ml-0 block sm:ml-2 sm:inline font-normal">(ref: N/A)</span>
+                                                    <span className="text-[12px] text-[#64748B] ml-0 block sm:ml-2 sm:inline font-normal">(ref: N/A)</span>
                                                 )}
                                             </div>
                                             {getBiomarkerReportDate(b) && (
-                                                <p className="text-[11px] text-[#94A3B8] mt-0.5 font-medium">
+                                                <p className="text-[11px] text-[#64748B] mt-0.5 font-medium">
                                                     From report {mounted ? new Date(getBiomarkerReportDate(b)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                                                 </p>
                                             )}
@@ -485,7 +485,7 @@ export default function ResultsPage() {
                         <div className="sticky transform-gpu top-6">
                             {!selectedBiomarker ? (
                                 <div className="app-panel p-8 text-center h-[200px] flex items-center justify-center">
-                                    <p className="text-[15px] text-[#94A3B8] font-medium">Select a result to see AI interpretation</p>
+                                    <p className="text-[15px] text-[#64748B] font-medium">Select a result to see AI interpretation</p>
                                 </div>
                             ) : (
                                 <div className="app-panel p-6 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-shadow hover:shadow-md">
@@ -494,7 +494,7 @@ export default function ResultsPage() {
                                         <button
                                             onClick={() => setSelectedBiomarker(null)}
                                             aria-label="Close details"
-                                            className="text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#FFFFFF] active:scale-90 transition-all duration-200 p-1 rounded-md"
+                                            className="text-[#64748B] hover:text-[#0F172A] hover:bg-[#FFFFFF] active:scale-90 transition-all duration-200 p-1 rounded-md"
                                         >
                                             <X size={20} />
                                         </button>
@@ -507,11 +507,11 @@ export default function ResultsPage() {
                                             {selectedBiomarker.value !== null && selectedBiomarker.value !== undefined ? `${selectedBiomarker.value} ${selectedBiomarker.unit || ''}` : 'N/A'}
                                         </div>
                                         {(selectedBiomarker.reference_range_min !== undefined || selectedBiomarker.reference_range_max !== undefined) ? (
-                                            <p className="text-[13px] text-[#94A3B8] font-medium">
+                                            <p className="text-[13px] text-[#64748B] font-medium">
                                                 Reference: {selectedBiomarker.reference_range_min ?? 'N/A'} – {selectedBiomarker.reference_range_max ?? 'N/A'}
                                             </p>
                                         ) : (
-                                            <p className="text-[13px] text-[#94A3B8] font-medium">Reference: N/A</p>
+                                            <p className="text-[13px] text-[#64748B] font-medium">Reference: N/A</p>
                                         )}
                                     </div>
 
@@ -521,12 +521,12 @@ export default function ResultsPage() {
                                         {getPatientStatus(selectedBiomarker.status).printLabel}
                                     </div>
 
-                                    <h3 className="text-[11px] font-bold uppercase text-[#94A3B8] mb-3 tracking-widest">WHY THIS MAY MATTER</h3>
+                                    <h3 className="text-[11px] font-bold uppercase text-[#64748B] mb-3 tracking-widest">WHY THIS MAY MATTER</h3>
                                     <p className="text-[15px] text-[#475569] leading-relaxed mb-8 text-wrap-safe">
                                         {selectedBiomarker.ai_interpretation || "No interpretation available for this result."}
                                     </p>
 
-                                    <h3 className="text-[11px] font-bold uppercase text-[#94A3B8] mb-4 tracking-widest flex items-center gap-2">
+                                    <h3 className="text-[11px] font-bold uppercase text-[#64748B] mb-4 tracking-widest flex items-center gap-2">
                                         <TrendingUp size={14} className="text-sky-500" />
                                         HISTORICAL TREND
                                     </h3>
@@ -544,14 +544,14 @@ export default function ResultsPage() {
                                             </div>
                                         ) : (
                                             <div className="h-full w-full border-2 border-dashed border-[#EBEAE4] rounded-xl flex flex-col items-center justify-center p-6 text-center bg-white/30">
-                                                <Info size={28} className="text-[#94A3B8] mb-3 opacity-30" />
-                                                <p className="text-[12px] text-[#94A3B8] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to add context.</p>
+                                                <Info size={28} className="text-[#64748B] mb-3 opacity-30" />
+                                                <p className="text-[12px] text-[#64748B] font-medium max-w-[200px]">Not enough data to show a trend line yet. Upload more reports to add context.</p>
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="flex justify-between items-center py-4 border-t border-[#EBEAE4] mb-4">
-                                        <span className="text-[12px] text-[#94A3B8] font-bold uppercase tracking-wider">AI Confidence</span>
+                                        <span className="text-[12px] text-[#64748B] font-bold uppercase tracking-wider">AI Confidence</span>
                                         <div className="flex items-center gap-4">
                                             <span className="text-[13px] font-bold text-[#0F172A]">
                                                 {selectedBiomarker.confidence !== null && selectedBiomarker.confidence !== undefined ? `${Math.round(selectedBiomarker.confidence * 100)}%` : '—'}

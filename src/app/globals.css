@@ -9,9 +9,9 @@
   --color-border-medium: #D1CFCD;
   --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
-  --color-text-muted: #94A3B8;
-  --color-brand-primary: #0369A1;
-  --color-brand-primary-hover: #0369A1;
+  --color-text-muted: #64748B;
+  --color-brand-primary: #0ea5e9;
+  --color-brand-primary-hover: #0284C7;
   --color-brand-subtle: #F0F9FF;
   --color-status-optimal: #059669;
   --color-status-optimal-bg: #ECFDF5;
@@ -691,7 +691,7 @@
 
   .nav-item-active {
     background-color: #F0F9FF;
-    color: #0369A1;
+    color: #0ea5e9;
     border-left-color: var(--color-brand-primary);
     font-weight: 600;
   }
@@ -869,7 +869,7 @@
 
   /* ── Gradient text ── */
   .gradient-text-brand {
-    background: linear-gradient(135deg, #0369A1 0%, #38BDF8 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #38BDF8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -50,7 +50,7 @@ export function StepSymptoms() {
             {/* Symptom chips */}
             <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] 
-                      text-[#94A3B8] mb-3">
+                      text-[#64748B] mb-3">
                     Select all that apply
                 </p>
                 <div className="flex flex-wrap gap-2">

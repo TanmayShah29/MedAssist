@@ -8,7 +8,7 @@ interface SectionHeaderProps {
 
 /**
  * The standard section label used throughout the app.
- * Replaces the repeated `text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider` pattern.
+ * Replaces the repeated `text-[10px] font-semibold uppercase text-[#64748B] tracking-wider` pattern.
  */
 export function SectionHeader({ label, className, action }: SectionHeaderProps) {
   return (

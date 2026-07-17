@@ -33,7 +33,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
                 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             First name *
                         </label>
                         <input
@@ -45,7 +45,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Last name
                         </label>
                         <input
@@ -60,7 +60,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Age *
                         </label>
                         <input
@@ -72,7 +72,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                        <label className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Biological sex *
                         </label>
                         <div className="flex gap-2">
@@ -97,7 +97,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
 
             {/* Symptoms Section */}
             <div className="space-y-4 bg-white p-6 rounded-[16px] border border-[#EBEAE4] shadow-sm">
-                <h3 className="text-[14px] font-bold text-[#0F172A]">2. How are you feeling? <span className="text-[#94A3B8] font-normal">(Optional)</span></h3>
+                <h3 className="text-[14px] font-bold text-[#0F172A]">2. How are you feeling? <span className="text-[#64748B] font-normal">(Optional)</span></h3>
                 <div className="flex flex-wrap gap-2">
                     {SYMPTOM_OPTIONS.map((symptom) => {
                         const selected = selectedSymptoms.includes(symptom.label);
@@ -133,7 +133,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
                         "flex items-center gap-2 px-8 py-3 rounded-[10px] text-sm font-semibold transition-all",
                         canAdvance
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#EBEAE4] text-[#94A3B8] cursor-not-allowed"
+                            : "bg-[#EBEAE4] text-[#64748B] cursor-not-allowed"
                     )}
                 >
                     Continue to Review

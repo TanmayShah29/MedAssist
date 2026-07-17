@@ -24,7 +24,7 @@ function getTitle(pathname: string): string {
 
 export function MobileNavbar() {
   const pathname  = usePathname();
-  const { initials } = useUserProfile();
+  const { initials, isLoading } = useUserProfile();
 
   return (
     <header className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-[#FDFDFB]/90 backdrop-blur-xl border-b border-[#EBEAE4] flex flex-col">
@@ -48,9 +48,13 @@ export function MobileNavbar() {
           className="w-9 h-9 rounded-full bg-sky-50 border border-sky-200 flex items-center justify-center shadow-sm active:scale-95 transition-transform flex-shrink-0"
           aria-label="Go to profile"
         >
-          <span className="text-[11px] font-bold text-sky-600 leading-none">
-            {initials === "?" ? "…" : initials}
-          </span>
+          {isLoading ? (
+            <span className="h-4 w-4 rounded-full bg-sky-200 animate-pulse" aria-hidden />
+          ) : (
+            <span className="text-[11px] font-bold text-sky-700 leading-none">
+              {initials === "?" ? "P" : initials}
+            </span>
+          )}
         </Link>
       </div>
     </header>

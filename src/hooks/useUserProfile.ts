@@ -7,9 +7,10 @@ export interface UserProfile {
   name: string | null;
   initials: string;
   email: string | null;
+  isLoading: boolean;
 }
 
-const DEFAULT: UserProfile = { name: null, initials: "?", email: null };
+const DEFAULT: UserProfile = { name: null, initials: "?", email: null, isLoading: true };
 
 /**
  * Shared hook that fetches the authenticated user's display name
@@ -26,38 +27,44 @@ export function useUserProfile(): UserProfile {
     );
 
     const fetchProfile = async () => {
-      // Supabase auth + profile table
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setProfile({ name: null, initials: "?", email: null, isLoading: false });
+          return;
+        }
 
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("first_name, last_name")
-        .eq("id", user.id)
-        .single();
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("id", user.id)
+          .single();
 
-      if (prof?.first_name) {
-        const firstName = prof.first_name as string;
-        const lastName = (prof.last_name ?? "") as string;
-        setProfile({
-          name: `${firstName} ${lastName}`.trim(),
-          initials: `${firstName[0]}${lastName[0] ?? ""}`.toUpperCase(),
-          email: user.email ?? null,
-        });
-      } else {
-        // 3. Email fallback
-        const emailName = user.email?.split("@")[0] ?? "Patient";
-        setProfile({
-          name: emailName,
-          initials: emailName[0].toUpperCase(),
-          email: user.email ?? null,
-        });
+        if (prof?.first_name) {
+          const firstName = prof.first_name as string;
+          const lastName = (prof.last_name ?? "") as string;
+          setProfile({
+            name: `${firstName} ${lastName}`.trim(),
+            initials: `${firstName[0]}${lastName[0] ?? ""}`.toUpperCase(),
+            email: user.email ?? null,
+            isLoading: false,
+          });
+        } else {
+          const emailName = user.email?.split("@")[0] ?? "Patient";
+          setProfile({
+            name: emailName,
+            initials: emailName[0].toUpperCase(),
+            email: user.email ?? null,
+            isLoading: false,
+          });
+        }
+      } catch {
+        setProfile((prev) => ({ ...prev, isLoading: false }));
       }
     };
 
     fetchProfile();
 
-    // Re-fetch when profile is updated by another component
     const handler = () => fetchProfile();
     window.addEventListener("medassist_profile_updated", handler);
     window.addEventListener("storage", handler);

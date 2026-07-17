@@ -102,7 +102,7 @@ export function MedicineCabinet() {
                     </div>
                     <div className="min-w-0">
                         <h3 className="text-[18px] font-bold text-[#0F172A] truncate">Medication Context</h3>
-                        <p className="text-[12px] text-[#94A3B8] truncate">Track medications & supplements for your clinician</p>
+                        <p className="text-[12px] text-[#64748B] truncate">Track medications & supplements for your clinician</p>
                     </div>
                 </div>
                 <button
@@ -125,7 +125,7 @@ export function MedicineCabinet() {
                     >
                         <div className="grid grid-cols-1 gap-3">
                             <div>
-                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Medication or Supplement</label>
+                                <label className="text-[11px] font-bold text-[#64748B] uppercase mb-1 block">Medication or Supplement</label>
                                 <input
                                     type="text"
                                     required
@@ -136,7 +136,7 @@ export function MedicineCabinet() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Dosage</label>
+                                <label className="text-[11px] font-bold text-[#64748B] uppercase mb-1 block">Dosage</label>
                                 <input
                                     type="text"
                                     value={newSupp.dosage}
@@ -146,7 +146,7 @@ export function MedicineCabinet() {
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-bold text-[#94A3B8] uppercase mb-1 block">Start Date</label>
+                                <label className="text-[11px] font-bold text-[#64748B] uppercase mb-1 block">Start Date</label>
                                 <input
                                     type="date"
                                     required
@@ -187,7 +187,7 @@ export function MedicineCabinet() {
                             </div>
                             <button
                                 onClick={() => handleDelete(supp.id)}
-                                className="p-2 text-[#94A3B8] hover:text-rose-600 hover:bg-rose-50 active:scale-90 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 shrink-0"
+                                className="p-2 text-[#64748B] hover:text-rose-600 hover:bg-rose-50 active:scale-90 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 shrink-0"
                                 aria-label={`Remove ${supp.name}`}
                             >
                                 <Trash2 size={16} />
@@ -196,7 +196,7 @@ export function MedicineCabinet() {
                     ))
                 ) : (
                     <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-[#EBEAE4]">
-                        <p className="text-[12px] text-[#94A3B8]">No medications or supplements logged yet.</p>
+                        <p className="text-[12px] text-[#64748B]">No medications or supplements logged yet.</p>
                     </div>
                 )}
             </div>
@@ -204,7 +204,7 @@ export function MedicineCabinet() {
             <div className="mt-6 pt-4 border-t border-[#EBEAE4]">
                 <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-rose-400 mt-0.5" />
-                    <p className="text-[11px] text-[#94A3B8] leading-relaxed">
+                    <p className="text-[11px] text-[#64748B] leading-relaxed">
                         Start dates are shown as context on biomarker trend charts. Review medication or supplement changes with your clinician.
                     </p>
                 </div>

@@ -50,7 +50,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                               tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             First name *
                         </label>
                         <input
@@ -68,7 +68,7 @@ export function StepBasicInfo() {
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                               tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Last name
                         </label>
                         <input
@@ -89,7 +89,7 @@ export function StepBasicInfo() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                               tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Age *
                         </label>
                         <input
@@ -110,7 +110,7 @@ export function StepBasicInfo() {
                     </div>
                     <div>
                         <label className="text-[10px] font-semibold uppercase 
-                               tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                               tracking-[0.12em] text-[#64748B] mb-1.5 block">
                             Biological sex *
                         </label>
                         <div className="flex gap-2">
@@ -135,7 +135,7 @@ export function StepBasicInfo() {
 
                 <div>
                     <label className="text-[10px] font-semibold uppercase 
-                             tracking-[0.12em] text-[#94A3B8] mb-1.5 block">
+                             tracking-[0.12em] text-[#64748B] mb-1.5 block">
                         Blood type
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ export function StepBasicInfo() {
                         "text-sm font-semibold transition-all",
                         canAdvance
                             ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sm shadow-sky-500/20"
-                            : "bg-[#EBEAE4] text-[#94A3B8] cursor-not-allowed"
+                            : "bg-[#EBEAE4] text-[#64748B] cursor-not-allowed"
                     )}
                 >
                     Continue

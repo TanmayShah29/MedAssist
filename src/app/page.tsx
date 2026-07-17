@@ -63,7 +63,7 @@ function HeroWorkflowScene() {
           </div>
           <div className="rounded-[12px] border border-dashed border-sky-200 bg-sky-50/60 p-3.5">
             <p className="text-sm font-bold text-[#0F172A]">Blood work PDF</p>
-            <p className="mt-1 text-xs text-[#94A3B8]">CBC, CMP, lipids, A1C</p>
+            <p className="mt-1 text-xs text-[#64748B]">CBC, CMP, lipids, A1C</p>
           </div>
         </motion.div>
 
@@ -164,7 +164,7 @@ export default function LandingPage() {
   return (
     <div ref={containerRef} className="min-h-[100dvh] bg-[#FDFDFB] font-sans">
 
-      <LandingHeader />
+      <LandingHeader variant="overlay" />
 
       {/* ── HERO ── */}
       <section className="relative min-h-[100dvh] px-4 pb-10 pt-20 sm:px-6 sm:pt-24 overflow-hidden">
@@ -262,7 +262,7 @@ export default function LandingPage() {
                 <h2 className="font-display text-4xl text-[#0F172A] mb-6">
                   You get your results back.
                   <br />
-                  <span className="text-[#94A3B8]">Now what?</span>
+                  <span className="text-[#64748B]">Now what?</span>
                 </h2>
               </motion.div>
               <div className="space-y-3">
@@ -392,7 +392,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-[18px] font-bold text-[#0F172A] mb-3">{item.title}</h3>
                 <p className="text-[14px] text-[#475569] leading-relaxed mb-4">{item.desc}</p>
-                <p className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider">{item.detail}</p>
+                <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">{item.detail}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -528,7 +528,7 @@ export default function LandingPage() {
                   <div className="flex-shrink-0 text-[#D1CFCD] text-lg">→</div>
                   <div className="flex-shrink-0 rounded-xl border border-dashed border-sky-300 bg-sky-50/50 px-4 py-3">
                     <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-500 mb-1">Next Visit</p>
-                    <p className="text-[12px] font-semibold text-[#94A3B8]">
+                    <p className="text-[12px] font-semibold text-[#64748B]">
                       <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }}>_</motion.span>
                     </p>
                   </div>

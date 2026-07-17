@@ -11,6 +11,8 @@ import { BottomMenu } from "@/components/ui/bottom-menu";
 import { FeedbackButton } from "@/components/feedback-button";
 import { ConsentBanner } from "@/components/consent-banner";
 import { Toaster } from "sonner";
+import { APP_SHELL_ROUTES, isAppShellRoute } from "@/lib/app-shell";
+import { useNavShortcuts } from "@/hooks/useNavShortcuts";
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -27,7 +29,8 @@ export function ClientLayout({
 }: ClientLayoutProps) {
   const nextPathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
-  // Safely determine pathname, prioritizing client-side usePathname()
+  useNavShortcuts();
+
   const pathname = nextPathname || initialPathname || "";
   const pageMotion: MotionProps = prefersReducedMotion
     ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0 } }
@@ -51,12 +54,10 @@ export function ClientLayout({
     return !sessionStorage.getItem("medassist_loaded");
   });
 
-  // Determine if current page needs the app shell
   const needsAppShell = pathname ? appShellRoutes.some(
     route => pathname.startsWith(route)
   ) : false;
 
-  // Determine if this is a standalone page
   const isStandalone = pathname ? standaloneRoutes.some(
     route => pathname === route || (route !== "/" && pathname.startsWith(route))
   ) : false;
@@ -68,15 +69,8 @@ export function ClientLayout({
     setLoading(false);
   };
 
-  // Active nav item for bottom menu
-  const _activeId = pathname.includes("assistant") ? "assistant"
-    : pathname.includes("results") ? "results"
-      : pathname.includes("plan") ? "plan"
-      : pathname.includes("profile") ? "profile"
-        : pathname.includes("settings") ? "settings"
-          : "dashboard";
+  const mobileNavOffset = isAppShellRoute(pathname);
 
-  // Service Worker Registration
   useEffect(() => {
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
@@ -91,7 +85,6 @@ export function ClientLayout({
 
   return (
     <>
-      {/* ── STANDALONE PAGES (landing, auth, onboarding) ── */}
       {isStandalone && (
         <div className="min-h-[100dvh] overflow-x-hidden">
           <AnimatePresence mode="wait" initial={false}>
@@ -102,7 +95,6 @@ export function ClientLayout({
         </div>
       )}
 
-      {/* ── APP PAGES (dashboard, results, assistant, etc.) ── */}
       {needsAppShell && (
         <>
           <Preloader
@@ -149,7 +141,6 @@ export function ClientLayout({
         </>
       )}
 
-      {/* ── FALLBACK ── */}
       {!isStandalone && !needsAppShell && (
         <div className="min-h-[100dvh] overflow-x-hidden">
           <AnimatePresence mode="wait" initial={false}>
@@ -162,7 +153,19 @@ export function ClientLayout({
 
       <ConsentBanner />
       <FeedbackButton />
-      <Toaster position="bottom-center" />
+      <Toaster
+        position="bottom-center"
+        offset={mobileNavOffset ? "6rem" : "1rem"}
+        mobileOffset={mobileNavOffset ? "6rem" : "1rem"}
+        toastOptions={{
+          classNames: {
+            toast: "font-sans",
+          },
+        }}
+      />
     </>
   );
 }
+
+// Re-export for layout.tsx convenience
+export { APP_SHELL_ROUTES };

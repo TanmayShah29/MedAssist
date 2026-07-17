@@ -21,10 +21,10 @@ const buttonVariants = cva(
       variant: {
         /** Sky-500 filled — primary CTA */
         primary:
-          "bg-[#0369A1] text-white shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:bg-[#0369A1] hover:shadow-[0_4px_18px_rgba(14,165,233,0.35)]",
+          "bg-[var(--color-brand-primary)] text-white shadow-[var(--shadow-brand)] hover:bg-[var(--color-brand-primary-hover)] hover:shadow-[0_4px_18px_rgba(3,105,161,0.35)]",
         /** Bordered, subtle fill on hover */
         secondary:
-          "bg-[#FFFFFF] text-[#0F172A] border-2 border-[#EBEAE4] hover:border-[#0369A1] hover:bg-[#F0F9FF] hover:text-[#0369A1]",
+          "bg-[#FFFFFF] text-[#0F172A] border-2 border-[#EBEAE4] hover:border-[var(--color-brand-primary)] hover:bg-[var(--color-brand-subtle)] hover:text-[var(--color-brand-primary)]",
         /** No background, transparent */
         ghost:
           "bg-transparent text-[#475569] border border-transparent hover:bg-[#FAFAFA] hover:text-[#0F172A] hover:border-[#EBEAE4]",
@@ -33,7 +33,7 @@ const buttonVariants = cva(
           "bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600",
         /** Outlined brand */
         outline:
-          "bg-transparent text-[#0369A1] border-2 border-[#0369A1] hover:bg-[#F0F9FF]",
+          "bg-transparent text-[var(--color-brand-primary)] border-2 border-[var(--color-brand-primary)] hover:bg-[var(--color-brand-subtle)]",
         /** Dark surface — for use on dark backgrounds */
         dark:
           "bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:border-white/40",

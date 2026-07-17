@@ -23,7 +23,7 @@ export function TimelineItem({
         <div className="mt-2 h-full min-h-6 w-px bg-[#EBEAE4]" />
       </div>
       <div className="min-w-0 pb-5">
-        {date && <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#94A3B8]">{date}</p>}
+        {date && <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#64748B]">{date}</p>}
         <h3 className="mt-0.5 text-sm font-bold leading-tight text-[#0F172A] text-wrap-safe transition-colors duration-200 group-hover:text-sky-700">{title}</h3>
         {detail && <div className="mt-1 text-[13px] leading-relaxed text-[#475569] text-wrap-safe">{detail}</div>}
       </div>

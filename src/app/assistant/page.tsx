@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Send, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { BouncingDots } from "@/components/ui/bouncing-dots";
 import { createClient } from "@/lib/supabase/client";
 import { logger } from "@/lib/logger";
 import { AssistantSidebar } from "@/components/assistant/sidebar";
@@ -314,15 +316,11 @@ export function AssistantPageInner() {
         <>
             {/* Welcome Banner (No Results) */}
             {biomarkers.length === 0 && (
-                <div style={{
-                    background: '#FFFFFF',
-                    borderBottom: '1px solid #EBEAE4',
-                    padding: 24,
-                }}>
-                    <p style={{ fontSize: 15, color: '#0F172A', fontWeight: 600, margin: '0 0 8px 0' }}>
+                <div className="border-b border-[#EBEAE4] bg-white px-5 py-6">
+                    <p className="mb-2 text-[15px] font-semibold text-[#0F172A]">
                         Welcome to your AI health assistant
                     </p>
-                    <p style={{ fontSize: 14, color: '#475569', margin: 0, lineHeight: 1.6 }}>
+                    <p className="m-0 text-sm leading-relaxed text-[#475569]">
                         I can answer general health questions right now, but I&apos;ll give you much more personalized insights once you upload your first lab report. Head to the dashboard to upload one.
                     </p>
                 </div>
@@ -338,8 +336,15 @@ export function AssistantPageInner() {
                 className="grow shrink basis-0 overflow-y-auto p-5 space-y-6 min-w-0"
             >
                 {messages.map((msg) => (
-                    <div key={msg.id} role="article" aria-label={`${msg.role} message`} className={cn(
-                        "flex w-full stagger-fade-sm",
+                    <motion.div
+                        key={msg.id}
+                        role="article"
+                        aria-label={`${msg.role} message`}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className={cn(
+                        "flex w-full",
                         msg.role === "user" ? "justify-end" : "justify-start"
                     )}>
                         {/* MESSAGE BUBBLES */}
@@ -359,14 +364,7 @@ export function AssistantPageInner() {
                             </div>
                         ) : msg.role === "typing" ? (
                             <div className="bg-[#FDFDFB] border border-[#EBEAE4] text-sm text-[#475569] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex gap-1">
-                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                        <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                    </div>
-                                    <span className="text-xs text-[#94A3B8]">Thinking...</span>
-                                </div>
+                                <BouncingDots message="Thinking…" messagePlacement="right" />
                             </div>
                         ) : msg.isError ? (
                             <div role="alert" className="bg-red-50 border border-red-200 text-sm text-red-700 px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm break-words min-w-0">
@@ -403,19 +401,12 @@ export function AssistantPageInner() {
                                                 </ReactMarkdown>
                                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 ))}
                 {isProcessing && messages[messages.length - 1]?.role !== 'typing' && (
                     <div className="flex w-full justify-start">
                         <div className="bg-[#FDFDFB] border border-[#EBEAE4] text-sm text-[#475569] px-5 py-3.5 rounded-[14px] rounded-tl-sm max-w-[85%] shadow-sm">
-                            <div className="flex items-center gap-2">
-                                <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                </div>
-                                <span className="text-xs text-[#94A3B8]">Thinking...</span>
-                            </div>
+                            <BouncingDots message="Thinking…" messagePlacement="right" />
                         </div>
                     </div>
                 )}
@@ -496,7 +487,7 @@ export function AssistantPageInner() {
                         )}
                     </button>
                 </div>
-                <p className="text-[11px] text-[#94A3B8] text-center mt-3">
+                <p className="text-[11px] text-[#64748B] text-center mt-3">
                     Educational only. AI can make mistakes; discuss results with a qualified clinician.
                 </p>
             </div>

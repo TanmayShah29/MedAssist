@@ -8,7 +8,7 @@ import {
     LayoutDashboard,
     MessageSquare,
     FlaskConical,
-    User,
+    Settings,
     ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,8 +26,8 @@ const DEFAULT_ITEMS: MenuItem[] = [
     { id: "dashboard", label: "Today", href: "/dashboard", icon: LayoutDashboard },
     { id: "results",   label: "Labs",   href: "/results",   icon: FlaskConical },
     { id: "plan",      label: "Plan",   href: "/plan",      icon: ListChecks },
-    { id: "assistant", label: "Ask",        href: "/assistant", icon: MessageSquare },
-    { id: "profile",   label: "Profile",   href: "/profile",   icon: User },
+    { id: "assistant", label: "Assistant", href: "/assistant", icon: MessageSquare },
+    { id: "settings",  label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export interface BottomMenuProps {
@@ -61,9 +61,9 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             aria-label={item.label}
                             aria-current={isActive ? "page" : undefined}
                             className={cn(
-                                "flex flex-col items-center gap-1 group relative flex-1 min-h-[54px] justify-center",
+                                "flex flex-col items-center gap-0.5 group relative flex-1 min-h-[52px] justify-center px-0.5",
                                 "transition-all duration-150 active:scale-90",
-                                isActive ? "text-sky-500" : "text-[#94A3B8]"
+                                isActive ? "text-sky-600" : "text-[#64748B]"
                             )}
                         >
                             {/* Active background pill */}
@@ -91,8 +91,8 @@ export function BottomMenu({ items = DEFAULT_ITEMS, className }: BottomMenuProps
                             </div>
 
                             <span className={cn(
-                                "text-[10px] font-bold transition-colors leading-none",
-                                isActive ? "text-sky-600" : "text-[#C5C2B8] group-hover:text-[#94A3B8]"
+                                "text-[9px] sm:text-[10px] font-bold transition-colors leading-none text-center max-w-[4.5rem] truncate",
+                                isActive ? "text-sky-700" : "text-[#64748B] group-hover:text-[#475569]"
                             )}>
                                 {item.label}
                             </span>

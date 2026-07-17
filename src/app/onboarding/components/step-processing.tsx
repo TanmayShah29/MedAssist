@@ -212,7 +212,7 @@ function ReviewExtractedValues({
             </div>
 
             <div className="rounded-[16px] border border-[#EBEAE4] bg-white overflow-hidden shadow-sm">
-                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#FFFFFF] border-b border-[#EBEAE4] text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">
+                <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr_44px] gap-3 px-4 py-3 bg-[#FFFFFF] border-b border-[#EBEAE4] text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">
                     <span>Name</span>
                     <span>Value</span>
                     <span>Unit</span>
@@ -282,7 +282,7 @@ function ReviewExtractedValues({
                             <button
                                 type="button"
                                 onClick={() => removeRow(index)}
-                                className="h-10 w-10 rounded-[10px] text-[#94A3B8] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
+                                className="h-10 w-10 rounded-[10px] text-[#64748B] hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center"
                                 aria-label={`Remove ${row.name || "row"}`}
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -309,7 +309,7 @@ function ReviewExtractedValues({
 
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#94A3B8]">Brief completeness</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">Brief completeness</p>
                     <p className="font-display text-3xl text-[#0F172A]">{reviewedScore}<span className="text-sm text-[#475569] font-sans"> / 100</span></p>
                 </div>
                 <button
@@ -663,7 +663,7 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
                                     "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 transition-colors duration-300",
                                     isActive && "bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200",
                                     isCompleted && "bg-emerald-500 border-emerald-500 text-white",
-                                    isPending && "bg-white border-[#EBEAE4] text-[#94A3B8]"
+                                    isPending && "bg-white border-[#EBEAE4] text-[#64748B]"
                                 )}
                             >
                                 {isCompleted ? <Check className="w-4 h-4" /> : stage.step}
@@ -690,7 +690,7 @@ export function StepProcessing({ currentStep }: { currentStep?: number }) {
             </div>
 
             <div className="mt-12 text-center">
-                <p className="text-xs text-[#94A3B8] font-medium">This usually takes 20–40 seconds</p>
+                <p className="text-xs text-[#64748B] font-medium">This usually takes 20–40 seconds</p>
                 <button
                     onClick={state === 'uploading' || state === 'analyzing' || state === 'finalizing' ? handleCancel : goBackToUpload}
                     className="mt-4 text-sm text-[#475569] hover:text-[#0F172A] font-medium flex items-center gap-1.5 mx-auto"

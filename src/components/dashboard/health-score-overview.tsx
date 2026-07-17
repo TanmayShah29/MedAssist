@@ -19,7 +19,7 @@ interface HealthScoreOverviewProps {
 
 function getScoreLabel(score: number): { label: string; color: string; bg: string; ring: string } {
     if (score >= 85) return { label: "Ready to review", color: "#065F46", bg: "#ECFDF5", ring: "#059669" };
-    if (score >= 70) return { label: "Almost ready", color: "#0C4A6E", bg: "#F0F9FF", ring: "#0369A1" };
+    if (score >= 70) return { label: "Almost ready", color: "#0C4A6E", bg: "#F0F9FF", ring: "#0ea5e9" };
     if (score >= 45) return { label: "Add more context", color: "#78350F", bg: "#FFFBEB", ring: "#F59E0B" };
     return { label: "Start your brief", color: "#991B1B", bg: "#FFF1F2", ring: "#EF4444" };
 }
@@ -71,12 +71,12 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             aria-label={onClick ? "Brief completeness details" : undefined}
         >
             <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
-                <h3 className="text-[10px] font-semibold uppercase text-[#94A3B8] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
+                <h3 className="text-[10px] font-semibold uppercase text-[#64748B] tracking-wider flex items-center gap-2 min-w-0 text-wrap-safe">
                     Brief Completeness
                     <button
                       type="button"
                       aria-label="About brief completeness"
-                      className="cursor-help text-[#94A3B8] hover:text-[#475569] relative"
+                      className="cursor-help text-[#64748B] hover:text-[#475569] relative"
                       onFocus={() => setShowTooltip(true)}
                       onBlur={() => setShowTooltip(false)}
                       onMouseEnter={() => setShowTooltip(true)}
@@ -115,7 +115,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="font-display text-3xl font-bold text-[#0F172A] leading-none">{displayScore}</span>
-                        <span className="text-[10px] font-bold text-[#94A3B8] mt-0.5">/ 100</span>
+                        <span className="text-[10px] font-bold text-[#64748B] mt-0.5">/ 100</span>
                     </div>
                 </div>
 
