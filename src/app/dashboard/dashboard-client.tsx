@@ -34,19 +34,28 @@ import { BiomarkerGrid } from '@/components/dashboard/biomarker-grid'
 import { CarePlanSection } from '@/components/dashboard/care-plan-section'
 import { LongitudinalInsightsSection } from '@/components/dashboard/longitudinal-insights-section'
 import { DoctorVisitPrep } from '@/components/dashboard/doctor-visit-prep'
-import { InsightCard } from '@/components/ui/insight-card'
-import { StatusSummary } from '@/components/ui/status-summary'
-import { ActionItem as PlanActionItem } from '@/components/ui/action-item'
-import { TrustCallout } from '@/components/ui/trust-callout'
 
 import { useStore } from '@/store/useStore'
 import { Biomarker, Profile, LabResult } from '@/types/medical'
 import { labResultSummary, latestUniqueBiomarkers, decryptRawAiJson } from '@/lib/medical-data'
 import { computeBriefCompleteness, PATIENT_STATUS } from '@/lib/patient-status'
 import { TrustLayer } from '@/components/trust-layer'
-import { generateCarePlanItems, getTopTrendChanges, getVisitFocus } from '@/lib/health-companion'
 
 // ── Helpers ──────────────────────────────────────────────────────────────
+
+function RevealSection({ children, className }: { children: React.ReactNode; className?: string }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
 
 function getDelta(current: number | string, previous: number | string | null | undefined) {
     if (previous === null || previous === undefined) return null;
@@ -153,7 +162,7 @@ function LongitudinalComparisonCard({
 function EmptyDashboard({ onUpload, onDemo }: { onUpload: () => void; onDemo: () => void }) {
     return (
         <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[18px] px-8 py-12 text-center mb-6 stagger-fade">
-            <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105">
+            <div className="w-14 h-14 rounded-full bg-[#F0F9FF] flex items-center justify-center mx-auto mb-4 transition-transform duration-500 hover:scale-105 float-gentle">
                 <FileText size={24} color="#0ea5e9" />
             </div>
             <h2 className="font-display text-[28px] text-[#0F172A] mb-3">Ready when you are</h2>
@@ -324,14 +333,6 @@ export default function DashboardClient({
               year: 'numeric',
           })
         : null;
-
-    const visitFocus = getVisitFocus(latestBiomarkers);
-    const topTrendChanges = getTopTrendChanges(latestBiomarkers, displayBiomarkers, latestLabResult?.id);
-    const generatedPlanItems = generateCarePlanItems({
-        biomarkers: latestBiomarkers,
-        reportCount: displayLabResults.length,
-        symptomCount: initialSymptoms.length,
-    }).slice(0, 3);
 
     const handleBiomarkerClick = (b: Biomarker) => {
         setSelectedBiomarkerData(b);
@@ -505,130 +506,9 @@ export default function DashboardClient({
             )}
 
             {totalCount > 0 && (
-                <>
-                    <section className="mb-8 print:hidden stagger-fade">
-                        <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
-                    </section>
-
-                <section className="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)] print:hidden">
-                    <div className="app-panel p-5 sm:p-6 stagger-fade">
-                        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-600">Today</p>
-                                <h2 className="mt-1 font-display text-[30px] leading-tight text-[#0F172A] sm:text-[34px]">
-                                    {visitFocus.title}
-                                </h2>
-                                <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-[#475569] text-wrap-safe">
-                                    {visitFocus.detail}
-                                </p>
-                            </div>
-                            <div className="w-full lg:w-[18rem]">
-                                <StatusSummary optimal={optimalCount} warning={warningCount} critical={criticalCount} />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                            <InsightCard
-                                tone={criticalCount > 0 ? 'critical' : warningCount > 0 ? 'warning' : 'success'}
-                                eyebrow="Visit focus"
-                                title={criticalCount > 0 ? 'Review soon' : warningCount > 0 ? 'Discuss at visit' : 'Routine review'}
-                                description={criticalCount > 0
-                                    ? `${criticalCount} result${criticalCount === 1 ? '' : 's'} should be reviewed with a qualified clinician.`
-                                    : warningCount > 0
-                                        ? `${warningCount} result${warningCount === 1 ? '' : 's'} may be worth discussing.`
-                                        : 'No current values are marked for discussion.'}
-                                action="Open plan"
-                                onClick={() => router.push('/plan')}
-                                className="stagger-fade-sm"
-                            />
-                            <InsightCard
-                                tone="info"
-                                eyebrow="Doctor prep"
-                                title="One-page prep pack"
-                                description="Keep your top discussion points, questions, actions, and key labs in one place."
-                                action="Build pack"
-                                onClick={() => router.push('/plan')}
-                                className="stagger-fade-sm"
-                            />
-                            <InsightCard
-                                tone="neutral"
-                                eyebrow="Health record"
-                                title={displayLabResults.length > 1 ? `${displayLabResults.length} reports tracked` : 'Build your baseline'}
-                                description={displayLabResults.length > 1
-                                    ? 'Trend-aware context is available for your latest report.'
-                                    : 'Upload your next report to unlock clearer trend comparisons.'}
-                                action="View labs"
-                                onClick={() => router.push('/results')}
-                                className="stagger-fade-sm"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex min-w-0 flex-col gap-5">
-                        <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '80ms' }}>
-                            <div className="mb-4 flex items-center justify-between gap-3">
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">What changed</p>
-                                    <h2 className="text-lg font-bold text-[#0F172A]">Top trends</h2>
-                                </div>
-                                <button
-                                    onClick={() => router.push('/results')}
-                                    className="text-xs font-bold text-sky-600 transition-colors duration-200 hover:text-sky-700"
-                                >
-                                    Labs
-                                </button>
-                            </div>
-                            {topTrendChanges.length ? (
-                                <div className="space-y-3">
-                                    {topTrendChanges.map((change, idx) => (
-                                        <InsightCard
-                                            key={change.biomarker.id}
-                                            title={change.title}
-                                            description={change.detail}
-                                            tone={change.biomarker.status === 'critical' ? 'critical' : change.biomarker.status === 'warning' ? 'warning' : 'success'}
-                                            onClick={() => handleBiomarkerClick(change.biomarker)}
-                                            className="stagger-fade-sm"
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm leading-relaxed text-[#475569]">
-                                    Upload another report to compare changes over time.
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="app-panel p-5 stagger-fade" style={{ animationDelay: '140ms' }}>
-                            <div className="mb-4 flex items-center justify-between gap-3">
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B]">Next actions</p>
-                                    <h2 className="text-lg font-bold text-[#0F172A]">Plan preview</h2>
-                                </div>
-                                <button
-                                    onClick={() => router.push('/plan')}
-                                    className="text-xs font-bold text-sky-600 transition-colors duration-200 hover:text-sky-700"
-                                >
-                                    Open plan
-                                </button>
-                            </div>
-                            <div className="space-y-3">
-                                {generatedPlanItems.map((item) => (
-                                    <PlanActionItem
-                                        key={item.id}
-                                        title={item.title}
-                                        reason={item.reason}
-                                        kind={item.kind}
-                                        status={item.status}
-                                        timeframe={item.timeframe}
-                                        related={item.related_biomarkers}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                        <TrustCallout />
-                    </div>
-                </section>
-                </>
+                <RevealSection className="mb-8 print:hidden">
+                    <DoctorVisitPrep biomarkers={displayBiomarkers} demoMode={demoMode} />
+                </RevealSection>
             )}
 
             {/* ── Main dashboard content ── */}
@@ -638,7 +518,8 @@ export default function DashboardClient({
                     onDemo={() => setDemoMode(true)}
                 />
             ) : (
-                <div className="app-section-grid mb-6">
+                <RevealSection className="mb-6">
+                <div className="app-section-grid">
 
                     {/* ── LEFT: Main clinical column ── */}
                     <div className="flex flex-col gap-6 min-w-0">
@@ -768,6 +649,7 @@ export default function DashboardClient({
                     </div>
 
                 </div>
+                </RevealSection>
             )}
 
             {/* ── Modals ── */}

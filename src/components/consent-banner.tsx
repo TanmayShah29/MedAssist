@@ -102,12 +102,15 @@ export function ConsentBanner() {
               <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 border border-sky-100">
                 <Shield className="h-4 w-4 text-sky-600" aria-hidden />
               </div>
-              <p className="text-sm leading-relaxed text-[#475569]">
-                MedAssist processes your lab report data using AI to provide health
-                insights. Your data is encrypted in transit and at rest. You can delete
-                your data at any time from{" "}
-                <span className="font-semibold text-[#0F172A]">Settings</span>.
-              </p>
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-[#0F172A] leading-snug">Your data stays private</p>
+                <p className="text-[13px] leading-relaxed text-[#475569] mt-0.5">
+                  MedAssist processes your lab report data using AI to provide health
+                  insights. Your data is encrypted in transit and at rest. You can delete
+                  your data at any time from{" "}
+                  <span className="font-semibold text-[#0F172A]">Settings</span>.
+                </p>
+              </div>
             </div>
             <div className="flex shrink-0 gap-2 sm:pl-2">
               <button

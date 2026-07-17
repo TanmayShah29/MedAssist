@@ -190,7 +190,7 @@ export function BiomarkerGrid({
 function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
     return (
         <div className="bg-[#FFFFFF] border border-[#EBEAE4] rounded-[14px] py-12 px-8 text-center flex flex-col items-center justify-center stagger-fade">
-            <div className="w-16 h-16 bg-[#EBEAE4] rounded-full flex items-center justify-center mb-6 transition-transform duration-500 hover:scale-105">
+            <div className="w-16 h-16 bg-[#EBEAE4] rounded-full flex items-center justify-center mb-6 transition-transform duration-500 hover:scale-105 float-gentle">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="1" />
@@ -270,7 +270,7 @@ function BiomarkerCard({
             {/* Top row: badge + value */}
             <div className="flex flex-col items-start gap-2 min-w-0">
                 <div className={`inline-flex max-w-full items-center gap-2 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-transform duration-200 group-hover:scale-105 ${style.badgeClass}`}>
-                    <div className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
+                    <div className={`w-1.5 h-1.5 rounded-full ${style.dotClass} ${(b.status === 'critical' || b.status === 'warning') ? 'attention-pulse' : ''}`} />
                     <span className="truncate">{style.label.toUpperCase()}</span>
                     <span className="sr-only">({style.description})</span>
                 </div>

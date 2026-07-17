@@ -9,6 +9,7 @@ import Link from "next/link";
 import { logger } from "@/lib/logger";
 import { resetOnboardingCookie } from "@/app/actions/user-data";
 import { BrandLockup } from "@/components/branding/brand-lockup";
+import { motion } from "framer-motion";
 
 function AuthContent() {
     const router = useRouter();
@@ -300,12 +301,18 @@ function AuthContent() {
 export default function AuthPage() {
     return (
         <div className="min-h-[100dvh] bg-[#FDFDFB] flex flex-col justify-center items-center p-4 relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(224,242,254,0.72),rgba(250,250,247,0))]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(14,165,233,0.10),transparent_28rem),radial-gradient(circle_at_75%_100%,rgba(16,185,129,0.06),transparent_24rem)]" />
+            <div className="absolute inset-x-0 top-0 h-80 bg-[linear-gradient(180deg,rgba(224,242,254,0.72),rgba(250,250,247,0))]" />
             <Link href="/" className="fixed top-[max(2rem,env(safe-area-inset-top,0px))] left-6 z-10 group">
                 <BrandLockup showTagline markClassName="transition-transform group-hover:-rotate-3 group-hover:scale-105" />
             </Link>
 
-            <div className="relative grid w-full max-w-5xl grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1fr)]">
+            <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative grid w-full max-w-5xl grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1fr)]"
+            >
                 <aside className="hidden lg:block">
                     <p className="section-label mb-3 text-sky-600">What happens next</p>
                     <h2 className="font-display text-5xl leading-tight text-[#0F172A]">
@@ -334,7 +341,7 @@ export default function AuthPage() {
                         <AuthContent />
                     </div>
                 </Suspense>
-            </div>
+            </motion.div>
         </div>
     );
 }

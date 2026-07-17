@@ -53,7 +53,7 @@ export function AssistantPageInner() {
         {
             id: "1",
             role: "assistant",
-            content: "Hello. I'm ready to help answer your health questions.",
+            content: "Hi there — I'm your visit prep assistant. Ask me anything about your lab results, or tap a suggestion below to get started.",
             timestamp: new Date()
         }
     ]);
@@ -164,7 +164,7 @@ export function AssistantPageInner() {
                     setMessages([{
                         id: "1",
                         role: "assistant",
-                        content: `Hello! I'm here to help you prepare for your next doctor visit. I notice your ${critical.name} is marked ${getPatientStatus(critical.status).label}; I can help turn that into clear questions for your clinician.`,
+                        content: `Hi! I can see your ${critical.name} is flagged as ${getPatientStatus(critical.status).label.toLowerCase()}. Want me to help you prepare clear questions for your doctor about it?`,
                         timestamp: new Date()
                     }]);
                 }
@@ -335,14 +335,14 @@ export function AssistantPageInner() {
                 aria-label="Chat messages from AI assistant"
                 className="grow shrink basis-0 overflow-y-auto p-5 space-y-6 min-w-0"
             >
-                {messages.map((msg) => (
+                {messages.map((msg, idx) => (
                     <motion.div
                         key={msg.id}
                         role="article"
                         aria-label={`${msg.role} message`}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1], delay: idx === messages.length - 1 && idx > 0 ? 0.05 : 0 }}
                         className={cn(
                         "flex w-full",
                         msg.role === "user" ? "justify-end" : "justify-start"

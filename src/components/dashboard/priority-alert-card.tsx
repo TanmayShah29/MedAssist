@@ -14,7 +14,7 @@ export function PriorityAlertCard({ biomarkers }: PriorityAlertCardProps) {
     if (soonMarkers.length === 0) {
         return (
             <div className="bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 flex flex-col md:flex-row items-center gap-4 shadow-sm transition-all duration-300 hover:border-[#D1CFCD] hover:shadow-md stagger-fade">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100 transition-transform duration-300 hover:scale-105">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100 transition-transform duration-300 hover:scale-105 float-gentle">
                     <CheckCircle className="w-6 h-6 text-emerald-500" />
                 </div>
                 <div className="min-w-0">

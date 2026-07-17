@@ -47,6 +47,7 @@ export default function ResultsPage() {
     const [labResults, setLabResults] = useState<any[]>([])
     const [selectedReportId, setSelectedReportId] = useState<string>('all')
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
+    const [showAttentionOnly, setShowAttentionOnly] = useState(false)
     const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null)
     const [searchQuery, setSearchValue] = useState('')
     const [biomarkerTrends, setBiomarkerTrends] = useState<{ date: string; score: number }[]>([])
@@ -156,6 +157,7 @@ export default function ResultsPage() {
         : biomarkers.filter(b => b.lab_result_id?.toString() === selectedReportId)
     )
         .filter(b => selectedCategory === 'all' || (b.category || 'other').toLowerCase() === selectedCategory)
+        .filter(b => !showAttentionOnly || b.status === 'warning' || b.status === 'critical')
         .filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
     // Bug 7 fix: Deduplicate for status counts only (show most recent per biomarker name)
@@ -353,6 +355,15 @@ export default function ResultsPage() {
                 {/* ── Category tabs & Search ── */}
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-6 min-w-0">
                     <div className="flex flex-wrap gap-2 pb-1 min-w-0 xl:flex-1 xl:flex-nowrap xl:overflow-x-auto xl:scrollbar-hide xl:scroll-smooth xl:mask-fade-right">
+                        <button
+                            onClick={() => setShowAttentionOnly(v => !v)}
+                            className={`px-3.5 py-2 rounded-[12px] text-[14px] font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 min-h-[44px] ${showAttentionOnly
+                                ? 'bg-red-500 text-white shadow-sm shadow-red-500/20 scale-[1.02]'
+                                : 'bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300'
+                                }`}
+                        >
+                            ⚠ Needs Attention
+                        </button>
                         {CATEGORIES.map(category => (
                             <button
                                 key={category}
