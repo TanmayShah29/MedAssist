@@ -177,7 +177,7 @@ CREATE POLICY "lab_results_delete" ON lab_results
 CREATE TABLE IF NOT EXISTS biomarkers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   lab_result_id UUID REFERENCES lab_results(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   value TEXT,
   unit TEXT,
@@ -365,15 +365,8 @@ CREATE TABLE IF NOT EXISTS user_notes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS assistant_artifacts (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  artifact_type TEXT NOT NULL,
-  title TEXT NOT NULL,
-  content JSONB NOT NULL,
-  conversation_id BIGINT REFERENCES conversations(id) ON DELETE SET NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+-- NOTE: assistant_artifacts is defined after conversations (below) because it
+-- has a FK reference to conversations(id).
 
 CREATE TABLE IF NOT EXISTS exports (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -553,7 +546,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION cleanup_expired_cache() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_expired_cache() TO service_role;
 
 ALTER TABLE global_ai_cache ENABLE ROW LEVEL SECURITY;
 
@@ -590,6 +583,19 @@ CREATE POLICY "conversations_all" ON conversations
 -- Composite index for fast per-user history queries and rate limit checks
 CREATE INDEX IF NOT EXISTS conversations_user_id_created_at_idx
   ON conversations (user_id, created_at DESC);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ASSISTANT ARTIFACTS (created after conversations for FK reference)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS assistant_artifacts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  artifact_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content JSONB NOT NULL,
+  conversation_id BIGINT REFERENCES conversations(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- SAVE COMPLETE REPORT RPC (search_path secured)
@@ -717,7 +723,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION delete_expired_data(INT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION delete_expired_data(INT) TO service_role;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- AUDIT LOG (HIPAA audit controls)
@@ -736,12 +742,70 @@ CREATE TABLE IF NOT EXISTS audit_log (
 
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 
--- Append-only: anyone can insert, but no updates or deletes via RLS
+-- Append-only: authenticated users or service_role can insert, but no updates or deletes via RLS
 DROP POLICY IF EXISTS "audit_log_insert" ON audit_log;
 CREATE POLICY "audit_log_insert" ON audit_log
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK ((SELECT auth.uid()) IS NOT NULL OR (SELECT auth.role()) = 'service_role');
 
 -- Service role / admin reads via supabaseAdmin (bypasses RLS)
 DROP POLICY IF EXISTS "audit_log_select_admin" ON audit_log;
 CREATE POLICY "audit_log_select_admin" ON audit_log
   FOR SELECT USING ((SELECT auth.role()) = 'service_role');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ATOMIC DELETE: lab result + biomarkers in one transaction
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION delete_lab_result_cascade(p_report_id UUID, p_user_id UUID)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  DELETE FROM biomarkers WHERE lab_result_id = p_report_id AND user_id = p_user_id;
+  DELETE FROM lab_results WHERE id = p_report_id AND user_id = p_user_id;
+END;
+$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ATOMIC REPLACE: replace all symptoms for a user in one transaction
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION replace_user_symptoms(p_user_id UUID, p_symptoms TEXT[])
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  DELETE FROM symptoms WHERE user_id = p_user_id;
+  IF array_length(p_symptoms, 1) > 0 THEN
+    INSERT INTO symptoms (user_id, symptom)
+    SELECT p_user_id, unnest(p_symptoms);
+  END IF;
+END;
+$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- MISSING INDEXES for RLS performance
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_retest_reminders_user ON retest_reminders(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_notes_user ON user_notes(user_id);
+CREATE INDEX IF NOT EXISTS idx_assistant_artifacts_user ON assistant_artifacts(user_id);
+CREATE INDEX IF NOT EXISTS idx_supplements_user ON supplements(user_id);
+CREATE INDEX IF NOT EXISTS idx_consent_log_user ON consent_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(user_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- RATE LIMITS cleanup — prevent unbounded table growth
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION cleanup_rate_limits()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  DELETE FROM rate_limits
+  WHERE window_start < timezone('utc'::text, now()) - INTERVAL '24 hours';
+END;
+$$;

@@ -28,7 +28,7 @@ export function validateAndRecalculateScore(
 
   // Fallback: derive score from biomarker statuses
   const total = biomarkers.length;
-  if (total === 0) return 0;
+  if (total === 0) return 50;
 
   const optimal = biomarkers.filter(b => b.status === 'optimal').length;
   const warning = biomarkers.filter(b => b.status === 'warning').length;

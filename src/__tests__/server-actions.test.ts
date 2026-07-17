@@ -80,73 +80,57 @@ function buildDeleteChain() {
 // ── deleteLabResult tests ──────────────────────────────────────────────────────
 
 describe('deleteLabResult — input validation', () => {
-    let adminFrom: ReturnType<typeof vi.fn>;
+    let rpcMock: ReturnType<typeof vi.fn>;
     let reportChain: Record<string, ReturnType<typeof vi.fn>>;
-    let biomarkerChain: Record<string, ReturnType<typeof vi.fn>>;
-    let deleteReportChain: Record<string, ReturnType<typeof vi.fn>>;
 
     beforeEach(() => {
         vi.clearAllMocks();
         mockGetUser = vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
         mockFrom = vi.fn();
+        rpcMock = vi.fn().mockResolvedValue({ data: null, error: null });
 
         (getAuthClient as ReturnType<typeof vi.fn>).mockResolvedValue({
             auth: { getUser: mockGetUser },
             from: mockFrom,
+            rpc: rpcMock,
         });
 
         reportChain = buildDeleteChain();
-        biomarkerChain = buildDeleteChain();
-        deleteReportChain = buildDeleteChain();
-        
-        mockFrom
-            .mockReturnValueOnce(reportChain)
-            .mockReturnValueOnce(biomarkerChain)
-            .mockReturnValueOnce(deleteReportChain);
+        mockFrom.mockReturnValue(reportChain);
     });
 
     it('rejects empty string ID before touching the DB', async () => {
         const result = await deleteLabResult('');
         expect(result.success).toBe(false);
         expect(result.error).toBe('Invalid report ID');
-        // No DB call should have been made
         expect(mockFrom).not.toHaveBeenCalled();
     });
 
-    it('passes a UUID string through to the DB (RLS guards access)', async () => {
+    it('passes a UUID string through to the RPC (atomic delete)', async () => {
         const uuid = 'b534d94e-b7e0-4d21-962f-d62d8de7ed81';
         const result = await deleteLabResult(uuid);
         expect(mockFrom).toHaveBeenNthCalledWith(1, 'lab_results');
-        expect(mockFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
-        expect(mockFrom).toHaveBeenNthCalledWith(3, 'lab_results');
         expect(reportChain.eq).toHaveBeenCalledWith('id', uuid);
         expect(reportChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
-        expect(biomarkerChain.delete).toHaveBeenCalled();
-        expect(biomarkerChain.eq).toHaveBeenCalledWith('lab_result_id', uuid);
-        expect(biomarkerChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
-        expect(deleteReportChain.delete).toHaveBeenCalled();
-        expect(deleteReportChain.eq).toHaveBeenCalledWith('id', uuid);
-        expect(deleteReportChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
+        expect(rpcMock).toHaveBeenCalledWith('delete_lab_result_cascade', {
+            p_report_id: uuid,
+            p_user_id: 'user-1',
+        });
         expect(result.success).toBe(true);
     });
 
-    it('calls .from("lab_results").delete().eq("id", ...) for a numeric string ID', async () => {
+    it('calls RPC for a numeric string ID', async () => {
         const result = await deleteLabResult('42');
-        expect(mockFrom).toHaveBeenNthCalledWith(1, 'lab_results');
-        expect(mockFrom).toHaveBeenNthCalledWith(2, 'biomarkers');
-        expect(mockFrom).toHaveBeenNthCalledWith(3, 'lab_results');
-        expect(reportChain.eq).toHaveBeenCalledWith('id', '42');
-        expect(biomarkerChain.eq).toHaveBeenCalledWith('lab_result_id', '42');
-        expect(deleteReportChain.eq).toHaveBeenCalledWith('id', '42');
+        expect(rpcMock).toHaveBeenCalledWith('delete_lab_result_cascade', {
+            p_report_id: '42',
+            p_user_id: 'user-1',
+        });
         expect(result.success).toBe(true);
     });
 
     it('surfaces the DB error message on failure', async () => {
-        biomarkerChain.eq
-            .mockReturnValueOnce(biomarkerChain)
-            .mockResolvedValueOnce({ data: null, error: { message: 'permission denied' } });
+        rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'permission denied' } });
         const result = await deleteLabResult('some-uuid-99');
-        // Error is thrown and caught; message is surfaced
         expect(result.success).toBe(false);
         expect(result.error).toBe('permission denied');
     });

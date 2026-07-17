@@ -18,6 +18,9 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const MODEL = 'llama-3.3-70b-versatile';
 
+// ── In-memory lock map to prevent thundering herd on cache misses ──────────
+const generationLocks = new Map<string, Promise<{ questions: { question: string; context: string }[] }>>();
+
 // ── Input validation ────────────────────────────────────────────────────────
 
 // Type guard for cached doctor questions stored in raw_ai_json
@@ -147,10 +150,16 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 8. Generate questions via Groq (with retry)
-        // Fix #8: Use a JSON object wrapper so response_format: json_object is valid.
-        // The prompt asks for { "questions": [...] } and we unwrap below.
-        const questionsPrompt = `Based on these specific lab results that may be worth discussing with a clinician:
+        // 8. Generate questions via Groq — with lock to prevent thundering herd
+        let questions: { question: string; context: string }[] = [];
+        const existingLock = generationLocks.get(cacheKey);
+        if (existingLock) {
+            const result = await existingLock;
+            return apiResponse({ questions: result.questions, cached: 'lock' });
+        }
+
+        const generationPromise = (async () => {
+            const questionsPrompt = `Based on these specific lab results that may be worth discussing with a clinician:
 ${criticalBiomarkers.map((b: BiomarkerInput) =>
     `${b.name}: ${b.value} ${b.unit} (status: ${b.status}${
         b.reference_range_min != null && b.reference_range_max != null
@@ -174,41 +183,50 @@ Return a JSON object with a "questions" key containing an array:
   ]
 }`;
 
-        const completion = await withRetry(
-            () => groq.chat.completions.create({
-                messages: [{ role: 'user', content: questionsPrompt }],
-                model: MODEL,
-                temperature: 0.1,
-                response_format: { type: 'json_object' },
-                max_tokens: 700,
-            }),
-            { maxAttempts: 3, initialDelayMs: 600 }
-        );
+            const completion = await withRetry(
+                () => groq.chat.completions.create({
+                    messages: [{ role: 'user', content: questionsPrompt }],
+                    model: MODEL,
+                    temperature: 0.1,
+                    response_format: { type: 'json_object' },
+                    max_tokens: 700,
+                }),
+                { maxAttempts: 3, initialDelayMs: 600 }
+            );
 
-        // 9. Parse AI response — always expect { questions: [...] } now (fix #8)
-        let questions: { question: string; context: string }[] = [];
-        try {
-            const content = completion.choices[0].message.content || '{}';
-            const parsed = JSON.parse(content);
-            const validated = GeneratedQuestionsSchema.safeParse(parsed);
-            if (validated.success) {
-                questions = validated.data.questions;
-            } else {
-                // Fallback: try bare array for backward-compat
-                if (Array.isArray(parsed)) {
-                    questions = parsed.filter(
-                        (q): q is { question: string; context: string } =>
-                            typeof q?.question === 'string' && typeof q?.context === 'string'
-                    );
+            let parsedQuestions: { question: string; context: string }[] = [];
+            try {
+                const content = completion.choices[0].message.content || '{}';
+                const parsed = JSON.parse(content);
+                const validated = GeneratedQuestionsSchema.safeParse(parsed);
+                if (validated.success) {
+                    parsedQuestions = validated.data.questions;
+                } else {
+                    if (Array.isArray(parsed)) {
+                        parsedQuestions = parsed.filter(
+                            (q): q is { question: string; context: string } =>
+                                typeof q?.question === 'string' && typeof q?.context === 'string'
+                        );
+                    }
+                    if (parsedQuestions.length === 0) throw new Error('No valid questions in response');
                 }
-                if (questions.length === 0) throw new Error('No valid questions in response');
+            } catch (e) {
+                logger.error('[generate-questions] Failed to parse AI JSON response', e);
+                parsedQuestions = [{
+                    question: 'Could we review the results marked for discussion and decide what should be monitored next?',
+                    context: 'There was an error generating detailed questions, so this fallback keeps the visit focused on clinician review.',
+                }];
             }
-        } catch (e) {
-            logger.error('[generate-questions] Failed to parse AI JSON response', e);
-            questions = [{
-                question: 'Could we review the results marked for discussion and decide what should be monitored next?',
-                context: 'There was an error generating detailed questions, so this fallback keeps the visit focused on clinician review.',
-            }];
+
+            return { questions: parsedQuestions };
+        })();
+
+        generationLocks.set(cacheKey, generationPromise);
+        try {
+            const result = await generationPromise;
+            questions = result.questions;
+        } finally {
+            generationLocks.delete(cacheKey);
         }
 
         // 10. Write to both local and global cache (non-blocking)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateContentLength } from '@/lib/request-validation';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical';
+import { apiResponse } from '@/lib/api-response';
 import { z } from 'zod';
 
 export const maxDuration = 30;
@@ -35,7 +36,7 @@ const DEMO_PROFILE = {
 export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit();
     if (!rateLimitResult.success) {
-        return NextResponse.json(
+        return apiResponse(
             { error: "Too many requests. Please wait a moment." },
             { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
         );
@@ -45,12 +46,12 @@ export async function POST(request: NextRequest) {
     try {
         body = await request.json();
     } catch {
-        return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 });
+        return apiResponse({ error: 'Invalid JSON.' }, { status: 400 });
     }
 
     const parseResult = requestSchema.safeParse(body);
     if (!parseResult.success) {
-        return NextResponse.json({ error: parseResult.error.issues[0]?.message || 'Invalid input' }, { status: 400 });
+        return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid input' }, { status: 400 });
     }
 
     const { question, symptoms } = parseResult.data;
@@ -99,11 +100,11 @@ export async function POST(request: NextRequest) {
             [],
             DEMO_PROFILE
         );
-        return NextResponse.json({ answer });
+        return apiResponse({ answer });
     } catch (error: unknown) {
         if ((error as Error).message?.startsWith('RATE_LIMIT')) {
-            return NextResponse.json({ error: (error as Error).message }, { status: 429 });
+            return apiResponse({ error: (error as Error).message }, { status: 429 });
         }
-        return NextResponse.json({ error: 'Failed to get answer. Please try again.' }, { status: 500 });
+        return apiResponse({ error: 'Failed to get answer. Please try again.' }, { status: 500 });
     }
 }

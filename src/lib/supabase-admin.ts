@@ -14,7 +14,8 @@ export const supabaseAdmin = (() => {
 
     // Security & Functionality Check: If the key starts with 'sb_publishable_', it's an anon key, not a service role key.
     if (key.startsWith('sb_publishable_')) {
-        logger.warn('Supabase Admin: SUPABASE_SERVICE_ROLE_KEY is a publishable key. Admin-only operations (bypassing RLS) will fail, but SECURITY DEFINER RPCs may still work.')
+        logger.warn('Supabase Admin: SUPABASE_SERVICE_ROLE_KEY is a publishable key, not a service role key. Admin operations will fail.')
+        return null
     }
 
     try {

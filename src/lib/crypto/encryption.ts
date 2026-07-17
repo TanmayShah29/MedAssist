@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 const ALGORITHM = 'aes-256-gcm';
 
@@ -37,11 +38,15 @@ export function encrypt(text: string): string {
 export function decrypt(encryptedData: string): string {
   if (!encryptedData || !encryptedData.includes(':')) {
     // Return original data if it's not in the encrypted format
+    logger.warn('decrypt: data not in encrypted format, returning as-is');
     return encryptedData;
   }
 
   const parts = encryptedData.split(':');
-  if (parts.length !== 4) return encryptedData;
+  if (parts.length !== 4) {
+    logger.warn('decrypt: data not in encrypted format, returning as-is');
+    return encryptedData;
+  }
 
   const [, ivBase64, authTagBase64, encryptedTextBase64] = parts;
 
@@ -57,7 +62,7 @@ export function decrypt(encryptedData: string): string {
     decrypted += decipher.final('utf8');
     return decrypted;
   } catch (err) {
-    console.error('Decryption failed:', err);
+    logger.error('Decryption failed:', err);
     throw new Error('Failed to decrypt medical data. Encryption key may be invalid.');
   }
 }

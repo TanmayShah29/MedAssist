@@ -11,6 +11,7 @@ export async function logAuditEvent(params: {
   userAgent?: string;
 }) {
   if (!supabaseAdmin) {
+    logger.warn('Audit log skipped: supabaseAdmin not configured');
     return;
   }
 

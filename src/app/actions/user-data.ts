@@ -10,6 +10,17 @@ import { mergeBiomarkerSources } from "@/lib/medical-data";
 import { Biomarker } from "@/types/medical";
 import { encrypt } from "@/lib/crypto/encryption";
 
+// ── Shared validation schemas ──────────────────────────────────────────────
+
+const UpdateProfileSchema = z.object({
+  first_name: z.string().max(100).optional(),
+  last_name: z.string().max(100).optional(),
+  age: z.number().int().min(0).max(150).optional(),
+  sex: z.enum(["male", "female", "other", ""]).optional(),
+  blood_type: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", ""]).optional(),
+  symptoms: z.array(z.string().max(200).transform((s) => s.trim())).max(50).optional(),
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // saveLabResult — persist a full lab report + biomarkers in one atomic RPC
 // ─────────────────────────────────────────────────────────────────────────────
@@ -168,7 +179,6 @@ export async function deleteLabResult(labResultId: number | string) {
   }
 
   try {
-    // Use authenticated client — RLS ensures the user can only delete their own rows.
     const supabase = await getAuthClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
@@ -187,21 +197,13 @@ export async function deleteLabResult(labResultId: number | string) {
       return { success: false, error: "Report not found or already deleted." };
     }
 
-    const { error: biomarkerError } = await supabase
-      .from("biomarkers")
-      .delete()
-      .eq("lab_result_id", id)
-      .eq("user_id", user.id);
+    // Atomic delete: biomarkers + report in one transaction via RPC
+    const { error: rpcError } = await supabase.rpc("delete_lab_result_cascade", {
+      p_report_id: id,
+      p_user_id: user.id,
+    });
 
-    if (biomarkerError) throw biomarkerError;
-
-    const { error: reportError } = await supabase
-      .from("lab_results")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", user.id);
-
-    if (reportError) throw reportError;
+    if (rpcError) throw rpcError;
     return { success: true };
   } catch (error: unknown) {
     const msg = error instanceof Error
@@ -232,6 +234,11 @@ export async function updateUserProfile(
     symptoms?: string[];
   }
 ) {
+  const parsed = UpdateProfileSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || "Invalid profile data" };
+  }
+  const validatedData = parsed.data;
   // SECURITY: Verify that the userId matches the authenticated session.
   // Use the authenticated client by default so normal profile edits do not
   // depend on the service role key. If the admin client is configured, it can
@@ -250,7 +257,7 @@ export async function updateUserProfile(
   }
 
   try {
-    const { first_name, last_name, age, sex, blood_type, symptoms } = data;
+    const { first_name, last_name, age, sex, blood_type, symptoms } = validatedData;
 
     const profileUpdates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -269,13 +276,11 @@ export async function updateUserProfile(
     if (profileError) throw profileError;
 
     if (symptoms !== undefined) {
-      await supabase.from("symptoms").delete().eq("user_id", userId);
-      if (symptoms.length > 0) {
-        const { error: sympError } = await supabase
-          .from("symptoms")
-          .insert(symptoms.map((s) => ({ user_id: userId, symptom: s })));
-        if (sympError) throw sympError;
-      }
+      const { error: sympError } = await supabase.rpc("replace_user_symptoms", {
+        p_user_id: userId,
+        p_symptoms: symptoms,
+      });
+      if (sympError) throw sympError;
     }
 
     return { success: true };
@@ -390,6 +395,12 @@ export async function saveProfileFromSession(data: {
   blood_type?: string;
   symptoms?: string[];
 }) {
+  const parsed = UpdateProfileSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || "Invalid profile data" };
+  }
+  const validatedData = parsed.data;
+
   const supabase = await getAuthClient();
 
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -399,7 +410,7 @@ export async function saveProfileFromSession(data: {
   }
 
   try {
-    const { first_name, last_name, age, sex, blood_type, symptoms } = data;
+    const { first_name, last_name, age, sex, blood_type, symptoms } = validatedData;
 
     const profileUpdates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -422,14 +433,12 @@ export async function saveProfileFromSession(data: {
     }
 
     if (symptoms !== undefined) {
-      await supabase.from("symptoms").delete().eq("user_id", user.id);
-      if (symptoms.length > 0) {
-        const { error: sympError } = await supabase
-          .from("symptoms")
-          .insert(symptoms.map((s) => ({ user_id: user.id, symptom: s })));
-        if (sympError) {
-          logger.error("saveProfileFromSession — symptoms insert failed", sympError);
-        }
+      const { error: sympError } = await supabase.rpc("replace_user_symptoms", {
+        p_user_id: user.id,
+        p_symptoms: symptoms,
+      });
+      if (sympError) {
+        logger.error("saveProfileFromSession — symptoms replace failed", sympError);
       }
     }
 

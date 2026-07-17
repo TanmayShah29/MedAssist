@@ -79,9 +79,6 @@ export const logger = {
     } else {
       console.error(`[ERROR] [${timestamp()}] ${safeMsg}`);
     }
-    if (error instanceof Error) {
-      error.message = redactSensitiveData(error.message);
-    }
     _onError(error, safeMsg);
   },
 };

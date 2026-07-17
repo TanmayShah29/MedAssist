@@ -46,12 +46,12 @@ export type LabResultWithAnalysis = LabResult & {
 function asNumber(value: unknown): number {
   if (value === null || value === undefined) {
     logger.warn("asNumber: biomarker value is null/undefined");
-    return 0;
+    return Number.NaN;
   }
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) {
     logger.warn(`asNumber: biomarker value is not a valid number: "${value}"`);
-    return 0;
+    return Number.NaN;
   }
   return parsed;
 }

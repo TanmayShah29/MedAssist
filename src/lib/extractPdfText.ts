@@ -14,6 +14,8 @@
  * extraction path and was treating every PDF as a rasterised image.
  */
 
+import { logger } from "@/lib/logger";
+
 /** User-facing message when all extraction strategies fail. */
 export const IMAGE_BASED_PDF_MESSAGE =
   'This file appears to be image-based (scanned). Please upload a digital lab report or enter values manually.';
@@ -172,7 +174,7 @@ async function attemptOcrSpaceFallback(
     const data = (await response.json()) as OCRResponse;
 
     if (!response.ok || data.IsErroredOnProcessing) {
-      console.warn('[OCR.space] Error:', data.ErrorMessage?.[0] || 'Unknown error');
+      logger.warn('[OCR.space] Error:', data.ErrorMessage?.[0] || 'Unknown error');
       return '';
     }
 
@@ -184,7 +186,7 @@ async function attemptOcrSpaceFallback(
     if ((err as Error).message?.includes('expected pattern')) {
       throw new Error('OCR fallback is not configured correctly. Please upload a digital PDF or enter your values manually.');
     }
-    console.warn('[OCR.space] Fetch failed:', (err as Error).message);
+    logger.warn('[OCR.space] Fetch failed:', (err as Error).message);
     return ''; // Non-fatal — outer function handles the empty result
   } finally {
     clearTimeout(timeoutId);

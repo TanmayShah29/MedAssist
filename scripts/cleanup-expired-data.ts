@@ -16,6 +16,13 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 async function cleanup() {
+  const isDryRun = process.argv.includes('--dry-run');
+
+  if (isDryRun) {
+    console.log(`DRY RUN — would call delete_expired_data with retention_days=${retentionDays}`);
+    process.exit(0);
+  }
+
   console.log(`Starting cleanup: deleting records older than ${retentionDays} days...`);
 
   const { data, error } = await supabase.rpc("delete_expired_data", {

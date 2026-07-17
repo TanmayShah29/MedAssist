@@ -11,7 +11,8 @@ export interface AIMetrics {
 }
 
 export function recordAIMetrics(metrics: AIMetrics) {
-  logger.info("AI Metrics", metrics);
+  // Always log AI metrics regardless of production/verbose settings
+  console.log('[AI Metrics]', JSON.stringify(metrics));
 
   if (metrics.salvagedCount > metrics.biomarkerCount * 0.5 && metrics.biomarkerCount > 0) {
     logger.error("High salvage rate detected — AI may be degrading", metrics);

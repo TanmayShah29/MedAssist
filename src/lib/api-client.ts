@@ -42,9 +42,6 @@ export async function apiClient<T>(
         showLoadingToast = false,
     } = options;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
     let lastError: Error | null = null;
     let loadingId: string | number | null = null;
 
@@ -53,6 +50,9 @@ export async function apiClient<T>(
     }
 
     for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
         try {
             const response = await fetch(url, {
                 method,
@@ -103,6 +103,7 @@ export async function apiClient<T>(
 
             return data as T;
         } catch (error) {
+            clearTimeout(timeoutId);
             lastError = error as Error;
 
             if (error instanceof ApiError) {

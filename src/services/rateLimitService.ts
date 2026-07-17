@@ -13,33 +13,59 @@ const LIMITS = {
 };
 
 // ── In-memory rate limit fallback (when DB is unreachable) ───────────────
-const inMemoryRateLimit = new Map<string, { count: number; windowStart: number }>();
+const inMemoryRateLimit = new Map<string, { minuteCount: number; hourCount: number; minuteStart: number; hourStart: number }>();
 
 // Clean up old entries every 60 seconds
 setInterval(() => {
     const now = Date.now();
-    const windowMs = 60000;
-    const currentWindowStart = Math.floor(now / windowMs) * windowMs;
+    const minuteMs = 60_000;
+    const hourMs = 3_600_000;
+    const currentMinuteStart = Math.floor(now / minuteMs) * minuteMs;
+    const currentHourStart = Math.floor(now / hourMs) * hourMs;
     for (const [key, value] of inMemoryRateLimit.entries()) {
-        if (value.windowStart < currentWindowStart) {
+        if (value.minuteStart < currentMinuteStart && value.hourStart < currentHourStart) {
             inMemoryRateLimit.delete(key);
         }
     }
-}, 60000).unref();
+}, 60_000).unref();
 
-function checkInMemoryRateLimit(ipHash: string, limit: number): boolean {
+function checkInMemoryRateLimit(ipHash: string, minuteLimit: number, hourLimit: number): { allowed: boolean; retryAfter?: number } {
     const now = Date.now();
-    const windowMs = 60000;
-    const windowStart = Math.floor(now / windowMs) * windowMs;
+    const minuteMs = 60_000;
+    const hourMs = 3_600_000;
+    const currentMinuteStart = Math.floor(now / minuteMs) * minuteMs;
+    const currentHourStart = Math.floor(now / hourMs) * hourMs;
 
     const entry = inMemoryRateLimit.get(ipHash);
-    if (!entry || entry.windowStart !== windowStart) {
-        inMemoryRateLimit.set(ipHash, { count: 1, windowStart });
-        return true;
+    if (!entry || (entry.minuteStart < currentMinuteStart && entry.hourStart < currentHourStart)) {
+        inMemoryRateLimit.set(ipHash, { minuteCount: 1, hourCount: 1, minuteStart: currentMinuteStart, hourStart: currentHourStart });
+        return { allowed: true };
     }
 
-    entry.count++;
-    return entry.count <= limit;
+    // Check minute window
+    if (entry.minuteStart < currentMinuteStart) {
+        entry.minuteCount = 1;
+        entry.minuteStart = currentMinuteStart;
+    } else {
+        entry.minuteCount++;
+    }
+
+    // Check hour window
+    if (entry.hourStart < currentHourStart) {
+        entry.hourCount = 1;
+        entry.hourStart = currentHourStart;
+    } else {
+        entry.hourCount++;
+    }
+
+    if (entry.minuteCount > minuteLimit) {
+        return { allowed: false, retryAfter: Math.ceil((entry.minuteStart + minuteMs - now) / 1000) };
+    }
+    if (entry.hourCount > hourLimit) {
+        return { allowed: false, retryAfter: Math.ceil((entry.hourStart + hourMs - now) / 1000) };
+    }
+
+    return { allowed: true };
 }
 
 export type RateLimitResult = {
@@ -156,11 +182,12 @@ export async function checkRateLimit(identifier?: string): Promise<RateLimitResu
         // Fall back to in-memory rate limiting (stops abuse without blocking all traffic)
         const ip = await getClientIp().catch(() => "unknown");
         const fingerprint = identifier || hashIp(ip);
-        if (!checkInMemoryRateLimit(fingerprint, LIMITS.PER_MINUTE.limit)) {
+        const memResult = checkInMemoryRateLimit(fingerprint, LIMITS.PER_MINUTE.limit, LIMITS.PER_HOUR.limit);
+        if (!memResult.allowed) {
             return {
                 success: false,
                 message: "Rate limit exceeded. Please wait a moment.",
-                retryAfter: LIMITS.PER_MINUTE.window,
+                retryAfter: memResult.retryAfter,
             };
         }
 

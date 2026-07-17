@@ -27,6 +27,10 @@ const OPTIONAL = [
   'SENTRY_DSN',
 ] as const;
 
+// Features degraded when SUPABASE_SERVICE_ROLE_KEY is missing:
+//   rate limiting, audit logging, consent recording, cache management, feedback, account deletion
+const CRITICAL_OPTIONAL = ['SUPABASE_SERVICE_ROLE_KEY'] as const;
+
 export function validateEnv(): void {
   const missing = REQUIRED.filter((k) => !process.env[k]);
   if (missing.length > 0) {
@@ -37,14 +41,22 @@ export function validateEnv(): void {
     );
   }
 
-  // Warn about optional vars in development so they're caught early.
-  if (process.env.NODE_ENV !== 'production') {
-    const missingOptional = OPTIONAL.filter((k) => !process.env[k]);
-    if (missingOptional.length > 0) {
-      console.warn(
-        `[env] Optional vars not set: ${missingOptional.join(', ')}. ` +
-        `Some features (OCR fallback, sitemaps, error monitoring) will be limited.`
-      );
-    }
+  // Warn about optional vars so they're caught early.
+  const missingOptional = OPTIONAL.filter((k) => !process.env[k]);
+  if (missingOptional.length > 0) {
+    const logFn = process.env.NODE_ENV === 'production' ? console.error : console.warn;
+    logFn(
+      `[env] Optional vars not set: ${missingOptional.join(', ')}. ` +
+      `Some features (OCR fallback, sitemaps, error monitoring) will be limited.`
+    );
+  }
+
+  // Loud warning for critical optional vars that degrade core functionality
+  const missingCritical = CRITICAL_OPTIONAL.filter((k) => !process.env[k]);
+  if (missingCritical.length > 0) {
+    console.error(
+      `[env] WARNING: ${missingCritical.join(', ')} not set. ` +
+      `Degraded features: rate limiting, audit logging, consent recording, cache management, feedback, account deletion.`
+    );
   }
 }

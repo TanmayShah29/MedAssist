@@ -74,8 +74,8 @@ describe('validateAndRecalculateScore', () => {
     expect(validateAndRecalculateScore(-5, biomarkers)).toBe(75);
   });
 
-  it('returns 0 for an empty biomarker array', () => {
-    expect(validateAndRecalculateScore(NaN, [])).toBe(0);
+  it('returns 50 (neutral) for an empty biomarker array', () => {
+    expect(validateAndRecalculateScore(NaN, [])).toBe(50);
   });
 
   it('computes correctly with mixed statuses', () => {

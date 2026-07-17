@@ -47,4 +47,12 @@ export async function register() {
 }
 
 // ── Sentry — capture unhandled errors in server components ──────────────────
-export const onRequestError = (await import('@sentry/nextjs')).captureRequestError;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _captureRequestError: ((...args: any[]) => void) | undefined;
+try {
+  const Sentry = await import('@sentry/nextjs');
+  _captureRequestError = Sentry.captureRequestError;
+} catch {
+  // Sentry not available — gracefully degrade
+}
+export const onRequestError = _captureRequestError ?? (() => {});

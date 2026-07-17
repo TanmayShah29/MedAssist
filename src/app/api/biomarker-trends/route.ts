@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { apiResponse } from '@/lib/api-response';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { z } from 'zod';
@@ -9,91 +9,95 @@ import { getAuthClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
-    const rateLimitResult = await checkRateLimit();
-    if (!rateLimitResult.success) {
-        return apiResponse(
-            { error: rateLimitResult.message || 'Too many requests' },
-            { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
-        );
-    }
+    try {
+        const rateLimitResult = await checkRateLimit();
+        if (!rateLimitResult.success) {
+            return apiResponse(
+                { error: rateLimitResult.message || 'Too many requests' },
+                { status: 429, headers: { 'Retry-After': (rateLimitResult.retryAfter || 60).toString() } }
+            );
+        }
 
-    const { searchParams } = new URL(req.url);
-    const rawName = searchParams.get('name');
+        const { searchParams } = new URL(req.url);
+        const rawName = searchParams.get('name');
 
-    const querySchema = z.object({
-        name: z.string().min(1, 'Biomarker name is required').max(200)
-    });
-
-    const parseResult = querySchema.safeParse({ name: rawName });
-    if (!parseResult.success) {
-        return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid parameter' }, { status: 400 });
-    }
-    const biomarkerName = parseResult.data.name;
-
-    const supabase = await getAuthClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        return apiResponse({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const [{ data, error }, { data: labResults }] = await Promise.all([
-        supabase
-            .from('biomarkers')
-            .select(`
-                id,
-                name,
-                value,
-                unit,
-                status,
-                category,
-                reference_range_min,
-                reference_range_max,
-                ai_interpretation,
-                lab_result_id,
-                created_at,
-                lab_results!inner (
-                    user_id,
-                    uploaded_at,
-                    created_at
-                )
-            `)
-            .eq('lab_results.user_id', user.id)
-            .eq('name', biomarkerName)
-            .order('created_at', { ascending: true }),
-        supabase
-            .from('lab_results')
-            .select('id, uploaded_at, created_at, raw_ai_json')
-            .eq('user_id', user.id)
-            .order('uploaded_at', { ascending: true })
-    ]);
-
-    if (error) {
-        return apiResponse({ error: error.message }, { status: 500 });
-    }
-
-    const merged = mergeBiomarkerSources(data as Biomarker[] | null, labResults || [])
-        .filter((b) => b.name.toLowerCase() === biomarkerName.toLowerCase())
-        .sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
-
-    // Transform for Recharts (lab_results may be null if join fails)
-    const trends = merged
-        .filter((b) => {
-            const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            return !!(lr?.uploaded_at || lr?.created_at || b.created_at);
-        })
-        .map((b) => {
-            const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
-            const d = new Date((lr?.uploaded_at ?? lr?.created_at ?? b.created_at)!);
-            const month = d.toLocaleString('en-US', { month: 'short' });
-            const day = d.getDate();
-            return {
-                date: `${month} ${day}`,
-                value: Number(b.value),
-                unit: b.unit
-            };
+        const querySchema = z.object({
+            name: z.string().min(1, 'Biomarker name is required').max(200)
         });
 
-    return apiResponse({ trends });
+        const parseResult = querySchema.safeParse({ name: rawName });
+        if (!parseResult.success) {
+            return apiResponse({ error: parseResult.error.issues[0]?.message || 'Invalid parameter' }, { status: 400 });
+        }
+        const biomarkerName = parseResult.data.name;
+
+        const supabase = await getAuthClient();
+
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return apiResponse({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const [{ data, error }, { data: labResults }] = await Promise.all([
+            supabase
+                .from('biomarkers')
+                .select(`
+                    id,
+                    name,
+                    value,
+                    unit,
+                    status,
+                    category,
+                    reference_range_min,
+                    reference_range_max,
+                    ai_interpretation,
+                    lab_result_id,
+                    created_at,
+                    lab_results!inner (
+                        user_id,
+                        uploaded_at,
+                        created_at
+                    )
+                `)
+                .eq('lab_results.user_id', user.id)
+                .eq('name', biomarkerName)
+                .order('created_at', { ascending: true }),
+            supabase
+                .from('lab_results')
+                .select('id, uploaded_at, created_at, raw_ai_json')
+                .eq('user_id', user.id)
+                .order('uploaded_at', { ascending: true })
+        ]);
+
+        if (error) {
+            return apiResponse({ error: error.message }, { status: 500 });
+        }
+
+        const merged = mergeBiomarkerSources(data as Biomarker[] | null, labResults || [])
+            .filter((b) => b.name.toLowerCase() === biomarkerName.toLowerCase())
+            .sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+
+        // Transform for Recharts (lab_results may be null if join fails)
+        const trends = merged
+            .filter((b) => {
+                const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+                return !!(lr?.uploaded_at || lr?.created_at || b.created_at);
+            })
+            .map((b) => {
+                const lr = Array.isArray(b.lab_results) ? b.lab_results[0] : b.lab_results;
+                const d = new Date((lr?.uploaded_at ?? lr?.created_at ?? b.created_at)!);
+                const month = d.toLocaleString('en-US', { month: 'short' });
+                const day = d.getDate();
+                return {
+                    date: `${month} ${day}`,
+                    value: Number(b.value),
+                    unit: b.unit
+                };
+            });
+
+        return apiResponse({ trends });
+    } catch (err) {
+        return apiResponse({ error: (err as Error).message || 'Internal server error' }, { status: 500 });
+    }
 }

@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { z } from "zod";
 import { ExtractionResultSchema } from "./validations/analysis";
 import { logger } from "@/lib/logger";
 import { withRetry } from "@/lib/retry";
@@ -27,6 +28,10 @@ const CONFIDENCE_THRESHOLD = 0.4;
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
+
+if (!process.env.GROQ_API_KEY) {
+  logger.warn('GROQ_API_KEY not set — AI features will fail');
+}
 
 const MODEL = "llama-3.3-70b-versatile";
 const EXTRACTION_MODEL = "llama-3-8b-8192";
@@ -188,7 +193,7 @@ export async function extractAndInterpretBiomarkers(
   const historicalContext =
     history.length > 0
       ? `\n\nUser's Historical Lab Data:\n${history
-          .map((b) => `- ${b.name}: ${b.value} ${b.unit} (${b.status})`)
+          .map((b) => `- ${sanitizeString(b.name)}: ${b.value} ${sanitizeString(b.unit)} (${sanitizeString(b.status)})`)
           .join("\n")}`
       : "";
 
@@ -410,7 +415,7 @@ export async function answerHealthQuestion(
       ? `The user has the following biomarkers from their lab report:\n${biomarkers
           .map(
             (b) =>
-              `- ${b.name}: ${b.value} ${b.unit} (status: ${b.status}, reference: ${b.reference_range_min}–${b.reference_range_max})`
+              `- ${sanitizeString(b.name)}: ${b.value} ${sanitizeString(b.unit)} (status: ${sanitizeString(b.status)}, reference: ${b.reference_range_min}–${b.reference_range_max})`
           )
           .join("\n")}`
       : "The user has not uploaded a lab report yet.";
@@ -460,6 +465,9 @@ ${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.map(s => sanitiz
 
   try {
     const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
+    if (!completion.choices?.[0]) {
+      throw new Error("Empty AI response");
+    }
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
     handleGroqRateLimit(error);
@@ -484,7 +492,7 @@ export async function streamHealthQuestion(
       ? `The user has the following biomarkers from their lab report:\n${biomarkers
           .map(
             (b) =>
-              `- ${b.name}: ${b.value} ${b.unit} (status: ${b.status}, reference: ${b.reference_range_min}–${b.reference_range_max})`
+              `- ${sanitizeString(b.name)}: ${b.value} ${sanitizeString(b.unit)} (status: ${sanitizeString(b.status)}, reference: ${b.reference_range_min}–${b.reference_range_max})`
           )
           .join("\n")}`
       : "The user has not uploaded a lab report yet.";
@@ -531,7 +539,7 @@ export async function generateAIGreeting(
   firstName: string
 ): Promise<string> {
   const biomarkerSummary = biomarkers
-    .map((b) => `${b.name}: ${b.value} ${b.unit} (${b.status})`)
+    .map((b) => `${sanitizeString(b.name)}: ${b.value} ${sanitizeString(b.unit)} (${sanitizeString(b.status)})`)
     .join("\n");
 
   const runOnce = async () => {
@@ -579,6 +587,9 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.map(s => sanitizeStri
 
   try {
     const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
+    if (!completion.choices?.[0]) {
+      throw new Error("Empty AI response");
+    }
     return completion.choices[0].message.content || "";
   } catch (error: unknown) {
     handleGroqRateLimit(error);
@@ -587,6 +598,38 @@ User's reported symptoms: ${symptoms.length > 0 ? symptoms.map(s => sanitizeStri
 }
 
 // ── Clinical Insight ─────────────────────────────────────────────────────────
+
+const ClinicalInsightSchema = z.object({
+  type: z.enum(["symptom", "lab", "report"]),
+  summary: z.string().min(1),
+  riskLevel: z.enum(["low", "moderate", "high", "critical"]),
+  confidence: z.number().min(0).max(100),
+  details: z.array(z.object({
+    label: z.string(),
+    value: z.string(),
+    status: z.enum(["stable", "warning", "critical", "optimal"]),
+    trend: z.enum(["up", "down", "flat"]).optional(),
+  })),
+  chartData: z.array(z.object({ key: z.string(), data: z.number() })).optional(),
+  biomarkers: z.array(z.object({
+    name: z.string(),
+    value: z.number(),
+    unit: z.string(),
+    status: z.enum(["optimal", "warning", "critical"]),
+    category: z.enum(["hematology", "inflammation", "metabolic", "vitamins", "other"]),
+    confidence: z.number().optional().default(0.8),
+    referenceMin: z.number().nullable().default(null),
+    referenceMax: z.number().nullable().default(null),
+    aiInterpretation: z.string(),
+  })).optional(),
+  recommendations: z.array(z.string()),
+});
+
+const AppointmentPrepSchema = z.object({
+  summary: z.string().optional(),
+  checklist: z.array(z.string()).optional(),
+  questions: z.array(z.string()).optional(),
+});
 
 export interface ClinicalInsight {
   type: "symptom" | "lab" | "report";
@@ -647,20 +690,39 @@ Return the response in JSON format:
 IMPORTANT: "status" must be exactly one of: "optimal", "warning", or "critical"`;
     }
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt },
-      ],
-      model: MODEL,
-      temperature: 0.2,
-      max_tokens: 2000,
-      response_format: { type: "json_object" },
-    });
+    const runOnce = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
+      try {
+        return await groq.chat.completions.create({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: prompt },
+          ],
+          model: MODEL,
+          temperature: 0.2,
+          max_tokens: 2000,
+          response_format: { type: "json_object" },
+        }, { signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
+
+    if (!completion.choices?.[0]) {
+      throw new Error("Empty AI response");
+    }
 
     const text = completion.choices[0].message.content || "{}";
-    const data = JSON.parse(text);
-    return { success: true, data };
+    const raw = JSON.parse(text);
+    const parsed = ClinicalInsightSchema.safeParse(raw);
+    if (!parsed.success) {
+      logger.warn("ClinicalInsight validation failed, using raw data", parsed.error.issues);
+      return { success: true, data: raw as ClinicalInsight };
+    }
+    return { success: true, data: parsed.data };
   } catch (err: unknown) {
     logger.error("AI Generation Failed", (err as Error).message);
     return { success: false, error: "AI Generation Failed", status: 500 };
@@ -710,17 +772,24 @@ Return ONLY valid JSON with keys: summary, checklist (string array), questions (
 
   try {
     const completion = await withRetry(runOnce, { maxAttempts: 2, initialDelayMs: 500 });
-    const result = JSON.parse(completion.choices[0].message.content || "{}");
+
+    if (!completion.choices?.[0]) {
+      throw new Error("Empty AI response");
+    }
+
+    const raw = JSON.parse(completion.choices[0].message.content || "{}");
+    const result = AppointmentPrepSchema.safeParse(raw);
+    const data = result.success ? result.data : raw;
     return {
       summary:
-        result.summary ||
+        data.summary ||
         "Prepare for your appointment by reviewing recent health changes.",
-      checklist: result.checklist || [
+      checklist: data.checklist || [
         "Bring recent lab results",
         "List current medications",
         "Note any new symptoms",
       ],
-      questions: result.questions || [
+      questions: data.questions || [
         "What do these results mean in the context of my history?",
         "Which markers should we re-test, and when?",
         "Are there symptoms, medications, or supplements that could explain these changes?",

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse } from "@/lib/api-response";
 
 export const runtime = "nodejs";
 
@@ -32,7 +32,7 @@ export async function GET() {
 
   const isHealthy = checks.database && checks.ai_service;
 
-  return NextResponse.json(
+  return apiResponse(
     { status: isHealthy ? "healthy" : "degraded", checks },
     { status: isHealthy ? 200 : 503 }
   );
