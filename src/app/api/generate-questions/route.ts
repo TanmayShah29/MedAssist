@@ -1,5 +1,5 @@
 import { getAuthClient } from '@/lib/supabase/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { apiResponse } from '@/lib/api-response';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { validateContentLength } from '@/lib/request-validation';
@@ -13,8 +13,11 @@ import { GenerateQuestionsRequestSchema, GeneratedQuestionsSchema } from '@/lib/
 export const maxDuration = 30;
 export const runtime = 'nodejs';
 
-// Re-use a single Groq client (not instantiated on every request)
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroqClient(): Groq {
+    return new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy-key-for-build" });
+}
+
+const groq = getGroqClient();
 
 const MODEL = 'llama-3.3-70b-versatile';
 

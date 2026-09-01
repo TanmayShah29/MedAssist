@@ -24,8 +24,8 @@ async function DashboardContent({ user }: { user: { id: string } }) {
     const ua = headerList.get('user-agent') || 'unknown'
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key',
         {
             cookies: {
                 getAll() {

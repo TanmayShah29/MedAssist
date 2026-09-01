@@ -1,6 +1,5 @@
 import { getAuthClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { waitUntil } from '@vercel/functions'
+import { NextRequest } from "next/server";
 import { apiResponse } from '@/lib/api-response'
 import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical'
 import { validateContentLength } from '@/lib/request-validation'

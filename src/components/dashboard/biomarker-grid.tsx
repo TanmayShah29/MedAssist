@@ -45,7 +45,6 @@ const BIOMARKER_DEFINITIONS: Record<string, string> = {
     'ApoB': 'The primary protein in LDL cholesterol; a precise marker for heart disease risk.',
 };
 
-const CATEGORIES = ['hematology', 'metabolic', 'lipids', 'thyroid', 'inflammation', 'vitamins', 'vitals', 'other'] as const;
 
 function getDelta(current: number | string, previous: number | string | null | undefined) {
     if (previous === null || previous === undefined) return null;

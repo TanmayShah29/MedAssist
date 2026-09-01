@@ -6,8 +6,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { BrandLockup } from "@/components/branding/brand-lockup";
-import { StepBasicInfo } from "./components/step-basic-info";
-import { StepSymptoms } from "./components/step-symptoms";
 import { StepUpload } from "./components/step-upload";
 import { StepProcessing } from "./components/step-processing";
 import { StepTour } from "./components/step-tour";

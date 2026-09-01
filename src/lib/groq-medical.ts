@@ -25,13 +25,16 @@ function handleGroqRateLimit(error: unknown): never {
 
 const CONFIDENCE_THRESHOLD = 0.4;
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-if (!process.env.GROQ_API_KEY) {
-  logger.warn('GROQ_API_KEY not set — AI features will fail');
+function getGroqClient(): Groq {
+  if (!process.env.GROQ_API_KEY) {
+    logger.warn('GROQ_API_KEY not set — AI features will fail');
+  }
+  return new Groq({
+    apiKey: process.env.GROQ_API_KEY || "dummy-key-for-build",
+  });
 }
+
+const groq = getGroqClient();
 
 const MODEL = "llama-3.3-70b-versatile";
 const EXTRACTION_MODEL = "llama-3-8b-8192";
@@ -536,7 +539,7 @@ ${symptoms.length > 0 ? `\nUser's reported symptoms: ${symptoms.map(s => sanitiz
 export async function generateAIGreeting(
   biomarkers: BiomarkerContext[],
   symptoms: string[],
-  firstName: string
+  _firstName: string
 ): Promise<string> {
   const biomarkerSummary = biomarkers
     .map((b) => `${sanitizeString(b.name)}: ${b.value} ${sanitizeString(b.unit)} (${sanitizeString(b.status)})`)
