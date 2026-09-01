@@ -242,7 +242,7 @@ function BiomarkerCard({
 
     return (
         <div
-            className="bg-white border border-[#EBEAE4] rounded-[14px] p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:border-sky-200 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md cursor-pointer group shadow-sm relative overflow-hidden min-h-[120px] min-w-0 stagger-fade-sm"
+            className="glass-card p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:border-sky-300 hover:shadow-xl hover:-translate-y-1 focus-within:border-sky-400 focus-within:shadow-xl cursor-pointer group relative overflow-hidden min-h-[120px] min-w-0 stagger-fade-sm"
             style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
             onClick={onClick}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }}}
