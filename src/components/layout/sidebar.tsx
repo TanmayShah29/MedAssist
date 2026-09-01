@@ -34,8 +34,8 @@ export function Sidebar({ className }: { className?: string }) {
 
   const handleSignOut = async () => {
     const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
     );
     await signOutAndResetMedAssist(supabase);
     router.push("/");
@@ -45,7 +45,7 @@ export function Sidebar({ className }: { className?: string }) {
     <aside
       className={cn(
         "hidden lg:flex min-h-[100dvh] fixed left-0 top-0 z-40",
-        "w-[17rem] bg-[#F0EFE9]/95 border-r border-[#EBEAE4] flex-col shadow-[8px_0_32px_rgba(28,25,23,0.04)]",
+        "w-[17.5rem] bg-[#F0EFE9]/85 backdrop-blur-xl border-r border-[#EBEAE4]/80 flex-col shadow-[12px_0_36px_rgba(15,23,42,0.04)]",
         className
       )}
     >
@@ -72,12 +72,12 @@ export function Sidebar({ className }: { className?: string }) {
               key={item.id}
               href={item.path}
               className={cn(
-                "flex items-center justify-between px-3.5 py-3 rounded-[12px] min-h-[46px]",
-                "text-sm font-medium transition-all duration-200 ease-out group",
+                "flex items-center justify-between px-3.5 py-3 rounded-[14px] min-h-[46px]",
+                "text-sm font-medium transition-all duration-200 ease-out group relative overflow-hidden",
                 "border-l-2",
                 isActive
-                  ? "bg-[#F0F9FF] text-[#0ea5e9] border-[#0ea5e9] font-semibold"
-                  : "text-[#475569] hover:bg-[#FAFAFA] hover:text-[#0F172A] hover:translate-x-0.5 border-transparent"
+                  ? "bg-white/90 text-[#0ea5e9] border-[#0ea5e9] font-semibold shadow-sm shadow-sky-500/10 backdrop-blur-md"
+                  : "text-[#475569] hover:bg-white/60 hover:text-[#0F172A] hover:translate-x-1 border-transparent"
               )}
             >
               <div className="flex items-center gap-3">

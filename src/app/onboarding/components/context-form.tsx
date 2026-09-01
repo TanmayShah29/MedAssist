@@ -1,9 +1,8 @@
 import { useOnboardingStore } from "@/lib/onboarding-store";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BLOOD_TYPES, SYMPTOM_OPTIONS } from "@/lib/constants";
-import { useState } from "react";
+import { SYMPTOM_OPTIONS } from "@/lib/constants";
 
 export function ContextForm({ onComplete }: { onComplete: () => void }) {
     const { basicInfo, setBasicInfo, selectedSymptoms, toggleSymptom } = useOnboardingStore();
@@ -79,7 +78,7 @@ export function ContextForm({ onComplete }: { onComplete: () => void }) {
                             {["male", "female", "other"].map(s => (
                                 <button
                                     key={s}
-                                    onClick={() => setBasicInfo({ sex: s as any })}
+                                    onClick={() => setBasicInfo({ sex: s as "male" | "female" | "other" })}
                                     className={cn(
                                         "grow py-3 rounded-[10px] text-sm font-medium border transition-all capitalize",
                                         basicInfo.sex === s

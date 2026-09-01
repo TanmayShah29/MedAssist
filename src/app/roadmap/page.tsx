@@ -1,5 +1,5 @@
 import { BrandLockup } from "@/components/branding/brand-lockup";
-import { ArrowRight, ChevronRight, Activity, Headphones, Stethoscope, CreditCard, Sparkles, Server } from "lucide-react";
+import { ChevronRight, Activity, Headphones, Stethoscope, CreditCard, Sparkles, Server } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {

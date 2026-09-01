@@ -228,7 +228,7 @@ export default function LandingPage() {
                 { icon: Trash2, label: "Delete reports anytime" },
                 { icon: Shield, label: "No report training" },
                 { icon: CheckCircle2, label: "Export your data" },
-              ].map(t => (
+              ].map((t) => (
                 <span key={t.label} className="inline-flex w-[calc(100vw-2rem)] max-w-full sm:w-auto items-center gap-1.5 truncate text-[12px] font-semibold text-[#475569] bg-white border border-[#EBEAE4] px-3 py-1.5 rounded-full shadow-sm">
                   <t.icon className="h-3.5 w-3.5 text-sky-500" /> {t.label}
                 </span>
@@ -571,8 +571,8 @@ export default function LandingPage() {
                   { tag: "LIVE", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10", dot: "bg-emerald-500", title: "Medication Context", desc: "Log medications and supplements so trend charts show start-date markers your clinician can review." },
                   { tag: "Q2 2026", color: "text-sky-400 border-sky-500/30 bg-sky-500/10", dot: "bg-sky-500/40", title: "Health Timeline", desc: "A unified diary connecting symptoms, lifestyle context, and lab results into one longitudinal view." },
                   { tag: "Q3 2026", color: "text-violet-400 border-violet-500/30 bg-violet-500/10", dot: "bg-violet-500/40", title: "Wearable Context", desc: "Connect Apple Health or Oura Ring to discuss sleep and activity context alongside bloodwork." },
-                ].map((item, i) => (
-                  <motion.div key={i} variants={fadeInUp} className="flex gap-4">
+                ].map((item) => (
+                  <motion.div key={item.title} variants={fadeInUp} className="flex gap-4">
                     <div className={`w-0.5 rounded-full flex-shrink-0 self-stretch ${item.dot}`} />
                     <div>
                       <div className="flex items-center gap-2 mb-1.5">
@@ -723,7 +723,7 @@ export default function LandingPage() {
               { n: "1st Report", colorTop: "bg-sky-400", colorPill: "bg-sky-100 text-sky-600", title: "Clinical Baseline", desc: "Establish your starting point and build your first visit brief." },
               { n: "2nd Report", colorTop: "bg-violet-400", colorPill: "bg-violet-100 text-violet-600", title: "Trend Context", desc: "See what changed and what belongs in the next clinician conversation." },
               { n: "3rd Report +", colorTop: "bg-emerald-400", colorPill: "bg-emerald-100 text-emerald-700", title: "Longitudinal Clarity", desc: "Track patterns over time without replacing professional medical judgment." },
-            ].map((s, i) => (
+            ].map((s) => (
               <motion.div
                 key={s.n}
                 variants={fadeInUp}

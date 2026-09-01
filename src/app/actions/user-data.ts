@@ -8,7 +8,6 @@ import { logger } from "@/lib/logger";
 import { z } from "zod";
 import { mergeBiomarkerSources } from "@/lib/medical-data";
 import { Biomarker } from "@/types/medical";
-import { encrypt } from "@/lib/crypto/encryption";
 
 // ── Shared validation schemas ──────────────────────────────────────────────
 

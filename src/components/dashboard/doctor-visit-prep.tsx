@@ -121,7 +121,7 @@ export function DoctorVisitPrep({
     };
 
     return (
-        <section id="doctor-prep-sheet" className={cn("bg-white border border-sky-100 rounded-[18px] p-5 md:p-6 shadow-sm transition-all duration-300 hover:border-sky-200 hover:shadow-md stagger-fade", className)}>
+        <section id="doctor-prep-sheet" className={cn("glass-card border-sky-100/80 p-5 md:p-6 shadow-sm transition-all duration-300 hover:border-sky-200 hover:shadow-xl stagger-fade", className)}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-5">
                 <div className="flex items-start gap-3 min-w-0">
                     <div className="w-11 h-11 rounded-[12px] bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">

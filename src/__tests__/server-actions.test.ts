@@ -15,8 +15,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // We re-assign these in beforeEach — initial value doesn't matter
 let mockGetUser: ReturnType<typeof vi.fn>;
 let mockFrom: ReturnType<typeof vi.fn>;
-let mockDelete: ReturnType<typeof vi.fn>;
-let mockEq: ReturnType<typeof vi.fn>;
+let _mockDelete: ReturnType<typeof vi.fn>;
+let _mockEq: ReturnType<typeof vi.fn>;
 let mockRpc: ReturnType<typeof vi.fn>;
 
 vi.mock('@/lib/supabase/server', () => ({

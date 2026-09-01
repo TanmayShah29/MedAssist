@@ -65,7 +65,7 @@ export function HealthScoreOverview({ score, optimalCount, warningCount, critica
             onBlur={() => setShowTooltip(false)}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
-            className={`bg-[#FDFDFB] border border-[#EBEAE4] rounded-[18px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all duration-300 ease-out ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-md hover:-translate-y-0.5 focus-within:border-sky-300 focus-within:shadow-md' : ''}`}
+            className={`glass-card rounded-[22px] p-6 shadow-sm h-full flex flex-col justify-between relative group transition-all duration-300 ease-out ${onClick ? 'cursor-pointer hover:border-sky-300 hover:shadow-xl hover:-translate-y-1 focus-within:border-sky-400 focus-within:shadow-xl' : ''}`}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
             aria-label={onClick ? "Brief completeness details" : undefined}

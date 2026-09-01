@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { validateContentLength } from '@/lib/request-validation';
 import { checkRateLimit } from '@/services/rateLimitService';
 import { answerHealthQuestion, streamHealthQuestion } from '@/lib/groq-medical';

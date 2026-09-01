@@ -36,11 +36,13 @@
   --radius-modal: 24px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
-  --shadow-card: 0 1px 3px 0 rgba(28, 25, 23, 0.06), 0 1px 2px -1px rgba(28, 25, 23, 0.04);
-  --shadow-hover: 0 4px 16px 0 rgba(28, 25, 23, 0.08), 0 2px 4px -2px rgba(28, 25, 23, 0.04);
-  --shadow-modal: 0 20px 60px 0 rgba(28, 25, 23, 0.16), 0 8px 16px -8px rgba(28, 25, 23, 0.12);
-  --shadow-brand: 0 4px 14px 0 rgba(14, 165, 233, 0.25);
+  /* ── Shadows & Glass ── */
+  --shadow-card: 0 2px 8px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  --shadow-hover: 0 12px 32px -4px rgba(14, 165, 233, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  --shadow-modal: 0 24px 64px -12px rgba(15, 23, 42, 0.2), 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --shadow-brand: 0 8px 24px -4px rgba(14, 165, 233, 0.35);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(235, 234, 228, 0.8);
 
   /* ── Transitions ── */
   --transition-fast: 150ms ease-out;
@@ -131,9 +133,25 @@
   .card {
     background-color: var(--color-card);
     border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     transition: box-shadow var(--transition-spring), border-color var(--transition-base), transform var(--transition-spring);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    transition: all var(--transition-spring);
+  }
+
+  .glass-card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(14, 165, 233, 0.3);
+    transform: translateY(-2px);
   }
 
   /* ── App frame ── */
